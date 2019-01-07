@@ -63,8 +63,8 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
     mutate(smaj = ifelse(smaj == 0 | smin == 0, NA, smaj),
            smin = ifelse(smin == 0 | is.na(smaj), NA, smin),
            eor = ifelse(is.na(smaj) | is.na(smin), NA, eor),
-           obs.type = ifelse(is.na(smaj) & is.na(smin), "LS", obs.type)
-  
+           obs.type = ifelse(is.na(smaj) & is.na(smin), "LS", obs.type))
+
   ## Use argosfilter::sdafilter to identify outlier locations
   filt <- rep("not", nrow(d))
   filt[d$keep] <- subset(d, keep) %>% sdafilter(.$lat, .$lon, .$date, .$lc, ang=-1, vmax=vmax)
