@@ -1,12 +1,34 @@
-Package: ctrw
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Package: foieGras
+Title: Fit Continuous-Time State-Space Models for Filtering Argos Satellite (and other) Telemetry Data
+Version: 0.1.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(
+      person(given = "Ian",
+           family = "Jonsen",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "ian.jonsen@mq.edu.au"),
+           person(given = "Toby",
+           family = "Patterson",
+           role = c("aut", "ctb"),
+           email = "toby.patterson@cisro.au")
+           )
+Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
+Description: `foieGras` is an R package that fits a continuous-time state-space model (either a simple Randon Walk or a Correlated Random Walk) to filter Argos satellite location data. Template Model Builder (`TMB`) is used for fast estimation. The Argos data can be: (older) Least Squares-based locations; (newer) Kalman Filter-based locations with error ellipse information; or a mixture of both. Separate measurement models are used for these two data types. The model estimates two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular).
+License: AGPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.1.1
+LinkingTo: 
+    TMB,
+    RcppEigen
+Imports: 
+    dplyr,
+    rgdal,
+    sp,
+    tibble,
+    argosfilter,
+    multidplyr (>= 0.0.0.9000)
+Remotes: 
+    hadley/multidplyr
+Suggests: 
+    lubridate
