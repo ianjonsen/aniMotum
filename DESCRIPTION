@@ -26,8 +26,7 @@ Imports:
     rgdal,
     sp,
     tibble,
-    argosfilter,
-    multidplyr (>= 0.0.0.9000)
+    argosfilter
 Remotes: 
     hadley/multidplyr
 Suggests: 
