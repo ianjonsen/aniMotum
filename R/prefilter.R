@@ -59,15 +59,19 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
     mutate(obs.type = ifelse(is.na(smaj) | is.na(smin) | is.na(eor), "LS", "KF"))
 
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
+  ## convert error ellipse smaj & smin from m to km and eor from deg to rad
   d <- d %>%
     mutate(smaj = ifelse(smaj == 0 | smin == 0, NA, smaj),
            smin = ifelse(smin == 0 | is.na(smaj), NA, smin),
            eor = ifelse(is.na(smaj) | is.na(smin), NA, eor),
-           obs.type = ifelse(is.na(smaj) & is.na(smin), "LS", obs.type))
+           obs.type = ifelse(is.na(smaj) & is.na(smin), "LS", obs.type)) %>%
+    mutate(smaj = smaj/1000,
+           smin = smin/1000,
+           eor = eor/180 * pi)
 
   ## Use argosfilter::sdafilter to identify outlier locations
   filt <- rep("not", nrow(d))
-  filt[d$keep] <- subset(d, keep) %>% sdafilter(.$lat, .$lon, .$date, .$lc, ang=-1, vmax=vmax)
+  filt[d$keep] <- with(subset(d, keep), sdafilter(lat, lon, date, lc, ang=-1, vmax=vmax))
   d <- d %>%
     mutate(keep = ifelse(filt == "removed", FALSE, keep))
 
@@ -95,47 +99,17 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
   }
   d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
 
+  ## add LS error info to corresponding records
+  ## set amf's = NA if obs.type == "KF" - not essential but for clarity
+  tmp <- amf()
+    d <- d %>%
+      left_join(., tmp, by = "lc") %>%
+      mutate(amf_x = ifelse(obs.type == "KF", NA, amf_x),
+             amf_y = ifelse(obs.type == "KF", NA, amf_y))
+
+    if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
+                                  perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
 
 
-  f <- sum(!d$keep)
-#  cat(sprintf("%d observations with duplicate dates will be ignored \n", f))
-
-  ## Prepare operations specific to data type
-  switch(data.type,
-         LS = {
-           ## Argos error multiplication factors
-           amf <- data.frame(
-             lc = factor(
-               c("3", "2", "1", "0", "A", "B", "Z"),
-               levels = c("3", "2", "1", "0", "A", "B", "Z"),
-               ordered = TRUE
-             ),
-             amf_x = c(1, 1.54, 3.72, 23.9, 13.51, 44.22, 44.22),
-             amf_y = c(1, 1.29, 2.55, 103.7, 14.99, 32.53, 32.53)
-           )
-           d <- d %>%
-             left_join(., amf, by = "lc")
-           if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
-                                         perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
-         },
-         KF = {
-           ##  convert error ellipse axes from m to km
-           ##  convert ellipse orientation from deg to rad
-           d <- d %>%
-             mutate(smaj = smaj / 1000, smin = smin / 1000) %>%
-             mutate(eor = eor / 180 * pi)
-         })
-
-  f1 <- sum(!d$keep) - f
-#  cat(sprintf("%d potential outlier locations with residuals > %d km will be ignored \n", f1, min.dist))
-
-  switch(data.type,
-         LS = {
-           d <- d %>% select(id, date, lc, lon, lat, x, y, amf_x, amf_y, keep, cntr)
-         },
-         KF = {
-           d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, keep, cntr)
-         })
-
-  return(d)
+  d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep, cntr)
 }
