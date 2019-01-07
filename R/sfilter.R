@@ -4,7 +4,7 @@
 ##'
 ##' @title fit a C-T SSM to individual track data
 ##'
-##' @useDynLib ctssm
+##' @useDynLib foieGras
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim
 ##' @importFrom dplyr mutate filter select full_join arrange lag %>%
@@ -15,25 +15,19 @@
 
 sfilter <-
   function(d,
+           model = c("rw","crw"),
            time.step = 1,
-           psi = 0,
            fit.to.subset = TRUE,
            parameters = NULL,
-           map = NULL,
            optim = c("nlminb","optim"),
            verbose = FALSE,
            inner.control = NULL
            ) {
+
     st <- proc.time()
     call <- match.call()
     optim <- match.arg(optim)
-
-    if(ncol(d) == 12) data.class <- "KF"
-    else if(ncol(d) == 11) {
-      data.class <- "LS"
-    } else stop("\n unexpected number of columns in pre-filtered tibble")
-
-    if(!psi %in% 0:1) stop("psi argument must be 0 or 1 - see ?fit_ssm")
+    model <- match.arg(model)
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     ## add is.data flag (distinquish obs from reg states)
@@ -46,36 +40,33 @@ sfilter <-
         mutate(isd = TRUE)
     }
 
-    if (length(ptime) == 1) {
-      ## Interpolation times - assume on ptime-multiple of the hour
-      tsp <- ptime * 3600
+    if (length(time.step) == 1) {
+      ## Interpolation times - assume on time.step-multiple of the hour
+      tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
-      ptime <-
+      time.step <-
         data.frame(date = seq(
           trunc(d$date[1], "hour"),
           by = tsp,
           length.out = max(index) + 2
         ))
     } else {
-      ptime <- ptime %>%
+      time.step <- time.step %>%
         filter(id == unique(d$id)) %>%
         select(date)
     }
 
     ## merge data and interpolation times
-    d.all <- full_join(dnew, ptime, by = "date") %>%
+    d.all <- full_join(dnew, time.step, by = "date") %>%
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
       mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
 
-    class(d.all$x) <- NA_real_
-    class(d.all$y) <- NA_real_
-
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
       as.numeric() / 24
-    dt[1] <- 0
+    dt[1] <- 0.00000001 # - 0 causes numerical issues in CRW model
 
     ## use approx & MA filter to obtain state initial values
         x.init <- approx(x = select(dnew, date, x), xout = d.all$date, rule = 2)$y
@@ -89,6 +80,7 @@ sfilter <-
         y.init[which(is.na(y.init))] <- y.init[which(is.na(y.init))[1]-1]
         xs <- cbind(x.init, y.init)
 
+    state0 <- c(xs[1,], 0 ,0)
     if (is.null(parameters)) {
       ## Estimate stochastic innovations
       es <- xs[-1,] - xs[-nrow(xs),]
@@ -96,94 +88,60 @@ sfilter <-
       ## Estimate components of variance
       V <- cov(es)
       sigma <- sqrt(diag(V))
-      rho <- V[1, 2] / prod(sqrt(diag(V)))
+      rho <- V[1, 2] / prod(sigma)
 
       parameters <-
-        list(
-          l_sigma = log(pmax(1e-08, sigma)),
-          l_rho_p = log((1 + rho) / (1 - rho)),
-          X = xs,
-          l_psi = 0,
-          l_tau = c(0,0),
-          l_rho_o = 0
+        switch(model,
+               rw = {
+                 list(
+                      l_sigma = log(pmax(1e-08, sigma)),
+                      l_rho_p = log((1 + rho) / (1 - rho)),
+                      X = xs,                                   # location states in RW
+                      l_psi = 0,
+                      l_tau = c(0,0),
+                      l_rho_o = 0
+                      )
+               },
+               crw = {
+                 list(
+                      logD = 10,      # 1-d Diffusion term in CRW
+                      mu = t(xs),      # location states in CRW
+                      v = t(xs) * 0,   # velocities in CRW
+                      l_psi = 0,
+                      l_tau = c(0,0),
+                      l_rho_o = 0
+                      )
+               }
         )
     }
 
     ## TMB - data list
-    fill <- rep(1, nrow(d.all))
-    if(data.class == "KF" & psi == 0) {
-      data <-
-        list(
-          Y = cbind(d.all$x, d.all$y),
-          dt = dt,
-          isd = as.integer(d.all$isd),
-          obs_mod = 1,
-          v = 0,
-          K = cbind(fill,fill),
-          m = d.all$smin,
-          M = d.all$smaj,
-          c = d.all$eor
-        )
-    } else if(data.class == "KF" & psi == 1) {
-      data <-
-        list(
-          Y = cbind(d.all$x, d.all$y),
-          dt = dt,
-          isd = as.integer(d.all$isd),
-          obs_mod = 1,
-          v = 1,
-          K = cbind(fill,fill),
-          m = d.all$smin,
-          M = d.all$smaj,
-          c = d.all$eor
-        )
-    } else if(data.class == "LS") {
-      data <-
-        list(
-          Y = cbind(d.all$x, d.all$y),
-          dt = dt,
-          isd = as.integer(d.all$isd),
-          obs_mod = 0,
-          v = 0,
-          m = fill,
-          M = fill,
-          c = fill,
-          K = cbind(d.all$amf_x,d.all$amf_y)
-        )
-    } else stop("Data class not recognised")
+    data <- list(
+      Y = cbind(d.all$x, d.all$y),
+      state0 = state0,
+      dt = dt,
+      isd = as.integer(d.all$isd),
+      proc_mod = switch(model, rw = 0, crw = 1),
+      obs_mod = ifelse(d.all$obs.type == "LS", 0, 1),
+      m = d.all$smin,
+      M = d.all$smaj,
+      c = d.all$eor,
+      K = cbind(d.all$amf_x, d.all$amf_y)
+    )
 
-    if(data.class == "KF" & psi == 0) {
-      map <-
-        list(
-          l_psi = factor(NA),
-          l_tau = factor(c(NA, NA)),
-          l_rho_o = factor(NA)
-        )
-    }
-    else if (data.class == "KF" & psi == 1) {
-      map <-
-        list(
-          l_tau = factor(c(NA, NA)),
-          l_rho_o = factor(NA)
-        )
-    }
-    else if (data.class == "LS") {
-      map <- list(l_psi = factor(NA))
-    }
-
-
+    browser()
 ## TMB - create objective function
     if(is.null(inner.control)) {
       inner.control <- list(smartsearch = TRUE, maxit = 1000)
     }
-
+    rnd <- switch(model, rw ="X", crw = c("u","v"))
     obj <-
       MakeADFun(
         data,
         parameters,
-        map = map,
-        random = "X",
-        DLL = "ctrw",
+#        map = map,
+        random = rnd,
+        DLL = "foieGras",
         hessian = TRUE,
         silent = !verbose,
         inner.control = inner.control
@@ -196,6 +154,8 @@ sfilter <-
 
 ## add par values to trace if verbose = TRUE
     myfn <- function(x){print("pars:"); print(x); obj$fn(x)}
+
+    browser()
 
     ## Minimize objective function
     opt <-
@@ -308,7 +268,6 @@ sfilter <-
       errmsg = opt
     )
   }
-    class(out) <- append("ctrwSSM", class(out))
 
     out
   }
