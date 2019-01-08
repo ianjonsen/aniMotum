@@ -38,6 +38,7 @@ pluck <- function(x, what = "fitted", ...) {
     x <- x[-nf, ]
   }
 
+  ## NEEDS TO BE FIXED TO DEAL WITH BOTH RW AND CRW OUTPUTS
   switch(what,
          fitted = {
            lapply(x$ssm, function(.) .$fitted) %>%
