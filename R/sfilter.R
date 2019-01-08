@@ -343,5 +343,6 @@ sfilter <-
       )
     }
 
+    class(out) <- append("foieGras", class(out))
     out
   }
