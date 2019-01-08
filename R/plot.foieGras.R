@@ -1,37 +1,37 @@
-##' Visualise ctrw SSM fit to track data
+##' Visualise foieGras SSM fits to track data
 ##'
 ##' @title plot
-##' @param m a fitted object of class ctrwSSM
+##' @param m a foieGras fitted object
 ##' @importFrom ggplot2 ggplot geom_point geom_qq aes ggtitle theme_bw
 ##' @importFrom gridExtra grid.arrange
-##' @method plot ctrwSSM
+##' @method plot foieGras
 ##' @export
 
-plot.ctrwSSM <- function(m)
+plot.foieGras <- function(m)
 {
   dat <- subset(m$data, keep)
   ndat <- subset(m$data, !keep)
 
   p1 <- ggplot() +
     geom_point(data = dat, aes(x, y), shape = 19, col = grey(0.85)) +
-    geom_point(data = fit$fitted, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
+    geom_point(data = m$fitted, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
     theme_bw() +
     ggtitle("Fitted values")
 
   p2 <- ggplot() +
     geom_point(data = dat, aes(x, y), shape = 19, col = grey(0.85)) +
-    geom_point(data = fit$predicted, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
+    geom_point(data = m$predicted, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
     theme_bw() +
     ggtitle("Predicted values")
 
   p3 <- ggplot() +
     geom_point(data = dat, aes(date, x), shape = 19, col = grey(0.85)) +
-    geom_point(data = fit$fitted, aes(date, x), size = 0.2, shape = 20, col = "dodgerblue") +
+    geom_point(data = m$fitted, aes(date, x), size = 0.2, shape = 20, col = "dodgerblue") +
     theme_bw()
 
   p4 <- ggplot() +
     geom_point(data = dat, aes(date, y), shape = 19, col = grey(0.85)) +
-    geom_point(data = fit$fitted, aes(date, y), size = 0.2, shape = 20, col = "dodgerblue") +
+    geom_point(data = m$fitted, aes(date, y), size = 0.2, shape = 20, col = "dodgerblue") +
     theme_bw()
 
 
