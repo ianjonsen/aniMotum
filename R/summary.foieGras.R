@@ -20,8 +20,8 @@ summary.foieGras <- function(x, digits = 3, ...) {
 
   cat("number of observations:", nbStates, "\n")
   cat("number of regular state estimates:", nbrStates, "\n")
-  cat("time interval:", x$ts, "hours\n\n")
-  cat("measurement error model: Argos", mmod, "\n")
+  cat("time interval:", mean(diff(x$predicted$date)), "hours\n\n")
+  cat("process model: ", x$pm, "\n")
   cat("parameter estimates\n")
   cat("-------------------------\n")
   print(parm, digits = digits, justify = "right");cat("\n")

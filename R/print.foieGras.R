@@ -1,6 +1,6 @@
 ##' Print \code{ctrw}
 ##'
-##' @method print ctrwSSM
+##' @method print foieGras
 ##'
 ##' @param x a \code{ctrw} fit object
 ##' @param digits number of digits to use in display
@@ -8,16 +8,16 @@
 ##'
 ##' @export
 
-print.ctrwSSM <- function(x, digits = 3, ...)
+print.foieGras <- function(x, digits = 3, ...)
 {
-  mmod <- x$mmod
+  pm <- x$pm
   nbrStates <- nrow(x$predicted)
   nbStates <- nrow(x$fitted)
   parm <- x$par
 
   cat("negative log-likelihood:", x$opt$objective, "\n")
   cat("convergence:", x$opt$message, "\n\n")
-  cat("Argos measurement error model:", mmod, "\n")
+  cat("Process model:", pm, "\n")
   cat("number of observations:", nbStates, "\n")
   cat("number of regularised state estimates:", nbrStates, "\n\n")
   cat("parameter estimates\n")
