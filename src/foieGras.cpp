@@ -38,7 +38,7 @@ template<class Type>
     PARAMETER(logD);				// 1-d Diffusion coefficient
     // random variables
     PARAMETER_MATRIX(mu); /* State location */
-    PARAMETER_ARRAY(v); /* state velocities */
+    PARAMETER_MATRIX(v); /* state velocities */
 
     // OBSERVATION PARAMETERS
     // for KF OBS MODEL
@@ -149,7 +149,7 @@ template<class Type>
         if(proc_mod == 0) {
           jnll += nll_obs(Y.row(i) - X.row(i));   // RW innovations
         } else if(proc_mod == 1) {
-          jnll += nll_obs(Y.row(i) - mu.row(i));   // CRW innovations
+          jnll += nll_obs(Y.col(i) - mu.col(i));   // CRW innovations
         }
 
       }
