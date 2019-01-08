@@ -1,3 +1,23 @@
+##' @title Pluck tbl's by name from a foieGras fitted model object
+##'
+##' @description `pluck()` lets you obtain `fitted`, `predicted`, or `data` tbl's from
+##' a compound tbl created when fitting to multiple individual data sets. The specified tbl's
+##' are appended to a single output tbl.
+##'
+##' @usage pluck(fitobj, what)
+##'
+##' @param fitobj a foieGras fitted model object
+##' @param what the tbl to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)
+##'
+##' @return a tbl with all individual tbl's appended
+##'
+##' @examples
+##' \dontrun{
+##' data("ellie")
+##' ellie.fit <- fit_ssm(ellie, model = "crw", time.step = 6)
+##'
+##' pred <- pluck(ellie.fit, "predicted")
+##' }
 ##' @importFrom dplyr %>% tbl_df arrange mutate select
 ##' @importFrom tibble as_tibble
 ##' @export
