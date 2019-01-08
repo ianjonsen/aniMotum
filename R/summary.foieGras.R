@@ -1,8 +1,8 @@
 ##' @importFrom stats pnorm
 ##' @importFrom dplyr %>%
-##' @method summary ctrwSSM
+##' @method summary foieGras
 ##' @export
-summary.ctrwSSM <- function(x, digits = 3, ...) {
+summary.foieGras <- function(x, digits = 3, ...) {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
