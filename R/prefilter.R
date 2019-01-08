@@ -110,6 +110,5 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
     if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
 
-
   d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep, cntr)
 }
