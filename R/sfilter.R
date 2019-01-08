@@ -110,17 +110,30 @@ sfilter <-
         l_rho_o = 0
       )
     }
+
     ## calculate prop'n of obs that are LS-derived
+    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF"), labels = c("LS","KF")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
     map <- switch(model,
                   rw = {
                     if (pls == 1) {
                       list(logD = factor(NA),
-                           l_psi = factor(NA))
+                           l_psi = factor(NA),
+                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                           )
                     } else if (pls == 0) {
                       list(logD = factor(NA),
                            l_tau = factor(c(NA, NA)),
-                           l_rho_o = factor(NA))
+                           l_rho_o = factor(NA),
+                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                           )
+                    } else if (pls > 0 & pls < 1) {
+                      list(logD = factor(NA),
+                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                           )
                     }
                   },
                   crw = {
@@ -128,14 +141,21 @@ sfilter <-
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
+                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_psi = factor(NA)
                       )
                     } else if (pls == 0) {
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
+                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_tau = factor(c(NA, NA)),
                         l_rho_o = factor(NA)
+                      )
+                    } else if (pls > 0 & pls < 1) {
+                      list(l_sigma = factor(c(NA, NA)),
+                           l_rho_p = factor(NA),
+                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                       )
                     }
                   })
@@ -159,9 +179,9 @@ sfilter <-
     )
 
     ## TMB - create objective function
- #   if (is.null(inner.control)) {
- #     inner.control <- list(smartsearch = TRUE, maxit = 1000)
- #   }
+    if (is.null(inner.control)) {
+      inner.control <- list(smartsearch = TRUE)
+    }
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
     obj <-
       MakeADFun(
@@ -203,16 +223,14 @@ sfilter <-
                               ))))
 
     ## if error then exit with limited output to aid debugging
-    rep <- try(sdreport(obj,  ignore.parm.uncertainty=TRUE), silent = TRUE)
+    rep <- try(sdreport(obj))
     if (class(opt) != "try-error" & class(rep) != "try-error") {
-      ## Parameters, states and the fitted values
 
+      ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
 
       switch(model,
              rw = {
-               fxd <- fxd[c(1:3, 5:8), ]
-
                rdm <-
                  matrix(summary(rep, "random"),
                         nrow(d.all),
@@ -226,9 +244,9 @@ sfilter <-
                    isd = d.all$isd
                  ) %>%
                  select(id, date, x, y, x.se, y.se, isd)
+
              },
              crw = {
-               fxd <- fxd[c(4:8),]
                tmp <- summary(rep, "random")
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
