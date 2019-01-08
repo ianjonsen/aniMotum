@@ -55,7 +55,8 @@ template<class Type>
     Type psi = exp(l_psi);
     Type D = exp(logD);
 
-	int timeSteps = X.rows();
+    int timeSteps = dt.size();
+
 	/* Define likelihood */
     parallel_accumulator<Type> jnll(this);
     Type tiny = 1e-5;
@@ -90,14 +91,14 @@ template<class Type>
     	cov(3,3) = 2 * D * dt(0);
 
     	// loop over 2 coords and update nll of start location and velocities.
-    	for(int i=0;i<2;i++) {
+    	for(int i = 0; i < 2; i++) {
     	  jnll -= dnorm(mu(i,0), state0(i), tiny, true);
     	  jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
     	}
 
     	// CRW PROCESS MODEL
     	vector<Type> x_t(4);
-    	for(int i=1;i<timeSteps;i++) {
+    	for(int i = 1; i < timeSteps; i++) {
     		// process cov at time t
       		cov.setZero();
       		cov(0,0) = tiny;
@@ -122,7 +123,7 @@ template<class Type>
     MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
 
 //    vector<Type> mu_t(2);
-    for(int i=0; i < timeSteps; ++i) {
+    for(int i = 0; i < timeSteps; ++i) {
       if(isd(i) == 1) {
         if(obs_mod(i) == 0) {
           // Argos Least Squares observations
@@ -155,9 +156,12 @@ template<class Type>
       }
     }
 
-    ADREPORT(rho_p);
-    ADREPORT(sigma);
-    ADREPORT(D);
+    if(proc_mod == 0) {
+      ADREPORT(rho_p);
+      ADREPORT(sigma);
+    } else if(proc_mod == 1) {
+      ADREPORT(D);
+    }
     ADREPORT(rho_o);
     ADREPORT(tau);
     ADREPORT(psi);
