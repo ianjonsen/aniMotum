@@ -33,13 +33,10 @@
 ##' require(dplyr)
 ##' data(ellie)
 ##' ## fit KF measurement error model
-##' fkf <- fit_ssm(ellie, time.step = 12, psi = 0)
+##' fkf <- fit_ssm(ellie, time.step = 6)
 ##'
-##' ## fit KFp measurement error model
-##' fkfp <- fit_ssm(ellie, time.step = 12, psi = 1)
-##'
-##' ## fit LS measurement error model
-##' fls <- fit_ssm(ellie[, 1:5], time.step = 12)
+##' ## fit LS measurement error model to multiple animals
+##' fls <- fit_ssm(rope, time.step = 3)
 ##' }
 ##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
 ##' @importFrom tibble as_tibble
