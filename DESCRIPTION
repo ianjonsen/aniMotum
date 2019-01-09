@@ -29,6 +29,7 @@ Imports:
     argosfilter,
     ggplot2,
     gridExtra,
-    lubridate
+    lubridate,
+    TMB
 Remotes: 
     hadley/multidplyr
