@@ -1,7 +1,7 @@
 # foieGras
 fit continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![](https://img.shields.io/github/downloads-pre/ianjonsen/foieGras/latest/total.svg)
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)
 
