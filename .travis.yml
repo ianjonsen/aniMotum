@@ -5,4 +5,6 @@ sudo: required
 cache: packages
 
 apt_packages:
-  - gdal
+  - libgdal1-dev
+  - libproj-dev
+  - libgeos-dev
