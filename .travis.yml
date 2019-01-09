@@ -6,3 +6,4 @@ cache: packages
 
 apt_packages:
   - gdal-bin
+  - gdal-config
