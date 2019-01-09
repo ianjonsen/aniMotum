@@ -4,10 +4,21 @@
 \alias{plot.foieGras}
 \title{plot}
 \usage{
-\method{plot}{foieGras}(m)
+\method{plot}{foieGras}(m, est = c("fitted", "predicted"),
+  proj = c("ll", "xy"), se = TRUE, resid = FALSE, outlier = FALSE)
 }
 \arguments{
 \item{m}{a foieGras fitted object}
+
+\item{est}{specify which location estimates to display on time-series plots: fitted or predicted}
+
+\item{proj}{specify whether to plot mercator xy or ll (longlat)}
+
+\item{se}{include 2 * SE on time-series plots (SE's currently not displayed when proj = "ll")}
+
+\item{resid}{display time-series plots as trends (FALSE - default) or as residuals (TRUE)}
+
+\item{outlier}{include outliers identified during prefilter-ing}
 }
 \description{
 Visualise foieGras SSM fits to track data
