@@ -3,3 +3,6 @@
 language: R
 sudo: required
 cache: packages
+
+apt_packages:
+  - gdal-bin
