@@ -26,8 +26,9 @@ Imports:
     rgdal,
     sp,
     tibble,
-    argosfilter
+    argosfilter,
+    ggplot2,
+    gridExtra,
+    lubridate
 Remotes: 
     hadley/multidplyr
-Suggests: 
-    lubridate
