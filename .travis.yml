@@ -1,10 +1,25 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
-sudo: required
-cache: packages
+language: r
 
-apt_packages:
-  - libgdal1-dev
-  - libproj-dev
-  - libgeos-dev
+r:
+  - release
+  -devel
+
+deploy.skip_cleanup: true
+
+sudo: required
+dist: trusty
+
+cache:
+  - packages
+  - ccache
+
+latex: false
+
+addons:
+  apt:
+    packages:
+      - libgdal-dev
+      - libproj-dev
+      - libgeos-dev
