@@ -6,6 +6,8 @@ r:
   - release
   - devel
 
+warnings_are_errors: false
+
 deploy.skip_cleanup: true
 
 sudo: required
