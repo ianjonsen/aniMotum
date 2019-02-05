@@ -54,7 +54,7 @@ require(dplyr)
 data(ellie)
 fkf <- fit_ssm(ellie, time.step = 6)
 
-## summary plot of fitted locations as mercator projected x,y
+## summary plot of fitted locations as mercator x,y
 plot(fkf$ssm[[1]], proj="xy")
 
 ## summary plot of fitted locations as longlat
