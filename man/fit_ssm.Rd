@@ -4,7 +4,7 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, time.step, ...)
+fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -15,11 +15,11 @@ fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, time.step, ...)
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
 
-\item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
-
 \item{...}{arguments passed to sfilter, described below:}
 
 \item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model}
+
+\item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
 
 \item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
 
@@ -50,6 +50,7 @@ and predict locations at user-specified time intervals (regular or irregular)
 \dontrun{
 require(dplyr)
 ## fit RW model to Argos data with KF error ellipse data
+## use a 6-h time.step
 data(ellie)
 fkf <- fit_ssm(ellie, time.step = 6)
 
