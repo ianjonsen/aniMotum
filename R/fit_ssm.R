@@ -32,6 +32,7 @@
 ##' \dontrun{
 ##' require(dplyr)
 ##' ## fit RW model to Argos data with KF error ellipse data
+##' ## use a 6-h time.step
 ##' data(ellie)
 ##' fkf <- fit_ssm(ellie, time.step = 6)
 ##'
@@ -59,7 +60,6 @@ fit_ssm <- function(d,
                     vmax = 10,
                     min.dt = 60,
                     pf = FALSE,
-                    time.step,
                     ...
                     )
 {
