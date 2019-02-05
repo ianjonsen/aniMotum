@@ -43,7 +43,7 @@
 ##'
 ##' ## fit CRW model to multiple individuals with Argos LS data
 ##' data(rope)
-##' fls <- fit_ssm(rope, time.step = 3)
+##' fls <- fit_ssm(rope, model = "crw", time.step = 3)
 ##'
 ##' ## summary plot of fitted longlat locations for individual 3
 ##' plot(fls$ssm[[3]])
