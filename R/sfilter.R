@@ -27,6 +27,13 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
+    if(is.null(time.step)) print("\nNo time.step specified, using 6 h as a default time step")
+    else if(length(time.step) > 1 & !is.data.frame(time.step))
+      stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
+    else if(length(time.step) > 1 & is.data.frame(time.step)) {
+      if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
+    }
+
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     ## add is.data flag (distinquish obs from reg states)
     if (fit.to.subset) {

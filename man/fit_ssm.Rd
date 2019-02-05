@@ -4,7 +4,7 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, time.step, ...)
+fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -15,13 +15,13 @@ fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, time.step, ...)
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
 
-\item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
-
 \item{...}{arguments passed to sfilter, described below:}
 
-\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
+\item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model}
 
-\item{psi}{estimate scaling parameter for the KF measurement error model error ellipses (0 = no psi, default; 1 = single psi for semi-minor axis)}
+\item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
+
+\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
@@ -49,14 +49,25 @@ and predict locations at user-specified time intervals (regular or irregular)
 \examples{
 \dontrun{
 require(dplyr)
+## fit RW model to Argos data with KF error ellipse data
+## use a 6-h time.step
 data(ellie)
-## fit KF measurement error model
-fkf <- fit_ssm(ellie, time.step = 12, psi = 0)
+fkf <- fit_ssm(ellie, time.step = 6)
 
-## fit KFp measurement error model
-fkfp <- fit_ssm(ellie, time.step = 12, psi = 1)
+## summary plot of fitted locations as mercator x,y
+plot(fkf$ssm[[1]], proj="xy")
 
-## fit LS measurement error model
-fls <- fit_ssm(ellie[, 1:5], time.step = 12)
+## summary plot of fitted locations as longlat
+plot(fkf$ssm[[1]])
+
+## fit CRW model to multiple individuals with Argos LS data
+data(rope)
+fls <- fit_ssm(rope, model = "crw", time.step = 3)
+
+## summary plot of fitted longlat locations for individual 3
+plot(fls$ssm[[3]])
+
+## summary plot of predicted longlat locations for individual 3
+plot(fls$ssm[[3]], est="predicted")
 }
 }
