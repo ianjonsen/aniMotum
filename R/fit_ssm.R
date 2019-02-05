@@ -36,7 +36,7 @@
 ##' data(ellie)
 ##' fkf <- fit_ssm(ellie, time.step = 6)
 ##'
-##' ## summary plot of fitted locations as mercator projected x,y
+##' ## summary plot of fitted locations as mercator x,y
 ##' plot(fkf$ssm[[1]], proj="xy")
 ##'
 ##' ## summary plot of fitted locations as longlat
@@ -63,12 +63,6 @@ fit_ssm <- function(d,
                     ...
                     )
 {
-  if(is.null(time.step)) print("\nNo time.step specified, using 6 h as a default time step")
-  else if(length(time.step) > 1 & !is.data.frame(time.step))
-    stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
-  else if(length(time.step) > 1 & is.data.frame(time.step)) {
-    if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
-  }
 
   fit <- d %>%
     group_by(id) %>%
@@ -80,7 +74,7 @@ fit_ssm <- function(d,
   } else {
     fit <- fit %>%
       rowwise() %>%
-      do(ssm = try(sfilter(.$pf, time.step = time.step, ...), silent = TRUE))
+      do(ssm = try(sfilter(.$pf, ...), silent = TRUE))
 
     fail <- which(sapply(fit$ssm, length) == 6 || sapply(fit$ssm, length) == 1)
     if (length(fail) > 0) {
