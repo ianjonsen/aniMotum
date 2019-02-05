@@ -6,11 +6,11 @@
 ##' @param d a data frame of observations including Argos KF error ellipse info
 ##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
 ##' @param min.dt minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM
-##' @param time.step the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.
-##' @param ... arguments passed to sfilter, described below:
-##' @param fit.to.subset fit the SSM to the data subset determined by prefilter (default is TRUE)
-##' @param psi estimate scaling parameter for the KF measurement error model error ellipses (0 = no psi, default; 1 = single psi for semi-minor axis)
 ##' @param pf just pre-filter the data, do not fit the ctrw (default is FALSE)
+##' @param ... arguments passed to sfilter, described below:
+##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model
+##' @param time.step the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.
+##' @param fit.to.subset fit the SSM to the data subset determined by prefilter (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization
 ##'
@@ -31,12 +31,25 @@
 ##' @examples
 ##' \dontrun{
 ##' require(dplyr)
+##' ## fit RW model to Argos data with KF error ellipse data
 ##' data(ellie)
-##' ## fit KF measurement error model
 ##' fkf <- fit_ssm(ellie, time.step = 6)
 ##'
-##' ## fit LS measurement error model to multiple animals
+##' ## summary plot of fitted locations as mercator projected x,y
+##' plot(fkf$ssm[[1]], proj="xy")
+##'
+##' ## summary plot of fitted locations as longlat
+##' plot(fkf$ssm[[1]])
+##'
+##' ## fit CRW model to multiple individuals with Argos LS data
+##' data(rope)
 ##' fls <- fit_ssm(rope, time.step = 3)
+##'
+##' ## summary plot of fitted longlat locations for individual 3
+##' plot(fls$ssm[[3]])
+##'
+##' ## summary plot of predicted longlat locations for individual 3
+##' plot(fls$ssm[[3]], est="predicted")
 ##' }
 ##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
 ##' @importFrom tibble as_tibble
