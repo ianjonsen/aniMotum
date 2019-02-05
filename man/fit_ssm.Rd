@@ -19,9 +19,9 @@ fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, time.step, ...)
 
 \item{...}{arguments passed to sfilter, described below:}
 
-\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
+\item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model}
 
-\item{psi}{estimate scaling parameter for the KF measurement error model error ellipses (0 = no psi, default; 1 = single psi for semi-minor axis)}
+\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
@@ -49,11 +49,24 @@ and predict locations at user-specified time intervals (regular or irregular)
 \examples{
 \dontrun{
 require(dplyr)
+## fit RW model to Argos data with KF error ellipse data
 data(ellie)
-## fit KF measurement error model
 fkf <- fit_ssm(ellie, time.step = 6)
 
-## fit LS measurement error model to multiple animals
-fls <- fit_ssm(rope, time.step = 3)
+## summary plot of fitted locations as mercator projected x,y
+plot(fkf$ssm[[1]], proj="xy")
+
+## summary plot of fitted locations as longlat
+plot(fkf$ssm[[1]])
+
+## fit CRW model to multiple individuals with Argos LS data
+data(rope)
+fls <- fit_ssm(rope, model = "crw", time.step = 3)
+
+## summary plot of fitted longlat locations for individual 3
+plot(fls$ssm[[3]])
+
+## summary plot of predicted longlat locations for individual 3
+plot(fls$ssm[[3]], est="predicted")
 }
 }
