@@ -77,26 +77,33 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
 
   ##  if lon spans -180,180 then shift to
   ##    0,360; else if lon spans 360,0 then shift to
-  ##    -180,180
-  if(min(d$lon, na.rm = TRUE) < 0 & diff(range(d$lon, na.rm = TRUE)) > 350) {
-    d <- d %>%
-      mutate(lon = wrap_lon(lon, 0)) %>%
-      mutate(cntr = 0)
-  } else if (min(d$lon) < 0 & max(d$lon) > 0){
-    d <- d %>%
-      mutate(lon = wrap_lon(lon, -180)) %>%
-      mutate(cntr = 180)
+  ##    -180,180 ... have to do this on keep subset only
+  dd <- subset(d, keep)
+  if(sum(round(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon, -180), 6)) == 0) {
+    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
   } else {
-    d <- d %>%
-      mutate(cntr = 90)
+    prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
   }
 
+  # if(min(dd$lon, na.rm = TRUE) < 0 & diff(range(dd$lon, na.rm = TRUE)) > 350) {
+  #   dd <- dd %>%
+  #     mutate(lon = wrap_lon(lon, 0)) %>%
+  #     mutate(cntr = 0)
+  # } else if (min(dd$lon, na.rm = TRUE) < 0 & max(dd$lon, na.rm = TRUE) > 0){
+  #   dd <- dd %>%
+  #     mutate(lon = wrap_lon(lon, -180)) %>%
+  #     mutate(cntr = 180)
+  # } else {
+  #   dd <- dd %>%
+  #     mutate(cntr = 90)
+  # }
+
   ## reproject from longlat to mercator x,y (km)
-  if(d$cntr[1] == 0 | d$cntr[1] == 90){
-    prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
-  } else if(d$cntr[1] == 180) {
-    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-  }
+  # if(d$cntr[1] == 0 | d$cntr[1] == 90){
+  #   prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+  # } else if(d$cntr[1] == 180) {
+  #   prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+  # }
   d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
 
   ## add LS error info to corresponding records
@@ -110,5 +117,7 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
     if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
 
-  d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep, cntr)
+  d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep)
+  return(list(data = d, proj = prj))
+
 }
