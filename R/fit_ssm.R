@@ -64,14 +64,17 @@ fit_ssm <- function(d,
                     )
 {
 
+  cat("prefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
     do(pf = prefilter(., vmax = vmax, min.dt = min.dt))
 
   if(pf){
-    fit <- do.call(rbind, fit$pf) %>%
+    pfd <- lapply(fit$pf, function(.) .$data)
+    fit <- do.call(rbind, pfd) %>%
       as_tibble()
   } else {
+    cat("\nfitting SSM...\n")
     fit <- fit %>%
       rowwise() %>%
       do(ssm = try(sfilter(.$pf, ...), silent = TRUE))
