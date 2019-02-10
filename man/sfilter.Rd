@@ -4,7 +4,7 @@
 \alias{sfilter}
 \title{fit a C-T SSM to individual track data}
 \usage{
-sfilter(d, model = c("rw", "crw"), time.step = 1,
+sfilter(x, model = c("rw", "crw"), time.step = 1,
   fit.to.subset = TRUE, parameters = NULL, optim = c("nlminb",
   "optim"), verbose = FALSE, inner.control = NULL)
 }
