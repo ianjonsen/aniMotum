@@ -38,27 +38,40 @@ pluck <- function(x, what = "fitted", ...) {
     x <- x[-nf, ]
   }
 
-  ## NEEDS TO BE FIXED TO DEAL WITH BOTH RW AND CRW OUTPUTS
   switch(what,
          fitted = {
-           lapply(x$ssm, function(.) .$fitted) %>%
+           f <- lapply(x$ssm, function(.) .$fitted) %>%
              do.call(rbind, .) %>%
-             tibble::as_tibble() %>%
-             dplyr::arrange(id) %>%
-             dplyr::select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
+             as_tibble() %>%
+             arrange(id)
+           f <- switch(x$ssm[[1]]$pm,
+                  rw = {
+                    f %>% select(id, date, lon, lat, x, y, x.se, y.se)
+                  },
+                  crw = {
+                    f %>% select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
+                  })
+           return(f)
          },
          predicted = {
-           lapply(x$ssm, function(.) .$predicted) %>%
+           p <- lapply(x$ssm, function(.) .$predicted) %>%
              do.call(rbind, .) %>%
-             tibble::as_tibble() %>%
-             dplyr::arrange(id) %>%
-             dplyr::select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
+             as_tibble() %>%
+             arrange(id)
+           p <- switch(x$ssm[[1]]$pm,
+                       rw = {
+                         p %>% select(id, date, lon, lat, x, y, x.se, y.se)
+                       },
+                       crw = {
+                         p %>% select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
+                       })
+           return(p)
          },
          data = {
            lapply(x$ssm, function(.) .$data) %>%
              do.call(rbind, .) %>%
-             tibble::as_tibble() %>%
-             dplyr::arrange(id)
+             as_tibble() %>%
+             arrange(id)
          })
 
 }
