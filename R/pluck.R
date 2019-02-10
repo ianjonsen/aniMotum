@@ -31,7 +31,7 @@ pluck <- function(x, what = "fitted", ...) {
     stop("Only `fitted`, `predicted` or `data` objects can be extracted")
 
   ## remove convergence failures from extraction
-  nf <- which(sapply(x$ssm, length) < 13)
+  nf <- which(sapply(x$ssm, length) < 12)
   if(length(nf) > 0) {
     sprintf("%d convergence failures removed from output", length(nf))
     sprintf("ids: %s", x[nf, "id"])
