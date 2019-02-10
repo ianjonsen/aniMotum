@@ -14,7 +14,7 @@
 ##' @export
 
 sfilter <-
-  function(d,
+  function(x,
            model = c("rw", "crw"),
            time.step = 1,
            fit.to.subset = TRUE,
@@ -33,6 +33,9 @@ sfilter <-
     else if(length(time.step) > 1 & is.data.frame(time.step)) {
       if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
+
+    d <- x$data
+    prj <- x$proj
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     ## add is.data flag (distinquish obs from reg states)
@@ -279,24 +282,9 @@ sfilter <-
                  select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
              })
 
-
       ## reproject mercator x,y back to WGS84 longlat
-      if (d$cntr[1] == 0) {
-        prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
-      } else {
-        prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-      }
-
       rdm[, c("lon", "lat")] <-
         as_tibble(project(as.matrix(rdm[, c("x", "y")]), proj = prj, inv = TRUE))
-
-      if (d$cntr[1] == 0) {
-        rdm <- rdm %>%
-          mutate(lon = wrap_lon(lon, 0))
-      } else if (d$cntr[1] == 90) {
-        rdm <- rdm %>%
-          mutate(lon = lon + 180)
-      }
 
       switch(model,
              rw = {
@@ -328,8 +316,7 @@ sfilter <-
         predicted = pd,
         fitted = fd,
         par = fxd,
-        data = select(d, -cntr),
-        lon.wrapped = ifelse(d$cntr[1] == 0, TRUE, FALSE),
+        data = d,
         inits = parameters,
         pm = model,
         opt = opt,
