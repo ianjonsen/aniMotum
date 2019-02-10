@@ -85,25 +85,6 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
     prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
   }
 
-  # if(min(dd$lon, na.rm = TRUE) < 0 & diff(range(dd$lon, na.rm = TRUE)) > 350) {
-  #   dd <- dd %>%
-  #     mutate(lon = wrap_lon(lon, 0)) %>%
-  #     mutate(cntr = 0)
-  # } else if (min(dd$lon, na.rm = TRUE) < 0 & max(dd$lon, na.rm = TRUE) > 0){
-  #   dd <- dd %>%
-  #     mutate(lon = wrap_lon(lon, -180)) %>%
-  #     mutate(cntr = 180)
-  # } else {
-  #   dd <- dd %>%
-  #     mutate(cntr = 90)
-  # }
-
-  ## reproject from longlat to mercator x,y (km)
-  # if(d$cntr[1] == 0 | d$cntr[1] == 90){
-  #   prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
-  # } else if(d$cntr[1] == 180) {
-  #   prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-  # }
   d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
 
   ## add LS error info to corresponding records
