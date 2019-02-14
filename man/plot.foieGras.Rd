@@ -5,7 +5,8 @@
 \title{plot}
 \usage{
 \method{plot}{foieGras}(m, est = c("fitted", "predicted"),
-  proj = c("ll", "xy"), se = TRUE, resid = FALSE, outlier = FALSE)
+  proj = c("ll", "xy"), se = TRUE, resid = FALSE, outlier = FALSE,
+  wrapLon = NULL)
 }
 \arguments{
 \item{m}{a foieGras fitted object}
@@ -19,6 +20,8 @@
 \item{resid}{display time-series plots as trends (FALSE - default) or as residuals (TRUE)}
 
 \item{outlier}{include outliers identified during prefilter-ing}
+
+\item{wrapLon}{specify the minimum longitude for wrapping around -180,180 or 0,360 (default is NULL - no wrapping)}
 }
 \description{
 Visualise foieGras SSM fits to track data

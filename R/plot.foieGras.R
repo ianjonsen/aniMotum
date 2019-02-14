@@ -7,12 +7,13 @@
 ##' @param se include 2 * SE on time-series plots (SE's currently not displayed when proj = "ll")
 ##' @param resid display time-series plots as trends (FALSE - default) or as residuals (TRUE)
 ##' @param outlier include outliers identified during prefilter-ing
+##' @param wrapLon specify the minimum longitude for wrapping around -180,180 or 0,360 (default is NULL - no wrapping)
 ##' @importFrom ggplot2 ggplot geom_point geom_line geom_path aes ggtitle theme_bw theme element_blank
 ##' @importFrom gridExtra grid.arrange
 ##' @method plot foieGras
 ##' @export
 
-plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"), se = TRUE, resid = FALSE, outlier = FALSE)
+plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"), se = TRUE, resid = FALSE, outlier = FALSE, wrapLon=NULL)
 {
   proj <- match.arg(proj)
   est <- match.arg(est)
@@ -37,12 +38,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
             ggtitle(paste0(fd$id[1], "\nfitted values"))
              },
         ll = {
+          if(is.null(wrapLon)) {
           ggplot() +
             geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
             geom_point(data = fd, aes(lon, lat), size = 0.4, shape = 20, col = "red") +
             geom_path(data = fd, aes(lon, lat), lwd = 0.25, col = "red") +
             theme_bw() +
             ggtitle(paste0(fd$id[1], "\nfitted values"))
+          } else {
+            ggplot() +
+              geom_point(data = dd, aes(wrap_lon(lon,wrapLon), lat), shape = 19, col = grey(0.85)) +
+              geom_point(data = fd, aes(wrap_lon(lon,wrapLon), lat), size = 0.4, shape = 20, col = "red") +
+              geom_path(data = fd, aes(wrap_lon(lon,wrapLon), lat), lwd = 0.25, col = "red") +
+              theme_bw() +
+              ggtitle(paste0(fd$id[1], "\nfitted values"))
+          }
            })
 
 
@@ -56,12 +66,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
                    ggtitle("\npredicted values")
                },
                ll = {
+                 if(is.null(wrapLon)) {
                  ggplot() +
                    geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
                    geom_point(data = pd, aes(lon, lat), size = 0.4, shape = 20, col = "dodgerblue") +
                    geom_path(data = pd, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
                    theme_bw() +
                    ggtitle("\npredicted values")
+                 } else {
+                   ggplot() +
+                     geom_point(data = dd, aes(wrap_lon(lon,wrapLon), lat), shape = 19, col = grey(0.85)) +
+                     geom_point(data = pd, aes(wrap_lon(lon,wrapLon), lat), size = 0.4, shape = 20, col = "dodgerblue") +
+                     geom_path(data = pd, aes(wrap_lon(lon,wrapLon), lat), lwd = 0.25, col = "dodgerblue") +
+                     theme_bw() +
+                     ggtitle("\npredicted values")
+                 }
                })
 
 
@@ -83,11 +102,19 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
               p
            },
            ll = {
+             if(is.null(wrapLon)) {
             ggplot() +
               geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
               geom_point(data = fd, aes(date, lon), size = 0.2, shape = 20, col = "red") +
               theme_bw() +
                theme(axis.title.x=element_blank())
+             } else {
+               ggplot() +
+                 geom_point(data = dd, aes(date, wrap_lon(lon,wrapLon)), shape = 19, col = grey(0.85)) +
+                 geom_point(data = fd, aes(date, wrap_lon(lon,wrapLon)), size = 0.2, shape = 20, col = "red") +
+                 theme_bw() +
+                 theme(axis.title.x=element_blank())
+             }
            })
         },
       predicted = {
@@ -106,11 +133,19 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
                  p
                },
                ll = {
+                 if(is.null(wrapLon)){
                  ggplot() +
                    geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
                    geom_point(data = pd, aes(date, lon), size = 0.2, shape = 20, col = "dodgerblue") +
                    theme_bw() +
                    theme(axis.title.x=element_blank())
+                 } else {
+                   ggplot() +
+                     geom_point(data = dd, aes(date, wrap_lon(lon,wrapLon)), shape = 19, col = grey(0.85)) +
+                     geom_point(data = pd, aes(date, wrap_lon(lon,wrapLon)), size = 0.2, shape = 20, col = "dodgerblue") +
+                     theme_bw() +
+                     theme(axis.title.x=element_blank())
+                 }
                })
         })
 
