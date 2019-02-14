@@ -16,50 +16,50 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
 {
   proj <- match.arg(proj)
   est <- match.arg(est)
-  d <- if(!outlier) {
+  dd <- if(!outlier) {
     subset(m$data, keep)
   } else {
-    d <- m$data
+    dd <- m$data
   }
   nd <- subset(m$data, !keep)
-  f <- m$fitted
-  p <- m$predicted
+  fd <- m$fitted
+  pd <- m$predicted
 
 
   p1 <-
     switch(proj,
         xy = {
           ggplot() +
-            geom_point(data = d, aes(x, y), shape = 19, col = grey(0.85)) +
-            geom_point(data = f, aes(x, y), size = 0.4, shape = 20, col = "red") +
-            geom_path(data = f, aes(x, y), lwd = 0.25, col = "red") +
+            geom_point(data = dd, aes(x, y), shape = 19, col = grey(0.85)) +
+            geom_point(data = fd, aes(x, y), size = 0.4, shape = 20, col = "red") +
+            geom_path(data = fd, aes(x, y), lwd = 0.25, col = "red") +
             theme_bw() +
-            ggtitle(paste0(f$id[1], "\nfitted values"))
+            ggtitle(paste0(fd$id[1], "\nfitted values"))
              },
         ll = {
           ggplot() +
-            geom_point(data = d, aes(lon, lat), shape = 19, col = grey(0.85)) +
-            geom_point(data = f, aes(lon, lat), size = 0.4, shape = 20, col = "red") +
-            geom_path(data = f, aes(lon, lat), lwd = 0.25, col = "red") +
+            geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
+            geom_point(data = fd, aes(lon, lat), size = 0.4, shape = 20, col = "red") +
+            geom_path(data = fd, aes(lon, lat), lwd = 0.25, col = "red") +
             theme_bw() +
-            ggtitle(paste0(f$id[1], "\nfitted values"))
+            ggtitle(paste0(fd$id[1], "\nfitted values"))
            })
 
 
   p2 <- switch(proj,
                xy = {
                  ggplot() +
-                   geom_point(data = d, aes(x, y), shape = 19, col = grey(0.85)) +
-                   geom_point(data = p, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
-                   geom_path(data = p, aes(x, y), lwd = 0.25, col = "dodgerblue") +
+                   geom_point(data = dd, aes(x, y), shape = 19, col = grey(0.85)) +
+                   geom_point(data = pd, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
+                   geom_path(data = pd, aes(x, y), lwd = 0.25, col = "dodgerblue") +
                    theme_bw() +
                    ggtitle("\npredicted values")
                },
                ll = {
                  ggplot() +
-                   geom_point(data = d, aes(lon, lat), shape = 19, col = grey(0.85)) +
-                   geom_point(data = p, aes(lon, lat), size = 0.4, shape = 20, col = "dodgerblue") +
-                   geom_path(data = p, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
+                   geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
+                   geom_point(data = pd, aes(lon, lat), size = 0.4, shape = 20, col = "dodgerblue") +
+                   geom_path(data = pd, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
                    theme_bw() +
                    ggtitle("\npredicted values")
                })
@@ -71,21 +71,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
       switch(proj,
            xy = {
             p <- ggplot() +
-              geom_point(data = d, aes(date, x), shape = 19, col = grey(0.85)) +
-              geom_point(data = f, aes(date, x), size = 0.2, shape = 20, col = "red") +
+              geom_point(data = dd, aes(date, x), shape = 19, col = grey(0.85)) +
+              geom_point(data = fd, aes(date, x), size = 0.2, shape = 20, col = "red") +
                theme_bw() +
                theme(axis.title.x=element_blank())
               if(se) {
                 p <- p +
-              geom_line(data = f, aes(date, x + 2 * x.se), lwd = 0.25, col = "red") +
-              geom_line(data = f, aes(date, x - 2 * x.se), lwd = 0.25, col = "red")
+              geom_line(data = fd, aes(date, x + 2 * x.se), lwd = 0.25, col = "red") +
+              geom_line(data = fd, aes(date, x - 2 * x.se), lwd = 0.25, col = "red")
               }
               p
            },
            ll = {
             ggplot() +
-              geom_point(data = d, aes(date, lon), shape = 19, col = grey(0.85)) +
-              geom_point(data = f, aes(date, lon), size = 0.2, shape = 20, col = "red") +
+              geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
+              geom_point(data = fd, aes(date, lon), size = 0.2, shape = 20, col = "red") +
               theme_bw() +
                theme(axis.title.x=element_blank())
            })
@@ -94,21 +94,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
         switch(proj,
                xy = {
                  p <- ggplot() +
-                    geom_point(data = d, aes(date, x), shape = 19, col = grey(0.85)) +
-                    geom_point(data = p, aes(date, x), size = 0.2, shape = 20, col = "dodgerblue") +
+                    geom_point(data = dd, aes(date, x), shape = 19, col = grey(0.85)) +
+                    geom_point(data = pd, aes(date, x), size = 0.2, shape = 20, col = "dodgerblue") +
                    theme_bw() +
                    theme(axis.title.x=element_blank())
                     if(se) {
                     p <-  p +
-                      geom_line(data = p, aes(date, x + 2 * x.se), lwd = 0.25, col = "dodgerblue") +
-                    geom_line(data = p, aes(date, x - 2 * x.se), lwd = 0.25, col = "dodgerblue")
+                      geom_line(data = pd, aes(date, x + 2 * x.se), lwd = 0.25, col = "dodgerblue") +
+                    geom_line(data = pd, aes(date, x - 2 * x.se), lwd = 0.25, col = "dodgerblue")
                     }
                  p
                },
                ll = {
                  ggplot() +
-                   geom_point(data = d, aes(date, lon), shape = 19, col = grey(0.85)) +
-                   geom_point(data = p, aes(date, lon), size = 0.2, shape = 20, col = "dodgerblue") +
+                   geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
+                   geom_point(data = pd, aes(date, lon), size = 0.2, shape = 20, col = "dodgerblue") +
                    theme_bw() +
                    theme(axis.title.x=element_blank())
                })
@@ -119,21 +119,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
                  switch(proj,
                         xy = {
                           p <- ggplot() +
-                            geom_point(data = d, aes(date, y), shape = 19, col = grey(0.85)) +
-                            geom_point(data = f, aes(date, y), size = 0.2, shape = 20, col = "red") +
+                            geom_point(data = dd, aes(date, y), shape = 19, col = grey(0.85)) +
+                            geom_point(data = fd, aes(date, y), size = 0.2, shape = 20, col = "red") +
                             theme_bw() +
                             theme(axis.title.x=element_blank())
                             if(se) {
                             p <- p +
-                              geom_line(data = f, aes(date, y + 2 * y.se), lwd = 0.25, col = "red") +
-                            geom_line(data = f, aes(date, y - 2 * y.se), lwd = 0.25, col = "red")
+                              geom_line(data = fd, aes(date, y + 2 * y.se), lwd = 0.25, col = "red") +
+                            geom_line(data = fd, aes(date, y - 2 * y.se), lwd = 0.25, col = "red")
                             }
                           p
                         },
                         ll = {
                           ggplot() +
-                            geom_point(data = d, aes(date, lat), shape = 19, col = grey(0.85)) +
-                            geom_point(data = f, aes(date, lat), size = 0.2, shape = 20, col = "red") +
+                            geom_point(data = dd, aes(date, lat), shape = 19, col = grey(0.85)) +
+                            geom_point(data = fd, aes(date, lat), size = 0.2, shape = 20, col = "red") +
                             theme_bw() +
                             theme(axis.title.x=element_blank())
                         })
@@ -142,21 +142,21 @@ plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"),
                  switch(proj,
                         xy = {
                           p <- ggplot() +
-                            geom_point(data = d, aes(date, y), shape = 19, col = grey(0.85)) +
-                            geom_point(data = p, aes(date, y), size = 0.2, shape = 20, col = "dodgerblue") +
+                            geom_point(data = dd, aes(date, y), shape = 19, col = grey(0.85)) +
+                            geom_point(data = pd, aes(date, y), size = 0.2, shape = 20, col = "dodgerblue") +
                             theme_bw() +
                             theme(axis.title.x=element_blank())
                             if(se) {
                             p <- p +
-                            geom_line(data = p, aes(date, y + 2 * y.se), lwd = 0.25, col = "dodgerblue") +
-                            geom_line(data = p, aes(date, y - 2 * y.se), lwd = 0.25, col = "dodgerblue")
+                            geom_line(data = pd, aes(date, y + 2 * y.se), lwd = 0.25, col = "dodgerblue") +
+                            geom_line(data = pd, aes(date, y - 2 * y.se), lwd = 0.25, col = "dodgerblue")
                             }
                           p
                         },
                         ll = {
                           ggplot() +
-                            geom_point(data = d, aes(date, lat), shape = 19, col = grey(0.85)) +
-                            geom_point(data = p, aes(date, lat), size = 0.2, shape = 20, col = "dodgerblue") +
+                            geom_point(data = dd, aes(date, lat), shape = 19, col = grey(0.85)) +
+                            geom_point(data = pd, aes(date, lat), size = 0.2, shape = 20, col = "dodgerblue") +
                             theme_bw() +
                             theme(axis.title.x=element_blank())
                         })
