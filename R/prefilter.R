@@ -79,10 +79,15 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
   ##    0,360; else if lon spans 360,0 then shift to
   ##    -180,180 ... have to do this on keep subset only
   dd <- subset(d, keep)
-  if(sum(round(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon, -180), 6)) == 0) {
-    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+
+  if (max(abs(diff(dd$lon))) > 300) {
+    if (sum(round(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon,-180), 6)) == 0) {
+      prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+    } else {
+      prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+    }
   } else {
-    prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
   }
 
   d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
