@@ -19,7 +19,7 @@ identifies observations with duplicate dates; (3) orders observations in time;
 (4) removes duplicate observations; (5) removes observations occurring within 60 s of one another (keeps first);
 (6) shifts longitudes that straddle -180,180 to 0,360 and vice-versa; (7) projects lonlat coords to mercator x,y
 coords (in km); (8) adds location error multiplication factors based on Argos location class (for type LS);
-and (9) uses a loess smooth to identify potential outlier locations (by distance only) to be ignored when fitting
+and (9) uses a argosfilter::sdafilter to identify potential outlier locations (by distance only) to be ignored when fitting
 the \code{ctrw} model
 }
 \details{
