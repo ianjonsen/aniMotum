@@ -71,14 +71,14 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
 
   ## Use argosfilter::sdafilter to identify outlier locations
   filt <- rep("not", nrow(d))
-  tmp <- try(with(subset(d, keep), sdafilter(lat, lon, date, lc, ang=-1, vmax=vmax)))
+  tmp <- suppressWarnings(try(with(subset(d, keep), sdafilter(lat, lon, date, lc, ang=-1, vmax=vmax)), silent = TRUE))
   ## screen potential sdafilter errors
   if(!inherits(tmp, "try-error")) {
     filt[d$keep] <- tmp
     d <- d %>%
       mutate(keep = ifelse(filt == "removed", FALSE, keep))
   } else if(inherits(tmp, "try-error")) {
-    warning("argosfilter::sdafilter errored, unable to apply speed filter")
+    warning(paste("\nargosfilter::sdafilter produced an error on id", d$id[1], "unable to apply speed filter"), immediate. = TRUE)
   }
 
   ##  if lon spans -180,180 then shift to
