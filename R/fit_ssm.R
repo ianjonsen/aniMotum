@@ -76,7 +76,6 @@ fit_ssm <- function(d,
   } else {
     cat("\nfitting SSM...\n")
     fit <- fit %>%
-      rowwise() %>%
       do(ssm = try(sfilter(.$pf, ...), silent = TRUE))
 
     fail <- which(sapply(fit$ssm, length) == 6 || sapply(fit$ssm, length) == 1)

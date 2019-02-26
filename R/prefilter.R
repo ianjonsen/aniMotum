@@ -16,7 +16,7 @@
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom stats loess
 ##' @importFrom dplyr mutate distinct arrange filter select %>% left_join lag
-##' @importFrom rgdal project
+##' @importFrom sf st_as_sf st_set_crs st_transform
 ##' @importFrom argosfilter sdafilter
 ##'
 ##' @export
@@ -85,31 +85,56 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
   ##    0,360; else if lon spans 360,0 then shift to
   ##    -180,180 ... have to do this on keep subset only
   dd <- subset(d, keep)
+  dd$project <- "polar_s"
 
-  if (max(abs(diff(dd$lon))) > 300) {
-    if (sum(round(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon,-180), 6)) == 0) {
-      prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-    } else {
-      prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
-    }
-  } else {
-    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+  switch(dd$project[1],
+  polar_s = {
+    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
+      st_set_crs("+proj=longlat +ellps=WGS84") %>%
+      st_transform(., "+init=epsg:3031 +units=km")
+  },
+  polar_n = {
+    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
+      st_set_crs("+proj=longlat +ellps=WGS84") %>%
+      st_transform(., "+init=epsg:3995 +units=km")
+  },
+  lon180 = {
+    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
+      st_set_crs("+proj=longlat +ellps=WGS84") %>%
+      st_transform(., "+init=epsg:4326 +lon_0=180 +units=km")
+  },
+  lon_360 = {
+    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
+      st_set_crs("+proj=longlat +ellps=WGS84") %>%
+      st_transform(., "+init=epsg:4326 +lon_0=0 +units=km")
   }
+  )
+  prj <- NULL
 
-  d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
+  # if (max(abs(diff(dd$lon))) > 300) {
+  #   if (max(abs(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon,-180))) < 0.00001) {
+  #     prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+  #   } else if (max(abs(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon, -180))) == 360){
+  #     prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+  #   }
+  # } else {
+  #   prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+  # }
+  #
+  # d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
 
   ## add LS error info to corresponding records
   ## set amf's = NA if obs.type == "KF" - not essential but for clarity
   tmp <- amf()
-    d <- d %>%
+    out <- sf_locs %>%
       left_join(., tmp, by = "lc") %>%
       mutate(amf_x = ifelse(obs.type == "KF", NA, amf_x),
              amf_y = ifelse(obs.type == "KF", NA, amf_y))
 
-    if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
+    if(sum(is.na(out$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
 
-  d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep)
-  return(list(data = d, proj = prj))
+  #d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep)
+  return(out)
 
 }
