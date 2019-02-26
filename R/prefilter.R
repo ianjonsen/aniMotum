@@ -13,6 +13,7 @@
 ##' @param d input data - must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
+##' @param project user-specified projection for obs & estimates, if NULL then a guess is made
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom stats loess
 ##' @importFrom dplyr mutate distinct arrange filter select %>% left_join lag
@@ -21,7 +22,7 @@
 ##'
 ##' @export
 
-prefilter <- function(d, vmax = 10, min.dt = 1) {
+prefilter <- function(d, vmax = 10, min.dt = 1, project = NULL) {
 
   # check input data
   if(!ncol(d) %in% c(5,8)) stop("Data can only have 5 (for LS data) or 8 (for KF data) columns")
@@ -85,43 +86,54 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
   ##    0,360; else if lon spans 360,0 then shift to
   ##    -180,180 ... have to do this on keep subset only
   dd <- subset(d, keep)
-  dd$project <- "polar_s"
 
-  switch(dd$project[1],
-  polar_s = {
-    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
-      st_set_crs("+proj=longlat +ellps=WGS84") %>%
-      st_transform(., "+init=epsg:3031 +units=km")
-  },
-  polar_n = {
-    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
-      st_set_crs("+proj=longlat +ellps=WGS84") %>%
-      st_transform(., "+init=epsg:3995 +units=km")
-  },
-  lon180 = {
-    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
-      st_set_crs("+proj=longlat +ellps=WGS84") %>%
-      st_transform(., "+init=epsg:4326 +lon_0=180 +units=km")
-  },
-  lon_360 = {
-    sf_locs <- st_as_sf(dd, coords=c("lon","lat")) %>%
-      st_set_crs("+proj=longlat +ellps=WGS84") %>%
-      st_transform(., "+init=epsg:4326 +lon_0=0 +units=km")
-  }
-  )
-  prj <- NULL
+  ## build user-specified projection
+  mlon <- mean(dd$lon) %>% round(., 2)
+  if(!is.null(project)) {
+    switch(project,
+           merc = {
+             if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
+               prj <- "+init=epsg:3395 +units=km +lon_0=0"
+             } else if (any(diff(wrap_lon(dd$lon, -180)) < -300) || any(diff(wrap_lon(dd$lon, -180)) > 300)) {
+               prj <- "+init=epsg:3395 +units=km +lon_0=180"
+             } else {
+             prj <- "+init=epsg:3395 +units=km"
+             }
+           },
+           polar = {
+             if(max(dd$lat) < -20) prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
+             else if(min(dd$lat) > 20) prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
+             else {
+               prj <- "+init=epsg:3395 +units=km"
+               warning("\na tropical latitudes detected, switching to a mercator projection\n")
+             }
+           })
+    sf_locs <- st_as_sf(dd, coords = c("lon", "lat")) %>%
+      st_set_crs(4326) %>%
+      st_transform(., prj)
 
-  # if (max(abs(diff(dd$lon))) > 300) {
-  #   if (max(abs(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon,-180))) < 0.00001) {
-  #     prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-  #   } else if (max(abs(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon, -180))) == 360){
-  #     prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
-  #   }
-  # } else {
-  #   prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-  # }
-  #
-  # d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
+  } else if(is.null(project)){
+      tmp <- st_as_sf(dd, coords = c("lon", "lat")) %>%
+        st_set_crs(4326)
+
+    if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
+        prj <- "+init=epsg:3395 +units=km +lon_0=0"
+      } else if (any(diff(wrap_lon(dd$lon, -180)) < -300) || any(diff(wrap_lon(dd$lon, -180)) > 300)) {
+        prj <- "+init=epsg:3395 +units=km +lon_0=180"
+      } else {
+        prj <- "+init=epsg:3395 +units=km"
+      }
+      sf_locs <- tmp %>% st_transform(., prj)
+
+    if(min(dd$lat) <= -55) {
+      prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
+      sf_locs <- sf_locs %>% st_transform(., prj)
+    } else if(max(dd$lat) >= 55) {
+      prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
+      sf_locs <- sf_locs %>% st_transform(., prj)
+    }
+
+    }
 
   ## add LS error info to corresponding records
   ## set amf's = NA if obs.type == "KF" - not essential but for clarity

@@ -238,7 +238,7 @@ sfilter <-
 
     ## if error then exit with limited output to aid debugging
     rep <- try(sdreport(obj))
-    if (class(opt) != "try-error" & class(rep) != "try-error") {
+    if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
@@ -290,10 +290,6 @@ sfilter <-
       rdm <- rdm %>%
         st_as_sf(coords = c("x","y")) %>%
         st_set_crs(prj)
-
-      ## reproject x,y back to WGS84 longlat
-#      lonlat <- rdm %>%
-#        st_transform(4326)
 
       switch(model,
              rw = {
