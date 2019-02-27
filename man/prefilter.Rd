@@ -4,7 +4,7 @@
 \alias{prefilter}
 \title{Prepare Argos data for fitting a ct ssm}
 \usage{
-prefilter(d, vmax = 10, min.dt = 1)
+prefilter(d, vmax = 10, min.dt = 1, project = NULL)
 }
 \arguments{
 \item{d}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
@@ -12,6 +12,8 @@ prefilter(d, vmax = 10, min.dt = 1)
 \item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations}
 
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
+
+\item{project}{user-specified projection for obs & estimates, if NULL then a guess is made}
 }
 \description{
 \code{prefilter()} (1) determines Argos data type (LS or KF); (2) converts dates to POSIXt;

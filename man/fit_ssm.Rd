@@ -4,7 +4,7 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
+fit_ssm(d, vmax = 10, min.dt = 60, project = NULL, pf = FALSE, ...)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -12,6 +12,8 @@ fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
 \item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations}
 
 \item{min.dt}{minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM}
+
+\item{project}{specify projection for observations and estimated locations, if unspecified (\code{project = NULL}; default) an educated guess is made that may not be optimal. Current options are: \code{merc} and \code{polar}, which transform coordinates from geographic space to a global Mercator projection (epsg 3395) or to a polar stereographic projection (epsg 3031 for S hemisphere, epsg 3995 for N) centred on the mean observed longitude, respectively. Currently, the specified option will be applied to all tracks in a multi-individual fit, whereas educated guesses are made for each individual separately.}
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
 
