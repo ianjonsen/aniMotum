@@ -65,6 +65,12 @@ fit_ssm <- function(d,
                     ...
                     )
 {
+
+  ##FIXME: add a 3rd option 'user' to allow user to supply data with their own
+  ##        projection as an sf data.frame, so long as the units are in km.
+  ##        This option turns off all sf-enabled code during the pre-filtering
+  ##        stage
+
   if(!is.null(project)) {
     if(!project %in% c("merc", "polar"))
       stop("\nprojection strings must be one of 'merc' or 'polar'")
