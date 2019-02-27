@@ -66,8 +66,8 @@ fit_ssm <- function(d,
                     )
 {
   if(!is.null(project)) {
-    if(!project %in% c("merc", "merc_0", "merc_180", "polar"))
-      stop("\nprojection strings must be one of 'merc', merc_0', 'merc_180', 'polar'")
+    if(!project %in% c("merc", "polar"))
+      stop("\nprojection strings must be one of 'merc' or 'polar'")
   }
 
   cat("prefiltering data...\n")
