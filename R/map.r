@@ -19,8 +19,34 @@ map <- function(x, est = c("fitted","predicted"), se = TRUE, outlier = FALSE)
     d <- x$data
   }
   od <- subset(x$data, !keep)
-  fd <- x$fitted
-  pd <- x$predicted
+
+  switch(est,
+         fitted = {
+           sf_locs <- x$fitted
+         },
+         predicted = {
+           sf_locs <- x$predicted
+         })
+
+  prj <- st_crs(sf_locs)
+
+  ## get coastline shapes
+  bounds <- st_bbox(sf_locs)
+  countriesLow <- NULL
+  data("countriesLow", package = "rworldmap", envir = environment())
+
+  browser()
+
+  ## FIXME: this doesn't work - GEOS returning an evaluation error when trying to crop the transformed coast data
+  ## FIXME: try converting sf_locs to 4326 and then crop coast data to see if it's the polar projection that's
+  ## FIXME: causing the issue
+  coast <- st_as_sf(countriesLow) %>%
+    st_transform(., prj) %>%
+    st_crop(., bounds) %>%
+    st_buffer(0)
+
+
+#  bb <- st_bbox(c(
 
   browser()
 
