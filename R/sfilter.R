@@ -288,7 +288,7 @@ sfilter <-
 
       ## coerce x,y back to sf object
       rdm <- rdm %>%
-        st_as_sf(coords = c("x","y")) %>%
+        st_as_sf(coords = c("x","y"), remove = FALSE) %>%
         st_set_crs(prj)
 
       switch(model,
