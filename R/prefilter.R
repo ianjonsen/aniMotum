@@ -19,6 +19,7 @@
 ##' @importFrom dplyr mutate distinct arrange filter select %>% left_join lag
 ##' @importFrom sf st_as_sf st_set_crs st_transform
 ##' @importFrom argosfilter sdafilter
+##' @importFrom tibble as_tibble
 ##'
 ##' @export
 
@@ -125,10 +126,10 @@ prefilter <- function(d, vmax = 10, min.dt = 1, project = NULL) {
       }
       sf_locs <- tmp %>% st_transform(., prj)
 
-    if(min(dd$lat) <= -55) {
+    if(max(dd$lat) <= -60) {
       prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
       sf_locs <- sf_locs %>% st_transform(., prj)
-    } else if(max(dd$lat) >= 55) {
+    } else if(min(dd$lat) >= 60) {
       prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
       sf_locs <- sf_locs %>% st_transform(., prj)
     }
@@ -141,7 +142,8 @@ prefilter <- function(d, vmax = 10, min.dt = 1, project = NULL) {
     out <- sf_locs %>%
       left_join(., tmp, by = "lc") %>%
       mutate(amf_x = ifelse(obs.type == "KF", NA, amf_x),
-             amf_y = ifelse(obs.type == "KF", NA, amf_y))
+             amf_y = ifelse(obs.type == "KF", NA, amf_y)) %>%
+      as_tibble()
 
     if(sum(is.na(out$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")

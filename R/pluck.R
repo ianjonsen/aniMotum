@@ -7,7 +7,8 @@
 ##' @usage pluck(fitobj, what)
 ##'
 ##' @param fitobj a foieGras fitted model object
-##' @param what the tbl to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)
+##' @param what the tibble to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)
+##' @param no.sf return a tibble with unprojected coordinates
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'
@@ -18,10 +19,12 @@
 ##'
 ##' pred <- pluck(ellie.fit, "predicted")
 ##' }
-##' @importFrom dplyr %>% tbl_df arrange mutate select
+##' @importFrom dplyr %>% tbl_df arrange mutate select bind_rows
+##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##' @export
-pluck <- function(x, what = "fitted", ...) {
+##'
+pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
@@ -38,40 +41,63 @@ pluck <- function(x, what = "fitted", ...) {
     x <- x[-nf, ]
   }
 
-  switch(what,
-         fitted = {
-           f <- lapply(x$ssm, function(.) .$fitted) %>%
-             do.call(rbind, .) %>%
-             as_tibble() %>%
-             arrange(id)
-           f <- switch(x$ssm[[1]]$pm,
-                  rw = {
-                    f %>% select(id, date, lon, lat, x, y, x.se, y.se)
+  if (what != "data") {
+    out_lst <- lapply(x$ssm, function(.) {
+      x <- switch(what,
+                  fitted = {
+                    .$fitted
                   },
-                  crw = {
-                    f %>% select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
+                  predicted = {
+                    .$predicted
                   })
-           return(f)
-         },
-         predicted = {
-           p <- lapply(x$ssm, function(.) .$predicted) %>%
-             do.call(rbind, .) %>%
-             as_tibble() %>%
-             arrange(id)
-           p <- switch(x$ssm[[1]]$pm,
-                       rw = {
-                         p %>% select(id, date, lon, lat, x, y, x.se, y.se)
-                       },
-                       crw = {
-                         p %>% select(id, date, lat, lon, x, y, x.se, y.se, u, v, u.se, v.se)
-                       })
-           return(p)
-         },
-         data = {
-           lapply(x$ssm, function(.) .$data) %>%
-             do.call(rbind, .) %>%
-             as_tibble() %>%
-             arrange(id)
-         })
+      prj <- st_crs(x)
+      xy <- st_coordinates(x) %>%
+        as.data.frame(.)
+      names(xy) <- c("x", "y")
+      ll <- x %>%
+        st_transform(4326) %>%
+        st_coordinates(.) %>%
+        as.data.frame(.)
+      names(ll) <- c("lon", "lat")
+      st_geometry(x) <- NULL
+      cbind(x, xy, ll)
+    })
+
+    if (as_sf) {
+      ## get crs from fit object x, allow for different crs' among individuals to handle -180,180; 0,360 wrapping
+      prj <- lapply(x$ssm, function(.)
+        switch(what, fitted = st_crs(.$fitted), predicted = st_crs(.$predicted))
+        )
+      out_sf <- lapply(1:length(out_lst), function(i) {
+        st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+          st_set_crs(4326) %>%
+          st_transform(., prj[[i]])
+      }) %>%
+        do.call(rbind, .)
+
+      out_sf <- switch(x$ssm[[1]]$pm,
+             rw = out_sf %>% select(id, date, x.se, y.se, geometry),
+             crw = out_sf %>% select(id, date, u, v, u.se, v.se, x.se, y.se, geometry)
+             )
+      return(out_sf)
+
+    } else {
+      out_df <- do.call(bind_rows, out_lst)
+      out_df <- switch(x$ssm[[1]]$pm,
+             rw = out_df %>% select(id, date, lon, lat, x, y, x.se, y.se),
+             crw = out_df  %>% select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se)
+        ) %>% as_tibble()
+      return(out_df)
+    }
+  } else {
+    data = {
+      browser()
+      lapply(x$ssm, function(.)
+        .$data) %>%
+        do.call(rbind, .) %>%
+        as_tibble() %>%
+        arrange(id)
+    }
+  }
 
 }
