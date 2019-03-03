@@ -40,16 +40,8 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
     sprintf("ids: %s", x[nf, "id"])
     x <- x[-nf, ]
   }
-
-  if (what != "data") {
     out_lst <- lapply(x$ssm, function(.) {
-      x <- switch(what,
-                  fitted = {
-                    .$fitted
-                  },
-                  predicted = {
-                    .$predicted
-                  })
+      x <- switch(what, fitted = .$fitted, predicted = .$predicted, data = .$data)
       prj <- st_crs(x)
       xy <- st_coordinates(x) %>%
         as.data.frame(.)
@@ -66,7 +58,7 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
     if (as_sf) {
       ## get crs from fit object x, allow for different crs' among individuals to handle -180,180; 0,360 wrapping
       prj <- lapply(x$ssm, function(.)
-        switch(what, fitted = st_crs(.$fitted), predicted = st_crs(.$predicted))
+        switch(what, fitted = st_crs(.$fitted), predicted = st_crs(.$predicted), data = st_crs(.$data))
         )
       out_sf <- lapply(1:length(out_lst), function(i) {
         st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
@@ -75,29 +67,31 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
       }) %>%
         do.call(rbind, .)
 
+      if(what != "data") {
       out_sf <- switch(x$ssm[[1]]$pm,
              rw = out_sf %>% select(id, date, x.se, y.se, geometry),
              crw = out_sf %>% select(id, date, u, v, u.se, v.se, x.se, y.se, geometry)
              )
       return(out_sf)
+      } else {
+        out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, obs.type, amf_x, amf_y, geometry)
+        return(out_sf)
+      }
 
     } else {
       out_df <- do.call(bind_rows, out_lst)
-      out_df <- switch(x$ssm[[1]]$pm,
+      if(what != "data") {
+        out_df <- switch(x$ssm[[1]]$pm,
              rw = out_df %>% select(id, date, lon, lat, x, y, x.se, y.se),
              crw = out_df  %>% select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se)
-        ) %>% as_tibble()
+          ) %>% as_tibble()
+      } else {
+        out_df <- out_df %>%
+          select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, amf_x, amf_y) %>%
+          as_tibble()
+      }
       return(out_df)
     }
-  } else {
-    data = {
-      browser()
-      lapply(x$ssm, function(.)
-        .$data) %>%
-        do.call(rbind, .) %>%
-        as_tibble() %>%
-        arrange(id)
-    }
-  }
+
 
 }

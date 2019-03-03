@@ -142,8 +142,7 @@ prefilter <- function(d, vmax = 10, min.dt = 1, project = NULL) {
     out <- sf_locs %>%
       left_join(., tmp, by = "lc") %>%
       mutate(amf_x = ifelse(obs.type == "KF", NA, amf_x),
-             amf_y = ifelse(obs.type == "KF", NA, amf_y)) %>%
-      as_tibble()
+             amf_y = ifelse(obs.type == "KF", NA, amf_y))
 
     if(sum(is.na(out$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")

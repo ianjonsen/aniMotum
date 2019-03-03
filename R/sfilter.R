@@ -17,7 +17,6 @@ sfilter <-
   function(x,
            model = c("rw", "crw"),
            time.step = 1,
-           fit.to.subset = TRUE,
            parameters = NULL,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
@@ -36,21 +35,13 @@ sfilter <-
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     ## add is.data flag (di`stinquish obs from reg states)
-
-    prj <- st_crs(x)
-    loc <- as.data.frame(st_coordinates(x))
+    xx <- x
+    prj <- st_crs(xx)
+    loc <- as.data.frame(st_coordinates(xx))
     names(loc) <- c("x","y")
-    st_geometry(x) <- NULL
-    x <- cbind(x, loc)
-
-    if (fit.to.subset) {
-      d <- x %>%
-        filter(.$keep) %>%
-        mutate(isd = TRUE)
-    } else {
-      d <- x %>%
-        mutate(isd = TRUE)
-    }
+    st_geometry(xx) <- NULL
+    d <- cbind(xx, loc) %>%
+      mutate(isd = TRUE)
 
     if (length(time.step) == 1) {
       ## Interpolation times - assume on time.step-multiple of the hour
@@ -322,7 +313,7 @@ sfilter <-
         predicted = pd,
         fitted = fd,
         par = fxd,
-        data = d,
+        data = x,
         inits = parameters,
         pm = model,
         opt = opt,
@@ -335,7 +326,7 @@ sfilter <-
       ## if optimiser fails
       out <- list(
         call = call,
-        data = d,
+        data = x,
         inits = parameters,
         pm = model,
         tmb = obj,
