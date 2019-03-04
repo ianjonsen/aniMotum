@@ -9,6 +9,7 @@
 ##' @param fitobj a foieGras fitted model object
 ##' @param what the tibble to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)
 ##' @param no.sf return a tibble with unprojected coordinates
+##' @param ... additional arguments are ignored
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'

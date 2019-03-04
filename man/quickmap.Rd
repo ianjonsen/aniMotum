@@ -4,7 +4,7 @@
 \alias{quickmap}
 \title{quickmap}
 \usage{
-quickmap(x, what = c("fitted", "predicted"), crs = NULL,
+quickmap(x, what = c("fitted", "predicted"), data = NULL, crs = NULL,
   ext.rng = c(0.1, 0.1))
 }
 \arguments{
