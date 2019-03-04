@@ -72,6 +72,7 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
              rw = out_sf %>% select(id, date, x.se, y.se, geometry),
              crw = out_sf %>% select(id, date, u, v, u.se, v.se, x.se, y.se, geometry)
              )
+      attr(out_sf, "class") <- append(class(out_sf), what, after = 1)
       return(out_sf)
       } else {
         out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, obs.type, amf_x, amf_y, geometry)
@@ -90,6 +91,7 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
           select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, amf_x, amf_y) %>%
           as_tibble()
       }
+      attr(out_df, "class") <- append(class(out_sf), what, after = 1)
       return(out_df)
     }
 

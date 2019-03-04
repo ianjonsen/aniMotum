@@ -5,7 +5,7 @@
 \title{quickmap}
 \usage{
 quickmap(x, what = c("fitted", "predicted"), crs = NULL,
-  ext.rng = 0.2)
+  ext.rng = c(0.1, 0.1))
 }
 \arguments{
 \item{x}{a foieGras fitted object}
