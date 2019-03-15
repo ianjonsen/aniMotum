@@ -73,7 +73,7 @@ prefilter <- function(d, vmax = 10, min.dt = 1, project = NULL) {
 
   ## Use argosfilter::sdafilter to identify outlier locations
   filt <- rep("not", nrow(d))
-  tmp <- suppressWarnings(try(with(subset(d, keep), sdafilter(lat, lon, date, lc, ang=-1, vmax=vmax)), silent = TRUE))
+  tmp <- suppressWarnings(try(with(subset(d, keep), sdafilter(lat, lon, date, lc, vmax=vmax)), silent = TRUE))
   ## screen potential sdafilter errors
   if(!inherits(tmp, "try-error")) {
     filt[d$keep] <- tmp
