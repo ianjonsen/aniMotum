@@ -32,7 +32,7 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
   if(!what %in% c("fitted","predicted","data"))
-    stop("Only `fitted`, `predicted` or `data` objects can be extracted")
+    stop("Only `fitted`, `predicted` or `data` objects can be plucked")
 
   ## remove convergence failures from extraction
   nf <- which(sapply(x$ssm, length) < 12)
@@ -92,7 +92,7 @@ pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
           select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, amf_x, amf_y) %>%
           as_tibble()
       }
-      attr(out_df, "class") <- append(class(out_sf), what, after = 1)
+      attr(out_df, "class") <- append(class(out_df), what, after = 1)
       return(out_df)
     }
 
