@@ -9,11 +9,11 @@ pluck(fitobj, what)
 \arguments{
 \item{what}{the tibble to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)}
 
+\item{as_sf}{return a tibble with unprojected coordinates}
+
 \item{...}{additional arguments are ignored}
 
 \item{fitobj}{a foieGras fitted model object}
-
-\item{no.sf}{return a tibble with unprojected coordinates}
 }
 \value{
 a tbl with all individual tbl's appended
