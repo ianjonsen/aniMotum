@@ -4,14 +4,15 @@
 ##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param obs include Argos observations on map (logical)
-##' @param crs proj4string or epsg for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used
+##' @param outlier include all extreme outliers flagged by prefilter in plots (logical); ignored if `obs = FALSE`
+##' @param crs `proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used
 ##' @param ext.rng proportions to extend the plot range in x and y dimensions
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle
 ##' @importFrom ggplot2 theme element_blank scale_colour_viridis_d
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs
 ##' @export
 
-quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL, ext.rng = c(0.1, 0.1))
+quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, outlier = FALSE, crs = NULL, ext.rng = c(0.1, 0.1))
 {
   if(class(x)[1] != "sf") {
   what <- match.arg(what)
@@ -66,6 +67,9 @@ quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL
             lwd = 0)
 
   if(obs) {
+    if(!outlier) {
+      sf_data <- sf_data %>% filter(keep)
+    }
     p <- p + geom_sf(data = sf_data, col = grey(0.7), size = 0.85)
   }
 

@@ -4,8 +4,8 @@
 \alias{quickmap}
 \title{quickmap}
 \usage{
-quickmap(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL,
-  ext.rng = c(0.1, 0.1))
+quickmap(x, what = c("fitted", "predicted"), obs = FALSE,
+  outlier = FALSE, crs = NULL, ext.rng = c(0.1, 0.1))
 }
 \arguments{
 \item{x}{a foieGras fitted object}
@@ -14,7 +14,9 @@ quickmap(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL,
 
 \item{obs}{include Argos observations on map (logical)}
 
-\item{crs}{proj4string or epsg for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used}
+\item{outlier}{include all extreme outliers flagged by prefilter in plots (logical); ignored if `obs = FALSE`}
+
+\item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used}
 
 \item{ext.rng}{proportions to extend the plot range in x and y dimensions}
 }
