@@ -85,7 +85,8 @@ quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, outlier = 
                      size = 0.6
                      )
   }
-  p <- p + theme(legend.position = "none")
+  p <- p + theme(legend.position = "none") +
+    scale_x_continuous(breaks = seq(-180, 180, by = 5))
 
   return(p)
 }
