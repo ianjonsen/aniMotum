@@ -4,13 +4,19 @@
 \alias{quickmap}
 \title{quickmap}
 \usage{
-quickmap(x, what = c("fitted", "predicted"), data = NULL, crs = NULL,
+quickmap(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL,
   ext.rng = c(0.1, 0.1))
 }
 \arguments{
 \item{x}{a foieGras fitted object}
 
 \item{what}{specify which location estimates to map: fitted or predicted}
+
+\item{obs}{include Argos observations on map (logical)}
+
+\item{crs}{proj4string or epsg for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used}
+
+\item{ext.rng}{proportions to extend the plot range in x and y dimensions}
 }
 \description{
 map foieGras fitted or predicted locations

@@ -18,6 +18,7 @@ sfilter <-
            model = c("rw", "crw"),
            time.step = 1,
            parameters = NULL,
+           fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
            inner.control = NULL) {
@@ -34,8 +35,10 @@ sfilter <-
     }
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
-    ## add is.data flag (di`stinquish obs from reg states)
-    xx <- x
+    ## add is.data flag (distinquish obs from reg states)
+    if(fit.to.subset) xx <- x %>% filter(keep)
+    else xx <- x
+
     prj <- st_crs(xx)
     loc <- as.data.frame(st_coordinates(xx))
     names(loc) <- c("x","y")

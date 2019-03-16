@@ -5,8 +5,8 @@
 \title{fit a C-T SSM to individual track data}
 \usage{
 sfilter(x, model = c("rw", "crw"), time.step = 1, parameters = NULL,
-  optim = c("nlminb", "optim"), verbose = FALSE,
-  inner.control = NULL)
+  fit.to.subset = TRUE, optim = c("nlminb", "optim"),
+  verbose = FALSE, inner.control = NULL)
 }
 \description{
 Filter Argos LS or KF track data

@@ -4,14 +4,15 @@
 \alias{plot.foieGras}
 \title{plot}
 \usage{
-\method{plot}{foieGras}(m, what = c("fitted", "predicted"), se = TRUE)
+\method{plot}{foieGras}(m, what = c("fitted", "predicted"),
+  outlier = FALSE)
 }
 \arguments{
 \item{m}{a foieGras fitted object}
 
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
-\item{se}{include 2 * SE on time-series plots (SE's currently not displayed when proj = "ll")}
+\item{outlier}{include all extreme outliers flagged by prefilter in plots (logical)}
 }
 \description{
 Visualise foieGras SSM fits to track data

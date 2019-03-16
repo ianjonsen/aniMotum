@@ -113,12 +113,13 @@ prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), min.
                warning("\na tropical latitudes detected, switching to a mercator projection\n")
              }
            })
-    sf_locs <- st_as_sf(dd, coords = c("lon", "lat")) %>%
+    sf_locs <- st_as_sf(d, coords = c("lon", "lat")) %>%
       st_set_crs(4326) %>%
       st_transform(., prj)
 
   } else if(is.null(project)){
-      tmp <- st_as_sf(dd, coords = c("lon", "lat")) %>%
+    ## projection not provided by user so guess at best projection
+      tmp <- st_as_sf(d, coords = c("lon", "lat")) %>%
         st_set_crs(4326)
 
     if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
@@ -151,7 +152,6 @@ prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), min.
     if(sum(is.na(out$lc)) > 0) stop("\n NA's found in location class values,\n
                                   perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
 
-  #d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep)
   return(out)
 
 }

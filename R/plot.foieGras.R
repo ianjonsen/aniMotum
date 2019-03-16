@@ -3,19 +3,22 @@
 ##' @title plot
 ##' @param m a foieGras fitted object
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
-##' @param se include 2 * SE on time-series plots (SE's currently not displayed when proj = "ll")
+##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank
 ##' @importFrom gridExtra grid.arrange
 ##' @method plot foieGras
 ##' @export
 
-plot.foieGras <- function(m, what = c("fitted","predicted"), se = TRUE)
+plot.foieGras <- function(m, what = c("fitted","predicted"), outlier = FALSE)
 {
   what <- match.arg(what)
   f_sf <- m$fitted
   p_sf <- m$predicted
-  d_sf <- m$data
-
+  if(!outlier) {
+    d_sf <- m$data %>% filter(keep)
+  } else {
+    d_sf <- m$data
+  }
 
   xy <- f_sf %>% st_coordinates(.) %>%
     as.data.frame(.)
