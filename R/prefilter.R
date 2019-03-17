@@ -14,6 +14,7 @@
 ##' @param vmax max travel rate (m/s) - see ?argosfilter::sdafilter for details
 ##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
 ##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param spdf turn speed filter on (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
 ##' @param project user-specified projection for obs & estimates, if NULL then a guess is made
 ##' @importFrom lubridate ymd_hms
@@ -25,7 +26,7 @@
 ##'
 ##' @export
 
-prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), min.dt = 60, project = NULL) {
+prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), spdf = TRUE, min.dt = 60, project = NULL) {
 
   # check input data
   if(!ncol(d) %in% c(5,8)) stop("Data can only have 5 (for LS data) or 8 (for KF data) columns")
@@ -74,17 +75,39 @@ prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), min.
            eor = eor/180 * pi)
 
   ## Use argosfilter::sdafilter to identify outlier locations
-  filt <- rep("not", nrow(d))
-  tmp <- suppressWarnings(try(with(subset(d, keep), sdafilter(lat, lon, date, lc, vmax=vmax, ang=ang, distlim=distlim)),
-                              silent = TRUE))
-  ## screen potential sdafilter errors
-  if(!inherits(tmp, "try-error")) {
-    filt[d$keep] <- tmp
-    d <- d %>%
-      mutate(keep = ifelse(filt == "removed", FALSE, keep))
-  } else if(inherits(tmp, "try-error")) {
-    warning(paste("\nargosfilter::sdafilter produced an error on id", d$id[1], "unable to apply speed filter"),
-            immediate. = TRUE)
+  if (spdf) {
+    filt <- rep("not", nrow(d))
+    tmp <-
+      suppressWarnings(try(with(
+        subset(d, keep),
+        sdafilter(
+          lat,
+          lon,
+          date,
+          lc,
+          vmax = vmax,
+          ang = ang,
+          distlim = distlim
+        )
+      ),
+      silent = TRUE)
+      )
+    ## screen potential sdafilter errors
+    if (!inherits(tmp, "try-error"))
+    {
+      filt[d$keep] <- tmp
+      d <- d %>%
+        mutate(keep = ifelse(filt == "removed", FALSE, keep))
+    } else if (inherits(tmp, "try-error")) {
+      warning(
+        paste(
+          "\nargosfilter::sdafilter produced an error on id",
+          d$id[1],
+          "unable to apply speed filter"
+        ),
+        immediate. = TRUE
+      )
+    }
   }
 
   ##  if lon spans -180,180 then shift to

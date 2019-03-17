@@ -59,6 +59,9 @@
 ##' @export
 fit_ssm <- function(d,
                     vmax = 10,
+                    ang = c(15,25),
+                    distlim = c(2500,5000),
+                    spdf = TRUE,
                     min.dt = 60,
                     project = NULL,
                     pf = FALSE,
@@ -81,7 +84,7 @@ fit_ssm <- function(d,
   cat("prefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
-    do(pf = prefilter(., vmax = vmax, min.dt = min.dt, project = project))
+    do(pf = prefilter(., vmax = vmax, ang = ang, distlim = distlim, spdf = spdf, min.dt = min.dt, project = project))
 
   if(pf){
     pfd <- lapply(fit$pf, function(.) .$data)
