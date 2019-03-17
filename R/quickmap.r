@@ -88,21 +88,22 @@ quickmap <- function(x,
                      ) +
     scale_colour_viridis_d()
   } else {
-    lab_dates <- sf_locs$date %>% pretty()
+    lab_dates <- with(sf_locs, seq(min(date), max(date), l = 5)) %>% as.Date()
 
     p <- p + geom_sf(data = sf_locs,
-                    aes(colour = as.numeric(date)),
+                    aes(colour = as.numeric(as.Date(date))),
                      size = size
                      ) +
       scale_colour_viridis_c("date", breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
       theme(legend.position = "bottom",
-            legend.text = element_text(size = 6, angle = 90, hjust = 1)
+            legend.text = element_text(size = 8),
+            legend.key.width = unit(1.5, "cm")
             ) +
-      ggtitle(paste0("id: ", x$predicted$id[1], "    ", what, " values"))
+      ggtitle(paste0("id: ", x$predicted$id[1], ";  model: ", x$pm, ";   ", what, " values"))
 
   }
-  p <- p + #theme(legend.position = "none") +
-    scale_x_continuous(breaks = seq(-180, 180, by = 5))
+#  p <- p + #theme(legend.position = "none") +
+#    scale_x_continuous(breaks = seq(-180, 180, by = 5))
 
   return(p)
 }
