@@ -5,7 +5,7 @@
 \title{quickmap}
 \usage{
 quickmap(x, what = c("fitted", "predicted"), obs = FALSE,
-  outlier = FALSE, crs = NULL, ext.rng = c(0.1, 0.1))
+  outlier = FALSE, crs = NULL, ext.rng = c(0.1, 0.1), size = 1)
 }
 \arguments{
 \item{x}{a foieGras fitted object}
@@ -19,6 +19,8 @@ quickmap(x, what = c("fitted", "predicted"), obs = FALSE,
 \item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used}
 
 \item{ext.rng}{proportions to extend the plot range in x and y dimensions}
+
+\item{size}{size of estimated location points}
 }
 \description{
 map foieGras fitted or predicted locations

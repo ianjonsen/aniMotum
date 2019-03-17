@@ -4,7 +4,8 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 10, min.dt = 60, project = NULL, pf = FALSE, ...)
+fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
+  spdf = TRUE, min.dt = 60, project = NULL, pf = FALSE, ...)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
