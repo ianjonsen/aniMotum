@@ -3,6 +3,7 @@
 S3method(plot,foieGras)
 S3method(print,foieGras)
 S3method(summary,foieGras)
+export(extract)
 export(fit_ssm)
 export(grab)
 export(pluck)

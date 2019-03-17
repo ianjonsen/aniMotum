@@ -2,14 +2,17 @@
 % Please edit documentation in R/foieGras-deprecated.R
 \name{pluck}
 \alias{pluck}
+\alias{extract}
 \title{Deprecated functions.}
 \usage{
 pluck(...)
+
+extract(...)
 }
 \arguments{
 \item{...}{ignored}
 }
 \description{
-\code{pluck} has been deprecated to avoid conflict with purrr::pluck. Instead use
+\code{extract} and \code{pluck} have been deprecated to avoid conflict with raster::extract, purrr::pluck. Instead use
 \code{grab}.
 }
