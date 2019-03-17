@@ -75,6 +75,8 @@ fit_ssm <- function(d,
     if(!project %in% c("merc", "polar"))
       stop("\nprojection strings must be one of 'merc' or 'polar'")
   }
+  if(!is.numeric(vmax)) stop("\nvmax must be a numeric value in m/s")
+  if(!is.numeric(min.dt)) stop("\nmin.dt must be a numeric value in s")
 
   cat("prefiltering data...\n")
   fit <- d %>%
