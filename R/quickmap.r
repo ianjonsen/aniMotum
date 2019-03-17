@@ -10,7 +10,7 @@
 ##' @param size size of estimated location points
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle
 ##' @importFrom ggplot2 theme element_blank scale_colour_viridis_d
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_linestring
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates
 ##' @export
 
 quickmap <- function(x,
@@ -96,7 +96,7 @@ quickmap <- function(x,
                      ) +
       scale_colour_viridis_c("date", breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
       theme(legend.position = "bottom",
-            legend.text = element_text(size = 5, angle = 90, hjust = 1)
+            legend.text = element_text(size = 6, angle = 90, hjust = 1)
             ) +
       ggtitle(paste0("id: ", x$predicted$id[1], "    ", what, " values"))
 
