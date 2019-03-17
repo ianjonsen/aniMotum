@@ -7,12 +7,19 @@
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical); ignored if `obs = FALSE`
 ##' @param crs `proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used
 ##' @param ext.rng proportions to extend the plot range in x and y dimensions
+##' @param size size of estimated location points
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle
 ##' @importFrom ggplot2 theme element_blank scale_colour_viridis_d
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_linestring
 ##' @export
 
-quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, outlier = FALSE, crs = NULL, ext.rng = c(0.1, 0.1))
+quickmap <- function(x,
+                     what = c("fitted", "predicted"),
+                     obs = FALSE,
+                     outlier = FALSE,
+                     crs = NULL,
+                     ext.rng = c(0.1, 0.1),
+                     size = 1)
 {
   if(class(x)[1] != "sf") {
   what <- match.arg(what)
@@ -70,22 +77,31 @@ quickmap <- function(x, what = c("fitted", "predicted"), obs = FALSE, outlier = 
     if(!outlier) {
       sf_data <- sf_data %>% filter(keep)
     }
-    p <- p + geom_sf(data = sf_data, col = grey(0.7), size = 0.85)
+    p <- p + geom_sf(data = sf_data, col = grey(0.8), size = 1, shape = 3)
   }
 
   if(length(unique(x$id)) > 1) {
+
     p <- p + geom_sf(data = sf_locs,
                      aes(color = id),
-                     size = 0.6
+                     size = size
                      ) +
     scale_colour_viridis_d()
   } else {
+    lab_dates <- sf_locs$date %>% pretty()
+
     p <- p + geom_sf(data = sf_locs,
-                     col = switch(what, fitted = "firebrick", predicted = "dodgerblue"),
-                     size = 0.6
-                     )
+                    aes(colour = as.numeric(date)),
+                     size = size
+                     ) +
+      scale_colour_viridis_c("date", breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
+      theme(legend.position = "bottom",
+            legend.text = element_text(size = 5, angle = 90, hjust = 1)
+            ) +
+      ggtitle(paste0("id: ", x$predicted$id[1], "    ", what, " values"))
+
   }
-  p <- p + theme(legend.position = "none") +
+  p <- p + #theme(legend.position = "none") +
     scale_x_continuous(breaks = seq(-180, 180, by = 5))
 
   return(p)
