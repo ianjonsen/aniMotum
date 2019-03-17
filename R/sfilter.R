@@ -16,7 +16,7 @@
 sfilter <-
   function(x,
            model = c("rw", "crw"),
-           time.step = 1,
+           time.step,
            parameters = NULL,
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
@@ -27,11 +27,13 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
-    if(is.null(time.step)) print("\nNo time.step specified, using 6 h as a default time step")
-    else if(length(time.step) > 1 & !is.data.frame(time.step))
-      stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
-    else if(length(time.step) > 1 & is.data.frame(time.step)) {
-      if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
+    if(is.null(time.step)) {
+      print("\nNo time.step specified, using 6 h as a default time step")
+      time.step <- 6
+    } else if(length(time.step) > 1 & !is.data.frame(time.step)) {
+        stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
+    } else if(length(time.step) > 1 & is.data.frame(time.step)) {
+        if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
@@ -51,20 +53,20 @@ sfilter <-
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
-      time.step <-
+      ts <-
         data.frame(date = seq(
           trunc(d$date[1], "hour"),
           by = tsp,
           length.out = max(index) + 2
         ))
     } else {
-      time.step <- time.step %>%
+      ts <- time.step %>%
         filter(id == unique(d$id)) %>%
         select(date)
     }
 
     ## merge data and interpolation times
-    d.all <- full_join(d, time.step, by = "date") %>%
+    d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
       mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
@@ -319,6 +321,7 @@ sfilter <-
         data = x,
         inits = parameters,
         pm = model,
+        ts = time.step,
         opt = opt,
         tmb = obj,
         rep = rep,
@@ -332,6 +335,7 @@ sfilter <-
         data = x,
         inits = parameters,
         pm = model,
+        ts = time.step,
         tmb = obj,
         errmsg = opt
       )

@@ -71,7 +71,7 @@ plot.foieGras <- function(m, what = c("fitted","predicted"), outlier = FALSE)
     geom_path(data = p_df, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
     geom_point(data = p_df, aes(lon, lat), size = 0.75, shape = 20, col = "dodgerblue") +
     theme_bw() +
-    ggtitle(paste0("model: ", m$pm), subtitle = "predicted states")
+    ggtitle(paste0("model: ", m$pm, "    time.step: ", m$ts, " h"), subtitle = "predicted states")
 
 
   p3 <- ggplot() +
