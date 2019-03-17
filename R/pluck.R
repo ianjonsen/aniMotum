@@ -1,14 +1,14 @@
-##' @title Pluck tbl's by name from a foieGras fitted model object
+##' @title grab tbl's by name from a foieGras fitted model object
 ##'
-##' @description `pluck()` lets you obtain `fitted`, `predicted`, or `data` tbl's from
+##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's from
 ##' a compound tbl created when fitting to multiple individual data sets. The specified tbl's
 ##' are appended to a single output tbl.
 ##'
-##' @usage pluck(fitobj, what)
+##' @usage grab(fitobj, what, as_sf = TRUE)
 ##'
 ##' @param fitobj a foieGras fitted model object
-##' @param what the tibble to be plucked; either `fitted`, `predicted`, or `data` (single letters can be used)
-##' @param as_sf return a tibble with unprojected coordinates
+##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)
+##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble
 ##' @param ... additional arguments are ignored
 ##'
 ##' @return a tbl with all individual tbl's appended
@@ -25,14 +25,14 @@
 ##' @importFrom tibble as_tibble
 ##' @export
 ##'
-pluck <- function(x, what = "fitted", as_sf = TRUE, ...) {
+grab <- function(x, what = "fitted", as_sf = TRUE, ...) {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
   if(!what %in% c("fitted","predicted","data"))
-    stop("Only `fitted`, `predicted` or `data` objects can be plucked")
+    stop("Only `fitted`, `predicted` or `data` objects can be grabbed")
 
   ## remove convergence failures from extraction
   nf <- which(sapply(x$ssm, length) < 12)
