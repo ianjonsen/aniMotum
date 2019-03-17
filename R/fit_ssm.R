@@ -104,7 +104,9 @@ fit_ssm <- function(d,
       ungroup() %>%
       mutate(id = sapply(.$ssm, function(x)
         x$data$id[1])) %>%
-      select(id, ssm)
+      mutate(converged = sapply(.$ssm, function(x)
+        x$opt$convergence == 0)) %>%
+      select(id, ssm, converged)
   }
   fit <- fit %>% group_by(id)
   return(fit)
