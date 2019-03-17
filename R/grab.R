@@ -15,11 +15,12 @@
 ##'
 ##' @examples
 ##' \dontrun{
-##' data("ellie")
-##' ellie.fit <- fit_ssm(ellie, model = "crw", time.step = 6)
+##' data(rope)
+##' fit <- fit_ssm(rope, model = "crw", time.step = 12)
 ##'
-##' pred <- grab(ellie.fit, "predicted")
+##' plocs <- grab(fit, "predicted")
 ##' }
+##'
 ##' @importFrom dplyr %>% tbl_df arrange mutate select bind_rows
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
