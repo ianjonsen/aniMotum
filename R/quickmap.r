@@ -99,7 +99,7 @@ quickmap <- function(x,
             legend.text = element_text(size = 8),
             legend.key.width = unit(1.5, "cm")
             ) +
-      ggtitle(paste0("id: ", x$predicted$id[1], ";  model: ", x$pm, ";   ", what, " values"))
+      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values"))
 
   }
 #  p <- p + #theme(legend.position = "none") +

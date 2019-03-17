@@ -36,7 +36,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE, ...) {
     stop("Only `fitted`, `predicted` or `data` objects can be grabbed")
 
   ## remove convergence failures from extraction
-  nf <- which(sapply(x$ssm, length) < 12)
+  nf <- which(sapply(x$ssm, length) < 13)
   if(length(nf) > 0) {
     sprintf("%d convergence failures removed from output", length(nf))
     sprintf("ids: %s", x[nf, "id"])
