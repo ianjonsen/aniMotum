@@ -107,6 +107,5 @@ fit_ssm <- function(d,
       select(id, ssm)
   }
   fit <- fit %>% group_by(id)
-  class(fit) <- append(class(fit), "foieGras", 0)
   return(fit)
 }
