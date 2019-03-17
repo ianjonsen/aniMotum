@@ -26,7 +26,7 @@
 ##'
 ##' @export
 
-prefilter <- function(d, vmax = 10, ang = c(15,25), distlim = c(2500,5000), spdf = TRUE, min.dt = 60, project = NULL) {
+prefilter <- function(d, vmax = 50, ang = -1, distlim = c(2500,5000), spdf = TRUE, min.dt = 60, project = NULL) {
 
   # check input data
   if(!ncol(d) %in% c(5,8)) stop("Data can only have 5 (for LS data) or 8 (for KF data) columns")

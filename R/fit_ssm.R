@@ -58,8 +58,8 @@
 ##'
 ##' @export
 fit_ssm <- function(d,
-                    vmax = 10,
-                    ang = c(15,25),
+                    vmax = 50,
+                    ang = -1,
                     distlim = c(2500,5000),
                     spdf = TRUE,
                     min.dt = 60,
