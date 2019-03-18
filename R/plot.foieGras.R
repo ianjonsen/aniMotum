@@ -1,7 +1,7 @@
 ##' Visualise foieGras SSM fits to track data
 ##'
 ##' @title plot
-##' @param m a foieGras fitted object
+##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank
@@ -9,15 +9,17 @@
 ##' @method plot foieGras
 ##' @export
 
-plot.foieGras <- function(m, what = c("fitted","predicted"), outlier = FALSE)
+plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
 {
   what <- match.arg(what)
-  f_sf <- m$fitted
-  p_sf <- m$predicted
+  if(inherits(x, "grouped_df")) stop("you can only plot 1 individual at a time, eg `plot(fit$ssm[[1]])`")
+  if(all(c(!inherits(x, "grouped_df"), !inherits(x, "foieGras")))) stop("you have not supplied a foieGras fitted object")
+  f_sf <- x$fitted
+  p_sf <- x$predicted
   if(!outlier) {
-    d_sf <- m$data %>% filter(keep)
+    d_sf <- x$data %>% filter(keep)
   } else {
-    d_sf <- m$data
+    d_sf <- x$data
   }
 
   xy <- f_sf %>% st_coordinates(.) %>%
@@ -71,7 +73,7 @@ plot.foieGras <- function(m, what = c("fitted","predicted"), outlier = FALSE)
     geom_path(data = p_df, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
     geom_point(data = p_df, aes(lon, lat), size = 0.75, shape = 20, col = "dodgerblue") +
     theme_bw() +
-    ggtitle(paste0("model: ", m$pm, "    time.step: ", m$ts, " h"), subtitle = "predicted states")
+    ggtitle(paste0("model: ", x$pm, "    time.step: ", x$ts, " h"), subtitle = "predicted states")
 
 
   p3 <- ggplot() +

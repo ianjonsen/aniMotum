@@ -11,7 +11,7 @@
 print.foieGras <- function(x, digits = 3, ...)
 {
   pm <- x$pm
-  timeStep <- mean(diff(x$predicted$date))
+  timeStep <- x$ts
   nbrStates <- nrow(x$predicted)
   nbStates <- nrow(x$fitted)
   parm <- x$par

@@ -6,7 +6,6 @@
 ##' @param d a data frame of observations including Argos KF error ellipse info
 ##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
 ##' @param min.dt minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM
-##' @param project specify projection for observations and estimated locations, if unspecified (\code{project = NULL}; default) an educated guess is made that may not be optimal. Current options are: \code{merc} and \code{polar}, which transform coordinates from geographic space to a global Mercator projection (epsg 3395) or to a polar stereographic projection (epsg 3031 for S hemisphere, epsg 3995 for N) centred on the mean observed longitude, respectively. Currently, the specified option will be applied to all tracks in a multi-individual fit, whereas educated guesses are made for each individual separately.
 ##' @param pf just pre-filter the data, do not fit the ctrw (default is FALSE)
 ##' @param ... arguments passed to sfilter, described below:
 ##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model
@@ -63,7 +62,6 @@ fit_ssm <- function(d,
                     distlim = c(2500,5000),
                     spdf = TRUE,
                     min.dt = 60,
-                    project = NULL,
                     pf = FALSE,
                     ...
                     )
@@ -84,7 +82,7 @@ fit_ssm <- function(d,
   cat("prefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
-    do(pf = prefilter(., vmax = vmax, ang = ang, distlim = distlim, spdf = spdf, min.dt = min.dt, project = project))
+    do(pf = prefilter(., vmax = vmax, ang = ang, distlim = distlim, spdf = spdf, min.dt = min.dt))
 
   if(pf){
     pfd <- lapply(fit$pf, function(.) .$data)

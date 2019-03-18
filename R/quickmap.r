@@ -10,7 +10,7 @@
 ##' @param size size of estimated location points
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle
 ##' @importFrom ggplot2 theme element_blank scale_colour_viridis_d
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
 ##' @export
 
 quickmap <- function(x,
@@ -18,10 +18,10 @@ quickmap <- function(x,
                      obs = FALSE,
                      outlier = FALSE,
                      crs = NULL,
-                     ext.rng = c(0.1, 0.1),
+                     ext.rng = c(0.05, 0.05),
                      size = 1)
 {
-  if(class(x)[1] != "sf") {
+  if(all(class(x) %in% c("foieGras", "list"))) {
   what <- match.arg(what)
 
   switch(what,
@@ -31,53 +31,45 @@ quickmap <- function(x,
          predicted = {
            sf_locs <- x$predicted
          })
-  } else {
+  } else if(class(x) == "sf"){
     sf_locs <- x
     what <- class(x)[2]
   }
-
-
-  prj <- st_crs(sf_locs)
-  if(!is.null(crs)) {
+  if(is.null(crs)) {
+    prj <- st_crs(sf_locs)
+    sf_data <- x$data
+    } else {
     sf_locs <- sf_locs %>% st_transform(., crs)
     prj <- st_crs(sf_locs)
-
     sf_data <- x$data %>% st_transform(., crs)
-  } else {
-    sf_data <- x$data
-  }
+    }
 
   bounds <- st_bbox(sf_locs)
   bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = ext.rng[1])
   bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = ext.rng[2])
 
-  ## get coastline shapes
+  sf_lines <- sf_locs %>%
+    group_by(id) %>%
+    summarise(do_union = FALSE) %>%
+    st_cast("MULTILINESTRING")
+
+  ## get coastline
   countriesLow <- NULL
   data("countriesLow", package = "rworldmap", envir = environment())
-  coast <- suppressWarnings(st_as_sf(countriesLow) %>%
-    st_transform(., prj) %>%
-    st_buffer(., 0, nQuadSegs = 1000) %>%
-    st_crop(., bounds))
+  coast <- st_as_sf(countriesLow) %>% st_transform(., prj)
 
-
-  if(!is.null(crs)) {
-    coast <- coast %>%
-      st_transform(., crs)
-
-    sf_locs <- sf_locs %>%
-      st_transform(., crs)
-  }
-
-  p <- ggplot(data = sf_locs) +
+  p <- ggplot() +
     geom_sf(data = coast,
-            fill = grey(0.4),
-            lwd = 0)
+            fill = grey(0.6),
+            lwd=0) +
+    xlim(bounds[c("xmin","xmax")]) +
+    ylim(bounds[c("ymin","ymax")])
 
   if(obs) {
     if(!outlier) {
       sf_data <- sf_data %>% filter(keep)
     }
-    p <- p + geom_sf(data = sf_data, col = grey(0.8), size = 1, shape = 3)
+    p <- p + geom_sf(data = sf_data, col = grey(0.8), size = 0.75, shape = 3)
   }
 
   if(length(unique(x$id)) > 1) {
@@ -90,20 +82,25 @@ quickmap <- function(x,
   } else {
     lab_dates <- with(sf_locs, seq(min(date), max(date), l = 5)) %>% as.Date()
 
-    p <- p + geom_sf(data = sf_locs,
+    p <- p + geom_sf(data = sf_lines,
+                     colour = "dodgerblue",
+                     size = 0.1) +
+      geom_sf(data = sf_locs,
                     aes(colour = as.numeric(as.Date(date))),
                      size = size
                      ) +
-      scale_colour_viridis_c("date", breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
+      scale_colour_viridis_c(breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
       theme(legend.position = "bottom",
-            legend.text = element_text(size = 8),
-            legend.key.width = unit(1.5, "cm")
+            legend.title = element_blank(),
+            legend.text = element_text(size = 8, vjust = 0),
+            legend.key.width = unit(1.5, "cm"),
+            legend.key.height = unit(0.5, "cm"),
+            plot.title = element_text(size = 10),
+            plot.subtitle = element_text(size = 5)
             ) +
-      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values"))
-
+      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
+              subtitle = paste0("epsg = ", prj))
   }
-#  p <- p + #theme(legend.position = "none") +
-#    scale_x_continuous(breaks = seq(-180, 180, by = 5))
 
   return(p)
 }

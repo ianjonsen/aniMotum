@@ -4,11 +4,11 @@
 \alias{plot.foieGras}
 \title{plot}
 \usage{
-\method{plot}{foieGras}(m, what = c("fitted", "predicted"),
+\method{plot}{foieGras}(x, what = c("fitted", "predicted"),
   outlier = FALSE)
 }
 \arguments{
-\item{m}{a foieGras fitted object}
+\item{x}{a foieGras fitted object}
 
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
