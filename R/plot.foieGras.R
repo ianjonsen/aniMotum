@@ -5,6 +5,7 @@
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank
+##' @importFrom ggplot2 element_text xlab
 ##' @importFrom gridExtra grid.arrange
 ##' @method plot foieGras
 ##' @export
@@ -12,8 +13,7 @@
 plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
 {
   what <- match.arg(what)
-  if(inherits(x, "grouped_df")) stop("you can only plot 1 individual at a time, eg `plot(fit$ssm[[1]])`")
-  if(all(c(!inherits(x, "grouped_df"), !inherits(x, "foieGras")))) stop("you have not supplied a foieGras fitted object")
+
   f_sf <- x$fitted
   p_sf <- x$predicted
   if(!outlier) {
@@ -66,14 +66,16 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
     geom_path(data = f_df, aes(lon, lat), lwd = 0.25, col = "firebrick") +
     geom_point(data = f_df, aes(lon, lat), size = 0.75, shape = 20, col = "firebrick") +
     theme_bw() +
-    ggtitle(paste0("id: ", f_sf$id[1]), subtitle = "fitted states")
+    ggtitle(label = paste0("id: ", f_sf$id[1], "   model: ", x$pm, "  time.step: ", x$ts, " h"), subtitle = "fitted states") +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
   p2 <- ggplot() +
     geom_point(data = d_df, aes(lon, lat), shape = 19, col = grey(0.85)) +
     geom_path(data = p_df, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
     geom_point(data = p_df, aes(lon, lat), size = 0.75, shape = 20, col = "dodgerblue") +
     theme_bw() +
-    ggtitle(paste0("model: ", x$pm, "    time.step: ", x$ts, " h"), subtitle = "predicted states")
+    ggtitle(label = " ", subtitle = "predicted states") +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
 
   p3 <- ggplot() +
@@ -81,14 +83,18 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
     geom_point(data = switch(what, fitted = f_df, predicted = p_df),
                aes(date, lon), size = 0.75, shape = 20,
                col = switch(what, fitted = "firebrick", predicted = "dodgerblue")) +
-    theme_bw()
+    theme_bw() +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8)) +
+    xlab(element_blank())
 
   p4 <- ggplot() +
     geom_point(data = d_df, aes(date, lat), shape = 19, col = grey(0.85)) +
     geom_point(data = switch(what, fitted = f_df, predicted = p_df),
                aes(date, lat), size = 0.75, shape = 20,
                col = switch(what, fitted = "firebrick", predicted = "dodgerblue")) +
-    theme_bw()
+    theme_bw() +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8)) +
+    xlab(element_blank())
 
   grid.arrange(p1, p2, p3, p4, layout_matrix = matrix(
     c(1, 2, 1, 2, 3, 3, 4, 4),
