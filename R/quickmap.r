@@ -8,9 +8,10 @@
 ##' @param crs `proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used
 ##' @param ext.rng proportions to extend the plot range in x and y dimensions
 ##' @param size size of estimated location points
-##' @importFrom ggplot2 ggplot geom_sf aes ggtitle
-##' @importFrom ggplot2 theme element_blank scale_colour_viridis_d
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit element_text
+##' @importFrom ggplot2 theme element_blank scale_colour_viridis_c
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
+##' @importFrom dplyr summarise
 ##' @export
 
 quickmap <- function(x,
@@ -69,7 +70,7 @@ quickmap <- function(x,
     if(!outlier) {
       sf_data <- sf_data %>% filter(keep)
     }
-    p <- p + geom_sf(data = sf_data, col = grey(0.8), size = 0.75, shape = 3)
+    p <- p + geom_sf(data = sf_data, colour = "orange", size = 2, shape = 18, alpha = 0.3)
   }
 
   if(length(unique(x$id)) > 1) {
@@ -89,7 +90,7 @@ quickmap <- function(x,
                     aes(colour = as.numeric(as.Date(date))),
                      size = size
                      ) +
-      scale_colour_viridis_c(breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
+      scale_colour_viridis_c(breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates, end = 0.95) +
       theme(legend.position = "bottom",
             legend.title = element_blank(),
             legend.text = element_text(size = 8, vjust = 0),
