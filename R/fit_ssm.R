@@ -100,6 +100,5 @@ fit_ssm <- function(d,
         x$opt$convergence == 0)) %>%
       select(id, ssm, converged)
   }
-  fit <- fit %>% group_by(id)
   return(fit)
 }
