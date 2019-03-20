@@ -16,9 +16,9 @@ quickmap(x, what = c("fitted", "predicted"), obs = FALSE,
 
 \item{outlier}{include all extreme outliers flagged by prefilter in plots (logical); ignored if `obs = FALSE`}
 
-\item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 4326) for the fitting the SSM will be used}
+\item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 3395) for the fitting the SSM will be used}
 
-\item{ext.rng}{proportions to extend the plot range in x and y dimensions}
+\item{ext.rng}{factors to extend the plot range in x and y dimensions (can exceed 1)}
 
 \item{size}{size of estimated location points}
 }
