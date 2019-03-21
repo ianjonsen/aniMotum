@@ -27,3 +27,30 @@
 ##'  @importFrom grDevices extendrange grey
 NULL
 
+##' @name ellie
+##' @docType data
+##' @title Elephant seal Argos satellite data (1 individual)
+##' @format .RData
+##' @keywords data
+##' @description Example elephant seal Argos tracking data. Data were sourced from
+##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
+##' Australian Government through the National Collaborative Research Infrastructure
+##' Strategy and the Super Science Initiative.
+NULL
+
+##' @name rope
+##' @docType data
+##' @title Royal penguin Argos satellite data (13 individuals)
+##' @format .RData
+##' @keywords data
+##' @description Example penguin Argos tracking data.
+NULL
+
+##' @name testfit
+##' @docType data
+##' @title a test foieGras fitted model object
+##' @format .RData
+##' @keywords data
+##' @description a foieGras fitted model object, using the ellie example data,
+##' for package testing purposes
+NULL
