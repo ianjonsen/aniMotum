@@ -4,36 +4,48 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step, parameters, fit.to.subset, optim, verbose, inner.control)
+fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step,
+parameters, fit.to.subset, optim, verbose, inner.control)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
 
-\item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations}
+\item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define
+outlier locations}
 
-\item{ang}{angles of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+\item{ang}{angles of outlier location "spikes" - see ?argosfilter::sdafilter
+for details}
 
-\item{distlim}{lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+\item{distlim}{lengths of outlier location "spikes" - see
+?argosfilter::sdafilter for details}
 
 \item{spdf}{(logical) turn argosfilter::sdafilter on (default; TRUE) or off}
 
-\item{min.dt}{minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM}
+\item{min.dt}{minimum allowable time difference between observations;
+dt <= min.dt will be ignored by the SSM}
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
 
-\item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model}
+\item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk
+("crw") as a continuous-time process model}
 
-\item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
+\item{time.step}{the regular time interval, in hours, to predict to.
+Alternatively, a vector of prediction times, possibly not regular, must be
+specified as a data.frame with id and POSIXt dates.}
 
-\item{parameters}{a list of initial values for all model parameters and unobserved states, default is to let sfilter specifiy these. Only play with this if you know what you are doing...}
+\item{parameters}{a list of initial values for all model parameters and
+unobserved states, default is to let sfilter specifiy these. Only play with
+this if you know what you are doing...}
 
-\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
+\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter
+(default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
 \item{verbose}{report progress during minimization}
 
-\item{inner.control}{list of control settings for the inner optimization (see ?TMB::MakeADFUN for additional details)}
+\item{inner.control}{list of control settings for the inner optimization
+(see ?TMB::MakeADFUN for additional details)}
 }
 \value{
 a list with components
@@ -52,7 +64,8 @@ a list with components
 \item{\code{time}}{the processing time for sfilter}
 }
 \description{
-fits either a simple random walk or a correlated random walk (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
+fits either a simple random walk or a correlated random walk
+(a random walk on velocity) in continuous time to filter Argos KF and/or LS data
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
@@ -82,6 +95,7 @@ plot(fls$ssm[[3]], what = "p", obs = TRUE)
 ## grab predicted locations for all individuals as a single sf tibble
 ##  and produce a basic ggplot
 plocs <- grab(fls, what = "p")
-ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() + ggplot2::scale_colour_viridis_c()
+ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() +
+   ggplot2::scale_colour_viridis_c()
 }
 }

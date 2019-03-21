@@ -1,24 +1,37 @@
 ##' @title Fit a Continuous-time state-space model to filter Argos data
 ##'
-##' @description fits either a simple random walk or a correlated random walk (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
+##' @description fits either a simple random walk or a correlated random walk
+##' (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
 ##' and predict locations at user-specified time intervals (regular or irregular)
 ##'
-##' @usage fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step, parameters, fit.to.subset, optim, verbose, inner.control)
+##' @usage fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step,
+##' parameters, fit.to.subset, optim, verbose, inner.control)
 ##'
 ##' @param d a data frame of observations including Argos KF error ellipse info
-##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
-##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
-##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define
+##'  outlier locations
+##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter
+##'  for details
+##' @param distlim lengths of outlier location "spikes" - see
+##' ?argosfilter::sdafilter for details
 ##' @param spdf (logical) turn argosfilter::sdafilter on (default; TRUE) or off
-##' @param min.dt minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM
+##' @param min.dt minimum allowable time difference between observations;
+##' dt <= min.dt will be ignored by the SSM
 ##' @param pf just pre-filter the data, do not fit the ctrw (default is FALSE)
-##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model
-##' @param time.step the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.
-##' @param parameters a list of initial values for all model parameters and unobserved states, default is to let sfilter specifiy these. Only play with this if you know what you are doing...
-##' @param fit.to.subset fit the SSM to the data subset determined by prefilter (default is TRUE)
+##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk
+##' ("crw") as a continuous-time process model
+##' @param time.step the regular time interval, in hours, to predict to.
+##' Alternatively, a vector of prediction times, possibly not regular, must be
+##' specified as a data.frame with id and POSIXt dates.
+##' @param parameters a list of initial values for all model parameters and
+##' unobserved states, default is to let sfilter specifiy these. Only play with
+##' this if you know what you are doing...
+##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
+##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization
-##' @param inner.control list of control settings for the inner optimization (see ?TMB::MakeADFUN for additional details)
+##' @param inner.control list of control settings for the inner optimization
+##' (see ?TMB::MakeADFUN for additional details)
 ##'
 ##' @return a list with components
 ##' \item{\code{call}}{the matched call}
@@ -62,7 +75,8 @@
 ##' ## grab predicted locations for all individuals as a single sf tibble
 ##' ##  and produce a basic ggplot
 ##' plocs <- grab(fls, what = "p")
-##' ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() + ggplot2::scale_colour_viridis_c()
+##' ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() +
+##'    ggplot2::scale_colour_viridis_c()
 ##' }
 ##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
 ##' @importFrom tibble as_tibble
@@ -94,7 +108,14 @@ fit_ssm <- function(d,
   cat("prefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
-    do(pf = prefilter(., vmax = vmax, ang = ang, distlim = distlim, spdf = spdf, min.dt = min.dt))
+    do(pf = prefilter(
+      .,
+      vmax = vmax,
+      ang = ang,
+      distlim = distlim,
+      spdf = spdf,
+      min.dt = min.dt
+    ))
 
   if(pf){
     pfd <- lapply(fit$pf, function(.) .$data)
@@ -103,7 +124,18 @@ fit_ssm <- function(d,
   } else {
     cat("\nfitting SSM...\n")
     fit <- fit %>%
-      do(ssm = try(sfilter(.$pf, ...), silent = TRUE))
+      do(ssm = try(sfilter(
+        .$pf,
+        model = model,
+        time.step = time.step,
+        parameters = parameters,
+        fit.to.subset = fit.to.subset,
+        optim = optim,
+        verbose = verbose,
+        inner.control = inner.control
+      ),
+      silent = TRUE)
+      )
 
     fail <- which(sapply(fit$ssm, length) == 6 || sapply(fit$ssm, length) == 1)
     if (length(fail) > 0) {

@@ -13,6 +13,8 @@
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
 \item{outlier}{include all extreme outliers flagged by prefilter in plots (logical)}
+
+\item{...}{additional arguments to be ignored}
 }
 \description{
 Visualise foieGras SSM fits to track data

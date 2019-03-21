@@ -4,6 +4,7 @@
 ##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
+##' @param ... additional arguments to be ignored
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank
 ##' @importFrom ggplot2 element_text xlab
 ##' @importFrom gridExtra grid.arrange
