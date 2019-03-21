@@ -33,4 +33,5 @@ Imports:
 Remotes: 
     hadley/multidplyr
 Suggests: 
-    testthat
+    testthat,
+    rworldmap
