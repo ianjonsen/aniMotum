@@ -58,26 +58,31 @@ and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
 \dontrun{
-require(dplyr)
-## fit RW model to Argos data with KF error ellipse data
-## use a 6-h time.step
 data(ellie)
-fkf <- fit_ssm(ellie, time.step = 6)
+fkf <- fit_ssm(ellie, time.step = 12)
 
-## summary plot of fitted locations as mercator x,y
-plot(fkf$ssm[[1]], proj="xy")
+## view quick summary output
+fkf
 
-## summary plot of fitted locations as longlat
+## summary plot of fit, with (irregular) fitted lon, lat state time-series
 plot(fkf$ssm[[1]])
+
+## summary plot of fit, with (regular) predicted lon, laat state time-series
+plot(fkf$ssm[[1]], what = "p")
 
 ## fit CRW model to multiple individuals with Argos LS data
 data(rope)
-fls <- fit_ssm(rope, model = "crw", time.step = 3)
+fls <- fit_ssm(rope, model = "crw", time.step = 6)
 
-## summary plot of fitted longlat locations for individual 3
+## summary plot of fitted locations for individual 3
 plot(fls$ssm[[3]])
 
-## summary plot of predicted longlat locations for individual 3
-plot(fls$ssm[[3]], est="predicted")
+## map of predicted locations and Argos observations for individual 3
+plot(fls$ssm[[3]], what = "p", obs = TRUE)
+
+## grab predicted locations for all individuals as a single sf tibble
+##  and produce a basic ggplot
+plocs <- grab(fls, what = "p")
+ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() + ggplot2::scale_colour_viridis_c()
 }
 }
