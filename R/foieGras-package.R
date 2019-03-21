@@ -12,8 +12,35 @@
 ##'  @keywords foieGras
 ##'  @examples
 ##'  \dontrun{
+##' ## fit RW model to Argos data with KF error ellipse data
+##' ## use a 12-h time.step
+##' data(ellie)
+##' fkf <- fit_ssm(ellie, time.step = 12)
 ##'
-##'  }
+##' ## view quick summary output
+##' fkf
+##'
+##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
+##' plot(fkf$ssm[[1]])
+##'
+##' ## summary plot of fit, with (regular) predicted lon, laat state time-series
+##' plot(fkf$ssm[[1]], what = "p")
+##'
+##' ## fit CRW model to multiple individuals with Argos LS data
+##' data(rope)
+##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
+##'
+##' ## summary plot of fitted locations for individual 3
+##' plot(fls$ssm[[3]])
+##'
+##' ## map of predicted locations and Argos observations for individual 3
+##' plot(fls$ssm[[3]], what = "p", obs = TRUE)
+##'
+##' ## grab predicted locations for all individuals as a single sf tibble
+##' ##  and produce a basic ggplot
+##' plocs <- grab(fls, what = "p")
+##' ggplot(plocs, aes(colour = id)) + geom_sf() + scale_colour_viridis_c()
+##' }
 ##'  @importFrom utils data
 ##'  @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice distinct arrange filter left_join lag full_join bind_cols summarise
 ##'  @importFrom tibble as_tibble

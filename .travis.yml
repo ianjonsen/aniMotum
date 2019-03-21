@@ -6,6 +6,9 @@ r:
   - release
   - devel
 
+repos:
+  CRAN: https://cloud.r-project.org
+
 warnings_are_errors: false
 
 deploy.skip_cleanup: true
