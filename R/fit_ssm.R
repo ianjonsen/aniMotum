@@ -140,12 +140,12 @@ fit_ssm <- function(d,
     }
 
     fit <- fit %>%
-      ungroup() %>%
+      ungroup(.) %>%
       mutate(id = sapply(.$ssm, function(x)
         x$data$id[1])) %>%
       mutate(converged = sapply(.$ssm, function(x)
         x$opt$convergence == 0)) %>%
-      select(id, ssm, converged)
+      select(., id, ssm, converged)
   }
   return(fit)
 }

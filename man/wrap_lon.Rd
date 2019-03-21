@@ -6,6 +6,12 @@
 \usage{
 wrap_lon(lon, lon_min = -180)
 }
+\arguments{
+\item{lon}{a vector of longitudes}
+
+\item{lon_min}{the minimum longitude value to wrap appropriately, eg. 0 to
+wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180}
+}
 \description{
 Utility functions
 }

@@ -29,7 +29,8 @@ Imports:
     gridExtra,
     lubridate,
     TMB,
-    sf
+    sf,
+    stringr
 Remotes: 
     hadley/multidplyr
 Suggests: 

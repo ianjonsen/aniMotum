@@ -56,3 +56,13 @@ NULL
 ##' @description a foieGras fitted model object, using the ellie example data,
 ##' for package testing purposes
 NULL
+
+## quiets concerns of R CMD check re: the .'s that appear in pipelines
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
+
+## stop R CMD check generating NOTES about global variables
+id <- ssm <- converged <- keep <- id <- y <- x.se <- y.se <- "shut.up"
+geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
+obs.type <- amf_x <- amf_y <- lon <- lat <- rename <- X <- Y <- "shut.up"
+isd <- digits <- "shut.up"
+

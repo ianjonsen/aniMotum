@@ -13,7 +13,7 @@
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
 ##' @param size size of estimated location points
-##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit element_text theme element_blank scale_colour_viridis_c
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit element_text theme element_blank scale_colour_viridis_c scale_colour_viridis_d
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey

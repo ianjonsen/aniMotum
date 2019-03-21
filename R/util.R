@@ -1,7 +1,9 @@
 ##' @title Utility functions
 ##'
 ##' @details Internal function, typically not called by user
-##'
+##' @param lon a vector of longitudes
+##' @param lon_min the minimum longitude value to wrap appropriately, eg. 0 to
+##' wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180
 ##'
 ##' @export
 
@@ -11,8 +13,8 @@ wrap_lon <- function(lon, lon_min = -180) {
 
   }
 
-amf <- function() {
 
+amf <- function() {
 data.frame(
     lc = factor(
       c("3", "2", "1", "0", "A", "B", "Z"),

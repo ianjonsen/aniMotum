@@ -1,3 +1,4 @@
+#define TMB_LIB_INIT R_init_mypkg
 #include <TMB.hpp>
 
 /*
