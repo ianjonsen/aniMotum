@@ -76,7 +76,7 @@ template<class Type>
 
     	// RW PROCESS MODEL
     	for(int i = 1; i < timeSteps; i++) {
-      		cov_dt = pow(dt(i), 2) * cov;
+      		cov_dt = dt(i) * dt(i) * cov;
       		nll_proc.setSigma(cov_dt);
       		jnll += nll_proc(X.row(i) - X.row(i - 1));
     	}
@@ -129,8 +129,8 @@ template<class Type>
           // Argos Least Squares observations
           Type s = tau(0) * K(i,0);
           Type q = tau(1) * K(i,1);
-          cov_obs(0,0) = pow(s, 2);
-          cov_obs(1,1) = pow(q, 2);
+          cov_obs(0,0) = s * s;
+          cov_obs(1,1) = q * q;
           cov_obs(0,1) = s * q * rho_o;
           cov_obs(1,0) = cov_obs(0,1);
         } else if(obs_mod(i) == 1) {
@@ -141,7 +141,7 @@ template<class Type>
           Type m2 = (m(i) * psi / sqrt(2)) * (m(i) * psi / sqrt(2));
           cov_obs(0,0) = (M2 * s2c + m2 * c2c);
           cov_obs(1,1) = (M2 * c2c + m2 * s2c);
-          cov_obs(0,1) = (0.5 * (pow(M(i),2) - pow(m(i) * psi,2))) * cos(c(i)) * sin(c(i));
+          cov_obs(0,1) = (0.5 * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
           cov_obs(1,0) = cov_obs(0,1);
         }
         nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
