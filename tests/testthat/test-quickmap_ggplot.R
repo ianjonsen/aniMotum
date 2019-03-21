@@ -1,8 +1,28 @@
 context("test quickmap")
 
 data(testfit)
-p <- quickmap(testfit$ssm[[1]], what = "predicted", obs = TRUE, outlier = FALSE)
+## step through the options incrementally
+p <- quickmap(testfit$ssm[[1]], what = "predicted")
+test_that("quickmap defaults return a ggplot object", {
+  expect_s3_class(p, "ggplot")
+})
 
-test_that("quickmap returns a ggplot object", {
+p <- quickmap(testfit$ssm[[1]], what = "predicted", obs = TRUE)
+test_that("quickmap with obs plotted returns a ggplot object", {
+  expect_s3_class(p, "ggplot")
+})
+
+p <- quickmap(testfit$ssm[[1]], what = "predicted", obs = TRUE, outlier = TRUE)
+test_that("quickmap w all obs plotted returns a ggplot object", {
+  expect_s3_class(p, "ggplot")
+})
+
+p <- quickmap(testfit$ssm[[1]], what = "predicted", obs = TRUE, outlier = TRUE, ext.rng=c(0.1, 0.1))
+test_that("quickmap with plot range extended by 10% in x,y returns a ggplot object", {
+  expect_s3_class(p, "ggplot")
+})
+
+p <- quickmap(testfit$ssm[[1]], what = "predicted", obs = TRUE, outlier = TRUE, ext.rng=c(0.1, 0.1), size = 2.5)
+test_that("quickmap with re-sized plot symbols returns a ggplot object", {
   expect_s3_class(p, "ggplot")
 })
