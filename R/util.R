@@ -2,7 +2,14 @@
 ##'
 ##' @details Internal function, typically not called by user
 ##'
+##'
 ##' @export
+
+wrap_lon <- function(lon, lon_min = -180) {
+
+  (lon - lon_min) %% 360 + lon_min
+
+  }
 
 amf <- function() {
 
