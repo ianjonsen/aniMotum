@@ -1,5 +1,5 @@
 # foieGras
-fit continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
+get your location ducks all lined up by fitting continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)  
 master branch:  
