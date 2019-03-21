@@ -5,7 +5,7 @@
 \title{plot}
 \usage{
 \method{plot}{foieGras}(x, what = c("fitted", "predicted"),
-  outlier = FALSE)
+  outlier = FALSE, ...)
 }
 \arguments{
 \item{x}{a foieGras fitted object}

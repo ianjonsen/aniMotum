@@ -4,16 +4,16 @@
 \alias{grab}
 \title{grab tbl's by name from a foieGras fitted model object}
 \usage{
-grab(fitobj, what, as_sf = TRUE)
+grab(x, what, as_sf = TRUE)
 }
 \arguments{
+\item{x}{a foieGras fitted model object}
+
 \item{what}{the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)}
 
 \item{as_sf}{logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble}
 
 \item{...}{additional arguments are ignored}
-
-\item{fitobj}{a foieGras fitted model object}
 }
 \value{
 a tbl with all individual tbl's appended

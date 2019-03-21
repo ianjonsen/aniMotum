@@ -10,6 +10,7 @@
 ##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols %>%
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
+##' @importFrom stats na.omit
 ##'
 ##' @export
 

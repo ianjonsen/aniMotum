@@ -10,8 +10,13 @@
 ##' @method plot foieGras
 ##' @export
 
-plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
+plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ...)
 {
+
+  if (length(list(...)) > 0) {
+    warning("additional arguments ignored")
+  }
+
   what <- match.arg(what)
 
   f_sf <- x$fitted

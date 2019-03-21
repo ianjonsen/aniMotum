@@ -2,11 +2,11 @@
 ##' @importFrom dplyr %>%
 ##' @method summary foieGras
 ##' @export
-summary.foieGras <- function(x, digits = 3, ...) {
+summary.foieGras <- function(object, ...) {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
-
+  x <- object
   mmod <- class(x$data)[2]
   nbrStates <- nrow(x$predicted)
   nbStates <- nrow(x$fitted)

@@ -4,9 +4,9 @@
 ##' a compound tbl created when fitting to multiple individual data sets. The specified tbl's
 ##' are appended to a single output tbl.
 ##'
-##' @usage grab(fitobj, what, as_sf = TRUE)
+##' @usage grab(x, what, as_sf = TRUE)
 ##'
-##' @param fitobj a foieGras fitted model object
+##' @param x a foieGras fitted model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)
 ##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble
 ##' @param ... additional arguments are ignored
@@ -27,10 +27,8 @@
 ##' @importFrom tibble as_tibble
 ##' @export
 ##'
-grab <- function(x, what = "fitted", as_sf = TRUE, ...) {
-  if (length(list(...)) > 0) {
-    warning("additional arguments ignored")
-  }
+grab <- function(x, what = "fitted", as_sf = TRUE) {
+
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
   if(!what %in% c("fitted","predicted","data"))

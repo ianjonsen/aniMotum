@@ -11,6 +11,8 @@
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit element_text
 ##' @importFrom ggplot2 theme element_blank scale_colour_viridis_c
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
+##' @importFrom utils data
+##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise
 ##' @export
 
