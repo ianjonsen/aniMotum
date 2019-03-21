@@ -1,0 +1,29 @@
+##' fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
+##'
+##' @name foieGras-package
+##' @aliases foieGras foieGras-package
+##' @docType package
+##' @author Ian Jonsen, Toby Patterson
+##'
+##'  Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
+##'  @seealso fit_ssm
+##'  @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology 100:e02566
+##'
+##'  @keywords foieGras
+##'  @examples
+##'  \dontrun{
+##'
+##'  }
+##'  @importFrom utils data
+##'  @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice distinct arrange filter left_join lag full_join bind_cols summarise
+##'  @importFrom tibble as_tibble
+##'  @importFrom lubridate ymd_hms
+##'  @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs st_coordinates st_geometry<- st_bbox st_cast
+##'  @importFrom argosfilter sdafilter
+##'  @importFrom TMB MakeADFun sdreport newtonOption
+##'  @importFrom stats approx cov sd predict nlminb optim na.omit
+##'  @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank geom_sf xlim ylim unit element_text scale_colour_viridis_c
+##'  @importFrom gridExtra grid.arrange
+##'  @importFrom grDevices extendrange grey
+NULL
+
