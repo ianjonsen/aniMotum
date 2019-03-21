@@ -96,8 +96,9 @@ plot(fls$ssm[[3]], what = "p", obs = TRUE)
 
 ## grab predicted locations for all individuals as a single sf tibble
 ##  and produce a basic ggplot
+library(ggplot2)
 plocs <- grab(fls, what = "p")
-ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() +
-   ggplot2::scale_colour_viridis_c()
+ggplot(plocs, aes(colour = id)) + geom_sf() +
+   scale_colour_viridis_d()
 
 }
