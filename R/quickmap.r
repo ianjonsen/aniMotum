@@ -32,10 +32,13 @@ quickmap <- function(x,
          predicted = {
            sf_locs <- x$predicted
          })
-  } else if(class(x) == "sf"){
+  } else if(class(x)[1] == "sf"){
     sf_locs <- x
-    what <- class(x)[2]
+    what <- substitute(x)
+  } else {
+    stop("you can only supply a foieGras fit object or the output from `foieGras::grab()`")
   }
+
   if(is.null(crs)) {
     prj <- st_crs(sf_locs)
     sf_data <- x$data

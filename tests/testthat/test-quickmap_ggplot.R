@@ -32,3 +32,9 @@ test_that("quickmap with user-specified crs returns a ggplot object", {
   expect_s3_class(p, "ggplot")
 })
 
+data(ellie)
+test_that("quickmap returns error when input is not a foieGras object or output from grab()", {
+  expect_error(quickmap(ellie))
+})
+
+
