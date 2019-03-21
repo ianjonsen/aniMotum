@@ -16,46 +16,20 @@ Ian Jonsen, Toby Patterson
  @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology 100:e02566
 
  @keywords foieGras
- @examples
- \donttest{
-## fit RW model to Argos data with KF error ellipse data
-## use a 12-h time.step
-data(ellie)
-fkf <- fit_ssm(ellie, time.step = 12)
-
-## view quick summary output
-fkf
-
-## summary plot of fit, with (irregular) fitted lon, lat state time-series
-plot(fkf$ssm[[1]])
-
-## summary plot of fit, with (regular) predicted lon, laat state time-series
-plot(fkf$ssm[[1]], what = "p")
-
-## fit CRW model to multiple individuals with Argos LS data
-data(rope)
-fls <- fit_ssm(rope, model = "crw", time.step = 6)
-
-## summary plot of fitted locations for individual 3
-plot(fls$ssm[[3]])
-
-## map of predicted locations and Argos observations for individual 3
-plot(fls$ssm[[3]], what = "p", obs = TRUE)
-
-## grab predicted locations for all individuals as a single sf tibble
-##  and produce a basic ggplot
-plocs <- grab(fls, what = "p")
-ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() + ggplot2::scale_colour_viridis_c()
-}
  @importFrom utils data
- @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice distinct arrange filter left_join lag full_join bind_cols summarise
+ @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
+ @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
+ @importFrom dplyr summarise
  @importFrom tibble as_tibble
  @importFrom lubridate ymd_hms
- @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs st_coordinates st_geometry<- st_bbox st_cast
+ @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
+ @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
  @importFrom argosfilter sdafilter
  @importFrom TMB MakeADFun sdreport newtonOption
  @importFrom stats approx cov sd predict nlminb optim na.omit
- @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank geom_sf xlim ylim unit element_text scale_colour_viridis_c
+ @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw
+ @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit
+ @importFrom ggplot2 element_text scale_colour_viridis_c
  @importFrom gridExtra grid.arrange
  @importFrom grDevices extendrange grey
 }

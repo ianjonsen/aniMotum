@@ -4,12 +4,11 @@
 ##' a compound tbl created when fitting to multiple individual data sets. The specified tbl's
 ##' are appended to a single output tbl.
 ##'
-##' @usage grab(x, what, as_sf = TRUE)
+##' @usage grab(x, what, as_sf)
 ##'
 ##' @param x a foieGras fitted model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)
 ##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble
-##' @param ... additional arguments are ignored
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'

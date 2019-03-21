@@ -3,13 +3,15 @@
 ##' @description fits either a simple random walk or a correlated random walk (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
 ##' and predict locations at user-specified time intervals (regular or irregular)
 ##'
+##' @usage fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step, parameters, fit.to.subset, optim, verbose, inner.control)
+##'
 ##' @param d a data frame of observations including Argos KF error ellipse info
 ##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
 ##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
 ##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param spdf (logical) turn argosfilter::sdafilter on (default; TRUE) or off
 ##' @param min.dt minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM
 ##' @param pf just pre-filter the data, do not fit the ctrw (default is FALSE)
-##' @param ... arguments passed to sfilter, described below:
 ##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model
 ##' @param time.step the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.
 ##' @param parameters a list of initial values for all model parameters and unobserved states, default is to let sfilter specifiy these. Only play with this if you know what you are doing...
@@ -73,7 +75,13 @@ fit_ssm <- function(d,
                     spdf = TRUE,
                     min.dt = 60,
                     pf = FALSE,
-                    ...
+                    model = "rw",
+                    time.step = 6,
+                    parameters = NULL,
+                    fit.to.subset = TRUE,
+                    optim = "nlminb",
+                    verbose = FALSE,
+                    inner.control = NULL
                     )
 {
 

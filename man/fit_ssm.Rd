@@ -4,8 +4,7 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
-  spdf = TRUE, min.dt = 60, pf = FALSE, ...)
+fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step, parameters, fit.to.subset, optim, verbose, inner.control)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -16,11 +15,11 @@ fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
 
 \item{distlim}{lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details}
 
+\item{spdf}{(logical) turn argosfilter::sdafilter on (default; TRUE) or off}
+
 \item{min.dt}{minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM}
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
-
-\item{...}{arguments passed to sfilter, described below:}
 
 \item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk ("crw") as a continuous-time process model}
 

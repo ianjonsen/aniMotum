@@ -16,12 +16,13 @@
 sfilter <-
   function(x,
            model = c("rw", "crw"),
-           time.step,
+           time.step = 6,
            parameters = NULL,
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
            inner.control = NULL) {
+
     st <- proc.time()
     call <- match.call()
     optim <- match.arg(optim)
