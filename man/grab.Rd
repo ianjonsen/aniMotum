@@ -23,13 +23,3 @@ a tbl with all individual tbl's appended
 from a compound tbl created when fitting to multiple individual data sets.
 The specified tbl's are appended to a single output tbl.
 }
-\examples{
-\donttest{
-data(rope)
-fit <- fit_ssm(rope, model = "crw", time.step = 12)
-
-plocs <- grab(fit, "predicted")
-ggplot(plocs, aes(colour = id)) + geom_sf()
-}
-
-}

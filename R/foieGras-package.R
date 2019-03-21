@@ -48,15 +48,6 @@ NULL
 ##' @description Example penguin Argos tracking data.
 NULL
 
-##' @name testfit
-##' @docType data
-##' @title a test foieGras fitted model object
-##' @format .RData
-##' @keywords data
-##' @description a foieGras fitted model object, using the ellie example data,
-##' for package testing purposes
-NULL
-
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 

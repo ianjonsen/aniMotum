@@ -12,14 +12,6 @@
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'
-##' @examples
-##' \donttest{
-##' data(rope)
-##' fit <- fit_ssm(rope, model = "crw", time.step = 12)
-##'
-##' plocs <- grab(fit, "predicted")
-##' ggplot(plocs, aes(colour = id)) + geom_sf()
-##' }
 ##'
 ##' @importFrom dplyr %>% tbl_df arrange mutate select bind_rows
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs

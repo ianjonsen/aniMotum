@@ -71,7 +71,7 @@ fits either a simple random walk or a correlated random walk
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
-\donttest{
+
 data(ellie)
 fkf <- fit_ssm(ellie, time.step = 12)
 
@@ -99,5 +99,5 @@ plot(fls$ssm[[3]], what = "p", obs = TRUE)
 plocs <- grab(fls, what = "p")
 ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() +
    ggplot2::scale_colour_viridis_c()
-}
+
 }

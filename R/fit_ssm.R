@@ -46,7 +46,7 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @examples
-##' \donttest{
+##'
 ##' data(ellie)
 ##' fkf <- fit_ssm(ellie, time.step = 12)
 ##'
@@ -74,7 +74,7 @@
 ##' plocs <- grab(fls, what = "p")
 ##' ggplot2::ggplot(plocs, aes(colour = id)) + ggplot2::geom_sf() +
 ##'    ggplot2::scale_colour_viridis_c()
-##' }
+##'
 ##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
 ##' @importFrom tibble as_tibble
 ##'
