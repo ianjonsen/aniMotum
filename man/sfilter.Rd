@@ -2,14 +2,37 @@
 % Please edit documentation in R/sfilter.R
 \name{sfilter}
 \alias{sfilter}
-\title{fit a C-T SSM to individual track data}
+\title{fit a continuous-time SSM to filter Argos LS or KF track data}
 \usage{
 sfilter(x, model = c("rw", "crw"), time.step = 6, parameters = NULL,
   fit.to.subset = TRUE, optim = c("nlminb", "optim"),
   verbose = FALSE, inner.control = NULL)
 }
+\arguments{
+\item{x}{Argos data passed through prefilter()}
+
+\item{model}{specify which SSM is to be fit: "rw" or "crw"}
+
+\item{time.step}{the regular time interval, in hours, to predict to.
+Alternatively, a vector of prediction times, possibly not regular, must be
+specified as a data.frame with id and POSIXt dates.}
+
+\item{parameters}{a list of initial values for all model parameters and
+unobserved states, default is to let sfilter specifiy these. Only play with
+this if you know what you are doing...}
+
+\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter
+(default is TRUE)}
+
+\item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
+
+\item{verbose}{report progress during minimization}
+
+\item{inner.control}{list of control settings for the inner optimization
+(see ?TMB::MakeADFUN for additional details)}
+}
 \description{
-Filter Argos LS or KF track data
+fit a continuous-time SSM to filter Argos LS or KF track data
 }
 \details{
 Internal function

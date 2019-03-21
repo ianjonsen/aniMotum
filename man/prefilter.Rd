@@ -21,13 +21,16 @@ prefilter(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
 }
 \description{
-\code{prefilter()} (1) determines Argos data type (LS or KF); (2) converts dates to POSIXt;
-identifies observations with duplicate dates; (3) orders observations in time;
-(4) removes duplicate observations; (5) removes observations occurring within 60 s of one another (keeps first);
-(6) shifts longitudes that straddle -180,180 to 0,360 and vice-versa; (7) projects lonlat coords to mercator x,y
-coords (in km); (8) adds location error multiplication factors based on Argos location class (for type LS);
-and (9) uses a argosfilter::sdafilter to identify potential outlier locations (by distance only) to be ignored when fitting
-the \code{ctrw} model
+\code{prefilter()} (1) determines Argos data type (LS or KF);
+(2) converts dates to POSIXt & identifies observations with duplicate dates;
+(3) orders observations in time; (4) removes duplicate observations;
+(5) removes observations occurring within 60 s of one another (keeps first);
+(6) shifts longitudes that straddle -180,180 to 0,360 and vice-versa;
+(7) projects lonlat coords to mercator x,y coords (in km);
+(8) adds location error multiplication factors based on Argos location
+class (for type LS);
+(9) uses a argosfilter::sdafilter to identify potential outlier locations
+(by distance only) to be ignored when fitting the \code{ctrw} model
 }
 \details{
 Internal function

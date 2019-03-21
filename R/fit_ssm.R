@@ -4,9 +4,6 @@
 ##' (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
 ##' and predict locations at user-specified time intervals (regular or irregular)
 ##'
-##' @usage fit_ssm(d, vmax, ang, distlim, spdf, min.dt, pf, model, time.step,
-##' parameters, fit.to.subset, optim, verbose, inner.control)
-##'
 ##' @param d a data frame of observations including Argos KF error ellipse info
 ##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define
 ##'  outlier locations

@@ -11,7 +11,6 @@ fit Continuous-Time Random Walk and Correlated Random Walk state-space models to
 \author{
 Ian Jonsen, Toby Patterson
 
- Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
  @seealso fit_ssm
  @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology 100:e02566
 

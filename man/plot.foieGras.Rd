@@ -17,5 +17,5 @@
 \item{...}{additional arguments to be ignored}
 }
 \description{
-Visualise foieGras SSM fits to track data
+visualise foieGras SSM fits to track data
 }

@@ -4,22 +4,24 @@
 \alias{grab}
 \title{grab tbl's by name from a foieGras fitted model object}
 \usage{
-grab(x, what, as_sf)
+grab(x, what = "fitted", as_sf = TRUE)
 }
 \arguments{
 \item{x}{a foieGras fitted model object}
 
-\item{what}{the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)}
+\item{what}{the tibble to be grabbed; either `fitted`, `predicted`, or
+`data` (single letters can be used)}
 
-\item{as_sf}{logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble}
+\item{as_sf}{logical; if FALSE then return a tibble with unprojected lonlat
+coordinates, otherwise return an sf tibble}
 }
 \value{
 a tbl with all individual tbl's appended
 }
 \description{
-`grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's from
-a compound tbl created when fitting to multiple individual data sets. The specified tbl's
-are appended to a single output tbl.
+`grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's
+from a compound tbl created when fitting to multiple individual data sets.
+The specified tbl's are appended to a single output tbl.
 }
 \examples{
 \donttest{

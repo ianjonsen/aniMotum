@@ -1,6 +1,7 @@
-##' Visualise foieGras SSM fits to track data
-##'
 ##' @title plot
+##'
+##' @description visualise foieGras SSM fits to track data
+##'
 ##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)

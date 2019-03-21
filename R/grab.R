@@ -1,14 +1,14 @@
 ##' @title grab tbl's by name from a foieGras fitted model object
 ##'
-##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's from
-##' a compound tbl created when fitting to multiple individual data sets. The specified tbl's
-##' are appended to a single output tbl.
-##'
-##' @usage grab(x, what, as_sf)
+##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's
+##' from a compound tbl created when fitting to multiple individual data sets.
+##' The specified tbl's are appended to a single output tbl.
 ##'
 ##' @param x a foieGras fitted model object
-##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or `data` (single letters can be used)
-##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat coordinates, otherwise return an sf tibble
+##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or
+##' `data` (single letters can be used)
+##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
+##' coordinates, otherwise return an sf tibble
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'

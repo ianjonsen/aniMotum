@@ -1,8 +1,21 @@
-##' Filter Argos LS or KF track data
+##' @title fit a continuous-time SSM to filter Argos LS or KF track data
 ##'
-##' Internal function
+##' @details Internal function
 ##'
-##' @title fit a C-T SSM to individual track data
+##' @param x Argos data passed through prefilter()
+##' @param model specify which SSM is to be fit: "rw" or "crw"
+##' @param time.step the regular time interval, in hours, to predict to.
+##' Alternatively, a vector of prediction times, possibly not regular, must be
+##' specified as a data.frame with id and POSIXt dates.
+##' @param parameters a list of initial values for all model parameters and
+##' unobserved states, default is to let sfilter specifiy these. Only play with
+##' this if you know what you are doing...
+##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
+##' (default is TRUE)
+##' @param optim numerical optimizer to be used ("nlminb" or "optim")
+##' @param verbose report progress during minimization
+##' @param inner.control list of control settings for the inner optimization
+##' (see ?TMB::MakeADFUN for additional details)
 ##'
 ##' @useDynLib foieGras
 ##' @importFrom TMB MakeADFun sdreport newtonOption

@@ -14,14 +14,18 @@ quickmap(x, what = c("fitted", "predicted"), obs = FALSE,
 
 \item{obs}{include Argos observations on map (logical)}
 
-\item{outlier}{include all extreme outliers flagged by prefilter in plots (logical); ignored if `obs = FALSE`}
+\item{outlier}{include all extreme outliers flagged by prefilter in plots
+(logical); ignored if `obs = FALSE`}
 
-\item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the default projection (eg. 3395) for the fitting the SSM will be used}
+\item{crs}{`proj4string` or `epsg` for reprojecting locations, if NULL the
+default projection (eg. 3395) for the fitting the SSM will be used}
 
-\item{ext.rng}{factors to extend the plot range in x and y dimensions (can exceed 1)}
+\item{ext.rng}{factors to extend the plot range in x and y dimensions
+(can exceed 1)}
 
 \item{size}{size of estimated location points}
 }
 \description{
-map foieGras fitted or predicted locations
+map foieGras fitted or predicted locations, with or without
+Argos observations, optionally apply a different projection
 }
