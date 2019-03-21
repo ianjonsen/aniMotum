@@ -34,5 +34,4 @@ Imports:
 Suggests: 
     testthat,
     rworldmap,
-    sp,
     rgeos
