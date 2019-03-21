@@ -10,10 +10,6 @@ r:
 repos:
   CRAN: https://cloud.r-project.org
 
-r_packages:
-  - rgeos
-  - rgdal
-
 warnings_are_errors: false
 
 deploy.skip_cleanup: true

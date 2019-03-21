@@ -67,7 +67,7 @@
 ##' plot(fls$ssm[[3]])
 ##'
 ##' ## map of predicted locations and Argos observations for individual 3
-##' plot(fls$ssm[[3]], what = "p", obs = TRUE)
+##' quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
 ##'
 ##' ## grab predicted locations for all individuals as a single sf tibble
 ##' ##  and produce a basic ggplot
