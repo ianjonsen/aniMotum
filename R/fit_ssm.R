@@ -50,8 +50,6 @@
 ##' data(ellie)
 ##' fkf <- fit_ssm(ellie, time.step = 12)
 ##'
-##' ## view quick summary output
-##' fkf
 ##'
 ##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 ##' plot(fkf$ssm[[1]])
@@ -64,7 +62,7 @@
 ##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
 ##'
 ##' ## summary plot of fitted locations for individual 3
-##' plot(fls$ssm[[3]])
+##' plot(fls$ssm[[3]], "p")
 ##'
 ##' ## map of predicted locations and Argos observations for individual 3
 ##' quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
