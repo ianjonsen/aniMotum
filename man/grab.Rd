@@ -24,7 +24,7 @@ a compound tbl created when fitting to multiple individual data sets. The specif
 are appended to a single output tbl.
 }
 \examples{
-\dontrun{
+\donttest{
 data(rope)
 fit <- fit_ssm(rope, model = "crw", time.step = 12)
 

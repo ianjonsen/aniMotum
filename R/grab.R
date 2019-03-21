@@ -14,7 +14,7 @@
 ##' @return a tbl with all individual tbl's appended
 ##'
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' data(rope)
 ##' fit <- fit_ssm(rope, model = "crw", time.step = 12)
 ##'

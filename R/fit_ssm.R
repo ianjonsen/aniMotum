@@ -34,7 +34,7 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' data(ellie)
 ##' fkf <- fit_ssm(ellie, time.step = 12)
 ##'

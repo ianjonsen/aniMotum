@@ -4,7 +4,7 @@
 \name{foieGras-package}
 \alias{foieGras-package}
 \alias{foieGras}
-\title{fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data}
+\title{\pkg{foieGras}}
 \description{
 fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
 }
@@ -17,7 +17,7 @@ Ian Jonsen, Toby Patterson
 
  @keywords foieGras
  @examples
- \dontrun{
+ \donttest{
 ## fit RW model to Argos data with KF error ellipse data
 ## use a 12-h time.step
 data(ellie)

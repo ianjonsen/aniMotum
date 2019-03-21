@@ -57,7 +57,7 @@ fits either a simple random walk or a correlated random walk (a random walk on v
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
-\dontrun{
+\donttest{
 data(ellie)
 fkf <- fit_ssm(ellie, time.step = 12)
 
