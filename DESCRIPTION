@@ -36,4 +36,5 @@ Remotes:
 Suggests: 
     testthat,
     rworldmap,
-    sp
+    sp,
+    rgeos
