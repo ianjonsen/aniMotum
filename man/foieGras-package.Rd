@@ -42,8 +42,10 @@ plot(fls$ssm[[3]])
 ## map of predicted locations and Argos observations for individual 3
 plot(fls$ssm[[3]], what = "p", obs = TRUE)
 
-## grab predicted locations for all individuals
+## grab predicted locations for all individuals as a single sf tibble
+##  and produce a basic ggplot
 plocs <- grab(fls, what = "p")
+ggplot(plocs, aes(colour = id)) + geom_sf() + scale_colour_viridis_c()
 }
  @importFrom utils data
  @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice distinct arrange filter left_join lag full_join bind_cols summarise
