@@ -35,4 +35,5 @@ Remotes:
     hadley/multidplyr
 Suggests: 
     testthat,
-    rworldmap
+    rworldmap,
+    sp
