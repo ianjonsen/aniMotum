@@ -4,12 +4,17 @@
 \alias{fit_ssm}
 \title{Fit a Continuous-time state-space model to filter Argos data}
 \usage{
-fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
+fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
+  spdf = TRUE, min.dt = 60, pf = FALSE, ...)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
 
 \item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations}
+
+\item{ang}{angles of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+
+\item{distlim}{lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details}
 
 \item{min.dt}{minimum allowable time difference between observations; dt <= min.dt will be ignored by the SSM}
 
@@ -21,21 +26,26 @@ fit_ssm(d, vmax = 10, min.dt = 60, pf = FALSE, ...)
 
 \item{time.step}{the regular time interval, in hours, to predict to. Alternatively, a vector of prediction times, possibly not regular, must be specified as a data.frame with id and POSIXt dates.}
 
+\item{parameters}{a list of initial values for all model parameters and unobserved states, default is to let sfilter specifiy these. Only play with this if you know what you are doing...}
+
 \item{fit.to.subset}{fit the SSM to the data subset determined by prefilter (default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
 \item{verbose}{report progress during minimization}
+
+\item{inner.control}{list of control settings for the inner optimization (see ?TMB::MakeADFUN for additional details)}
 }
 \value{
 a list with components
 \item{\code{call}}{the matched call}
-\item{\code{predicted}}{a data.frame of predicted location states}
-\item{\code{fitted}}{a data.frame of fitted locations}
+\item{\code{predicted}}{an sf tbl of predicted location states}
+\item{\code{fitted}}{an sf tbl of fitted locations}
 \item{\code{par}}{model parameter summmary}
-\item{\code{data}}{the input data.frame}
-\item{\code{subset}}{the input subset vector}
-\item{\code{mem}}{the measurement error model used}
+\item{\code{data}}{an augmented sf tbl of the input data}
+\item{\code{inits}}{a list of initial values}
+\item{\code{pm}}{the process model fit, either "rw" or "crw"}
+\item{\code{ts}}{time time.step in h used}
 \item{\code{opt}}{the object returned by the optimizer}
 \item{\code{tmb}}{the TMB object}
 \item{\code{rep}}{TMB sdreport}

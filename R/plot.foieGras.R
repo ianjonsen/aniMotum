@@ -1,201 +1,100 @@
 ##' Visualise foieGras SSM fits to track data
 ##'
 ##' @title plot
-##' @param m a foieGras fitted object
-##' @param est specify which location estimates to display on time-series plots: fitted or predicted
-##' @param proj specify whether to plot mercator xy or ll (longlat)
-##' @param se include 2 * SE on time-series plots (SE's currently not displayed when proj = "ll")
-##' @param resid display time-series plots as trends (FALSE - default) or as residuals (TRUE)
-##' @param outlier include outliers identified during prefilter-ing
-##' @param wrapLon specify the minimum longitude for wrapping around -180,180 or 0,360 (default is NULL - no wrapping)
-##' @importFrom ggplot2 ggplot geom_point geom_line geom_path aes ggtitle theme_bw theme element_blank
+##' @param x a foieGras fitted object
+##' @param what specify which location estimates to display on time-series plots: fitted or predicted
+##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
+##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw theme element_blank
+##' @importFrom ggplot2 element_text xlab
 ##' @importFrom gridExtra grid.arrange
 ##' @method plot foieGras
 ##' @export
 
-plot.foieGras <- function(m, est = c("fitted","predicted"), proj = c("ll","xy"), se = TRUE, resid = FALSE, outlier = FALSE, wrapLon=NULL)
+plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE)
 {
-  proj <- match.arg(proj)
-  est <- match.arg(est)
-  dd <- if(!outlier) {
-    subset(m$data, keep)
+  what <- match.arg(what)
+
+  f_sf <- x$fitted
+  p_sf <- x$predicted
+  if(!outlier) {
+    d_sf <- x$data %>% filter(keep)
   } else {
-    dd <- m$data
+    d_sf <- x$data
   }
-  nd <- subset(m$data, !keep)
-  fd <- m$fitted
-  pd <- m$predicted
+
+  xy <- f_sf %>% st_coordinates(.) %>%
+    as.data.frame(.)
+  names(xy) <- c("x", "y")
+  ll <- f_sf %>%
+    st_transform(4326) %>%
+    st_coordinates(.) %>%
+    as.data.frame(.)
+  names(ll) <- c("lon", "lat")
+  f_df <- f_sf
+  st_geometry(f_df) <- NULL
+  f_df <- cbind(f_df, ll, xy) %>%
+    select(id, date, lon, lat, x, y, x.se, y.se)
+
+  xy <- p_sf %>% st_coordinates(.) %>%
+    as.data.frame(.)
+  names(xy) <- c("x", "y")
+  ll <- p_sf %>%
+    st_transform(4326) %>%
+    st_coordinates(.) %>%
+    as.data.frame(.)
+  names(ll) <- c("lon", "lat")
+  p_df <- p_sf
+  st_geometry(p_df) <- NULL
+  p_df <- cbind(p_df, ll, xy) %>%
+    select(id, date, lon, lat, x, y, x.se, y.se)
+
+  xy <- st_coordinates(d_sf) %>%
+    as.data.frame(.)
+  names(xy) <- c("x","y")
+  ll <- d_sf %>%
+    st_transform(4326) %>%
+    st_coordinates(.) %>%
+    as.data.frame(.)
+  names(ll) <- c("lon", "lat")
+  d_df <- d_sf
+  st_geometry(d_df) <- NULL
+  d_df <- cbind(d_df, ll, xy) %>%
+    select(id, date, lon, lat, x, y)
+
+  p1 <- ggplot() +
+    geom_point(data = d_df, aes(lon, lat), shape = 19, col = grey(0.85)) +
+    geom_path(data = f_df, aes(lon, lat), lwd = 0.25, col = "firebrick") +
+    geom_point(data = f_df, aes(lon, lat), size = 0.75, shape = 20, col = "firebrick") +
+    theme_bw() +
+    ggtitle(label = paste0("id: ", f_sf$id[1], "   model: ", x$pm, "  time.step: ", x$ts, " h"), subtitle = "fitted states") +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
+
+  p2 <- ggplot() +
+    geom_point(data = d_df, aes(lon, lat), shape = 19, col = grey(0.85)) +
+    geom_path(data = p_df, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
+    geom_point(data = p_df, aes(lon, lat), size = 0.75, shape = 20, col = "dodgerblue") +
+    theme_bw() +
+    ggtitle(label = " ", subtitle = "predicted states") +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
 
-  p1 <-
-    switch(proj,
-        xy = {
-          ggplot() +
-            geom_point(data = dd, aes(x, y), shape = 19, col = grey(0.85)) +
-            geom_point(data = fd, aes(x, y), size = 0.4, shape = 20, col = "red") +
-            geom_path(data = fd, aes(x, y), lwd = 0.25, col = "red") +
-            theme_bw() +
-            ggtitle(paste0(fd$id[1], "\nfitted values"))
-             },
-        ll = {
-          if(is.null(wrapLon)) {
-          ggplot() +
-            geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
-            geom_point(data = fd, aes(lon, lat), size = 0.4, shape = 20, col = "red") +
-            geom_path(data = fd, aes(lon, lat), lwd = 0.25, col = "red") +
-            theme_bw() +
-            ggtitle(paste0(fd$id[1], "\nfitted values"))
-          } else {
-            ggplot() +
-              geom_point(data = dd, aes(wrap_lon(lon,wrapLon), lat), shape = 19, col = grey(0.85)) +
-              geom_point(data = fd, aes(wrap_lon(lon,wrapLon), lat), size = 0.4, shape = 20, col = "red") +
-              geom_path(data = fd, aes(wrap_lon(lon,wrapLon), lat), lwd = 0.25, col = "red") +
-              theme_bw() +
-              ggtitle(paste0(fd$id[1], "\nfitted values"))
-          }
-           })
+  p3 <- ggplot() +
+    geom_point(data = d_df, aes(date, lon), shape = 19, col = grey(0.85)) +
+    geom_point(data = switch(what, fitted = f_df, predicted = p_df),
+               aes(date, lon), size = 0.75, shape = 20,
+               col = switch(what, fitted = "firebrick", predicted = "dodgerblue")) +
+    theme_bw() +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8)) +
+    xlab(element_blank())
 
-
-  p2 <- switch(proj,
-               xy = {
-                 ggplot() +
-                   geom_point(data = dd, aes(x, y), shape = 19, col = grey(0.85)) +
-                   geom_point(data = pd, aes(x, y), size = 0.4, shape = 20, col = "dodgerblue") +
-                   geom_path(data = pd, aes(x, y), lwd = 0.25, col = "dodgerblue") +
-                   theme_bw() +
-                   ggtitle("\npredicted values")
-               },
-               ll = {
-                 if(is.null(wrapLon)) {
-                 ggplot() +
-                   geom_point(data = dd, aes(lon, lat), shape = 19, col = grey(0.85)) +
-                   geom_point(data = pd, aes(lon, lat), size = 0.4, shape = 20, col = "dodgerblue") +
-                   geom_path(data = pd, aes(lon, lat), lwd = 0.25, col = "dodgerblue") +
-                   theme_bw() +
-                   ggtitle("\npredicted values")
-                 } else {
-                   ggplot() +
-                     geom_point(data = dd, aes(wrap_lon(lon,wrapLon), lat), shape = 19, col = grey(0.85)) +
-                     geom_point(data = pd, aes(wrap_lon(lon,wrapLon), lat), size = 0.4, shape = 20, col = "dodgerblue") +
-                     geom_path(data = pd, aes(wrap_lon(lon,wrapLon), lat), lwd = 0.25, col = "dodgerblue") +
-                     theme_bw() +
-                     ggtitle("\npredicted values")
-                 }
-               })
-
-
-  p3 <-
-    switch(est,
-      fitted = {
-      switch(proj,
-           xy = {
-            p <- ggplot() +
-              geom_point(data = dd, aes(date, x), shape = 19, col = grey(0.85)) +
-              geom_point(data = fd, aes(date, x), size = 0.2, shape = 20, col = "red") +
-               theme_bw() +
-               theme(axis.title.x=element_blank())
-              if(se) {
-                p <- p +
-              geom_line(data = fd, aes(date, x + 2 * x.se), lwd = 0.25, col = "red") +
-              geom_line(data = fd, aes(date, x - 2 * x.se), lwd = 0.25, col = "red")
-              }
-              p
-           },
-           ll = {
-             if(is.null(wrapLon)) {
-            ggplot() +
-              geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
-              geom_point(data = fd, aes(date, lon), size = 0.2, shape = 20, col = "red") +
-              theme_bw() +
-               theme(axis.title.x=element_blank())
-             } else {
-               ggplot() +
-                 geom_point(data = dd, aes(date, wrap_lon(lon,wrapLon)), shape = 19, col = grey(0.85)) +
-                 geom_point(data = fd, aes(date, wrap_lon(lon,wrapLon)), size = 0.2, shape = 20, col = "red") +
-                 theme_bw() +
-                 theme(axis.title.x=element_blank())
-             }
-           })
-        },
-      predicted = {
-        switch(proj,
-               xy = {
-                 p <- ggplot() +
-                    geom_point(data = dd, aes(date, x), shape = 19, col = grey(0.85)) +
-                    geom_point(data = pd, aes(date, x), size = 0.2, shape = 20, col = "dodgerblue") +
-                   theme_bw() +
-                   theme(axis.title.x=element_blank())
-                    if(se) {
-                    p <-  p +
-                      geom_line(data = pd, aes(date, x + 2 * x.se), lwd = 0.25, col = "dodgerblue") +
-                    geom_line(data = pd, aes(date, x - 2 * x.se), lwd = 0.25, col = "dodgerblue")
-                    }
-                 p
-               },
-               ll = {
-                 if(is.null(wrapLon)){
-                 ggplot() +
-                   geom_point(data = dd, aes(date, lon), shape = 19, col = grey(0.85)) +
-                   geom_point(data = pd, aes(date, lon), size = 0.2, shape = 20, col = "dodgerblue") +
-                   theme_bw() +
-                   theme(axis.title.x=element_blank())
-                 } else {
-                   ggplot() +
-                     geom_point(data = dd, aes(date, wrap_lon(lon,wrapLon)), shape = 19, col = grey(0.85)) +
-                     geom_point(data = pd, aes(date, wrap_lon(lon,wrapLon)), size = 0.2, shape = 20, col = "dodgerblue") +
-                     theme_bw() +
-                     theme(axis.title.x=element_blank())
-                 }
-               })
-        })
-
-  p4 <- switch(est,
-               fitted = {
-                 switch(proj,
-                        xy = {
-                          p <- ggplot() +
-                            geom_point(data = dd, aes(date, y), shape = 19, col = grey(0.85)) +
-                            geom_point(data = fd, aes(date, y), size = 0.2, shape = 20, col = "red") +
-                            theme_bw() +
-                            theme(axis.title.x=element_blank())
-                            if(se) {
-                            p <- p +
-                              geom_line(data = fd, aes(date, y + 2 * y.se), lwd = 0.25, col = "red") +
-                            geom_line(data = fd, aes(date, y - 2 * y.se), lwd = 0.25, col = "red")
-                            }
-                          p
-                        },
-                        ll = {
-                          ggplot() +
-                            geom_point(data = dd, aes(date, lat), shape = 19, col = grey(0.85)) +
-                            geom_point(data = fd, aes(date, lat), size = 0.2, shape = 20, col = "red") +
-                            theme_bw() +
-                            theme(axis.title.x=element_blank())
-                        })
-               },
-               predicted = {
-                 switch(proj,
-                        xy = {
-                          p <- ggplot() +
-                            geom_point(data = dd, aes(date, y), shape = 19, col = grey(0.85)) +
-                            geom_point(data = pd, aes(date, y), size = 0.2, shape = 20, col = "dodgerblue") +
-                            theme_bw() +
-                            theme(axis.title.x=element_blank())
-                            if(se) {
-                            p <- p +
-                            geom_line(data = pd, aes(date, y + 2 * y.se), lwd = 0.25, col = "dodgerblue") +
-                            geom_line(data = pd, aes(date, y - 2 * y.se), lwd = 0.25, col = "dodgerblue")
-                            }
-                          p
-                        },
-                        ll = {
-                          ggplot() +
-                            geom_point(data = dd, aes(date, lat), shape = 19, col = grey(0.85)) +
-                            geom_point(data = pd, aes(date, lat), size = 0.2, shape = 20, col = "dodgerblue") +
-                            theme_bw() +
-                            theme(axis.title.x=element_blank())
-                        })
-               })
+  p4 <- ggplot() +
+    geom_point(data = d_df, aes(date, lat), shape = 19, col = grey(0.85)) +
+    geom_point(data = switch(what, fitted = f_df, predicted = p_df),
+               aes(date, lat), size = 0.75, shape = 20,
+               col = switch(what, fitted = "firebrick", predicted = "dodgerblue")) +
+    theme_bw() +
+    theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8)) +
+    xlab(element_blank())
 
   grid.arrange(p1, p2, p3, p4, layout_matrix = matrix(
     c(1, 2, 1, 2, 3, 3, 4, 4),

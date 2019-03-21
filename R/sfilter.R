@@ -9,16 +9,16 @@
 ##' @importFrom stats approx cov sd predict nlminb optim
 ##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols %>%
 ##' @importFrom tibble as_tibble
-##' @importFrom rgdal project
+##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##'
 ##' @export
 
 sfilter <-
   function(x,
            model = c("rw", "crw"),
-           time.step = 1,
-           fit.to.subset = TRUE,
+           time.step,
            parameters = NULL,
+           fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
            inner.control = NULL) {
@@ -27,46 +27,46 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
-    if(is.null(time.step)) print("\nNo time.step specified, using 6 h as a default time step")
-    else if(length(time.step) > 1 & !is.data.frame(time.step))
-      stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
-    else if(length(time.step) > 1 & is.data.frame(time.step)) {
-      if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
+    if(is.null(time.step)) {
+      print("\nNo time.step specified, using 6 h as a default time step")
+      time.step <- 6
+    } else if(length(time.step) > 1 & !is.data.frame(time.step)) {
+        stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
+    } else if(length(time.step) > 1 & is.data.frame(time.step)) {
+        if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
-
-    d <- x$data
-    prj <- x$proj
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     ## add is.data flag (distinquish obs from reg states)
-    if (fit.to.subset) {
-      dnew <- d %>%
-        filter(.$keep) %>%
-        mutate(isd = TRUE)
-    } else {
-      dnew <- d %>%
-        mutate(isd = TRUE)
-    }
+    if(fit.to.subset) xx <- x %>% filter(keep)
+    else xx <- x
+
+    prj <- st_crs(xx)
+    loc <- as.data.frame(st_coordinates(xx))
+    names(loc) <- c("x","y")
+    st_geometry(xx) <- NULL
+    d <- cbind(xx, loc) %>%
+      mutate(isd = TRUE)
 
     if (length(time.step) == 1) {
       ## Interpolation times - assume on time.step-multiple of the hour
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
-      time.step <-
+      ts <-
         data.frame(date = seq(
           trunc(d$date[1], "hour"),
           by = tsp,
           length.out = max(index) + 2
         ))
     } else {
-      time.step <- time.step %>%
+      ts <- time.step %>%
         filter(id == unique(d$id)) %>%
         select(date)
     }
 
     ## merge data and interpolation times
-    d.all <- full_join(dnew, time.step, by = "date") %>%
+    d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
       mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
@@ -78,7 +78,7 @@ sfilter <-
 
     ## use approx & MA filter to obtain state initial values
     x.init <-
-      approx(x = select(dnew, date, x),
+      approx(x = select(d, date, x),
              xout = d.all$date,
              rule = 2)$y
     x.init <-
@@ -88,7 +88,7 @@ sfilter <-
       x.init[which(is.na(x.init))[1] - 1]
 
     y.init <-
-      approx(x = select(dnew, date, y),
+      approx(x = select(d, date, y),
              xout = d.all$date,
              rule = 2)$y
     y.init <-
@@ -234,7 +234,7 @@ sfilter <-
 
     ## if error then exit with limited output to aid debugging
     rep <- try(sdreport(obj))
-    if (class(opt) != "try-error" & class(rep) != "try-error") {
+    if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
@@ -282,17 +282,19 @@ sfilter <-
                  select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
              })
 
-      ## reproject mercator x,y back to WGS84 longlat
-      rdm[, c("lon", "lat")] <-
-        as_tibble(project(as.matrix(rdm[, c("x", "y")]), proj = prj, inv = TRUE))
+      ## coerce x,y back to sf object
+      rdm <- rdm %>%
+        st_as_sf(coords = c("x","y"), remove = FALSE) %>%
+        st_set_crs(prj)
 
       switch(model,
              rw = {
-               rdm <- rdm %>% select(id, date, lon, lat, x, y, x.se, y.se, isd)
+               rdm <- rdm %>% select(id, date, x.se, y.se, isd)
+
              },
              crw = {
                rdm <- rdm %>%
-                 select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se, isd)
+                 select(id, date, x.se, y.se, u, v, u.se, v.se, isd)
              })
 
       ## Fitted values (estimated locations at observation times)
@@ -316,9 +318,10 @@ sfilter <-
         predicted = pd,
         fitted = fd,
         par = fxd,
-        data = d,
+        data = x,
         inits = parameters,
         pm = model,
+        ts = time.step,
         opt = opt,
         tmb = obj,
         rep = rep,
@@ -329,9 +332,10 @@ sfilter <-
       ## if optimiser fails
       out <- list(
         call = call,
-        data = d,
+        data = x,
         inits = parameters,
         pm = model,
+        ts = time.step,
         tmb = obj,
         errmsg = opt
       )

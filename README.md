@@ -1,5 +1,5 @@
 # foieGras
-fit continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
+get your location ducks all lined up by fitting continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)  
 master branch:  
@@ -7,7 +7,7 @@ master branch:
 dev branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.org/ianjonsen/foieGras)
 
-**foieGras** - Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
+**foieGras** - Get your location ducks all lined up by fitting Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data. 
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos satellite location data. Template Model Builder (`TMB`) is used for fast estimation. The Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). 
 

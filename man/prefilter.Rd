@@ -4,12 +4,19 @@
 \alias{prefilter}
 \title{Prepare Argos data for fitting a ct ssm}
 \usage{
-prefilter(d, vmax = 10, min.dt = 1)
+prefilter(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
+  spdf = TRUE, min.dt = 60)
 }
 \arguments{
 \item{d}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
 
-\item{vmax}{max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations}
+\item{vmax}{max travel rate (m/s) - see ?argosfilter::sdafilter for details}
+
+\item{ang}{angles of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+
+\item{distlim}{lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+
+\item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
 }

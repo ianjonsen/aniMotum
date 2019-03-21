@@ -11,35 +11,53 @@
 ##' @details Internal function
 ##'
 ##' @param d input data - must have 5 (LS), or 8 (KF) columns (see details)
-##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define outlier locations
+##' @param vmax max travel rate (m/s) - see ?argosfilter::sdafilter for details
+##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
 ##' @importFrom lubridate ymd_hms
-##' @importFrom stats loess
 ##' @importFrom dplyr mutate distinct arrange filter select %>% left_join lag
-##' @importFrom rgdal project
+##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom argosfilter sdafilter
+##' @importFrom tibble as_tibble
 ##'
 ##' @export
 
-prefilter <- function(d, vmax = 10, min.dt = 1) {
+prefilter <- function(d, vmax = 50, ang = -1, distlim = c(2500,5000), spdf = TRUE, min.dt = 60) {
 
   # check input data
-  if(!ncol(d) %in% c(5,8)) stop("Data can only have 5 (for LS data) or 8 (for KF data) columns")
+  if (!inherits(d, "sf")) {
+    if (!ncol(d) %in% c(5, 8))
+      stop("\nData can only have 5 (for LS data) or 8 (for KF data) columns")
 
-  if((ncol(d) == 5 &
-      !isTRUE(all.equal(names(d), c("id", "date", "lc", "lon", "lat")))) ||
-     (ncol(d) == 8 &
-      !isTRUE(all.equal(
-        names(d),
-        c("id", "date", "lc", "lon", "lat", "smaj", "smin", "eor")
-      )))) stop("Unexpected column names in Data, type `?prefilter` for details on data format")
+    if ((ncol(d) == 5 &
+         !isTRUE(all.equal(
+           names(d), c("id", "date", "lc", "lon", "lat")
+         ))) ||
+        (ncol(d) == 8 &
+         !isTRUE(all.equal(
+           names(d),
+           c("id", "date", "lc", "lon", "lat", "smaj", "smin", "eor")
+         ))))
+      stop("\nUnexpected column names in Data, type `?fit_ssm` for details")
+  } else if(inherits(d, "sf") && inherits(st_geometry(d), "sfc_POINT")){
+    if((ncol(d) == 7 &
+        !isTRUE(all.equal(
+      names(d), c("id", "date", "lc", "smaj", "smin", "eor", "geometry")))) ||
+      (ncol(d) == 4 & !isTRUE(all.equal(
+        names(d), c("id", "date", "lc", "geometry")))))
+      stop("\nUnexpected column names in Data, type`?fit_ssm` for details")
 
-  if(length(unique(d$id)) > 1) stop("Multiple individual tracks in Data, use fit_ssm")
+    if(is.na(st_crs(d))) stop("\nCRS info is missing from input data sf object")
+  }
+
+  if(length(unique(d$id)) > 1) stop("Multiple individual tracks in Data, use `fit_ssm`")
 
   if(!is.null(d$id)) d <- d %>% mutate(id = as.character(id))
 
   ## add KF error columns, if missing
-  if(ncol(d) == 5) {
+  if(ncol(d) %in% c(4,5)) {
     d <- d %>%
       mutate(smaj = NA, smin = NA, eor = NA)
   }
@@ -70,46 +88,113 @@ prefilter <- function(d, vmax = 10, min.dt = 1) {
            eor = eor/180 * pi)
 
   ## Use argosfilter::sdafilter to identify outlier locations
-  filt <- rep("not", nrow(d))
-  tmp <- suppressWarnings(try(with(subset(d, keep), sdafilter(lat, lon, date, lc, ang=-1, vmax=vmax)), silent = TRUE))
-  ## screen potential sdafilter errors
-  if(!inherits(tmp, "try-error")) {
-    filt[d$keep] <- tmp
-    d <- d %>%
-      mutate(keep = ifelse(filt == "removed", FALSE, keep))
-  } else if(inherits(tmp, "try-error")) {
-    warning(paste("\nargosfilter::sdafilter produced an error on id", d$id[1], "unable to apply speed filter"), immediate. = TRUE)
-  }
-
-  ##  if lon spans -180,180 then shift to
-  ##    0,360; else if lon spans 360,0 then shift to
-  ##    -180,180 ... have to do this on keep subset only
-  dd <- subset(d, keep)
-
-  if (max(abs(diff(dd$lon))) > 300) {
-    if (sum(round(wrap_lon(dd$lon, 0) - wrap_lon(dd$lon,-180), 6)) == 0) {
-      prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-    } else {
-      prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+  if (spdf) {
+    if(inherits(d, "sf") && st_is_longlat(d)) {
+      xy <- st_coordinates(d) %>%
+        as_tibble() %>%
+        rename(lon = X, lat = Y)
+      d <- bind_cols(d, xy)
+    } else if(inherits(d, "sf") && !st_is_longlat(d)) {
+      xy <- st_transform(d, 4326) %>%
+        st_coordinates() %>%
+        as_tibble() %>%
+        rename(lon = X, lat = Y)
+      d <- bind_cols(d, xy)
     }
-  } else {
-    prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+    filt <- rep("not", nrow(d))
+    tmp <-
+      suppressWarnings(try(with(
+        subset(d, keep),
+        sdafilter(
+          lat,
+          lon,
+          date,
+          lc,
+          vmax = vmax,
+          ang = ang,
+          distlim = distlim
+        )
+      ),
+      silent = TRUE)
+      )
+    ## screen potential sdafilter errors
+    if (!inherits(tmp, "try-error"))
+    {
+      filt[d$keep] <- tmp
+      d <- d %>%
+        mutate(keep = ifelse(filt == "removed", FALSE, keep))
+    } else if (inherits(tmp, "try-error")) {
+      warning(
+        paste(
+          "\nargosfilter::sdafilter produced an error on id",
+          d$id[1],
+          "unable to apply speed filter"
+        ),
+        immediate. = TRUE
+      )
+    }
   }
 
-  d[, c("x", "y")] <- as_tibble(project(as.matrix(d[, c("lon", "lat")]), proj = prj))
+  if(!inherits(d, "sf")) {
+    ##  if lon spans -180,180 then shift to
+    ##    0,360; else if lon spans 360,0 then shift to
+    ##    -180,180 ... have to do this on keep subset only
+    dd <- subset(d, keep)
+
+    ## build user-specified projection
+    mlon <- mean(dd$lon) %>% round(., 2)
+
+    ## projection not provided by user so guess at best projection
+    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = 4326)
+
+    if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
+      prj <- "+init=epsg:3395 +units=km +lon_0=0"
+    } else if (any(diff(wrap_lon(dd$lon,-180)) < -300) ||
+               any(diff(wrap_lon(dd$lon,-180)) > 300)) {
+      prj <- "+init=epsg:3395 +units=km +lon_0=180"
+    } else {
+      prj <- "+init=epsg:3395 +units=km"
+    }
+
+    sf_locs <- sf_locs %>% st_transform(., prj)
+
+    if (max(dd$lat) <= -60) {
+      prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
+      sf_locs <- sf_locs %>% st_transform(., prj)
+    } else if (min(dd$lat) >= 60) {
+      prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
+      sf_locs <- sf_locs %>% st_transform(., prj)
+    }
+
+
+  } else {
+    prj <- st_crs(d)
+    # if data CRS units are m then change to km, otherwise optimiser may choke
+    if (str_detect(prj$proj4string, "units=m")) {
+      prj$proj4string <-
+        str_replace(prj$proj4string, "units=m", "units=km")
+    }
+    sf_locs <- d %>%
+      select(-lon,-lat) %>%
+      st_transform(prj)
+  }
 
   ## add LS error info to corresponding records
   ## set amf's = NA if obs.type == "KF" - not essential but for clarity
   tmp <- amf()
-    d <- d %>%
-      left_join(., tmp, by = "lc") %>%
-      mutate(amf_x = ifelse(obs.type == "KF", NA, amf_x),
-             amf_y = ifelse(obs.type == "KF", NA, amf_y))
+  out <- sf_locs %>%
+    left_join(., tmp, by = "lc") %>%
+    mutate(
+      amf_x = ifelse(obs.type == "KF", NA, amf_x),
+      amf_y = ifelse(obs.type == "KF", NA, amf_y)
+    )
 
-    if(sum(is.na(d$lc)) > 0) stop("\n NA's found in location class values,\n
-                                  perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?")
+  if (sum(is.na(out$lc)) > 0)
+    stop(
+      "\n NA's found in location class values,\n
+      perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?"
+    )
 
-  d <- d %>% select(id, date, lc, lon, lat, smaj, smin, eor, x, y, amf_x, amf_y, obs.type, keep)
-  return(list(data = d, proj = prj))
+  return(out)
 
 }
