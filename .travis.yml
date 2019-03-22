@@ -17,7 +17,7 @@ warnings_are_errors: false
 deploy.skip_cleanup: true
 
 sudo: required
-dist: ubuntu
+dist: debian
 
 cache:
   - packages
@@ -30,4 +30,4 @@ addons:
       - libgdal-dev
       - libproj-dev
       - libgeos-dev
-      - libudunits2-dev --configure-args='--with-udunits2-lib=/usr/local/lib'
+      - libudunits2-dev
