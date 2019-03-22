@@ -58,7 +58,7 @@ head(foo)
 ```
 
 ### fitting a foieGras model
-model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
+model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
 require(tidyverse)
 require(foieGras)
@@ -93,50 +93,40 @@ The tracks can also be transformed to a user-specified projection
 quickmap(fit$ssm[[1]], what = "p", crs = "+init=epsg:3031 +lon_0=85")
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned aa projected sf object or a simple unprojected tibble
+```{r grab}
+## grab predicted locations from fit object as a projected sf object 
+plocs_sf <- grab(fit, what = "p")
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## grab predicted locations in unprojected form
+plocs <- grab(fit, what = "p", as_sf = FALSE)
 
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+## unprojected form looks like this
+plocs
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+`fit_ssm` can be applied to single tracks as shown, it can also fit to multiple individuals in a single input `tibble`. The specified SSM is fit to each individual separately. The fit object is a compound `tibble` with rows corresponding to each individual. 
+```{r multi-fits}
+# load royal penguin example data
+data(rope)
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+fit <- fit_ssm(rope, vmax = 20, ang = -1, model = "crw", time.step = 6)
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+# list fit outcomes for all penguins
+fit
+```
+individual id is displayed in the 1st column, all fit output in the 2nd column, and convergence status of each model fit is displayed in the 3rd column
 
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+currently, only individual `quickmap`'s can be plotted
+```{r rope map, fig.width=7, fig.height=7}
+quickmap(fit$ssm[[5]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
 ```
 
-Also a quote using `>`:
+but plotting all individual tracks is simple
+```{r plot all rope, fig.width=7, fig.height=7}
+plocs <- grab(fit, what = "p")
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+ggplot(plocs, aes(colour = id)) + 
+  geom_sf() + 
+  scale_colour_viridis_d(option="cividis")
+```
