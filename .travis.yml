@@ -30,4 +30,4 @@ addons:
       - libgdal-dev
       - libproj-dev
       - libgeos-dev
-      - libudunits2-dev
+      - libudunits2-dev --configure-args='--with-udunits2-lib=/usr/local/lib'
