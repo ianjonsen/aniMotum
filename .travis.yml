@@ -9,12 +9,15 @@ r:
 repos:
   CRAN: https://cloud.r-project.org
 
+r_paackages:
+  - Matrix-1.2.15
+
 warnings_are_errors: false
 
 deploy.skip_cleanup: true
 
 sudo: required
-dist: trusty
+dist: ubuntu
 
 cache:
   - packages
@@ -23,8 +26,7 @@ cache:
 latex: false
 
 addons:
-  apt:
-    packages:
+  apt_packages:
       - libgdal-dev
       - libproj-dev
       - libgeos-dev
