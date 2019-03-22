@@ -12,14 +12,21 @@ warnings_are_errors: false
 
 deploy.skip_cleanup: true
 
-sudo: required
+os:
+  - linux
+
+sudo: false
 dist: trusty
 
 cache:
   - packages
-  - ccache
 
 latex: false
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
 
 addons:
   apt_packages:
