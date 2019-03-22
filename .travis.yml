@@ -9,7 +9,7 @@ r:
 repos:
   CRAN: https://cloud.r-project.org
 
-r_paackages:
+r_packages:
   - Matrix-1.2.15
 
 warnings_are_errors: false
@@ -17,7 +17,7 @@ warnings_are_errors: false
 deploy.skip_cleanup: true
 
 sudo: required
-dist: debian
+dist: trusty
 
 cache:
   - packages
