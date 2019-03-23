@@ -53,10 +53,10 @@
 ##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 ##' plot(fkf$ssm[[1]])
 ##'
+##' \donttest{
 ##' ## summary plot of fit, with (regular) predicted lon, laat state time-series
 ##' plot(fkf$ssm[[1]], what = "p")
 ##'
-##' \donttest{
 ##' ## fit CRW model to multiple individuals with Argos LS data
 ##' data(rope)
 ##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
