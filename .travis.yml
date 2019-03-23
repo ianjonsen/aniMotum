@@ -16,7 +16,7 @@ deploy.skip_cleanup: true
 os:
   - linux
 
-sudo: false
+sudo: true
 dist: trusty
 
 cache:
