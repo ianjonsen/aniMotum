@@ -4,6 +4,8 @@ language: r
 
 r:
   - release
+  - devel
+  - oldrel
 
 repos:
   CRAN: https://cloud.r-project.org
