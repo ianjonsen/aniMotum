@@ -21,7 +21,8 @@ dist: trusty
 cache:
   - packages
 
-latex: false
+latex: true
+pandoc: true
 
 notifications:
   email:
