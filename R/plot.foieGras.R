@@ -9,6 +9,7 @@
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank
 ##' @importFrom ggplot2 element_text xlab
 ##' @importFrom gridExtra grid.arrange
+##' @importFrom magrittr "%>%"
 ##' @method plot foieGras
 ##' @export
 

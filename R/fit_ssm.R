@@ -48,12 +48,14 @@
 ##' @examples
 ##'
 ##' data(ellie)
-##' fkf <- fit_ssm(ellie, time.step = 12)
+##' # subset data to run super-fast example
+##' d <- ellie[seq(1, nrow(ellie), by  = 5), ]
+##' fkf <- fit_ssm(d, time.step = 24)
 ##'
 ##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 ##' plot(fkf$ssm[[1]])
 ##'
-##' \donttest{
+##' \dontrun{
 ##' ## summary plot of fit, with (regular) predicted lon, laat state time-series
 ##' plot(fkf$ssm[[1]], what = "p")
 ##'
@@ -75,7 +77,8 @@
 ##'    scale_colour_viridis_d()
 ##' }
 ##'
-##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
+##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
+##' @importFrom magrittr "%>%"
 ##' @importFrom tibble as_tibble
 ##'
 ##' @export

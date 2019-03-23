@@ -30,7 +30,8 @@ Imports:
     lubridate,
     TMB,
     sf,
-    stringr
+    stringr,
+    magrittr
 Suggests: 
     testthat,
     rworldmap,

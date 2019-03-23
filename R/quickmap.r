@@ -18,6 +18,7 @@
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise
+##' @importFrom magrittr "%>%"
 ##' @export
 
 quickmap <- function(x,

@@ -20,7 +20,8 @@
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
 ##' @importFrom lubridate ymd_hms
-##' @importFrom dplyr mutate distinct arrange filter select %>% left_join lag rename
+##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename
+##' @importFrom magrittr "%>%"
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom argosfilter sdafilter
 ##' @importFrom tibble as_tibble
