@@ -50,7 +50,7 @@ in this situation, `foieGras` treats observations with missing error ellipse inf
 
 4) a `sf` object where observations have any of the previous 3 structures and also include `CRS` information
 ```{r data 4, echo = FALSE, message=FALSE}
-library(tidyverse)
+library(dplyr)
 data(ellie, package = "foieGras")
 foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = 4326) %>%
   sf::st_transform(., crs = "+init=epsg:3031 +units=km")
@@ -60,7 +60,6 @@ head(foo)
 ### fitting a foieGras model
 model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
-require(tidyverse)
 require(foieGras)
 ## load foieGras example data
 data(ellie)
@@ -124,6 +123,7 @@ quickmap(fit$ssm[[5]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
 
 but plotting all individual tracks is simple
 ```{r plot all rope, fig.width=7, fig.height=7}
+require(ggplot2)
 plocs <- grab(fit, what = "p")
 
 ggplot(plocs, aes(colour = id)) + 
