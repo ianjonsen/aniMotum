@@ -38,5 +38,6 @@ Suggests:
     rgeos,
     knitr,
     rmarkdown,
-    sp
+    sp,
+    covr
 VignetteBuilder: knitr
