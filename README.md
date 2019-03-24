@@ -6,8 +6,6 @@ get your location ducks all lined up by fitting continuous-time movement models 
 
 master branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
-dev branch:  
-[![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.org/ianjonsen/foieGras)
 
 **foieGras** - fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data. 
 
