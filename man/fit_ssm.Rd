@@ -71,7 +71,7 @@ fits either a simple random walk or a correlated random walk
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
-
+\donttest{
 data(ellie)
 # subset data to run super-fast example
 d <- ellie[seq(1, nrow(ellie), by  = 5), ]
@@ -80,7 +80,6 @@ fkf <- fit_ssm(d, time.step = 24)
 ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 plot(fkf$ssm[[1]])
 
-\dontrun{
 ## summary plot of fit, with (regular) predicted lon, laat state time-series
 plot(fkf$ssm[[1]], what = "p")
 
