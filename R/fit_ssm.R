@@ -46,7 +46,7 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @examples
-##'
+##' \donttest{
 ##' data(ellie)
 ##' # subset data to run super-fast example
 ##' d <- ellie[seq(1, nrow(ellie), by  = 5), ]
@@ -55,7 +55,6 @@
 ##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 ##' plot(fkf$ssm[[1]])
 ##'
-##' \dontrun{
 ##' ## summary plot of fit, with (regular) predicted lon, laat state time-series
 ##' plot(fkf$ssm[[1]], what = "p")
 ##'
