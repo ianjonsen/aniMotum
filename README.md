@@ -35,3 +35,5 @@ Then install `devtools` and it's dependencies and finally install `foieGras` fro
 install.packages("devtools")  
 devtools::install_github("ianjonsen/foieGras")
 ```
+
+Please note that the 'foieGras' project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project, you agree to abide by its terms.
