@@ -36,8 +36,8 @@ Suggests:
     testthat,
     rworldmap,
     rgeos,
-    knitr,
-    rmarkdown,
     sp,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 VignetteBuilder: knitr

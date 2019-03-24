@@ -1,10 +1,9 @@
 ---
-title: "foieGras functions"
-author: "Ian Jonsen"
+title: "foieGras basics"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{foieGras}
+  %\VignetteIndexEntry{foieGras basics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,6 +14,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
 ## Disclaimer
 This vignette is an extended set of examples to highlight the `foieGras` package's functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is the user's job to understand their data, ensure they are asking the right questions of their data, and that the analyses they undertake appropriately reflect those questions. We can not do this for you!
 
