@@ -22,8 +22,8 @@ dist: ubuntu
 cache:
   - packages
 
-before_install:
-    - sudo apt-get install -y udunits-bin libproj-dev libgdal-dev libgdal1-dev libgeos-dev libudunits2-dev gdal-bin
+#before_install:
+#    - sudo apt-get install -y udunits-bin libproj-dev libgdal-dev libgdal1-dev libgeos-dev libudunits2-dev gdal-bin
 #    - wget http://download.osgeo.org/gdal/2.0.1/gdal-2.0.1.tar.gz
 #    - tar zxf gdal-2.0.1.tar.gz
 #    - cd gdal-2.0.1
@@ -46,9 +46,10 @@ r_github_packages:
 after_success:
       - Rscript -e 'covr::codecov()'
 
-#addons:
-#  apt_packages:
-#      - libgdal-dev
-#      - libproj-dev
-#      - libgeos-dev
-#      - libudunits2-dev
+addons:
+  apt_packages:
+      - libgdal-dev
+      - libproj-dev
+      - libgeos-dev
+      - libudunits2-dev
+      - gdal-bin
