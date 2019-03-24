@@ -248,7 +248,7 @@ sfilter <-
                               ))))
 
     ## if error then exit with limited output to aid debugging
-    rep <- try(sdreport(obj))
+    rep <- suppressWarnings(try(sdreport(obj)))
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
       ## Parameters, states and the fitted values
