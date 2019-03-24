@@ -17,7 +17,7 @@ os:
   - linux
 
 sudo: true
-dist: trusty
+dist: ubuntu
 
 cache:
   - packages
