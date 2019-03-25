@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(ggplot2)
 ```
 
 ## Disclaimer
@@ -112,10 +111,14 @@ plocs
 # load royal penguin example data
 data(rope)
 
-fit <- fit_ssm(rope, vmax = 20, ang = -1, model = "crw", time.step = 6)
+fit <- fit_ssm(rope, vmax = 20, model = "crw", time.step = 6)
 
 # list fit outcomes for all penguins
 fit
 ```
 individual id is displayed in the 1st column, all fit output in the 2nd column, and convergence status of each model fit is displayed in the 3rd column
 
+currently, only individual `quickmap`'s can be plotted
+```{r rope map, fig.width=7, fig.height=7}
+quickmap(fit$ssm[[2]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
+```
