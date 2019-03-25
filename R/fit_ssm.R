@@ -93,7 +93,7 @@ fit_ssm <- function(d,
   if(!is.numeric(distlim)) stop("\ndistlim must be two numeric values in m")
   if(!is.numeric(min.dt)) stop("\nmin.dt must be a numeric value in s")
 
-  cat("prefiltering data...\n")
+  cat("\nprefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
     do(pf = prefilter(
@@ -125,11 +125,6 @@ fit_ssm <- function(d,
       silent = TRUE)
       )
 
-    fail <- which(sapply(fit$ssm, length) == 6 || sapply(fit$ssm, length) == 1)
-    if (length(fail) > 0) {
-      cat(sprintf("\n%d optimisation failures\n", length(fail)))
-    }
-
     fit <- fit %>%
       ungroup(.) %>%
       mutate(id = sapply(.$ssm, function(x)
@@ -137,7 +132,7 @@ fit_ssm <- function(d,
       mutate(converged = sapply(.$ssm, function(x)
         if(length(x) == 13) {
         x$opt$convergence == 0
-          } else {
+          } else if(length(x) < 13) {
             FALSE
           })) %>%
       select(., id, ssm, converged)
