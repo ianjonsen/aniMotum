@@ -69,3 +69,39 @@ data(ellie)
 fit <- fit_ssm(ellie, model = "rw", time.step = 24)
 ```
 these are the minimum arguments required: the input data, the model ("rw" or "crw") and the time.step (in h) to which locations are predicted. Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative, usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
+
+### accessing and visualising model fit objects
+Simple summary information about the `foieGras` fit can be obtained by calling the fit object:
+```{r fit summary}
+fit$ssm[[1]]
+```
+and a summary `plot` method allows a quick visual of the SSM fit to the data:
+```{r fit plot, fig.width=7,fig.height=7}
+# plot time-series of the predicted values
+plot(fit$ssm[[1]], what = "predicted")
+```
+The predicted values are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). Fitted values (not shown) are the state esimates corresponding to the time of each observation; their time-series are plotted by default - `plot(fit$ssm[[1]])`.
+
+Estimated tracks can be mapped using the `foieGras`-guessed projection
+```{r quickmap, fig.width=7, fig.height=7}
+## include prefiltered observations
+quickmap(fit$ssm[[1]], what = "predicted", obs = TRUE)
+```
+
+The tracks can also be transformed to a user-specified projection
+```{r quickmap reproject, fig.width=7, fig.height=7}
+## use Antarctic Polar Stereographic projection approximately centred on the track midpoint
+quickmap(fit$ssm[[1]], what = "p", crs = "+init=epsg:3031 +lon_0=85")
+```
+
+The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned aa projected sf object or a simple unprojected tibble
+```{r grab}
+## grab predicted locations from fit object as a projected sf object 
+plocs_sf <- grab(fit, what = "p")
+
+## grab predicted locations in unprojected form
+plocs <- grab(fit, what = "p", as_sf = FALSE)
+
+## unprojected form looks like this
+plocs
+```
