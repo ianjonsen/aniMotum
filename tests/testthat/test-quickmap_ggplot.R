@@ -78,5 +78,5 @@ test_that("quickmap returns a ggplot object when input is an sf object from grab
 
 ploc <- grab(fit, what = "predicted", as_sf = FALSE)
 test_that("quickmap returns error when input is not a foieGras fit or sf object", {
-  expect_errror(quickmap(ploc), "you can only supply a foieGras fit object or the output from `foieGras::grab()`")
+  expect_error(quickmap(ploc))
 })
