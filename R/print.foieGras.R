@@ -8,7 +8,7 @@
 ##'
 ##' @export
 
-print.foieGras <- function(x, digits = 3, ...)
+print.foieGras <- function(x, ...)
 {
   pm <- x$pm
   timeStep <- x$ts
@@ -22,7 +22,7 @@ print.foieGras <- function(x, digits = 3, ...)
   cat("number of regularised state estimates:", nbrStates, "\n\n")
   cat("parameter estimates\n")
   cat("-------------------\n")
-  print(parm, digits = digits, justify = "right")
+  print(round(parm, 3), justify = "right")
   cat("-------------------\n")
   cat("negative log-likelihood:", x$opt$objective, "\n")
   cat("convergence:", x$opt$message, "\n\n")

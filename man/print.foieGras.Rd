@@ -4,14 +4,14 @@
 \alias{print.foieGras}
 \title{Print \code{ctrw}}
 \usage{
-\method{print}{foieGras}(x, digits = 3, ...)
+\method{print}{foieGras}(x, ...)
 }
 \arguments{
 \item{x}{a \code{ctrw} fit object}
 
-\item{digits}{number of digits to use in display}
-
 \item{...}{unused. For compatibility with the generic method.}
+
+\item{digits}{number of digits to use in display}
 }
 \description{
 Print \code{ctrw}

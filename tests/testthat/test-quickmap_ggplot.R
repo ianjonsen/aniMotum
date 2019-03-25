@@ -2,7 +2,7 @@ context("test quickmap")
 
 ## quickmap output is a ggplot objects
 data(ellie)
-d <- ellie[seq(1, nrow(ellie), by = 5),]
+d <- ellie[seq(1, nrow(ellie), by = 5), ]
 fit <- fit_ssm(d, model = "crw", time.step = 24)
 
 ## step through the options incrementally
@@ -68,4 +68,15 @@ p <-
   )
 test_that("quickmap with user-specified crs returns a ggplot object", {
   expect_s3_class(p, "ggplot")
+})
+
+ploc <- grab(fit, what = "predicted")
+p <- quickmap(ploc)
+test_that("quickmap returns a ggplot object when input is an sf object from grab()", {
+  expect_s3_class(p, "ggplot")
+})
+
+ploc <- grab(fit, what = "predicted", as_sf = FALSE)
+test_that("quickmap returns error when input is not a foieGras fit or sf object", {
+  expect_errror(quickmap(ploc), "you can only supply a foieGras fit object or the output from `foieGras::grab()`")
 })
