@@ -119,16 +119,3 @@ fit
 ```
 individual id is displayed in the 1st column, all fit output in the 2nd column, and convergence status of each model fit is displayed in the 3rd column
 
-currently, only individual `quickmap`'s can be plotted
-```{r rope map, fig.width=7, fig.height=7}
-quickmap(fit$ssm[[2]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
-```
-
-but plotting all individual tracks is simple
-```{r plot all rope, fig.width=7, fig.height=7}
-plocs <- grab(fit, what = "p")
-
-ggplot(plocs, aes(colour = id)) + 
-  geom_sf() + 
-  scale_colour_viridis_d(option="cividis")
-```

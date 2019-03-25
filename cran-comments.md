@@ -11,4 +11,4 @@ NOTES:
 
 1. This is a new release.  
 
-2. C++ files total 12.3 Mb (OS X), 19.5 Mb (Windows), 28.2 Mb (Ubuntu). I have been unable to reduce the file size further.  
+2. C++ files total 12.9 Mb (OS X), 19.5 Mb (Windows), 28.2 Mb (Ubuntu). I have been unable to reduce the file size further.  
