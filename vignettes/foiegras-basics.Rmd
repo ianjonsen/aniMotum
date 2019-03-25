@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+require(ggplot2)
 ```
 
 ## Disclaimer
@@ -104,4 +105,30 @@ plocs <- grab(fit, what = "p", as_sf = FALSE)
 
 ## unprojected form looks like this
 plocs
+```
+
+`fit_ssm` can be applied to single tracks as shown, it can also fit to multiple individuals in a single input `tibble`. The specified SSM is fit to each individual separately. The fit object is a compound `tibble` with rows corresponding to each individual. 
+```{r multi-fits}
+# load royal penguin example data
+data(rope)
+
+fit <- fit_ssm(rope, vmax = 20, ang = -1, model = "crw", time.step = 6)
+
+# list fit outcomes for all penguins
+fit
+```
+individual id is displayed in the 1st column, all fit output in the 2nd column, and convergence status of each model fit is displayed in the 3rd column
+
+currently, only individual `quickmap`'s can be plotted
+```{r rope map, fig.width=7, fig.height=7}
+quickmap(fit$ssm[[2]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
+```
+
+but plotting all individual tracks is simple
+```{r plot all rope, fig.width=7, fig.height=7}
+plocs <- grab(fit, what = "p")
+
+ggplot(plocs, aes(colour = id)) + 
+  geom_sf() + 
+  scale_colour_viridis_d(option="cividis")
 ```
