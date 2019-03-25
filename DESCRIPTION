@@ -13,7 +13,7 @@ Authors@R:
            email = "toby.patterson@cisro.au")
            )
 Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
-Description: `foieGras` is an R package that fits a continuous-time state-space model (either a simple Random Walk or a Correlated Random Walk) to filter Argos satellite location data. Template Model Builder (`TMB`) is used for fast estimation. The Argos data can be: (older) Least Squares-based locations; (newer) Kalman Filter-based locations with error ellipse information; or a mixture of both. Separate measurement models are used for these two data types. The model estimates two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular).
+Description: Fits continuous-time state-space models (either a simple Random Walk or a Correlated Random Walk) to filter Argos satellite location data. Template Model Builder (`TMB`) is used for fast estimation. The Argos data can be: (older) Least Squares-based locations; (newer) Kalman Filter-based locations with error ellipse information; or a mixture of both. Separate measurement models are used for these two data types. The models estimate two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular). See Jonsen et al. (2019) Ecology 100:e02566 (doi:10.1002/ecy.2566)
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
