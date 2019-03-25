@@ -1,0 +1,71 @@
+---
+title: "foieGras-basics"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{foieGras-basics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Disclaimer
+This vignette is an extended set of examples to highlight the `foieGras` package's functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is the user's job to understand their data, ensure they are asking the right questions of their data, and that the analyses they undertake appropriately reflect those questions. We can not do this for you!
+
+### foieGras models
+This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system. `foieGras` provides two state-space models (SSMs) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+
+- a simple Random Walk model, `rw`
+- a Correlated Random Walk model, `crw`  
+
+Both models are continuous-time models, that is, they account for time intervals between successive observations, thereby naturally accounting for the irregularly-timed nature of most Argos data. We won't dwell on the details of the models here, those will come in a future paper, except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.
+
+### input data
+`foieGras` expects data to be provided in one of four possible formats.
+
+1) a `data.frame` or `tibble` that looks like this
+```{r data 1, echo = FALSE}
+data(ellie, package = "foieGras")
+head(ellie)
+```
+where the Argos data are provided via CLS Argos' Kalman filter model (KF) and include error ellipse information for each observed location.  
+
+2) a `data.frame` or `tibble` that looks like this
+```{r data 2, echo = FALSE}
+data(rope, package = "foieGras")
+head(rope)
+```
+where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do not include error ellipse information.
+
+3) a data.frame or tibble that includes observations with missing KF error ellipse information
+```{r data 3, echo = FALSE}
+data(ellie, package = "foieGras")
+ellie[3:5, c("smaj","smin","eor")] <- NA
+head(ellie)
+```
+in this situation, `foieGras` treats observations with missing error ellipse information as though they are LS-based observations.
+
+4) a `sf` object where observations have any of the previous 3 structures and also include `CRS` information
+```{r data 4, echo = FALSE, message=FALSE}
+data(ellie, package = "foieGras")
+foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = 4326) 
+foo <- sf::st_transform(foo, crs = "+init=epsg:3031 +units=km")
+head(foo)
+```
+
+### fitting a foieGras model
+model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
+```{r fit_ssm, message=FALSE}
+require(foieGras)
+## load foieGras example data
+data(ellie)
+## prefilter and fit Random Walk SSM, using a 24 h time step
+fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+```
+these are the minimum arguments required: the input data, the model ("rw" or "crw") and the time.step (in h) to which locations are predicted. Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative, usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
