@@ -37,7 +37,4 @@ Suggests:
     rworldmap,
     rgeos,
     sp,
-    covr,
-    knitr,
-    rmarkdown
-VignetteBuilder: knitr
+    covr
