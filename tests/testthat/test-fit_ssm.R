@@ -4,7 +4,7 @@ context("test fit_ssm")
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)
 ##  that have S3 class foieGras
 data(ellie)
-dkf <- ellie[seq(1, nrow(ellie), by = 5),]
+dkf <- ellie
 ## drop KF error ellipse info to exercise LS portions of code
 dls <- dkf[, 1:5]
 
@@ -93,3 +93,11 @@ test_that("fit_ssm inner.control + crw return foieGras list w 13 elements", {
   expect_equal(length(f$ssm[[1]]), 13)
 })
 
+## test fit to multiple individuals
+data(rope)
+f <- fit_ssm(rope, vmax=20, model="crw", time.step=6)
+test_that("fit_ssm multi-track returns foieGras lists w 13 elements", {
+  expect_equal(nrow(f), 3)
+  expect_s3_class(f$ssm[[1]], "foieGras")
+  expect_equal(length(f$ssm[[1]]), 13)
+})

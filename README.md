@@ -6,8 +6,6 @@ get your location ducks all lined up by fitting continuous-time movement models 
 
 master branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
-dev branch:  
-[![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.org/ianjonsen/foieGras)
 
 **foieGras** - fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data. 
 
@@ -29,13 +27,13 @@ On PC's running Windows, ensure you have installed [Rtools](https://cran.r-proje
 
 On Mac's, ensure you have installed [Xcode](https://developer.apple.com/xcode/) and Xcode developer tools. If installation is needed, make sure you start Xcode after install to ensure final setup of developer tools is completed. Both Xcode and Xcode developer tools can be installed from the [Mac App Store](https://itunes.apple.com/au/app/xcode/id497799835?mt=12)
 
-Next, you will need to install `TMB` and it's dependencies from within R:
+If installing from CRAN:
 ```R
-install.packages("TMB")
+install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))
 ```
-To get the very latest development version, you must install `devtools` and it's dependencies and install `foieGras` from GitHub:
+To get the very latest `foieGras` stable version, you can install from GitHub:
+```R
+remotes::install_github("ianjonsen/foieGras", dependencies = c("Imports","LinkingTo","Suggests"))
+```
 
-```R
-install.packages("devtools")  
-devtools::install_github("ianjonsen/foieGras")
-```
+Note: there can be issues getting compilers to work properly, especially on a Mac with OS X 10.13.x or higher. If you encounter install and compile issues, I recommend you consult the excellent information on the [glmmTMB](https://github.com/glmmTMB/glmmTMB)
