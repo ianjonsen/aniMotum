@@ -10,8 +10,6 @@
 \item{x}{a \code{ctrw} fit object}
 
 \item{...}{unused. For compatibility with the generic method.}
-
-\item{digits}{number of digits to use in display}
 }
 \description{
 Print \code{ctrw}

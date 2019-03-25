@@ -3,7 +3,6 @@
 ##' @method print foieGras
 ##'
 ##' @param x a \code{ctrw} fit object
-##' @param digits number of digits to use in display
 ##' @param ... unused. For compatibility with the generic method.
 ##'
 ##' @export
