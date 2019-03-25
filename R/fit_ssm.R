@@ -48,32 +48,21 @@
 ##' @examples
 ##' \donttest{
 ##' data(ellie)
-##' # subset data to run super-fast example
-##' d <- ellie[seq(1, nrow(ellie), by  = 5), ]
-##' fkf <- fit_ssm(d, time.step = 24)
+##' ## fit rw model
+##' fkf <- fit_ssm(ellie, time.step = 24)
 ##'
 ##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 ##' plot(fkf$ssm[[1]])
 ##'
-##' ## summary plot of fit, with (regular) predicted lon, laat state time-series
+##' ## summary plot of fit, with (regular) predicted lon, lat state time-series
 ##' plot(fkf$ssm[[1]], what = "p")
 ##'
 ##' ## fit CRW model to multiple individuals with Argos LS data
 ##' data(rope)
 ##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
 ##'
-##' ## summary plot of fitted locations for individual 3
-##' plot(fls$ssm[[3]], "p")
-##'
 ##' ## map of predicted locations and Argos observations for individual 3
 ##' quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
-##'
-##' ## grab predicted locations for all individuals as a single sf tibble
-##' ##  and produce a basic ggplot
-##' library(ggplot2)
-##' plocs <- grab(fls, what = "p")
-##' ggplot(plocs, aes(colour = id)) + geom_sf() +
-##'    scale_colour_viridis_d()
 ##' }
 ##'
 ##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
