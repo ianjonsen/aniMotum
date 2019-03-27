@@ -26,7 +26,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param verbose report progress during minimization
+##' @param verbose report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
 ##'
@@ -82,7 +82,7 @@ fit_ssm <- function(d,
                     parameters = NULL,
                     fit.to.subset = TRUE,
                     optim = "nlminb",
-                    verbose = FALSE,
+                    verbose = 1,
                     inner.control = NULL
                     )
 {
@@ -93,7 +93,9 @@ fit_ssm <- function(d,
   if(!is.numeric(distlim)) stop("\ndistlim must be two numeric values in m")
   if(!is.numeric(min.dt)) stop("\nmin.dt must be a numeric value in s")
 
-  cat("\nprefiltering data...\n")
+  if(verbose %in% c(0,2)) options(dplyr.show_progress = FALSE)
+  if(verbose == 1)
+    cat("\nprefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
     do(pf = prefilter(
@@ -110,7 +112,12 @@ fit_ssm <- function(d,
     fit <- do.call(rbind, pfd) %>%
       as_tibble()
   } else {
-    cat("\nfitting SSM...\n")
+    if(verbose == 1)
+      cat("\nfitting SSM...\n")
+    if (verbose %in% 0:1)
+      verb <-  FALSE
+    else
+      verb <- TRUE
     fit <- fit %>%
       do(ssm = try(sfilter(
         .$pf,
@@ -119,7 +126,7 @@ fit_ssm <- function(d,
         parameters = parameters,
         fit.to.subset = fit.to.subset,
         optim = optim,
-        verbose = verbose,
+        verbose = verb,
         inner.control = inner.control
       ),
       silent = TRUE)
