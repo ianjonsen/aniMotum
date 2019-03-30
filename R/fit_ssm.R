@@ -50,12 +50,6 @@
 ##' \dontshow{
 ##' ellie <- ellie[seq(1, nrow(ellie), by=2), ]
 ##' }
-##' ## fit rw model
-##' fkf <- fit_ssm(ellie, time.step = 24)
-##'
-##' ## summary plot of fit, with (irregular) fitted lon, lat state time-series
-##' plot(fkf$ssm[[1]])
-##'
 ##' ## fit crw model to multiple individuals with Argos LS data
 ##' data(rope)
 ##' \dontshow{
