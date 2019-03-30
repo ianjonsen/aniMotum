@@ -15,7 +15,7 @@
 ##' @examples
 ##' data(ellie)
 ##' fit <- fit_ssm(ellie, model="rw", time.step=24)
-##' plot(fit$smm[[1]])
+##' plot(fit$ssm[[1]])
 ##'
 ##' @export
 

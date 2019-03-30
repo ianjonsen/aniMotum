@@ -47,6 +47,9 @@
 ##'
 ##' @examples
 ##' data(ellie)
+##' \dontshow{
+##' ellie <- ellie[seq(1, nrow(ellie), by=2), ]
+##' }
 ##' ## fit rw model
 ##' fkf <- fit_ssm(ellie, time.step = 24)
 ##'
@@ -58,6 +61,9 @@
 ##'
 ##' ## fit CRW model to multiple individuals with Argos LS data
 ##' data(rope)
+##' \dontshow{
+##' rope <- rope[seq(1, nrow(rope), by = 2), ]
+##' }
 ##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
 ##'
 ##' ## map of predicted locations and Argos observations for individual 3

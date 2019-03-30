@@ -85,7 +85,7 @@ quickmap <- function(x,
     if(!outlier) {
       sf_data <- sf_data %>% filter(keep)
     }
-    p <- p + geom_sf(data = sf_data, colour = "orange", size = 2, shape = 18, alpha = 0.3)
+    p <- p + geom_sf(data = sf_data, colour = "orange", size = 2, shape = 18, alpha = 0.5)
   }
 
   if(length(unique(x$id)) > 1) {

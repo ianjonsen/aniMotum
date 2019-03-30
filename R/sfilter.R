@@ -34,6 +34,9 @@
 ##'
 ##' @examples
 ##' data(ellie)
+##' \dontshow{
+##' ellie <- ellie[seq(1,nrow(ellie),by=2), ]
+##' }
 ##' pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
 ##' out <- sfilter(pf, model="rw", time.step=24)
 ##'
