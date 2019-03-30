@@ -1,4 +1,4 @@
-##' @title Fit a Continuous-time state-space model to filter Argos data
+##' @title Fit a continuous-time state-space model to filter Argos satellite geolocation data
 ##'
 ##' @description fits either a simple random walk or a correlated random walk
 ##' (a random walk on velocity) in continuous time to filter Argos KF and/or LS data
@@ -15,7 +15,7 @@
 ##' @param min.dt minimum allowable time difference between observations;
 ##' dt <= min.dt will be ignored by the SSM
 ##' @param pf just pre-filter the data, do not fit the ctrw (default is FALSE)
-##' @param model fit either a simple Random Walk ("rw") or Correlated Random Walk
+##' @param model fit either a simple random walk ("rw") or correlated random walk
 ##' ("crw") as a continuous-time process model
 ##' @param time.step the regular time interval, in hours, to predict to.
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
@@ -46,7 +46,6 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @examples
-##' \donttest{
 ##' data(ellie)
 ##' ## fit rw model
 ##' fkf <- fit_ssm(ellie, time.step = 24)
@@ -63,7 +62,6 @@
 ##'
 ##' ## map of predicted locations and Argos observations for individual 3
 ##' quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
-##' }
 ##'
 ##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
 ##' @importFrom magrittr "%>%"
