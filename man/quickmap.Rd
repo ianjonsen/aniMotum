@@ -26,6 +26,12 @@ default projection (eg. 3395) for the fitting the SSM will be used}
 \item{size}{size of estimated location points}
 }
 \description{
-map foieGras fitted or predicted locations, with or without
-Argos observations, optionally apply a different projection
+map foieGras fit object or data. FoieGras fits can be
+mapped with or without Argos observations. Alternate projection CRS can
+optionally be applied
+}
+\examples{
+data(ellie)
+ellie_sf <- sf::st_as_sf(ellie, coords = c("lon","lat"), crs = 4326)
+quickmap(ellie_sf, crs = "+init=epsg:3031 +lon_0=85")
 }

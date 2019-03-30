@@ -2,12 +2,12 @@
 % Please edit documentation in R/fit_ssm.R
 \name{fit_ssm}
 \alias{fit_ssm}
-\title{Fit a Continuous-time state-space model to filter Argos data}
+\title{Fit a continuous-time state-space model to filter Argos satellite geolocation data}
 \usage{
 fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
   spdf = TRUE, min.dt = 60, pf = FALSE, model = "rw",
   time.step = 6, parameters = NULL, fit.to.subset = TRUE,
-  optim = "nlminb", verbose = FALSE, inner.control = NULL)
+  optim = "nlminb", verbose = 1, inner.control = NULL)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -28,7 +28,7 @@ dt <= min.dt will be ignored by the SSM}
 
 \item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
 
-\item{model}{fit either a simple Random Walk ("rw") or Correlated Random Walk
+\item{model}{fit either a simple random walk ("rw") or correlated random walk
 ("crw") as a continuous-time process model}
 
 \item{time.step}{the regular time interval, in hours, to predict to.
@@ -44,7 +44,7 @@ this if you know what you are doing...}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
-\item{verbose}{report progress during minimization}
+\item{verbose}{report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar}
 
 \item{inner.control}{list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
@@ -71,7 +71,6 @@ fits either a simple random walk or a correlated random walk
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
-\donttest{
 data(ellie)
 ## fit rw model
 fkf <- fit_ssm(ellie, time.step = 24)
@@ -88,6 +87,5 @@ fls <- fit_ssm(rope, model = "crw", time.step = 6)
 
 ## map of predicted locations and Argos observations for individual 3
 quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
-}
 
 }

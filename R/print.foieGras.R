@@ -1,4 +1,4 @@
-##' Print \code{ctrw}
+##' Print \code{foieGras}
 ##'
 ##' @method print foieGras
 ##'

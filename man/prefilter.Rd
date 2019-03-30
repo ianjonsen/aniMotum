@@ -2,13 +2,13 @@
 % Please edit documentation in R/prefilter.R
 \name{prefilter}
 \alias{prefilter}
-\title{Prepare Argos data for fitting a ct ssm}
+\title{Prepare Argos data for fitting state-space model}
 \usage{
-prefilter(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
+prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
   spdf = TRUE, min.dt = 60)
 }
 \arguments{
-\item{d}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
+\item{data}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
 
 \item{vmax}{max travel rate (m/s) - see ?argosfilter::sdafilter for details}
 
@@ -20,8 +20,16 @@ prefilter(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
 
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
 }
+\value{
+an sf object with all observations passed from \code{data} and the following appended columns
+\item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
+\item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
+\item{\code{amf_x}}{Argos error multiplication factor for x direction}
+\item{\code{amf_y}}{Argos error multiplication factor for y direction}
+\item{\code{geometry}}{sf POINT object giving x,y coordinates in km}
+}
 \description{
-\code{prefilter()} (1) determines Argos data type (LS or KF);
+\code{prefilter} (1) determines Argos data type (LS or KF);
 (2) converts dates to POSIXt & identifies observations with duplicate dates;
 (3) orders observations in time; (4) removes duplicate observations;
 (5) removes observations occurring within 60 s of one another (keeps first);
@@ -33,5 +41,11 @@ class (for type LS);
 (by distance only) to be ignored when fitting the \code{ctrw} model
 }
 \details{
-Internal function
+called by \code{fit_ssm}.
+}
+\examples{
+data(ellie)
+pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
+pf
+
 }

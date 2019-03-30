@@ -1,8 +1,8 @@
 ##' @title quickmap
 ##'
-##' @description map foieGras fitted or predicted locations, with or without
-##' Argos observations, optionally apply a different projection
-##'
+##' @description map foieGras fit object or data. FoieGras fits can be
+##' mapped with or without Argos observations. Alternate projection CRS can
+##' optionally be applied
 ##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param obs include Argos observations on map (logical)
@@ -21,7 +21,9 @@
 ##' @importFrom magrittr "%>%"
 ##'
 ##' @examples
-##'
+##' data(ellie)
+##' ellie_sf <- sf::st_as_sf(ellie, coords = c("lon","lat"), crs = 4326)
+##' quickmap(ellie_sf, crs = "+init=epsg:3031 +lon_0=85")
 ##' @export
 
 quickmap <- function(x,
@@ -115,7 +117,7 @@ quickmap <- function(x,
         ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
               subtitle = paste0("epsg = ", prj))
       else
-        ggtitle(paste0("id: ", x$id[1], " data"))
+        ggtitle(paste0("id: ", x$id[1], " data"), subtitle = paste0("epsg = ", prj))
   }
 
   return(p)
