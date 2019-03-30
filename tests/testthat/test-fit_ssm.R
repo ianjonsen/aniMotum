@@ -4,7 +4,7 @@ context("test fit_ssm")
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)
 ##  that have S3 class foieGras
 data(ellie)
-dkf <- ellie
+dkf <- ellie[seq(1, nrow(ellie), by=3), ]
 ## drop KF error ellipse info to exercise LS portions of code
 dls <- dkf[, 1:5]
 
