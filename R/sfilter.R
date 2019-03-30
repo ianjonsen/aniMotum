@@ -1,6 +1,13 @@
-##' @title fit a continuous-time SSM to filter Argos LS or KF track data
+##' @title fit the state-space model to \code{prefilter}-ed data
 ##'
-##' @details Internal function
+##' @description generates initial values for model parameters and unobserved states;
+##' structures data and initial values for C++ \code{TMB} template;
+##' fits state-space model; minimises the joint log-likelihood via the selected
+##' optimizer (\code{nlminb} or \code{optim}); structures and passes output
+##' object to \code{fit_ssm}
+##'
+##' @details called by \code{fit_ssm}. \code{sfilter} can only fit to an
+##' individual track, use \code{fit_ssm} to fit to multiple tracks (see ?fit_ssm).
 ##'
 ##' @param x Argos data passed through prefilter()
 ##' @param model specify which SSM is to be fit: "rw" or "crw"
@@ -24,6 +31,11 @@
 ##' @importFrom magrittr "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
+##'
+##' @examples
+##' data(ellie)
+##' pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
+##' out <- sfilter(pf, model="rw", time.step=24)
 ##'
 ##' @export
 
