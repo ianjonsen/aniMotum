@@ -4,7 +4,7 @@ context("test fit_ssm")
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)
 ##  that have S3 class foieGras
 data(ellie)
-dkf <- ellie[seq(1, nrow(ellie), by=3), ]
+dkf <- ellie[seq(1, nrow(ellie), by=6), ]
 ## drop KF error ellipse info to exercise LS portions of code
 dls <- dkf[, 1:5]
 
@@ -73,14 +73,14 @@ test_that("fit_ssm optim + crw return foieGras list w 13 elements", {
 })
 
 ## fit to full data - crw
-f <- fit_ssm(dkf, fit.to.subset=FALSE, model = "crw", time.step=24)
+f <- fit_ssm(dkf, verbose=0, fit.to.subset=FALSE, model = "crw", time.step=24)
 test_that("fit_ssm full data + crw return foieGras list w 13 elements", {
   expect_s3_class(f$ssm[[1]], "foieGras")
   expect_equal(length(f$ssm[[1]]), 13)
 })
 
 ## turn trace on - crw
-f <- fit_ssm(dkf, verbose=TRUE, model = "crw", time.step=24)
+f <- fit_ssm(dkf, verbose=2, model = "crw", time.step=24)
 test_that("fit_ssm verbose + crw return foieGras list w 13 elements", {
   expect_s3_class(f$ssm[[1]], "foieGras")
   expect_equal(length(f$ssm[[1]]), 13)
