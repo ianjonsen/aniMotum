@@ -16,6 +16,12 @@
 ##' @importFrom magrittr "%>%"
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
+##'
+##' @examples
+##' data(ellie)
+##' fit <- fit_ssm(ellie, model="rw", time.step=24)
+##' ## grab predicted values as an unprojected tibble
+##' preds <- grab(fit, what = "p", as_sf = FALSE)
 ##' @export
 ##'
 grab <- function(x, what = "fitted", as_sf = TRUE) {

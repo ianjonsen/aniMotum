@@ -23,3 +23,9 @@ a tbl with all individual tbl's appended
 from a compound tbl created when fitting to multiple individual data sets.
 The specified tbl's are appended to a single output tbl.
 }
+\examples{
+data(ellie)
+fit <- fit_ssm(ellie, model="rw", time.step=24)
+## grab predicted values as an unprojected tibble
+preds <- grab(fit, what = "p", as_sf = FALSE)
+}
