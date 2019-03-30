@@ -81,10 +81,7 @@ fkf <- fit_ssm(ellie, time.step = 24)
 ## summary plot of fit, with (irregular) fitted lon, lat state time-series
 plot(fkf$ssm[[1]])
 
-## summary plot of fit, with (regular) predicted lon, lat state time-series
-plot(fkf$ssm[[1]], what = "p")
-
-## fit CRW model to multiple individuals with Argos LS data
+## fit crw model to multiple individuals with Argos LS data
 data(rope)
 \dontshow{
 rope <- rope[seq(1, nrow(rope), by = 2), ]
