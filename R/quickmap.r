@@ -19,6 +19,9 @@
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise
 ##' @importFrom magrittr "%>%"
+##'
+##' @examples
+##'
 ##' @export
 
 quickmap <- function(x,
@@ -52,7 +55,7 @@ quickmap <- function(x,
     } else {
     sf_locs <- sf_locs %>% st_transform(., crs)
     prj <- st_crs(sf_locs)
-    sf_data <- x$data %>% st_transform(., crs)
+    if(class(x)[1] != "sf") sf_data <- x$data %>% st_transform(., crs)
     }
 
   bounds <- st_bbox(sf_locs)
@@ -76,7 +79,7 @@ quickmap <- function(x,
     xlim(bounds[c("xmin","xmax")]) +
     ylim(bounds[c("ymin","ymax")])
 
-  if(obs) {
+  if(obs & class(x)[1] != "sf") {
     if(!outlier) {
       sf_data <- sf_data %>% filter(keep)
     }
@@ -84,7 +87,6 @@ quickmap <- function(x,
   }
 
   if(length(unique(x$id)) > 1) {
-
     p <- p + geom_sf(data = sf_locs,
                      aes_string(color = "id"),
                      size = size
@@ -109,8 +111,11 @@ quickmap <- function(x,
             plot.title = element_text(size = 10),
             plot.subtitle = element_text(size = 5)
             ) +
-      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
+      if(class(x)[1] != "sf")
+        ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
               subtitle = paste0("epsg = ", prj))
+      else
+        ggtitle(paste0("id: ", x$id[1], " data"))
   }
 
   return(p)
