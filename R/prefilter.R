@@ -1,4 +1,4 @@
-##' @title Prepare Argos data for fitting a ct ssm
+##' @title Prepare Argos data for fitting state-space model
 ##'
 ##' @description \code{prefilter} (1) determines Argos data type (LS or KF);
 ##' (2) converts dates to POSIXt & identifies observations with duplicate dates;
