@@ -11,7 +11,7 @@
 ##' (9) uses a argosfilter::sdafilter to identify potential outlier locations
 ##' (by distance only) to be ignored when fitting the \code{ctrw} model
 ##'
-##' @details called by \code{fit_ssm}
+##' @details called by \code{fit_ssm}.
 ##'
 ##' @param data input data - must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s) - see ?argosfilter::sdafilter for details
