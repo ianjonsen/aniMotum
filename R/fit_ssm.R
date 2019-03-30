@@ -46,19 +46,21 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @examples
+##' ## fit crw model to multiple individuals with Argos LS data
 ##' data(ellie)
 ##' \dontshow{
-##' ellie <- ellie[seq(1, nrow(ellie), by=2), ]
+##' ellie <- ellie[seq(1, nrow(ellie), by = 2), ]
 ##' }
-##' ## fit crw model to multiple individuals with Argos LS data
+##' fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+##' plot(fit$ssm[[1]])
+##'
+##' \donttest{
 ##' data(rope)
-##' \dontshow{
-##' rope <- rope[seq(1, nrow(rope), by = 2), ]
-##' }
-##' fls <- fit_ssm(rope, model = "crw", time.step = 6)
+##' fls <- fit_ssm(rope, model = "crw", time.step = 12)
 ##'
 ##' ## map of predicted locations and Argos observations for individual 3
-##' quickmap(fls$ssm[[3]], what = "p", obs = TRUE)
+##' quickmap(fls$ssm[[3]], what = "p")
+##'}
 ##'
 ##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
 ##' @importFrom magrittr "%>%"
