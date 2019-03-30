@@ -1,6 +1,6 @@
 ##' @title Prepare Argos data for fitting a ct ssm
 ##'
-##' @description \code{prefilter()} (1) determines Argos data type (LS or KF);
+##' @description \code{prefilter} (1) determines Argos data type (LS or KF);
 ##' (2) converts dates to POSIXt & identifies observations with duplicate dates;
 ##' (3) orders observations in time; (4) removes duplicate observations;
 ##' (5) removes observations occurring within 60 s of one another (keeps first);
@@ -11,9 +11,9 @@
 ##' (9) uses a argosfilter::sdafilter to identify potential outlier locations
 ##' (by distance only) to be ignored when fitting the \code{ctrw} model
 ##'
-##' @details Internal function
+##' @details called by \code{fit_ssm}, normally the user
 ##'
-##' @param d input data - must have 5 (LS), or 8 (KF) columns (see details)
+##' @param data input data - must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s) - see ?argosfilter::sdafilter for details
 ##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
 ##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
@@ -27,16 +27,29 @@
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
 ##'
+##' @return an sf object with all observations passed from \code{data} and the following appended columns
+##' \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
+##' \item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
+##' \item{\code{amf_x}}{Argos error multiplication factor for x direction}
+##' \item{\code{amf_y}}{Argos error multiplication factor for y direction}
+##' \item{\code{geometry}}{sf POINT object giving x,y coordinates in km}
+##'
+##' @examples
+##' data(ellie)
+##' pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
+##' pf
+##'
 ##' @export
 
 prefilter <-
-  function(d,
+  function(data,
            vmax = 50,
            ang = -1,
            distlim = c(2500, 5000),
            spdf = TRUE,
            min.dt = 60) {
 
+  d <- data
   # check input data
   if (!inherits(d, "sf")) {
     if (!ncol(d) %in% c(5, 8))
