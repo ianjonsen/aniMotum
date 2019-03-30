@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.foieGras.R
 \name{print.foieGras}
 \alias{print.foieGras}
-\title{Print \code{ctrw}}
+\title{print \code{foieGras} object summary information}
 \usage{
 \method{print}{foieGras}(x, ...)
 }
@@ -12,5 +12,12 @@
 \item{...}{unused. For compatibility with the generic method.}
 }
 \description{
-Print \code{ctrw}
+print \code{foieGras} object summary information
+}
+\examples{
+## see summary fit output
+data(ellie)
+fit <- fit_ssm(ellie, model="rw", time.step=24)
+fit
+
 }

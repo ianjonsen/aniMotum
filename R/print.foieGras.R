@@ -1,9 +1,15 @@
-##' Print \code{foieGras}
+##' @title print \code{foieGras} object summary information
 ##'
 ##' @method print foieGras
 ##'
 ##' @param x a \code{ctrw} fit object
 ##' @param ... unused. For compatibility with the generic method.
+##'
+##' @examples
+##' ## see summary fit output
+##' data(ellie)
+##' fit <- fit_ssm(ellie, model="rw", time.step=24)
+##' fit
 ##'
 ##' @export
 
