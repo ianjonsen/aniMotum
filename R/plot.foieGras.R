@@ -11,6 +11,12 @@
 ##' @importFrom gridExtra grid.arrange
 ##' @importFrom magrittr "%>%"
 ##' @method plot foieGras
+##'
+##' @examples
+##' data(ellie)
+##' fit <- fit_ssm(ellie, model="rw", time.step=24)
+##' plot(fit)
+##'
 ##' @export
 
 plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ...)
