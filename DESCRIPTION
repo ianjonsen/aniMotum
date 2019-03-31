@@ -39,5 +39,6 @@ Suggests:
     testthat,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rgeos
 VignetteBuilder: knitr
