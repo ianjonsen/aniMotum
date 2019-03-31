@@ -5,7 +5,7 @@ language: r
 r:
   - release
   - devel
-#  - oldrel
+
 repos:
   CRAN: https://cloud.r-project.org
 
@@ -17,7 +17,7 @@ os:
   - linux
 
 sudo: true
-dist: ubuntu
+dist: debian
 
 cache:
   - packages
