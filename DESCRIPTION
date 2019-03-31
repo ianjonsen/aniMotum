@@ -37,8 +37,6 @@ Imports:
     rnaturalearth
 Suggests: 
     testthat,
-    rgeos,
-    sp,
     covr,
     knitr,
     rmarkdown
