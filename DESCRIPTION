@@ -40,7 +40,8 @@ Suggests:
     knitr,
     rmarkdown,
     rnaturalearth,
-    rnaturalearthdata
+    rnaturalearthdata,
+    rgeos
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
