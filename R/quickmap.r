@@ -23,9 +23,6 @@
 ##'
 ##' @examples
 ##' data(ellie)
-##' \dontshow{
-##' ellie <- ellie[seq(1, nrow(ellie), by = 3), ]
-##' }
 ##' ellie_sf <- sf::st_as_sf(ellie, coords = c("lon","lat"), crs = 4326)
 ##' quickmap(ellie_sf)
 ##' @export
