@@ -84,13 +84,14 @@ plot(fit$ssm[[1]], what = "predicted")
 The predicted values are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). Fitted values (not shown) are the state estimates corresponding to the time of each observation; their time-series are plotted by default - `plot(fit$ssm[[1]])`.
 
 Estimated tracks can be mapped using the `foieGras`-guessed projection
-```{r quickmap, fig.width=7, fig.height=7}
+```{r ggplot map, fig.width=7, fig.height=7}
 ## include prefiltered observations
+coast <- rnaturalearthdata::countries50
 quickmap(fit$ssm[[1]], what = "predicted", obs = TRUE)
 ```
 
 The tracks can also be transformed to a user-specified projection
-```{r quickmap reproject, fig.width=7, fig.height=7}
+```{r reproject ggplot map, fig.width=7, fig.height=7}
 ## use Antarctic Polar Stereographic projection approximately centred on the track midpoint
 quickmap(fit$ssm[[1]], what = "p", crs = "+init=epsg:3031 +lon_0=85")
 ```
@@ -119,12 +120,8 @@ fit
 ```
 individual id is displayed in the 1st column, all fit output in the 2nd column, and convergence status of each model fit is displayed in the 3rd column
 
-currently, only individual `quickmap`'s can be plotted
-```{r rope map, fig.width=7, fig.height=7}
-quickmap(fit$ssm[[2]], what="p", obs=TRUE, crs = "+init=epsg:3031 +lon_0=160")
-```
-
-but plotting all individual tracks is simple
+The `sf` class output is easily reprojected but to plot all individuals on a single map, it is useful to cast
+the geometries from single POINTS to MULTIPOINTS
 ```{r plot all rope, fig.width=7, fig.height=7}
 plocs <- grab(fit, what = "p")
 
