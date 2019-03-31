@@ -55,8 +55,9 @@
 ##' data(rope)
 ##' fls <- fit_ssm(rope, model = "crw", time.step = 12)
 ##'
-##' ## map of predicted locations and Argos observations for individual 3
-##' quickmap(fls$ssm[[3]], what = "p")
+##' ## simple diagnostic plot for individual 3,
+##' ## showing predicted value time-series
+##' plot(fls$ssm[[3]], what = "predicted")
 ##'}
 ##'
 ##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
