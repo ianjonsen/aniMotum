@@ -94,7 +94,7 @@ ploc_sf <- fit$ssm[[1]]$predicted
 prj <- sf::st_crs(ploc_sf)
 
 ## get coastline data
-coast <- rnaturalearth::ne_countries(scale=50, returnclass = "sf") %>%
+coast <- ne_countries(scale=50, returnclass = "sf") %>%
   sf::st_transform(., crs = prj)
 
 bounds <- sf::st_bbox(ploc_sf)

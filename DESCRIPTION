@@ -38,7 +38,9 @@ Suggests:
     testthat,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rnaturalearth,
+    rnaturalearthdata
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
