@@ -20,8 +20,8 @@
 visualise foieGras SSM fits to track data
 }
 \examples{
-data(ellie)
-fit <- fit_ssm(ellie, model="rw", time.step=24)
+## load example foieGras fit object (to save time)
+data(fit)
 plot(fit$ssm[[1]])
 
 }

@@ -24,8 +24,8 @@ from a compound tbl created when fitting to multiple individual data sets.
 The specified tbl's are appended to a single output tbl.
 }
 \examples{
-data(ellie)
-fit <- fit_ssm(ellie, model="rw", time.step=24)
+## load example foieGras fit object (to save time)
+data(fit)
 ## grab predicted values as an unprojected tibble
 preds <- grab(fit, what = "p", as_sf = FALSE)
 }

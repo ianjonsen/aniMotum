@@ -73,17 +73,11 @@ and predict locations at user-specified time intervals (regular or irregular)
 \examples{
 ## fit crw model to multiple individuals with Argos LS data
 data(ellie)
-\dontshow{
-ellie <- ellie[seq(1, nrow(ellie), by = 4), ]
-}
 fit <- fit_ssm(ellie, model = "rw", time.step = 24)
 plot(fit$ssm[[1]])
 
 \donttest{
 data(rope)
-\dontshow{
-rope <- rope[seq(1, nrow(rope), by=4), ]
-}
 fls <- fit_ssm(rope, model = "crw", time.step = 12)
 
 ## map of predicted locations and Argos observations for individual 3
