@@ -48,6 +48,18 @@ NULL
 ##' @description Example penguin Argos tracking data.
 NULL
 
+##' @name fit
+##' @doctype data
+##' @title foieGras example fit object
+##' @format .RData
+##' @keywords data
+##' @description Example foieGras fit object, using ellie example data and the
+##' following call: fit <- fit_ssm(ellie, model="rw", time.step=24). This example
+##' fit is included purely to speed up examples where a fit object is required
+##' but fitting to data is not the focus of the example.
+##'
+
+
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 
