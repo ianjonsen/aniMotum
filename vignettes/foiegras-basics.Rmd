@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(ggplot2)
 ```
 
 ## Disclaimer
@@ -63,6 +62,7 @@ head(foo)
 ### fitting a foieGras model
 model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
+require(dplyr)
 require(foieGras)
 ## load foieGras example data
 data(ellie)
@@ -85,15 +85,61 @@ The predicted values are the state estimates predicted at regular time intervals
 
 Estimated tracks can be mapped using the `foieGras`-guessed projection
 ```{r ggplot map, fig.width=7, fig.height=7}
-## include prefiltered observations
-coast <- rnaturalearthdata::countries50
-quickmap(fit$ssm[[1]], what = "predicted", obs = TRUE)
+require(ggplot2)
+require(rnaturalearth)
+require(rnaturalearthdata)
+## if not installed: install.packages(c("rnaturalearth","rnaturalearthdata"))
+## get SSM-predicted locations
+ploc_sf <- fit$ssm[[1]]$predicted
+prj <- sf::st_crs(ploc_sf)
+
+## get coastline data
+coast <- rnaturalearth::ne_countries(scale=50, returnclass = "sf") %>%
+  sf::st_transform(., crs = prj)
+
+bounds <- sf::st_bbox(ploc_sf)
+## add a buffer to the bounds so plot extends beyond data limits
+bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = 0.1)
+bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = 0.1)
+
+ggplot(data = ploc_sf) +
+    geom_sf(data = coast,
+            fill = grey(0.6),
+            lwd=0) +
+    xlim(bounds[c("xmin","xmax")]) +
+    ylim(bounds[c("ymin","ymax")]) +
+  geom_sf(size = 1.25, colour = "dodgerblue")
+
 ```
 
 The tracks can also be transformed to a user-specified projection
 ```{r reproject ggplot map, fig.width=7, fig.height=7}
 ## use Antarctic Polar Stereographic projection approximately centred on the track midpoint
-quickmap(fit$ssm[[1]], what = "p", crs = "+init=epsg:3031 +lon_0=85")
+ploc_sf <- ploc_sf %>% sf::st_transform(., crs = "+init=epsg:3031 +lon_0=85")
+
+bounds <- sf::st_bbox(ploc_sf)
+bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = 0.1)
+bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = 0.1)
+
+## colour locations by date
+lab_dates <- with(ploc_sf, seq(min(date), max(date), l = 5)) %>% as.Date()
+
+ggplot(data = ploc_sf) +
+    geom_sf(data = coast,
+            fill = grey(0.6),
+            lwd=0) +
+    xlim(bounds[c("xmin","xmax")]) +
+    ylim(bounds[c("ymin","ymax")]) +
+  geom_sf(aes(colour = as.numeric(as.Date(date))), size = 1.25) + 
+  theme(legend.position = "bottom", 
+        legend.text = element_text(size = 8, vjust = 0), 
+        legend.key.width = unit(1.5, "cm"),
+        legend.key.height = unit(0.5, "cm"),
+        legend.title = element_blank()
+  ) + scale_colour_viridis_c(breaks = as.numeric(lab_dates), 
+                             option = "viridis", 
+                             labels = lab_dates, 
+                             end = 0.95)
 ```
 
 The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected sf object or as a simple unprojected tibble
