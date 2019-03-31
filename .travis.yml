@@ -17,7 +17,7 @@ os:
   - linux
 
 sudo: true
-dist: debian
+dist: ubuntu
 
 cache:
   - packages
