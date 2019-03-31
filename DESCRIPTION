@@ -33,16 +33,12 @@ Imports:
     TMB,
     sf,
     stringr,
-    magrittr,
-    rnaturalearth
+    magrittr
 Suggests: 
     testthat,
     covr,
     knitr,
-    rmarkdown,
-    rgeos,
-    rnaturalearthdata,
-    udunits2
+    rmarkdown
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
