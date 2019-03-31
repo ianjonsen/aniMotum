@@ -111,7 +111,7 @@ ggplot(data = ploc_sf) +
 
 ```
 
-The tracks can also be transformed to a user-specified projection
+The tracks can also be transformed to other projections, using the `sf` and `ggspatial` packages
 ```{r reproject ggplot map, fig.width=7, fig.height=7}
 require(ggspatial)
 
@@ -122,8 +122,8 @@ coast <- coast %>% sf::st_transform(., crs = "+init=epsg:3031 +lon_0=85")
 lab_dates <- with(ploc_sf, seq(min(date), max(date), l = 5)) %>% as.Date()
 
 ggplot() +
-  ggspatial::annotation_spatial(data = coast, fill = "grey", lwd = 0) +
-  ggspatial::layer_spatial(data = ploc_sf, aes(colour = as.numeric(as.Date(date))), size = 1.25) + 
+  annotation_spatial(data = coast, fill = "grey", lwd = 0) +
+  layer_spatial(data = ploc_sf, aes(colour = as.numeric(as.Date(date))), size = 1.25) + 
   theme(legend.position = "bottom", 
         legend.text = element_text(size = 8, vjust = 0), 
         legend.key.width = unit(1.5, "cm"),
