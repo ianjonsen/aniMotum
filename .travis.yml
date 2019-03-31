@@ -9,7 +9,7 @@ r:
 repos:
   CRAN: https://cloud.r-project.org
 
-warnings_are_errors: false
+warnings_are_errors: true
 
 deploy.skip_cleanup: true
 

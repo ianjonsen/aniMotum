@@ -49,7 +49,7 @@ NULL
 NULL
 
 ##' @name fit
-##' @doctype data
+##' @docType data
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data

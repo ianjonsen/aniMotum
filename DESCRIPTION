@@ -41,5 +41,6 @@ Suggests:
     knitr,
     rmarkdown,
     rgeos,
-    rnaturalearthdata
+    rnaturalearthdata,
+    udunits2
 VignetteBuilder: knitr
