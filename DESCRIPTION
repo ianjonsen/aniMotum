@@ -44,3 +44,5 @@ Suggests:
     rnaturalearthdata,
     udunits2
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.3.0)
