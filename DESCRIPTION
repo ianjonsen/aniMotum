@@ -41,7 +41,8 @@ Suggests:
     rmarkdown,
     rnaturalearth,
     rnaturalearthdata,
-    rgeos
+    rgeos,
+    units
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
