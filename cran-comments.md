@@ -5,7 +5,7 @@ This is a resubmission. In this version I have:
 * removed "Internal function" descriptions in exported functions
 * included small executable examples for all exported functions 
 * further reduced size of example data files
-* removed a plot function that produces complex errors on some R-devel platforms
+* removed a plot function that produces errors on some R-devel platforms
 
 ## Test environments
 * local OS X install (10.14.3), R 3.5.3

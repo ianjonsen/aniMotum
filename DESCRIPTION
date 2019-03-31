@@ -42,7 +42,7 @@ Suggests:
     rnaturalearth,
     rnaturalearthdata,
     rgeos,
-    units
+    ggspatial
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)

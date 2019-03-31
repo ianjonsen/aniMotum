@@ -113,23 +113,17 @@ ggplot(data = ploc_sf) +
 
 The tracks can also be transformed to a user-specified projection
 ```{r reproject ggplot map, fig.width=7, fig.height=7}
-## use Antarctic Polar Stereographic projection approximately centred on the track midpoint
-ploc_sf <- ploc_sf %>% sf::st_transform(., crs = "+init=epsg:3031 +lon_0=85")
+require(ggspatial)
 
-bounds <- sf::st_bbox(ploc_sf)
-bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = 0.1)
-bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = 0.1)
+## use Antarctic Polar Stereographic projection approximately centred on the track midpoint
+coast <- coast %>% sf::st_transform(., crs = "+init=epsg:3031 +lon_0=85")
 
 ## colour locations by date
 lab_dates <- with(ploc_sf, seq(min(date), max(date), l = 5)) %>% as.Date()
 
-ggplot(data = ploc_sf) +
-    geom_sf(data = coast,
-            fill = grey(0.6),
-            lwd=0) +
-    xlim(bounds[c("xmin","xmax")]) +
-    ylim(bounds[c("ymin","ymax")]) +
-  geom_sf(aes(colour = as.numeric(as.Date(date))), size = 1.25) + 
+ggplot() +
+  ggspatial::annotation_spatial(data = coast, fill = "grey", lwd = 0) +
+  ggspatial::layer_spatial(data = ploc_sf, aes(colour = as.numeric(as.Date(date))), size = 1.25) + 
   theme(legend.position = "bottom", 
         legend.text = element_text(size = 8, vjust = 0), 
         legend.key.width = unit(1.5, "cm"),
