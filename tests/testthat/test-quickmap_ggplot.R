@@ -1,9 +1,12 @@
 context("test quickmap")
 
 ## quickmap output is a ggplot objects
-data(ellie)
-d <- ellie[seq(1, nrow(ellie), by = 5), ]
-fit <- fit_ssm(d, model = "crw", time.step = 24)
+data(fit)
+
+## use fit object incorrectly
+test_that("quickmap returns helpful error when fit obj used incorrectly", {
+  expect_error(quickmap(fit, "p"))
+})
 
 ## step through the options incrementally
 p <- quickmap(fit$ssm[[1]], what = "predicted")
