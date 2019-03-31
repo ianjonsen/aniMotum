@@ -40,5 +40,6 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    rgeos
+    rgeos,
+    rnaturalearthdata
 VignetteBuilder: knitr
