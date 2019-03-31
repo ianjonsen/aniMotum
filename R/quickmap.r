@@ -19,6 +19,7 @@
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise
 ##' @importFrom magrittr "%>%"
+##' @importFrom rnaturalearth ne_countries
 ##'
 ##' @examples
 ##' data(ellie)
@@ -56,7 +57,7 @@ quickmap <- function(x,
 
   if(is.null(crs)) {
     prj <- st_crs(sf_locs)
-    sf_data <- x$data
+    if(class(x)[1] != "sf") sf_data <- x$data
     } else {
     sf_locs <- sf_locs %>% st_transform(., crs)
     prj <- st_crs(sf_locs)
@@ -73,9 +74,9 @@ quickmap <- function(x,
     st_cast("MULTILINESTRING")
 
   ## get coastline
-  countriesLow <- NULL
-  data("countriesLow", package = "rworldmap", envir = environment())
-  coast <- st_as_sf(countriesLow) %>% st_transform(., prj)
+  coast <- NULL
+  coast <- ne_countries(scale=50, returnclass = "sf") %>%
+    sf::st_transform(., crs = prj)
 
   p <- ggplot() +
     geom_sf(data = coast,

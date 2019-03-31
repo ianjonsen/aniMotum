@@ -31,7 +31,8 @@ Imports:
     TMB,
     sf,
     stringr,
-    magrittr
+    magrittr,
+    rnaturalearth
 Suggests: 
     testthat,
     rworldmap,
