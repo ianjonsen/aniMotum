@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 library(foieGras)
 library(dplyr)
 library(ggplot2)
+library(sf)
 ```
 
 ## Disclaimer
@@ -89,7 +90,7 @@ Estimated tracks can be mapped using the `foieGras`-applied projection (here EPS
 library(rnaturalearth)
 library(ggspatial)
 
-ploc_sf <- grab(fit, what = "predicted")
+ploc_sf <- grab(fit, what = "predicted") %>% st_transform(., crs = "+init=epsg:3395 +units=m")
 
 ## get coastline data
 coast <- ne_countries(scale=110, returnclass = "sf") 

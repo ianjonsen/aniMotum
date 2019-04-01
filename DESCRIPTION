@@ -41,7 +41,8 @@ Suggests:
     rmarkdown,
     rnaturalearth,
     rgeos,
-    ggspatial
+    ggspatial,
+    units
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
