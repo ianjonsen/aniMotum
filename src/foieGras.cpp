@@ -1,6 +1,6 @@
 #define TMB_LIB_INIT R_init_mypkg
 #include <TMB.hpp>
-#include <cmath>
+
 
 /*
 	Random walk with velocities as a random walk.
@@ -138,8 +138,8 @@ template<class Type>
           // Argos Kalman Filter (or Kalman Smoothed) observations
           Type s2c = sin(c(i)) * sin(c(i));
           Type c2c = cos(c(i)) * cos(c(i));
-          Type M2  = (M(i) / sqrt(double(2))) * (M(i) / sqrt(double(2)));
-          Type m2 = (m(i) * psi / sqrt(double(2))) * (m(i) * psi / sqrt(double(2)));
+          Type M2  = (M(i) / sqrt(2)) * (M(i) / sqrt(2));
+          Type m2 = (m(i) * psi / sqrt(2)) * (m(i) * psi / sqrt(2));
           cov_obs(0,0) = (M2 * s2c + m2 * c2c);
           cov_obs(1,1) = (M2 * c2c + m2 * s2c);
           cov_obs(0,1) = (0.5 * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));

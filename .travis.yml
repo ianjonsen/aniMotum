@@ -14,10 +14,10 @@ warnings_are_errors: true
 deploy.skip_cleanup: true
 
 os:
-  - linux
+  - solaris
 
 sudo: true
-dist: ubuntu
+#dist: ubuntu
 
 cache:
   - packages
