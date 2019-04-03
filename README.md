@@ -27,10 +27,10 @@ First, ensure you have R version >= 3.5.2 installed:
 R.Version()
 ```
 
-## From CRAN  
+### From CRAN  
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and can be downloaded within `R`, e.g., `install.packages("foieGras")`  
 
-## From GitHub (source)  
+### From GitHub (source)  
 
 On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/) 
 
