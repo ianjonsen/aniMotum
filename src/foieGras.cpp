@@ -12,6 +12,7 @@
 */
 
 using namespace density;
+using std::sqrt;
 
 template<class Type>
   Type objective_function<Type>::operator() ()
@@ -136,11 +137,11 @@ template<class Type>
           cov_obs(1,0) = cov_obs(0,1);
         } else if(obs_mod(i) == 1) {
           // Argos Kalman Filter (or Kalman Smoothed) observations
-          double num = 2.0;
+          double z = sqrt(2.);
           Type s2c = sin(c(i)) * sin(c(i));
           Type c2c = cos(c(i)) * cos(c(i));
-          Type M2  = (M(i) / sqrt(num)) * (M(i) / sqrt(num));
-          Type m2 = (m(i) * psi / sqrt(num)) * (m(i) * psi / sqrt(num));
+          Type M2  = (M(i) / z) * (M(i) / z);
+          Type m2 = (m(i) * psi / z) * (m(i) * psi / z);
           cov_obs(0,0) = (M2 * s2c + m2 * c2c);
           cov_obs(1,1) = (M2 * c2c + m2 * s2c);
           cov_obs(0,1) = (0.5 * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
