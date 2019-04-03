@@ -20,11 +20,11 @@ Read `?fit_ssm` for details and an example of how to use the package or read the
 browseVignettes(package = "foieGras")
 ```
 
-## Installation
+## Installation (from source)
 First, ensure you have R version >= 3.5.2 installed:
 
 ```R
-R.Version
+R.Version()
 ```
 On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/) 
 
@@ -39,4 +39,4 @@ To get the very latest `foieGras` stable version, you can install from GitHub:
 remotes::install_github("ianjonsen/foieGras", dependencies = c("Imports","LinkingTo","Suggests"))
 ```
 
-Note: there can be issues getting compilers to work properly, especially on a Mac with OS X 10.13.x or higher. If you encounter install and compile issues, I recommend you consult the excellent information on the [glmmTMB](https://github.com/glmmTMB/glmmTMB)
+Note: there can be issues getting compilers to work properly, especially on a Mac with OS X 10.13.x or higher. If you encounter install and compile issues, I recommend you consult the excellent information on the [glmmTMB](https://github.com/glmmTMB/glmmTMB) GitHub.
