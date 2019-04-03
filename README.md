@@ -20,12 +20,18 @@ Read `?fit_ssm` for details and an example of how to use the package or read the
 browseVignettes(package = "foieGras")
 ```
 
-## Installation (from source)
+## Installation 
 First, ensure you have R version >= 3.5.2 installed:
 
 ```R
 R.Version()
 ```
+
+## From CRAN  
+`foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and can be downloaded within `R`, e.g., `install.packages("foieGras")`  
+
+## From GitHub (source)  
+
 On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/) 
 
 On Mac's, ensure you have installed [Xcode](https://developer.apple.com/xcode/) and Xcode developer tools. If installation is needed, make sure you start Xcode after install to ensure final setup of developer tools is completed. Both Xcode and Xcode developer tools can be installed from the [Mac App Store](https://itunes.apple.com/au/app/xcode/id497799835?mt=12)
