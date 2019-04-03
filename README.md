@@ -1,11 +1,11 @@
 # foieGras
 get your location ducks all lined up by fitting continuous-time movement models to Least Squares- and/or Kalman Filter-derived Argos location data
 
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)  
-[![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)  
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras)  
-[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/foieGraas)](http://www.r-pkg.org/pkg/foieGras)  
-[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras)](http://r-pkg.org/pkg/foieGras)  
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/foieGraas)](http://www.r-pkg.org/pkg/foieGras)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras)](http://r-pkg.org/pkg/foieGras)
 
 master branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
