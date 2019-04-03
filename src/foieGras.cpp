@@ -1,5 +1,6 @@
 #define TMB_LIB_INIT R_init_mypkg
 #include <TMB.hpp>
+#include <cmath>
 
 /*
 	Random walk with velocities as a random walk.
@@ -112,8 +113,8 @@ template<class Type>
       		x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
 
       		// velocity innovations
-      		x_t(2) = (v(0,i) - v(0,i-1)); // /del_t(i); // divide by del_t(i) or not?
-      		x_t(3) = (v(1,i) - v(1,i-1)); // /del_t(i);
+      		x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
+      		x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
       		jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
     	}
     }
@@ -123,7 +124,6 @@ template<class Type>
     matrix<Type> cov_obs(2, 2);
     MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
 
-//    vector<Type> mu_t(2);
     for(int i = 0; i < timeSteps; ++i) {
       if(isd(i) == 1) {
         if(obs_mod(i) == 0) {
@@ -135,19 +135,17 @@ template<class Type>
           cov_obs(0,1) = s * q * rho_o;
           cov_obs(1,0) = cov_obs(0,1);
         } else if(obs_mod(i) == 1) {
-          // Argos Kalman Filter (or Kalman Smoothed) observations using Mclintock formulae
+          // Argos Kalman Filter (or Kalman Smoothed) observations
           Type s2c = sin(c(i)) * sin(c(i));
           Type c2c = cos(c(i)) * cos(c(i));
-          Type M2  = (M(i) / sqrt(2)) * (M(i) / sqrt(2));
-          Type m2 = (m(i) * psi / sqrt(2)) * (m(i) * psi / sqrt(2));
+          Type M2  = (M(i) / sqrt(double(2))) * (M(i) / sqrt(double(2)));
+          Type m2 = (m(i) * psi / sqrt(double(2))) * (m(i) * psi / sqrt(double(2)));
           cov_obs(0,0) = (M2 * s2c + m2 * c2c);
           cov_obs(1,1) = (M2 * c2c + m2 * s2c);
           cov_obs(0,1) = (0.5 * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
           cov_obs(1,0) = cov_obs(0,1);
         }
         nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
-//        mu_t(0) = (Y(0,i) - mu(0,i));
-//        mu_t(1) = (Y(1,i) - mu(1,i));
         if(proc_mod == 0) {
           jnll += nll_obs(Y.row(i) - X.row(i));   // RW innovations
         } else if(proc_mod == 1) {
