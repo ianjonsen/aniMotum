@@ -103,9 +103,10 @@ fit_ssm <- function(d,
     ))
 
   if(pf){
-    pfd <- lapply(fit$pf, function(.) .$data)
-    fit <- do.call(rbind, pfd) %>%
-      as_tibble()
+    pfd <- lapply(fit$pf, function(.) .)
+    fit <- try(do.call(rbind, pfd))
+    if(inherits(fit, "try-error")) stop("\n Cannot rbind multiple guessed projections in pre-filtered output. \n
+                                        Supply data as an `sf` object with a common projection across individuals.\n")
   } else {
     if(verbose == 1)
       cat("\nfitting SSM...\n")
