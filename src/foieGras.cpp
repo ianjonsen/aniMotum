@@ -18,45 +18,46 @@ template<class Type>
   Type objective_function<Type>::operator() ()
   {
     // DATA
-    DATA_MATRIX(Y);	            //  (x, y) observations
-    DATA_VECTOR(dt);         	//  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
-    DATA_VECTOR(state0);        //  initial state
-    DATA_IVECTOR(isd);          //  indexes observations vs. interpolation points
-    DATA_IVECTOR(obs_mod);      //  indicates which obs error model to be used
-    DATA_INTEGER(proc_mod);		//	indicates which process model to be used: RW or CRW
+    DATA_ARRAY(Y);	                    //  (x, y) observations
+    DATA_VECTOR(dt);         	    //  time diff in some appropriate unit. this should contain dt for both interp and obs positions
+    DATA_VECTOR(state0);                //  initial state
+    DATA_IVECTOR(isd);                  //  indexes observations vs. interpolation points
+    DATA_IVECTOR(obs_mod);              //  indicates which obs error model to be used
+    DATA_INTEGER(proc_mod);		          //	indicates which process model to be used: RW or CRW
+    DATA_ARRAY_INDICATOR(keep, Y);     // for one step predictions
 
     // for KF observation model
-    DATA_VECTOR(m);             //  m is the semi-minor axis length
-    DATA_VECTOR(M);             //  M is the semi-major axis length
-    DATA_VECTOR(c);             //  c is the orientation of the error ellipse
+    DATA_VECTOR(m);                     //  m is the semi-minor axis length
+    DATA_VECTOR(M);                     //  M is the semi-major axis length
+    DATA_VECTOR(c);                     //  c is the orientation of the error ellipse
     // for LS observation model
-    DATA_MATRIX(K);                 // error weighting factors for LS obs model
+    DATA_MATRIX(K);                     // error weighting factors for LS obs model
 
     // PROCESS PARAMETERS
     // for RW
-    PARAMETER_VECTOR(l_sigma);    //  Innovation variance (link scale)
-    PARAMETER(l_rho_p);           //  Innovation correlation (link scale)
-    PARAMETER_MATRIX(X);          //  Predicted locations TP - length(X) should be same as length(dt) - i.e. both interp & obs pos.
+    PARAMETER_VECTOR(log_sigma);    //  Innovation variance (link scale)
+    PARAMETER(log_rho_p);           //  Innovation correlation (link scale)
+    PARAMETER_ARRAY(X);          //  Predicted locations TP - length(X) should be same as length(dt) - i.e. both interp & obs pos.
     // for CRW
-    PARAMETER(logD);				// 1-d Diffusion coefficient
+    PARAMETER(log_D);				        // 1-d Diffusion coefficient
     // random variables
-    PARAMETER_MATRIX(mu); /* State location */
-    PARAMETER_MATRIX(v); /* state velocities */
+    PARAMETER_ARRAY(mu);          // State location
+    PARAMETER_ARRAY(v);           // state velocities
 
     // OBSERVATION PARAMETERS
     // for KF OBS MODEL
-    PARAMETER(l_psi); 				// error SD scaling parameter to account for possible uncertainty in Argos error ellipse variables
+    PARAMETER(log_psi); 				// error SD scaling parameter to account for possible uncertainty in Argos error ellipse variables
     // for LS OBS MODEL
-    PARAMETER_VECTOR(l_tau);     	// error dispersion for LS obs model (log scale)
-    PARAMETER(l_rho_o);             // error correlation
+    PARAMETER_VECTOR(log_tau);     	// error dispersion for LS obs model (log scale)
+    PARAMETER(log_rho_o);             // error correlation
 
 	  // Transform parameters
-	  vector<Type> sigma = exp(l_sigma);
-    Type rho_p = Type(2.0) / (Type(1.0) + exp(-l_rho_p)) - Type(1.0);
-    vector<Type> tau = exp(l_tau);
-    Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
-    Type psi = exp(l_psi);
-    Type D = exp(logD);
+	  vector<Type> sigma = exp(log_sigma);
+    Type rho_p = Type(2.0) / (Type(1.0) + exp(-log_rho_p)) - Type(1.0);
+    vector<Type> tau = exp(log_tau);
+    Type rho_o = Type(2.0) / (Type(1.0) + exp(-log_rho_o)) - Type(1.0);
+    Type psi = exp(log_psi);
+    Type D = exp(log_D);
 
     int timeSteps = dt.size();
 
@@ -81,7 +82,7 @@ template<class Type>
     	for(int i = 1; i < timeSteps; i++) {
       		cov_dt = dt(i) * dt(i) * cov;
       		nll_proc.setSigma(cov_dt);
-      		jnll += nll_proc(X.row(i) - X.row(i - 1));
+      		jnll += nll_proc(X.col(i) - X.col(i - 1));
     	}
     } else if(proc_mod == 1){
     	// CRW
@@ -149,9 +150,9 @@ template<class Type>
         }
         nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
         if(proc_mod == 0) {
-          jnll += nll_obs(Y.row(i) - X.row(i));   // RW innovations
+          jnll += nll_obs(Y.col(i) - X.col(i), keep.col(i));   // RW innovations
         } else if(proc_mod == 1) {
-          jnll += nll_obs(Y.col(i) - mu.col(i));   // CRW innovations
+          jnll += nll_obs(Y.col(i) - mu.col(i), keep.col(i));   // CRW innovations
         }
 
       }

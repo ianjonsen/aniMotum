@@ -4,18 +4,20 @@
 \alias{sfilter}
 \title{fit the state-space model to \code{prefilter}-ed data}
 \usage{
-sfilter(x, model = c("rw", "crw"), time.step = 6, parameters = NULL,
-  fit.to.subset = TRUE, optim = c("nlminb", "optim"),
-  verbose = FALSE, inner.control = NULL)
+sfilter(x, model = c("rw", "crw"), time.step = 6, map = NULL,
+  parameters = NULL, fit.to.subset = TRUE, optim = c("optim",
+  "nlminb"), verbose = FALSE, control = NULL, inner.control = NULL)
 }
 \arguments{
 \item{x}{Argos data passed through prefilter()}
 
 \item{model}{specify which SSM is to be fit: "rw" or "crw"}
 
-\item{time.step}{the regular time interval, in hours, to predict to.
+\item{time.step}{the regular time interval, in hours, to predict to
 Alternatively, a vector of prediction times, possibly not regular, must be
-specified as a data.frame with id and POSIXt dates.}
+specified as a data.frame with id and POSIXt dates}
+
+\item{map}{an optional named list of parameters (as factors) to be fixed in the estimation}
 
 \item{parameters}{a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specifiy these. Only play with
@@ -28,7 +30,9 @@ this if you know what you are doing...}
 
 \item{verbose}{report progress during minimization}
 
-\item{inner.control}{list of control settings for the inner optimization
+\item{control}{list of control parameters for the outer optimization (type ?nlminb or ?optim for details)}
+
+\item{inner.control}{list of control parameters for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
 }
 \description{

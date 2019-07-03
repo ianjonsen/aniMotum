@@ -5,7 +5,7 @@
 \title{Prepare Argos data for fitting state-space model}
 \usage{
 prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
-  spdf = TRUE, min.dt = 60)
+  spdf = TRUE, min.dt = 60, emf = NULL)
 }
 \arguments{
 \item{data}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
@@ -19,14 +19,16 @@ prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
+
+\item{emf}{optionally suppled vector of matrix of error multiplication factors for location quality classes. see Details}
 }
 \value{
 an sf object with all observations passed from \code{data} and the following appended columns
 \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
 \item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
-\item{\code{amf_x}}{Argos error multiplication factor for x direction}
-\item{\code{amf_y}}{Argos error multiplication factor for y direction}
-\item{\code{geometry}}{sf POINT object giving x,y coordinates in km}
+\item{\code{emf_x}}{error multiplication factors for \code{x} direction}
+\item{\code{emf_y}}{error multiplication factors for \code{y} direction}
+\item{\code{geometry}}{sf POINT object giving \code{x,y} coordinates in km}
 }
 \description{
 \code{prefilter} (1) determines Argos data type (LS or KF);
@@ -42,6 +44,16 @@ class (for type LS);
 }
 \details{
 called by \code{fit_ssm}.
+
+User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
+
+\code{emf.x} {emf values for the \code{x} direction}
+
+\code{emf.y} {emf values for \code{y} direction}
+
+\code{lc} {location class designations}
+
+The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be ammeanable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
 }
 \examples{
 data(ellie)

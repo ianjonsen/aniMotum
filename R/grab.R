@@ -12,8 +12,7 @@
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'
-##' @importFrom dplyr tbl_df arrange mutate select bind_rows
-##' @importFrom magrittr "%>%"
+##' @importFrom dplyr tbl_df arrange mutate select bind_rows "%>%"
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'
@@ -74,7 +73,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
       attr(out_sf, "class") <- append(class(out_sf), what, after = 1)
       return(out_sf)
       } else {
-        out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, obs.type, amf_x, amf_y, geometry)
+        out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, obs.type, emf.x, emf.y, keep, geometry)
         return(out_sf)
       }
 
@@ -87,7 +86,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
           ) %>% as_tibble()
       } else {
         out_df <- out_df %>%
-          select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, amf_x, amf_y) %>%
+          select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, emf.x, emf.y, keep) %>%
           as_tibble()
       }
       attr(out_df, "class") <- append(class(out_df), what, after = 1)

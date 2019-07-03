@@ -7,7 +7,7 @@
 \method{print}{foieGras}(x, ...)
 }
 \arguments{
-\item{x}{a \code{ctrw} fit object}
+\item{x}{a \code{foieGras} fit object}
 
 \item{...}{unused. For compatibility with the generic method.}
 }
