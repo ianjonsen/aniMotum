@@ -22,7 +22,7 @@
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename
 ##' @importFrom magrittr "%>%"
-##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs st_sf
+##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom argosfilter sdafilter
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
@@ -66,7 +66,6 @@ prefilter <-
          ))))
       stop("\nUnexpected column names in Data, type `?fit_ssm` for details")
   } else if(inherits(d, "sf") && inherits(st_geometry(d), "sfc_POINT")){
-    d <- st_sf(d) ## ensures geometry is in last column (no longer guaranteed in latest sf version)
     if((ncol(d) == 7 &
         !isTRUE(all.equal(
       names(d), c("id", "date", "lc", "smaj", "smin", "eor", "geometry")))) ||
@@ -181,14 +180,14 @@ prefilter <-
       prj <- "+init=epsg:3395 +units=km"
     }
 
-    sf_locs <- sf_locs %>% st_transform(., prj)
+    sf_locs <- sf_locs %>% st_transform(., crs = prj)
 
     if (max(dd$lat) <= -60) {
       prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
-      sf_locs <- sf_locs %>% st_transform(., prj)
+      sf_locs <- sf_locs %>% st_transform(., crs = prj)
     } else if (min(dd$lat) >= 60) {
       prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
-      sf_locs <- sf_locs %>% st_transform(., prj)
+      sf_locs <- sf_locs %>% st_transform(., crs = prj)
     }
 
 
