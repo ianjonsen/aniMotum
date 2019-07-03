@@ -1,12 +1,11 @@
 ## Submission
-This version addresses a compile error on r-patched-solaris-x86
-* I have modified C++ source code to avoid `sqrt(int)` overload ambiguity compile error on Solaris platforms
-* I am unable to verify this fix with testing on a comparable Solaris platform
+This version addresses an error discovered on a reverse dependency checks for the `sf` package. The geometry column in sf objects is no longer guaranteed to be the last column and this situation resulted in failed tests built into `foieGras`. 
+* I have modified the test code to handle arbitrary positioning of the geometry column
 
 ## Test environments
-* local OS X install (10.14.3), R 3.5.3
-* ubuntu 16.04.5 (on travis-ci), R 3.5.2, R-devel
-* win-builder (release, R-devel)
+* local OS X install (10.14.4), R 3.5.3
+* ubuntu 16.04.5 (on travis-ci), R 3.6.0, R-devel
+* windows (via rhub), x86_64-release, x86_64-devel
 
 ## R CMD check results
 
