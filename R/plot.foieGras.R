@@ -9,7 +9,7 @@
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank
 ##' @importFrom ggplot2 element_text xlab
 ##' @importFrom gridExtra grid.arrange
-##' @importFrom dplyr "%>%"
+##' @importFrom magrittr "%>%"
 ##' @method plot foieGras
 ##'
 ##' @examples
@@ -75,14 +75,12 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ..
   d_df <- cbind(d_df, ll, xy) %>%
     select(id, date, lon, lat, x, y)
 
-  if(length(x$ts) > 1) x$ts <- "user-supplied prediction times"
-
   p1 <- ggplot() +
     geom_point(data = d_df, aes_string("lon", "lat"), shape = 19, col = grey(0.85)) +
     geom_path(data = f_df, aes_string("lon", "lat"), lwd = 0.25, col = "firebrick") +
     geom_point(data = f_df, aes_string("lon", "lat"), size = 0.75, shape = 20, col = "firebrick") +
     theme_bw() +
-    ggtitle(label = NULL, subtitle = "fitted states") +
+    ggtitle(label = paste0("id: ", f_sf$id[1], "   model: ", x$pm, "  time.step: ", x$ts, " h"), subtitle = "fitted states") +
     theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
   p2 <- ggplot() +
@@ -90,7 +88,7 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ..
     geom_path(data = p_df, aes_string("lon", "lat"), lwd = 0.25, col = "dodgerblue") +
     geom_point(data = p_df, aes_string("lon", "lat"), size = 0.75, shape = 20, col = "dodgerblue") +
     theme_bw() +
-    ggtitle(label = NULL, subtitle = "predicted states") +
+    ggtitle(label = " ", subtitle = "predicted states") +
     theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
 
@@ -117,8 +115,5 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ..
     nrow = 4,
     ncol = 2,
     byrow = T
-    ),
-    top = paste0("id: ", f_sf$id[1], "  model: ", x$pm, "  time.step: ", x$ts,
-                 ifelse(!is.character(x$ts), " h", ""))
-    )
+    ))
 }

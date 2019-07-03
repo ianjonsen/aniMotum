@@ -11,10 +11,9 @@
 ##'
 ##' @param x Argos data passed through prefilter()
 ##' @param model specify which SSM is to be fit: "rw" or "crw"
-##' @param time.step the regular time interval, in hours, to predict to
+##' @param time.step the regular time interval, in hours, to predict to.
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
-##' specified as a data.frame with id and POSIXt dates
-##' @param map an optional named list of parameters (as factors) to be fixed in the estimation
+##' specified as a data.frame with id and POSIXt dates.
 ##' @param parameters a list of initial values for all model parameters and
 ##' unobserved states, default is to let sfilter specifiy these. Only play with
 ##' this if you know what you are doing...
@@ -22,14 +21,14 @@
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization
-##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
-##' @param inner.control list of control parameters for the inner optimization
+##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
 ##'
 ##' @useDynLib foieGras
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
-##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
+##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols
+##' @importFrom magrittr "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##'
@@ -44,12 +43,10 @@ sfilter <-
   function(x,
            model = c("rw", "crw"),
            time.step = 6,
-           map = NULL,
            parameters = NULL,
            fit.to.subset = TRUE,
-           optim = c("optim", "nlminb"),
+           optim = c("nlminb", "optim"),
            verbose = FALSE,
-           control = NULL,
            inner.control = NULL) {
 
     st <- proc.time()
@@ -57,12 +54,13 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
-
-    ## populate control list if any parameters specified...
-    if (length(control)) {
-      nms <- names(control)
-      if (!is.list(control) || is.null(nms))
-        stop("'control' argument must be a named list")
+    if(is.null(time.step)) {
+      print("\nNo time.step specified, using 6 h as a default time step")
+      time.step <- 6
+    } else if(length(time.step) > 1 & !is.data.frame(time.step)) {
+        stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
+    } else if(length(time.step) > 1 & is.data.frame(time.step)) {
+        if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
@@ -94,18 +92,6 @@ sfilter <-
         select(date)
     }
 
-
-    ## add 1 s to observation time(s) that exactly match prediction time(s) & throw a warning
-    if(sum(d$date %in% ts$date) > 0) {
-      o.times <- which(d$date %in% ts$date)
-      d[o.times, "date"] <- d[o.times, "date"] + 1
-
-      warning(sprintf("\n1 s added to %d observation time(s) that exactly match prediction time(s)", length(o.times)),
-        call. = FALSE,
-        immediate. = FALSE,
-        noBreaks. = FALSE)
-    }
-
     ## merge data and interpolation times
     d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
@@ -114,7 +100,7 @@ sfilter <-
 
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
-      as.numeric() #/ 24
+      as.numeric() / 24
     dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
 
     ## use approx & MA filter to obtain state initial values
@@ -150,38 +136,38 @@ sfilter <-
       rho <- V[1, 2] / prod(sigma)
 
       parameters <- list(
-        log_sigma = log(pmax(1e-08, sigma)),
-        log_rho_p = log((1 + rho) / (1 - rho)),
-        X = t(xs),
-        log_D = 10,
+        l_sigma = log(pmax(1e-08, sigma)),
+        l_rho_p = log((1 + rho) / (1 - rho)),
+        X = xs,
+        logD = 10,
         mu = t(xs),
         v = t(xs) * 0,
-        log_psi = 0,
-        log_tau = c(0, 0),
-        log_rho_o = 0
+        l_psi = 0,
+        l_tau = c(0, 0),
+        l_rho_o = 0
       )
     }
 
     ## calculate prop'n of obs that are LS-derived
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF"), labels = c("LS","KF")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
-    automap <- switch(model,
+    map <- switch(model,
                   rw = {
                     if (pls == 1) {
-                      list(log_D = factor(NA),
-                           log_psi = factor(NA),
+                      list(logD = factor(NA),
+                           l_psi = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
                     } else if (pls == 0) {
-                      list(log_D = factor(NA),
-                           log_tau = factor(c(NA, NA)),
-                           log_rho_o = factor(NA),
+                      list(logD = factor(NA),
+                           l_tau = factor(c(NA, NA)),
+                           l_rho_o = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
                     } else if (pls > 0 & pls < 1) {
-                      list(log_D = factor(NA),
+                      list(logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
@@ -190,39 +176,32 @@ sfilter <-
                   crw = {
                     if (pls == 1) {
                       list(
-                        log_sigma = factor(c(NA, NA)),
-                        log_rho_p = factor(NA),
+                        l_sigma = factor(c(NA, NA)),
+                        l_rho_p = factor(NA),
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        log_psi = factor(NA)
+                        l_psi = factor(NA)
                       )
                     } else if (pls == 0) {
                       list(
-                        log_sigma = factor(c(NA, NA)),
-                        log_rho_p = factor(NA),
+                        l_sigma = factor(c(NA, NA)),
+                        l_rho_p = factor(NA),
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        log_tau = factor(c(NA, NA)),
-                        log_rho_o = factor(NA)
+                        l_tau = factor(c(NA, NA)),
+                        l_rho_o = factor(NA)
                       )
                     } else if (pls > 0 & pls < 1) {
-                      list(log_sigma = factor(c(NA, NA)),
-                           log_rho_p = factor(NA),
+                      list(l_sigma = factor(c(NA, NA)),
+                           l_rho_p = factor(NA),
                            X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                       )
                     }
                   })
 
-    if(!is.null(map)) {
-      names(map) <- paste0("log_", names(map))
-      map <- append(automap, map)
-    } else {
-      map <- automap
-    }
-
     ## TMB - data list
     data <- list(
       Y = switch(
         model,
-        rw = rbind(d.all$x, d.all$y),
+        rw = cbind(d.all$x, d.all$y),
         crw = rbind(d.all$x, d.all$y)
       ),
       state0 = state0,
@@ -233,14 +212,13 @@ sfilter <-
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
-      K = cbind(d.all$emf.x, d.all$emf.y)
+      K = cbind(d.all$amf_x, d.all$amf_y)
     )
 
     ## TMB - create objective function
-    if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
+    if (is.null(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
     obj <-
       MakeADFun(
@@ -269,11 +247,7 @@ sfilter <-
     ## Minimize objective function
     opt <-
       suppressWarnings(switch(optim,
-                              nlminb = try(nlminb(obj$par,
-                                                  obj$fn,
-                                                  obj$gr,
-                                                  control = control
-                                                  ))
+                              nlminb = try(nlminb(obj$par, obj$fn, obj$gr))
                               , #myfn #obj$fn
                               optim = try(do.call(
                                 optim,
@@ -281,8 +255,7 @@ sfilter <-
                                   par = obj$par,
                                   fn = obj$fn,
                                   gr = obj$gr,
-                                  method = "L-BFGS-B",
-                                  control = control
+                                  method = "L-BFGS-B"
                                 )
                               ))))
 
@@ -295,19 +268,13 @@ sfilter <-
 
       switch(model,
              rw = {
-               tmp <- summary(rep, "random")
-               rdm <- cbind(tmp[seq(1, nrow(tmp), by = 2), ],
-                            tmp[seq(2, nrow(tmp), by = 2), ]
-                            ) %>%
-                 as_tibble() %>%
-                 select(1,3,2,4) %>%
-                 rename(x = "Estimate",
-                        y = "V3",
-                        x.se = "Std. Error",
-                        y.se = "V4")
+               rdm <-
+                 matrix(summary(rep, "random"),
+                        nrow(d.all),
+                        4,
+                        dimnames = list(NULL, c("x", "y", "x.se", "y.se")))
 
-
-               rdm <- rdm %>%
+               rdm <- as.data.frame(rdm) %>%
                  mutate(
                    id = unique(d.all$id),
                    date = d.all$date,
@@ -374,11 +341,11 @@ sfilter <-
       }
 
       out <- list(
+        call = call,
         predicted = pd,
         fitted = fd,
         par = fxd,
         data = x,
-        isd = d.all$isd,
         inits = parameters,
         pm = model,
         ts = time.step,
@@ -386,18 +353,17 @@ sfilter <-
         tmb = obj,
         rep = rep,
         aic = aic,
-        optimiser = optim,
         time = proc.time() - st
       )
     } else {
       ## if optimiser fails
       out <- list(
-        data = d.all,
+        call = call,
+        data = x,
         inits = parameters,
         pm = model,
         ts = time.step,
         tmb = obj,
-        optimiser = optim,
         errmsg = opt
       )
     }

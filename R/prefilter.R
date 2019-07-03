@@ -19,30 +19,20 @@
 ##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
-##' @param emf optionally suppled vector of matrix of error multiplication factors for location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
-##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename "%>%"
+##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename
+##' @importFrom magrittr "%>%"
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs st_sf
 ##' @importFrom argosfilter sdafilter
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
 ##'
-##' @details User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
-##'
-##' \code{emf.x} {emf values for the \code{x} direction}
-##'
-##' \code{emf.y} {emf values for \code{y} direction}
-##'
-##' \code{lc} {location class designations}
-##'
-##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be ammeanable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
-##'
 ##' @return an sf object with all observations passed from \code{data} and the following appended columns
 ##' \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
 ##' \item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
-##' \item{\code{emf_x}}{error multiplication factors for \code{x} direction}
-##' \item{\code{emf_y}}{error multiplication factors for \code{y} direction}
-##' \item{\code{geometry}}{sf POINT object giving \code{x,y} coordinates in km}
+##' \item{\code{amf_x}}{Argos error multiplication factor for x direction}
+##' \item{\code{amf_y}}{Argos error multiplication factor for y direction}
+##' \item{\code{geometry}}{sf POINT object giving x,y coordinates in km}
 ##'
 ##' @examples
 ##' data(ellie)
@@ -57,14 +47,11 @@ prefilter <-
            ang = -1,
            distlim = c(2500, 5000),
            spdf = TRUE,
-           min.dt = 60,
-           emf = NULL
-           ) {
+           min.dt = 60) {
 
   d <- data
   # check input data
   if (!inherits(d, "sf")) {
-    d <- st_sf(d) ## ensure geometry goes in last column
     if (!ncol(d) %in% c(5, 8))
       stop("\nData can only have 5 (for LS data) or 8 (for KF data) columns")
 
@@ -79,6 +66,7 @@ prefilter <-
          ))))
       stop("\nUnexpected column names in Data, type `?fit_ssm` for details")
   } else if(inherits(d, "sf") && inherits(st_geometry(d), "sfc_POINT")){
+    d <- st_sf(d) ## ensures geometry is in last column (no longer guaranteed in latest sf version)
     if((ncol(d) == 7 &
         !isTRUE(all.equal(
       names(d), c("id", "date", "lc", "smaj", "smin", "eor", "geometry")))) ||
@@ -102,6 +90,7 @@ prefilter <-
   ##  convert dates to POSIXt
   ##  flag any duplicate date records,
   ##  order records by time,
+  ##  set lc to ordered factor,
   ##  flag records as either KF or LS,
 
   d <- d %>%
@@ -109,6 +98,7 @@ prefilter <-
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
     arrange(order(date)) %>%
+    mutate(lc = factor(lc, levels = c(3,2,1,0,"A","B","Z"), ordered = TRUE)) %>%
     mutate(obs.type = ifelse(is.na(smaj) | is.na(smin) | is.na(eor), "LS", "KF"))
 
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
@@ -215,25 +205,19 @@ prefilter <-
   }
 
   ## add LS error info to corresponding records
-  ## set emf's = NA if obs.type == "KF" - not essential but for clarity
-  if(is.null(emf)) {
-      tmp <- emf()
-  } else if(is.data.frame(emf)) {
-      tmp <- emf
-  } else {
-      stop("\n supplied emf must be a data.frame. see `?prefilter`")
-    }
-
+  ## set amf's = NA if obs.type == "KF" - not essential but for clarity
+  tmp <- amf()
   out <- sf_locs %>%
     left_join(., tmp, by = "lc") %>%
     mutate(
-      emf.x = ifelse(obs.type == "KF", NA, emf.x),
-      emf.y = ifelse(obs.type == "KF", NA, emf.y)
+      amf_x = ifelse(obs.type == "KF", NA, amf_x),
+      amf_y = ifelse(obs.type == "KF", NA, amf_y)
     )
 
   if (sum(is.na(out$lc)) > 0)
     stop(
-      "\n NA's found in location class values"
+      "\n NA's found in location class values,\n
+      perhaps your input lc's != c(3,2,1,0,`A`,`B`,`Z`)?"
     )
 
   return(out)

@@ -14,7 +14,7 @@
 ##' @importFrom utils data
 ##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
-##' @importFrom dplyr summarise "%>%"
+##' @importFrom dplyr summarise
 ##' @importFrom tibble as_tibble
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
