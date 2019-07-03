@@ -1,5 +1,5 @@
 ## Submission
-This version addresses an error discovered on a reverse dependency checks for the `sf` package. The geometry column in sf objects is no longer guaranteed to be the last column and this situation resulted in failed tests built into `foieGras`. 
+This version addresses an error discovered on a reverse dependency check for the `sf` package. The geometry column in sf objects is no longer guaranteed to be the last column and this situation resulted in failed tests built into `foieGras`. 
 * I have modified the test code to handle arbitrary positioning of the geometry column
 
 ## Test environments
