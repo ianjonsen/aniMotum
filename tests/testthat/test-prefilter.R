@@ -21,7 +21,7 @@ test_that("prefilter handles incoming sf data", {
 })
 
 ## test that prefilter converts sf w units=m to units=km
-ellie_sf <- sf::st_transform(ellie_sf, crs = "+init=epsg:3031 + units=m")
+ellie_sf <- sf::st_transform(ellie_sf, crs = "+init=epsg:3031 +units=m")
 f <- prefilter(ellie_sf, vmax=10, ang=-1, min.dt=120)
 f <- dplyr::select(f, id, date, lc, smaj, smin,eor,keep,obs.type,amf_x,amf_y,geometry)
 test_that("prefilter handles incoming sf data", {
