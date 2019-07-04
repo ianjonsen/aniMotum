@@ -3,8 +3,9 @@ This version addresses an error discovered on a reverse dependency check for the
 * I have modified the test code to handle arbitrary positioning of the geometry column
 
 ## Test environments
-* local OS X install (10.14.4), R 3.5.3
+* local OS X install (10.14.4), R 3.6.0
 * ubuntu 16.04.5 (on travis-ci), R 3.6.0, R-devel
+* fedora (via rhub), R-devel
 * windows (via rhub), x86_64-release, x86_64-devel
 
 ## R CMD check results
