@@ -92,6 +92,17 @@ sfilter <-
         select(date)
     }
 
+    ## add 1 s to observation time(s) that exactly match prediction time(s) & throw a warning
+    if(sum(d$date %in% ts$date) > 0) {
+      o.times <- which(d$date %in% ts$date)
+      d[o.times, "date"] <- d[o.times, "date"] + 1
+
+      # warning(sprintf("\n1 s added to %d observation time(s) that exactly match prediction time(s)", length(o.times)),
+      #         call. = FALSE,
+      #         immediate. = FALSE,
+      #         noBreaks. = FALSE)
+    }
+
     ## merge data and interpolation times
     d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
