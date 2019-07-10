@@ -6,8 +6,9 @@
 \usage{
 fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
   spdf = TRUE, min.dt = 60, pf = FALSE, model = "rw",
-  time.step = 6, parameters = NULL, fit.to.subset = TRUE,
-  optim = "nlminb", verbose = 1, inner.control = NULL)
+  time.step = 6, emf = NULL, parameters = NULL,
+  fit.to.subset = TRUE, optim = "nlminb", verbose = 1,
+  inner.control = NULL)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
