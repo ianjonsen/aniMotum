@@ -94,7 +94,7 @@ fit_ssm <- function(d,
     cat("\nprefiltering data...\n")
   fit <- d %>%
     group_by(id) %>%
-    do(pf = prefilter(
+    do(pf = prefilter2(
       .,
       vmax = vmax,
       ang = ang,
