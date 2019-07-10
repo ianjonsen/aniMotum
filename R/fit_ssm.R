@@ -99,7 +99,8 @@ fit_ssm <- function(d,
       ang = ang,
       distlim = distlim,
       spdf = spdf,
-      min.dt = min.dt
+      min.dt = min.dt,
+      emf = emf
     ))
 
   if(pf){
