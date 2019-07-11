@@ -72,17 +72,17 @@ fit_ssm <- function(d,
                     spdf = TRUE,
                     min.dt = 60,
                     pf = FALSE,
-                    model = "rw",
+                    model = "crw",
                     time.step = 6,
                     emf = NULL,
+                    map = NULL,
                     parameters = NULL,
                     fit.to.subset = TRUE,
-                    optim = "nlminb",
+                    optim = "optim",
                     verbose = 1,
                     inner.control = NULL
                     )
 {
-
 
   if(!is.numeric(vmax)) stop("\nvmax must be a numeric value in m/s")
   if(!is.numeric(ang)) stop("\nang must be a numeric value in degrees, or -1 to ignore")
