@@ -223,7 +223,7 @@ sfilter <-
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
-      K = cbind(d.all$amf_x, d.all$amf_y)
+      K = cbind(d.all$emf.x, d.all$emf.y)
     )
 
     ## TMB - create objective function
