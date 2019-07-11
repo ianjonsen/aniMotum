@@ -162,7 +162,7 @@ sfilter <-
     ## calculate prop'n of obs that are LS-derived
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF"), labels = c("LS","KF")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
-    map <- switch(model,
+    automap <- switch(model,
                   rw = {
                     if (pls == 1) {
                       list(logD = factor(NA),
@@ -207,6 +207,14 @@ sfilter <-
                       )
                     }
                   })
+
+    if(!is.null(map)) {
+      names(map) <- paste0("l_", names(map))
+      map <- append(automap, map)
+    } else {
+      map <- automap
+    }
+
 
     ## TMB - data list
     data <- list(
