@@ -44,6 +44,7 @@ sfilter <-
            model = c("rw", "crw"),
            time.step = 6,
            parameters = NULL,
+           map = NULL,
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
