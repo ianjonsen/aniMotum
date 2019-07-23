@@ -74,7 +74,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
       attr(out_sf, "class") <- append(class(out_sf), what, after = 1)
       return(out_sf)
       } else {
-        out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, obs.type, amf_x, amf_y, geometry)
+        out_sf <- out_sf %>% select(id, date, lc, smaj, smin, eor, keep, obs.type, emf.x, emf.y, geometry)
         return(out_sf)
       }
 
@@ -87,7 +87,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
           ) %>% as_tibble()
       } else {
         out_df <- out_df %>%
-          select(id, date, lon, lat, lc, smaj, smin, eor, obs.type, x, y, amf_x, amf_y) %>%
+          select(id, date, lc, lon, lat, smaj, smin, eor, obs.type, keep, x, y, emf.x, emf.y) %>%
           as_tibble()
       }
       attr(out_df, "class") <- append(class(out_df), what, after = 1)
