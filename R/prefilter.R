@@ -124,17 +124,22 @@ prefilter <-
   ## Use argosfilter::sdafilter to identify outlier locations
   if (spdf) {
     if(inherits(d, "sf") && st_is_longlat(d)) {
+
       xy <- st_coordinates(d) %>%
         as_tibble() %>%
         rename(lon = X, lat = Y)
       d <- bind_cols(d, xy)
+
     } else if(inherits(d, "sf") && !st_is_longlat(d)) {
+
       xy <- st_transform(d, 4326) %>%
         st_coordinates() %>%
         as_tibble() %>%
         rename(lon = X, lat = Y)
       d <- bind_cols(d, xy)
+
     }
+
     filt <- rep("not", nrow(d))
     tmp <-
       suppressWarnings(try(with(
@@ -157,7 +162,9 @@ prefilter <-
       filt[d$keep] <- tmp
       d <- d %>%
         mutate(keep = ifelse(filt == "removed", FALSE, keep))
+
     } else if (inherits(tmp, "try-error")) {
+
       warning(
         paste(
           "\nargosfilter::sdafilter produced an error on id",
@@ -166,6 +173,7 @@ prefilter <-
         ),
         immediate. = TRUE
       )
+
       tmp <-
         suppressWarnings(try(with(
           subset(d, keep),
@@ -173,17 +181,20 @@ prefilter <-
             lat,
             lon,
             date,
-            vmax = vmax,
+            vmax = vmax
           )
         ),
         silent = TRUE)
         )
+
       if (!inherits(tmp, "try-error"))
       {
         filt[d$keep] <- tmp
         d <- d %>%
           mutate(keep = ifelse(filt == "removed", FALSE, keep))
+
       } else if (inherits(tmp, "try-error")) {
+
         warning(
           paste(
             "\nargosfilter::vmask also produced an error on id",
@@ -251,6 +262,7 @@ prefilter <-
     }
 
   out <- sf_locs %>%
+    mutate(lc = as.character(lc)) %>%
     left_join(., tmp, by = "lc") %>%
     mutate(
       emf.x = ifelse(obs.type == "KF", NA, emf.x),
