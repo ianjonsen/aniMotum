@@ -23,7 +23,7 @@
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename "%>%" everything
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
-##' @importFrom argosfilter sdafilter
+##' @importFrom argosfilter sdafilter vmask
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
 ##'
@@ -162,10 +162,37 @@ prefilter <-
         paste(
           "\nargosfilter::sdafilter produced an error on id",
           d$id[1],
-          "unable to apply speed filter"
+          "using argosfilter::vmask instead"
         ),
         immediate. = TRUE
       )
+      tmp <-
+        suppressWarnings(try(with(
+          subset(d, keep),
+          vmask(
+            lat,
+            lon,
+            date,
+            vmax = vmax,
+          )
+        ),
+        silent = TRUE)
+        )
+      if (!inherits(tmp, "try-error"))
+      {
+        filt[d$keep] <- tmp
+        d <- d %>%
+          mutate(keep = ifelse(filt == "removed", FALSE, keep))
+      } else if (inherits(tmp, "try-error")) {
+        warning(
+          paste(
+            "\nargosfilter::vmask also produced an error on id",
+            d$id[1],
+            "can not apply speed filter prior to SSM filtering"
+          ),
+          immediate. = TRUE
+        )
+      }
     }
   }
 

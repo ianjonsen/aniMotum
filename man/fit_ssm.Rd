@@ -5,9 +5,9 @@
 \title{Fit a continuous-time state-space model to filter Argos satellite geolocation data}
 \usage{
 fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
-  spdf = TRUE, min.dt = 60, pf = FALSE, model = "rw",
-  time.step = 6, emf = NULL, parameters = NULL,
-  fit.to.subset = TRUE, optim = "nlminb", verbose = 1,
+  spdf = TRUE, min.dt = 60, pf = FALSE, model = "crw",
+  time.step = 6, emf = NULL, map = NULL, parameters = NULL,
+  fit.to.subset = TRUE, optim = "optim", verbose = 1,
   inner.control = NULL)
 }
 \arguments{

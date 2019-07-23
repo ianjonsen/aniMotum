@@ -5,7 +5,7 @@
 \title{fit the state-space model to \code{prefilter}-ed data}
 \usage{
 sfilter(x, model = c("rw", "crw"), time.step = 6, parameters = NULL,
-  fit.to.subset = TRUE, optim = c("nlminb", "optim"),
+  map = NULL, fit.to.subset = TRUE, optim = c("nlminb", "optim"),
   verbose = FALSE, inner.control = NULL)
 }
 \arguments{
