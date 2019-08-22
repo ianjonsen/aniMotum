@@ -5,7 +5,7 @@ get your location ducks all lined up by fitting continuous-time movement models 
 [![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras)
 [![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](http://www.r-pkg.org/pkg/foieGras)
-[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras)](http://r-pkg.org/pkg/foieGras)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](http://r-pkg.org/pkg/foieGras)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
