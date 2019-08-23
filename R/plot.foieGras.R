@@ -75,13 +75,13 @@ plot.foieGras <- function(x, what = c("fitted","predicted"), outlier = FALSE, ..
   d_df <- cbind(d_df, ll, xy) %>%
     select(id, date, lon, lat, x, y)
 
-  ts <- ifelse(length(x$ts) == 1, x$ts, "multiple time.steps")
+  ts <- ifelse(length(x$ts) == 1, x$ts, "multiple")
   p1 <- ggplot() +
     geom_point(data = d_df, aes_string("lon", "lat"), shape = 19, col = grey(0.85)) +
     geom_path(data = f_df, aes_string("lon", "lat"), lwd = 0.25, col = "firebrick") +
     geom_point(data = f_df, aes_string("lon", "lat"), size = 0.75, shape = 20, col = "firebrick") +
     theme_bw() +
-    ggtitle(label = paste0("id: ", f_sf$id[1], "   model: ", x$pm, "  time.step: ", ts, " h"), subtitle = "fitted states") +
+    ggtitle(label = paste0("id: ", f_sf$id[1], "   model: ", x$pm, "  time.step: ", ts, if(is.numeric(ts)) " h"), subtitle = "fitted states") +
     theme(title = element_text(size = 9), plot.subtitle = element_text(size = 8))
 
   p2 <- ggplot() +

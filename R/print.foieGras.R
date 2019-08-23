@@ -26,7 +26,7 @@ print.foieGras <- function(x, ...)
     nll <- x$opt$value
   }
   cat("Process model:", pm, "\n")
-  cat("Time interval:", timeStep, "hours \n")
+  cat("Time interval:", timeStep, if(is.numeric(timeStep)) {"hours"}, "\n")
   cat("number of observations:", nbStates, "\n")
   cat("number of regularised state estimates:", nbrStates, "\n\n")
   cat("parameter estimates\n")
