@@ -273,8 +273,6 @@ sfilter <-
       obj$fn(x)
     }
 
-    browser()
-
     ## Set parameter bounds - most are -Inf, Inf
     if(model == "rw") {
       X.l <- rbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
@@ -292,16 +290,15 @@ sfilter <-
     (L <- L[-match(names(map), names(L))])
     (U <- U[-match(names(map), names(U))])
 
-    browser()
     ## Minimize objective function
     opt <-
       suppressWarnings(switch(optim,
                               nlminb = try(nlminb(obj$par,
                                                   obj$fn,
                                                   obj$gr,
-                                                  control = control
-#                                                  lower = L,
-#                                                  upper = U
+                                                  control = control,
+                                                  lower = L,
+                                                  upper = U
                               ))
                               , #myfn #obj$fn
                               optim = try(do.call(
@@ -311,9 +308,9 @@ sfilter <-
                                   fn = obj$fn,
                                   gr = obj$gr,
                                   method = "L-BFGS-B",
-                                  control = control
-#                                  lower = L,
-#                                  upper = U
+                                  control = control,
+                                  lower = L,
+                                  upper = U
                                 )
                               ))))
 
