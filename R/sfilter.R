@@ -48,12 +48,20 @@ sfilter <-
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
            verbose = FALSE,
+           control = NULL,
            inner.control = NULL) {
 
     st <- proc.time()
     call <- match.call()
     optim <- match.arg(optim)
     model <- match.arg(model)
+
+    ## populate control list if any parameters specified...
+    if (length(control)) {
+      nms <- names(control)
+      if (!is.list(control) || is.null(nms))
+        stop("'control' argument must be a named list")
+    }
 
     if(is.null(time.step)) {
       print("\nNo time.step specified, using 6 h as a default time step")
