@@ -50,7 +50,8 @@ sfilter <-
            optim = c("nlminb", "optim"),
            verbose = FALSE,
            control = NULL,
-           inner.control = NULL) {
+           inner.control = NULL,
+           lpsi=-10) {
 
     st <- proc.time()
     call <- match.call()
@@ -283,7 +284,7 @@ sfilter <-
     }
     mu.l <- v.l <- X.l
     mu.u <- v.u <- X.u
-    L = c(log_sigma=rep(-Inf,2), log_rho_p=-Inf, X=X.l, log_D = -Inf, mu=mu.l, v=v.l, log_psi=-10, log_tau=rep(-Inf, 2), log_rho_o=-Inf)
+    L = c(log_sigma=rep(-Inf,2), log_rho_p=-Inf, X=X.l, log_D = -Inf, mu=mu.l, v=v.l, log_psi=lpsi, log_tau=rep(-Inf, 2), log_rho_o=-Inf)
     U = c(log_sigma=rep(Inf,2), log_rho_p=Inf, X=X.u, log_D = Inf, mu=mu.u, v=v.u, log_psi=Inf, log_tau=rep(Inf, 2), log_rho_o=Inf)
 
     # Remove inactive parameters from bounds
