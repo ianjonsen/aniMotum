@@ -16,7 +16,7 @@
 print.foieGras <- function(x, ...)
 {
   pm <- x$pm
-  timeStep <- x$ts
+  timeStep <- ifelse(length(x$ts) == 1, x$ts, "multiple time.steps")
   nbrStates <- nrow(x$predicted)
   nbStates <- nrow(x$fitted)
   parm <- x$par
