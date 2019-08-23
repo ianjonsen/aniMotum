@@ -80,7 +80,9 @@ fit_ssm <- function(d,
                     fit.to.subset = TRUE,
                     optim = "optim",
                     verbose = 1,
-                    inner.control = NULL
+                    control = NULL,
+                    inner.control = NULL,
+                    lpsi=-10
                     )
 {
 
@@ -126,7 +128,9 @@ fit_ssm <- function(d,
         fit.to.subset = fit.to.subset,
         optim = optim,
         verbose = verb,
-        inner.control = inner.control
+        control = control,
+        inner.control = inner.control,
+        lpsi = lpsi
       ),
       silent = TRUE)
       )
