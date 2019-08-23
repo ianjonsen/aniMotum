@@ -20,7 +20,11 @@ print.foieGras <- function(x, ...)
   nbrStates <- nrow(x$predicted)
   nbStates <- nrow(x$fitted)
   parm <- x$par
-
+  if("objective" %in% names(x$opt)) {
+    nll <- x$opt$objective
+  } else{
+    nll <- x$opt$value
+  }
   cat("Process model:", pm, "\n")
   cat("Time interval:", timeStep, "hours \n")
   cat("number of observations:", nbStates, "\n")
@@ -29,7 +33,7 @@ print.foieGras <- function(x, ...)
   cat("-------------------\n")
   print(round(parm, 3), justify = "right")
   cat("-------------------\n")
-  cat("negative log-likelihood:", x$opt$objective, "\n")
+  cat("negative log-likelihood:", nll, "\n")
   cat("convergence:", x$opt$message, "\n\n")
 
 }
