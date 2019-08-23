@@ -264,10 +264,36 @@ sfilter <-
       obj$fn(x)
     }
 
+    browser()
+
+    ## Set parameter bounds - most are -Inf, Inf
+    if(model == "rw") {
+      X.l <- rbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
+      X.u <- rbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
+    } else if(model == "crw") {
+      X.l <- cbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
+      X.u <- cbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
+    }
+    mu.l <- v.l <- X.l
+    mu.u <- v.u <- X.u
+    L = c(log_sigma=rep(-Inf,2), log_rho_p=-Inf, X=X.l, log_D = -Inf, mu=mu.l, v=v.l, log_psi=-20, log_tau=rep(-Inf, 2), log_rho_o=-Inf)
+    U = c(log_sigma=rep(Inf,2), log_rho_p=Inf, X=X.u, log_D = Inf, mu=mu.u, v=v.u, log_psi=Inf, log_tau=rep(Inf, 2), log_rho_o=Inf)
+
+    # Remove inactive parameters from bounds
+    (L <- L[-match(names(map), names(L))])
+    (U <- U[-match(names(map), names(U))])
+
+    browser()
     ## Minimize objective function
     opt <-
       suppressWarnings(switch(optim,
-                              nlminb = try(nlminb(obj$par, obj$fn, obj$gr))
+                              nlminb = try(nlminb(obj$par,
+                                                  obj$fn,
+                                                  obj$gr,
+                                                  control = control
+#                                                  lower = L,
+#                                                  upper = U
+                              ))
                               , #myfn #obj$fn
                               optim = try(do.call(
                                 optim,
@@ -275,7 +301,10 @@ sfilter <-
                                   par = obj$par,
                                   fn = obj$fn,
                                   gr = obj$gr,
-                                  method = "L-BFGS-B"
+                                  method = "L-BFGS-B",
+                                  control = control
+#                                  lower = L,
+#                                  upper = U
                                 )
                               ))))
 
