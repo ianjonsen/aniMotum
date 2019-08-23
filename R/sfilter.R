@@ -256,8 +256,9 @@ sfilter <-
         parameters,
         map = map,
         random = rnd,
-        DLL = "foieGras",
         hessian = TRUE,
+        method = "L-BFGS-B",
+        DLL = "foieGras",
         silent = !verbose,
         inner.control = inner.control
       )
