@@ -276,21 +276,24 @@ sfilter <-
     }
 
     ## Set parameter bounds - most are -Inf, Inf
-    if(model == "rw") {
-      X.l <- rbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
-      X.u <- rbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
-    } else if(model == "crw") {
-      X.l <- cbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
-      X.u <- cbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
-    }
-    mu.l <- v.l <- X.l
-    mu.u <- v.u <- X.u
-    L = c(log_sigma=rep(-Inf,2), log_rho_p=-Inf, X=X.l, log_D = -Inf, mu=mu.l, v=v.l, log_psi=lpsi, log_tau=rep(-Inf, 2), log_rho_o=-Inf)
-    U = c(log_sigma=rep(Inf,2), log_rho_p=Inf, X=X.u, log_D = Inf, mu=mu.u, v=v.u, log_psi=Inf, log_tau=rep(Inf, 2), log_rho_o=Inf)
+    # if(model == "rw") {
+    #   X.l <- rbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
+    #   X.u <- rbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
+    # } else if(model == "crw") {
+    #   X.l <- cbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
+    #   X.u <- cbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
+    # }
+    # mu.l <- v.l <- X.l
+    # mu.u <- v.u <- X.u
+
+    L = c(l_sigma=c(-Inf,-Inf), l_rho_p=-Inf, logD=-Inf, l_psi=lpsi, l_tau=c(-Inf,-Inf), l_rho_o=-Inf)
+    U = c(l_sigma=c(Inf,Inf), l_rho_p=Inf, logD=Inf, l_psi=Inf, l_tau=c(Inf,Inf), l_rho_o=Inf)
+    names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
+    names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
     # Remove inactive parameters from bounds
-    (L <- L[-match(names(map), names(L))])
-    (U <- U[-match(names(map), names(U))])
+    L <- L[!names(L) %in% names(map)]
+    U <- U[!names(U) %in% names(map)]
 
     ## Minimize objective function
     opt <-
