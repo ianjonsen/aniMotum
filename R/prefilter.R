@@ -19,7 +19,7 @@
 ##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
-##' @param emf optionally suppled vector of matrix of error multiplication factors for location quality classes. see Details
+##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename "%>%" everything
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
