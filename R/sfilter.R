@@ -408,6 +408,7 @@ sfilter <-
         fitted = fd,
         par = fxd,
         data = x,
+        isd = d.all$isd,
         inits = parameters,
         pm = model,
         ts = time.step,
