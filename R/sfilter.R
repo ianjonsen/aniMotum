@@ -415,6 +415,7 @@ sfilter <-
         tmb = obj,
         rep = rep,
         aic = aic,
+        optimiser = optim,
         time = proc.time() - st
       )
     } else {
