@@ -143,9 +143,9 @@ fit_ssm <- function(d,
       mutate(id = sapply(.$ssm, function(x)
         x$data$id[1])) %>%
       mutate(converged = sapply(.$ssm, function(x)
-        if(length(x) == 13) {
+        if(length(x) == 14) {
         x$opt$convergence == 0
-          } else if(length(x) < 13) {
+          } else if(length(x) < 14) {
             FALSE
           })) %>%
       select(., id, ssm, converged)
