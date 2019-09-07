@@ -4,9 +4,9 @@ context("test fit_ssm")
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)
 ##  that have S3 class foieGras
 data(ellie)
-dkf <- ellie[seq(1, nrow(ellie), by=6), ]
+dkf <- ellie %>% dplyr::slice(seq(1, nrow(ellie), by = 6))
 ## drop KF error ellipse info to exercise LS portions of code
-dls <- dkf[, 1:5]
+dls <- dkf %>% dplyr::select(1:5)
 
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw

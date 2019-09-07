@@ -20,7 +20,7 @@ prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
 
 \item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
 
-\item{emf}{optionally suppled vector of matrix of error multiplication factors for location quality classes. see Details}
+\item{emf}{optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details}
 }
 \value{
 an sf object with all observations passed from \code{data} and the following appended columns

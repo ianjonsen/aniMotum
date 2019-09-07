@@ -8,7 +8,7 @@ fit_ssm(d, vmax = 50, ang = -1, distlim = c(2500, 5000),
   spdf = TRUE, min.dt = 60, pf = FALSE, model = "crw",
   time.step = 6, emf = NULL, map = NULL, parameters = NULL,
   fit.to.subset = TRUE, optim = "optim", verbose = 1,
-  inner.control = NULL)
+  control = NULL, inner.control = NULL, lpsi = -Inf)
 }
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info}
@@ -27,7 +27,7 @@ for details}
 \item{min.dt}{minimum allowable time difference between observations;
 dt <= min.dt will be ignored by the SSM}
 
-\item{pf}{just pre-filter the data, do not fit the ctrw (default is FALSE)}
+\item{pf}{just pre-filter the data, do not fit the SSM (default is FALSE)}
 
 \item{model}{fit either a simple random walk ("rw") or correlated random walk
 ("crw") as a continuous-time process model}
@@ -35,6 +35,10 @@ dt <= min.dt will be ignored by the SSM}
 \item{time.step}{the regular time interval, in hours, to predict to.
 Alternatively, a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates.}
+
+\item{emf}{optionally supplied data.frame of error multiplication factors for Argos location quality classes. Default behaviour is to use the factors supplied in foieGras::emf()}
+
+\item{map}{a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))}
 
 \item{parameters}{a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specifiy these. Only play with
@@ -47,8 +51,11 @@ this if you know what you are doing...}
 
 \item{verbose}{report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar}
 
-\item{inner.control}{list of control settings for the inner optimization
-(see ?TMB::MakeADFUN for additional details)}
+\item{control}{list of control settings for the outer optimizer (see ?nlminb or ?optim for details)}
+
+\item{inner.control}{list of control settings for the inner optimizer (see ?TMB::MakeADFUN for additional details)}
+
+\item{lpsi}{lower bound for the psi parameter}
 }
 \value{
 a list with components

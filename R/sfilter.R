@@ -25,6 +25,7 @@
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
+##' @param lpsi lower bound for the psi parameter
 ##'
 ##' @useDynLib foieGras
 ##' @importFrom TMB MakeADFun sdreport newtonOption
@@ -351,7 +352,7 @@ sfilter <-
                loc <-
                  cbind(loc[seq(1, dim(loc)[1], by = 2),], loc[seq(2, dim(loc)[1], by =
                                                                     2),]) %>%
-                 as_tibble() %>%
+                 data.frame() %>%
                  select(1, 3, 2, 4)
                names(loc) <- c("x", "y", "x.se", "y.se")
                vel <-

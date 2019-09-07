@@ -6,7 +6,8 @@
 \usage{
 sfilter(x, model = c("rw", "crw"), time.step = 6, parameters = NULL,
   map = NULL, fit.to.subset = TRUE, optim = c("nlminb", "optim"),
-  verbose = FALSE, inner.control = NULL)
+  verbose = FALSE, control = NULL, inner.control = NULL,
+  lpsi = -10)
 }
 \arguments{
 \item{x}{Argos data passed through prefilter()}
@@ -21,6 +22,8 @@ specified as a data.frame with id and POSIXt dates.}
 unobserved states, default is to let sfilter specifiy these. Only play with
 this if you know what you are doing...}
 
+\item{map}{a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))}
+
 \item{fit.to.subset}{fit the SSM to the data subset determined by prefilter
 (default is TRUE)}
 
@@ -28,8 +31,12 @@ this if you know what you are doing...}
 
 \item{verbose}{report progress during minimization}
 
+\item{control}{list of control parameters for the outer optimization (type ?nlminb or ?optim for details)}
+
 \item{inner.control}{list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
+
+\item{lpsi}{lower bound for the psi parameter}
 }
 \description{
 generates initial values for model parameters and unobserved states;

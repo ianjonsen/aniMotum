@@ -29,8 +29,10 @@
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar
-##' @param inner.control list of control settings for the inner optimization
-##' (see ?TMB::MakeADFUN for additional details)
+##' @param control list of control settings for the outer optimizer (see ?nlminb or ?optim for details)
+##' @param inner.control list of control settings for the inner optimizer (see ?TMB::MakeADFUN for additional details)
+##' @param lpsi lower bound for the psi parameter
+
 ##'
 ##' @return a list with components
 ##' \item{\code{call}}{the matched call}
@@ -64,7 +66,6 @@
 ##'
 ##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
 ##' @importFrom magrittr "%>%"
-##' @importFrom tibble as_tibble
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -84,7 +85,7 @@ fit_ssm <- function(d,
                     verbose = 1,
                     control = NULL,
                     inner.control = NULL,
-                    lpsi=-10
+                    lpsi=-Inf
                     )
 {
 
