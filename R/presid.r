@@ -18,13 +18,11 @@
 presid <- function(x, method = "oneStepGaussianOffMode", parallel = TRUE)
 {
 
-  if(inherits(x, "fG")) {
+  if(!inherits(x, c("fG","foieGras"))) stop("\nx must be either a compound `fG` tibble or an individual `foieGras` fit object")
 
-  } else if(inherits(x, "foieGras")) {
     sub <- which(rep(x$ssm[[1]]$isd, each = 2))
     r <- oneStepPredict(x$ssm[[1]]$tmb, "Y", "keep", method = method,
                         subset = sub, discrete = FALSE, parallel = parallel, ...)
-  }
 browser()
 
 

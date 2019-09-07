@@ -150,6 +150,6 @@ fit_ssm <- function(d,
           })) %>%
       select(., id, ssm, converged)
   }
-  class(fit) <- append("fG", class(fit), after = 0)
+  class(fit) <- append("fG", class(fit))
   return(fit)
 }
