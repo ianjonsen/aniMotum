@@ -150,11 +150,10 @@ template<class Type>
         }
         nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
         if(proc_mod == 0) {
-          jnll += nll_obs(Y.row(i) - X.row(i));   // RW innovations
+          jnll += nll_obs(Y.col(i) - X.col(i), keep.col(i));   // RW innovations
         } else if(proc_mod == 1) {
-          jnll += nll_obs(Y.col(i) - mu.col(i));   // CRW innovations
+          jnll += nll_obs(Y.col(i) - mu.col(i), keep.col(i));   // CRW innovations
         }
-
       }
     }
 
