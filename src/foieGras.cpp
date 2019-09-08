@@ -22,8 +22,9 @@ template<class Type>
     DATA_VECTOR(dt);         	//  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
     DATA_VECTOR(state0);        //  initial state
     DATA_IVECTOR(isd);          //  indexes observations vs. interpolation points
-    DATA_IVECTOR(obs_mod);      //  indicates which obs error model to be used
-    DATA_INTEGER(proc_mod);		//	indicates which process model to be used: RW or CRW
+    DATA_IVECTOR(obs_mod);              //  indicates which obs error model to be used
+    DATA_INTEGER(proc_mod);		         //	indicates which process model to be used: RW or CRW
+    DATA_ARRAY_INDICATOR(keep, Y);     // for one step predictions
 
     // for KF observation model
     DATA_VECTOR(m);             //  m is the semi-minor axis length
