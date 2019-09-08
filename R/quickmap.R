@@ -49,21 +49,21 @@ quickmap <- function(x,
     }
 
   } else {
-    stop("input must be either a `tbl_fG`, an individual `foieGras` fit object, or the output of `foieGras::grab()`")
+    stop("input must be either an `fG` compound tibble, an individual `foieGras` fit object, or the output of `foieGras::grab()`")
   }
 
   if(is.null(crs)) {
     prj <- st_crs(sf_locs)
     if(class(x)[1] == "foieGras")
       sf_data <- x$data
-    else if(class(x)[1] == "tbl_fG")
+    else if(class(x)[1] == "fG")
       sf_data <- grab(x, "data")
     } else {
     sf_locs <- sf_locs %>% st_transform(., crs)
     prj <- st_crs(sf_locs)
     if(class(x)[1] == "foieGras")
       sf_data <- x$data %>% st_transform(., crs)
-    else if(class(x)[1] == "tbl_fG")
+    else if(class(x)[1] == "fG")
       sf_data <- grab(x, "data") %>% st_transform(., crs)
     }
 
@@ -80,9 +80,6 @@ quickmap <- function(x,
   ## get coastline
   coast <- rnaturalearth::ne_countries(scale=10, returnclass = "sf") %>%
     st_transform(crs = prj)
-#  countriesLow <- NULL
-#  data("countriesLow", package = "rworldmap", envir = environment())
-#  coast <- st_as_sf(countriesLow) %>% st_transform(., prj)
 
   p <- ggplot() +
     geom_sf(data = coast,
@@ -111,9 +108,7 @@ quickmap <- function(x,
             legend.text = element_text(size = 7, vjust = 0),
             plot.title = element_text(size = 10),
             plot.subtitle = element_text(size = 5)
-      ) #+
-#      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
-#              subtitle = paste0("epsg = ", prj))
+      )
   } else {
     lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
 
@@ -133,9 +128,7 @@ quickmap <- function(x,
             legend.key.height = unit(0.5, "cm"),
             plot.title = element_text(size = 10),
             plot.subtitle = element_text(size = 5)
-      ) +
-      ggtitle(paste0("id: ", x$predicted$id[1], ";  ", x$pm, " ", what, " values @ ", x$ts, " h"),
-              subtitle = paste0("epsg = ", prj))
+      )
   }
 
   return(p)
