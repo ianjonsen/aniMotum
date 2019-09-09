@@ -21,9 +21,9 @@ osar <- function(x, method = "oneStepGaussianOffMode", parallel = TRUE)
   if(inherits(x, "fG")) {
 
   } else if(inherits(x, "foieGras")) {
-    sub <- which(rep(x$ssm[[1]]$isd, each = 2))
-    r <- oneStepPredict(x$ssm[[1]]$tmb, "Y", "keep", method = method,
-                        subset = sub, discrete = FALSE, parallel = parallel, ...)
+    sub <- which(rep(x$isd, each = 2))
+    r <- oneStepPredict(x$tmb, observation.name = "Y", data.term.indicator = "keep",
+                        method = method, subset = sub, discrete = FALSE, parallel = parallel)
   }
 browser()
 

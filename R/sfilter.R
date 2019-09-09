@@ -149,7 +149,9 @@ sfilter <-
       y.init[which(is.na(y.init))[1] - 1]
     xs <- cbind(x.init, y.init)
 
-    state0 <- c(xs[1,], 0 , 0)
+    state0 <- c(xs[1,1], xs[1,2], 0 , 0)
+    attributes(state0) <- NULL
+
     if (is.null(parameters)) {
       ## Estimate stochastic innovations
       es <- xs[-1,] - xs[-nrow(xs),]
@@ -162,7 +164,7 @@ sfilter <-
       parameters <- list(
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
-        X = xs,
+        X = t(xs),
         logD = 10,
         mu = t(xs),
         v = t(xs) * 0,
@@ -178,15 +180,15 @@ sfilter <-
     automap <- switch(model,
                   rw = {
                     if (pls == 1) {
-                      list(logD = factor(NA),
-                           l_psi = factor(NA),
+                      list(l_psi = factor(NA),
+                           logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
                     } else if (pls == 0) {
-                      list(logD = factor(NA),
-                           l_tau = factor(c(NA, NA)),
+                      list(l_tau = factor(c(NA, NA)),
                            l_rho_o = factor(NA),
+                           logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
@@ -223,17 +225,16 @@ sfilter <-
 
     if(!is.null(map)) {
       names(map) <- paste0("l_", names(map))
-      map <- append(automap, map)
+      map <- append(automap, map, after = 0)
     } else {
       map <- automap
     }
-
 
     ## TMB - data list
     data <- list(
       Y = switch(
         model,
-        rw = cbind(d.all$x, d.all$y),
+        rw = rbind(d.all$x, d.all$y),
         crw = rbind(d.all$x, d.all$y)
       ),
       state0 = state0,
@@ -278,18 +279,18 @@ sfilter <-
     }
 
     ## Set parameter bounds - most are -Inf, Inf
-    # if(model == "rw") {
-    #   X.l <- rbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
-    #   X.u <- rbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
-    # } else if(model == "crw") {
-    #   X.l <- cbind(rep(-Inf, nrow(xs)), rep(-Inf, nrow(xs)))
-    #   X.u <- cbind(rep(Inf, nrow(xs)), rep(Inf, nrow(xs)))
-    # }
-    # mu.l <- v.l <- X.l
-    # mu.u <- v.u <- X.u
-
-    L = c(l_sigma=c(-Inf,-Inf), l_rho_p=-Inf, logD=-Inf, l_psi=lpsi, l_tau=c(-Inf,-Inf), l_rho_o=-Inf)
-    U = c(l_sigma=c(Inf,Inf), l_rho_p=Inf, logD=Inf, l_psi=Inf, l_tau=c(Inf,Inf), l_rho_o=Inf)
+    L = c(l_sigma=c(-Inf,-Inf),
+          l_rho_p=-Inf,
+          logD=-Inf,
+          l_psi=lpsi,
+          l_tau=c(-Inf,-Inf),
+          l_rho_o=-Inf)
+    U = c(l_sigma=c(Inf,Inf),
+          l_rho_p=Inf,
+          logD=Inf,
+          l_psi=Inf,
+          l_tau=c(Inf,Inf),
+          l_rho_o=Inf)
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
@@ -330,13 +331,18 @@ sfilter <-
 
       switch(model,
              rw = {
-               rdm <-
-                 matrix(summary(rep, "random"),
-                        nrow(d.all),
-                        4,
-                        dimnames = list(NULL, c("x", "y", "x.se", "y.se")))
+               tmp <- summary(rep, "random")
+               rdm <- cbind(tmp[seq(1, nrow(tmp), by = 2), ],
+                            tmp[seq(2, nrow(tmp), by = 2), ]
+               ) %>%
+                 data.frame() %>%
+                 select(1,3,2,4) %>%
+                 rename(x = "Estimate",
+                        y = "Estimate.1",
+                        x.se = "Std..Error",
+                        y.se = "Std..Error.1")
 
-               rdm <- as.data.frame(rdm) %>%
+               rdm <- rdm %>%
                  mutate(
                    id = unique(d.all$id),
                    date = d.all$date,
@@ -350,15 +356,15 @@ sfilter <-
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
                loc <-
-                 cbind(loc[seq(1, dim(loc)[1], by = 2),], loc[seq(2, dim(loc)[1], by =
-                                                                    2),]) %>%
+                 cbind(loc[seq(1, dim(loc)[1], by = 2),],
+                       loc[seq(2, dim(loc)[1], by = 2),]) %>%
                  data.frame() %>%
                  select(1, 3, 2, 4)
                names(loc) <- c("x", "y", "x.se", "y.se")
                vel <-
-                 cbind(vel[seq(1, dim(vel)[1], by = 2),], vel[seq(2, dim(vel)[1], by =
-                                                                    2),]) %>%
-                 as_tibble() %>%
+                 cbind(vel[seq(1, dim(vel)[1], by = 2),],
+                       vel[seq(2, dim(vel)[1], by = 2),]) %>%
+                 data.frame() %>%
                  select(1, 3, 2, 4)
                names(vel) <- c("u", "v", "u.se", "v.se")
 
@@ -387,12 +393,12 @@ sfilter <-
              })
 
       ## Fitted values (estimated locations at observation times)
-      fd <- rdm %>%
+      fv <- rdm %>%
         filter(isd) %>%
         select(-isd)
 
       ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
-      pd <- rdm %>%
+      pv <- rdm %>%
         filter(!isd) %>%
         select(-isd)
 
@@ -404,8 +410,8 @@ sfilter <-
 
       out <- list(
         call = call,
-        predicted = pd,
-        fitted = fd,
+        predicted = pv,
+        fitted = fv,
         par = fxd,
         data = x,
         isd = d.all$isd,
