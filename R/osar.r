@@ -15,17 +15,25 @@
 ##' @importFrom TMB oneStepPredict
 ##' @export
 
-osar <- function(x, method = "oneStepGaussianOffMode", parallel = TRUE)
+osar <- function(x, method = "oneStepGaussianOffMode", parallel = TRUE, ...)
 {
 
   if(inherits(x, "fG")) {
 
   } else if(inherits(x, "foieGras")) {
     sub <- which(rep(x$isd, each = 2))
-    r <- oneStepPredict(x$tmb, observation.name = "Y", data.term.indicator = "keep",
-                        method = method, subset = sub, discrete = FALSE, parallel = parallel)
+    r <- oneStepPredict(
+      x$tmb,
+      "Y",
+      "keep",
+      method = method,
+      subset = sub,
+      discrete = FALSE,
+      parallel = parallel,
+      ...
+    )
   }
-browser()
 
+  r
 
 }
