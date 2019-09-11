@@ -1,6 +1,6 @@
-##' @title Utility functions
+##' @title wrap_lon
 ##'
-##' @details called by prefilter
+##' @details wrap longitudes from an arbitrary minimum
 ##' @param lon a vector of longitudes
 ##' @param lon_min the minimum longitude value to wrap appropriately, eg. 0 to
 ##' wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180

@@ -2,19 +2,22 @@
 % Please edit documentation in R/osar.r
 \name{osar}
 \alias{osar}
-\title{obtain one-step-ahead (prediction) residuals from a \code{foieGras} fit}
+\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit}
 \usage{
-osar(x, method = "oneStepGaussianOffMode", parallel = TRUE)
+osar(x, plot = TRUE, method = "oneStepGaussianOffMode", ...)
 }
 \arguments{
 \item{x}{a compound \code{fG} tbl or a \code{foieGras} individual fit object}
 
-\item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
+\item{plot}{should results be plotted and returned? (default = TRUE)}
 
-\item{parallel}{run TMB::oneStepPredict in parallel (default is TRUE; requires \code{parallel} package)}
+\item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
 }
 \description{
-obtain one-step-ahead (prediction) residuals from a \code{foieGras} fit
+calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
+}
+\details{
+One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version)
 }
 \examples{
 ## see summary fit output
@@ -22,4 +25,7 @@ obtain one-step-ahead (prediction) residuals from a \code{foieGras} fit
 data(fit)
 osar(fit$ssm[[1]])
 
+}
+\references{
+Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and A. Neilsen. 2017. Validation of ecological state space models using the Laplace approximation. Environmental and Ecological Statistics 24:317–339.
 }

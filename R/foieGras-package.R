@@ -67,5 +67,5 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 id <- ssm <- converged <- keep <- id <- y <- x.se <- y.se <- "shut.up"
 geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
 obs.type <- emf.x <- emf.y <- lon <- lat <- rename <- X <- Y <- "shut.up"
-isd <- digits <- "shut.up"
+y.z <- x.z <- z <- out <- r <- sub <- isd <- digits <- "shut.up"
 

@@ -42,7 +42,9 @@ Suggests:
     rnaturalearth,
     rgeos,
     ggspatial,
-    units
+    units,
+    furrr,
+    future (>= 1.14.0)
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.3.0)
