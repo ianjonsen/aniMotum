@@ -4,12 +4,10 @@
 \alias{osar}
 \title{calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit}
 \usage{
-osar(x, plot = TRUE, method = "oneStepGaussianOffMode", ...)
+osar(x, method = "oneStepGaussianOffMode", ...)
 }
 \arguments{
 \item{x}{a compound \code{fG} tbl or a \code{foieGras} individual fit object}
-
-\item{plot}{should results be plotted and returned? (default = TRUE)}
 
 \item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
 }

@@ -1,7 +1,6 @@
 ##' @title calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
 ##'
 ##' @param x a compound \code{fG} tbl or a \code{foieGras} individual fit object
-##' @param plot should results be plotted and returned? (default = TRUE)
 ##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
 ##'
 ##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version)
@@ -21,7 +20,7 @@
 ##' @importFrom future plan
 ##' @export
 
-osar <- function(x, plot = TRUE, method = "oneStepGaussianOffMode", ...)
+osar <- function(x, method = "oneStepGaussianOffMode", ...)
 {
 
   fmap_fn <- function(f) {
@@ -86,13 +85,6 @@ osar <- function(x, plot = TRUE, method = "oneStepGaussianOffMode", ...)
 
   }
 
-  if(plot) {
-    p <- ggplot(out %>% filter(!is.na(resid)), aes(sample = resid)) +
-      geom_qq() +
-      geom_qq_line(col = "firebrick") +
-      facet_grid(id ~ coord)
-    print(p)
-    }
-
-  out
+  class(out) <- append("osar", class(out))
+  return(out)
 }

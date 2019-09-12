@@ -1,0 +1,50 @@
+##' @title plot
+##'
+##' @description plot One-Step-Ahead (prediction) residuals from a foieGras fit
+##'
+##' @param x a compound fG tibble or an individual foieGras fitted object
+##' @param type type of residual plot to generate; either qqnorm (default), histogram or boxplot
+##' @param ... additional arguments to be ignored
+##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_histogram geom_boxplot geom_vline geom_hline
+##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip
+##' @importFrom dplyr "%>%" filter
+##' @method plot osar
+##'
+##' @examples
+##' ## load example osar output (to save time)
+##' data(fit_osar)
+##' plot(osar, "qq")
+##'
+##' @export
+
+plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), ...)
+{
+  if (length(list(...)) > 0) {
+    warning("additional arguments ignored")
+  }
+
+  type <- match.arg(type)
+
+  switch(type,
+         qqnorm = {
+           p <- ggplot(x %>% filter(!is.na(resid)), aes(sample = resid)) +
+             geom_qq() +
+             geom_qq_line(col = "firebrick") +
+             facet_grid(id ~ coord)
+         },
+         histogram = {
+           p <- ggplot(x %>% filter(!is.na(resid)), aes(x = resid)) +
+             geom_histogram(binwidth = 0.5, col = grey(0.9), lwd = 0.5) +
+             geom_vline(xintercept = 0, lty = 2, col = "firebrick") +
+             facet_grid(id ~ coord)
+         },
+         boxplot = {
+           p <- ggplot(x %>% filter(!is.na(resid)), aes(x = id, y = resid)) +
+             geom_boxplot() +
+             geom_hline(yintercept = 0, lty = 2, col = "firebrick") +
+             coord_flip() +
+             facet_wrap( ~ coord)
+         })
+
+  print(p)
+}
