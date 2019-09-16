@@ -48,4 +48,4 @@ Suggests:
     units
 VignetteBuilder: knitr
 Depends: 
-    R (>= 3.3.0)
+    R (>= 3.5.0)
