@@ -2,6 +2,7 @@
 ##'
 ##' @param x a compound \code{fG} tbl fit object
 ##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
+##' @param ... additional arguments to be ignored
 ##'
 ##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version)
 ##'
