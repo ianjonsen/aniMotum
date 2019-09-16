@@ -11,7 +11,7 @@ osar(x, method = "oneStepGaussianOffMode", ...)
 
 \item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
 
-\item{...}{additional arguments to be ignored}
+\item{...}{other arguments to TMB::oneStepPrediction}
 }
 \description{
 calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
