@@ -4,13 +4,17 @@
 \alias{plot.fG}
 \title{plot}
 \usage{
-\method{plot}{fG}(x, what = c("fitted", "predicted"), outlier = FALSE,
-  ...)
+\method{plot}{fG}(x, what = c("fitted", "predicted"), type = 1,
+  lc = FALSE, outlier = FALSE, ...)
 }
 \arguments{
 \item{x}{a fG compound tibble}
 
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
+
+\item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
+
+\item{lc}{display Argos location classes}
 
 \item{outlier}{include all extreme outliers flagged by prefilter in plots (logical)}
 
@@ -22,6 +26,7 @@ visualise multiple fits from an fG compound tibble
 \examples{
 ## load example foieGras fit object (to save time)
 data(fit)
-plot(fit$ssm[[1]])
+plot(fit, what = "f", type = 1)
+plot(fit, what = "p", type = 2, lc = TRUE)
 
 }

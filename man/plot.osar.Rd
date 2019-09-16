@@ -4,12 +4,15 @@
 \alias{plot.osar}
 \title{plot}
 \usage{
-\method{plot}{osar}(x, type = c("qqnorm", "histogram", "boxplot"), ...)
+\method{plot}{osar}(x, type = c("qqnorm", "histogram", "boxplot"),
+  bw = 0.5, ...)
 }
 \arguments{
 \item{x}{a compound fG tibble or an individual foieGras fitted object}
 
 \item{type}{type of residual plot to generate; either qqnorm (default), histogram or boxplot}
+
+\item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details)}
 
 \item{...}{additional arguments to be ignored}
 }

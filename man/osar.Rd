@@ -7,7 +7,7 @@
 osar(x, method = "oneStepGaussianOffMode", ...)
 }
 \arguments{
-\item{x}{a compound \code{fG} tbl or a \code{foieGras} individual fit object}
+\item{x}{a compound \code{fG} tbl fit object}
 
 \item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
 }
@@ -21,7 +21,7 @@ One-step-ahead residuals are useful for assessing goodness-of-fit in latent vari
 ## see summary fit output
 ## load example foieGras fit object (to save time)
 data(fit)
-osar(fit$ssm[[1]])
+osar(fit)
 
 }
 \references{
