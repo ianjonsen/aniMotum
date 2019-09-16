@@ -59,6 +59,16 @@ NULL
 ##' but fitting to data is not the focus of the example.
 ##'
 
+##' @name fit_res
+##' @docType data
+##' @title foieGras example osar (One-Step-Ahead residuals) object
+##' @format .RData
+##' @keywords data
+##' @description Example osar object, using rope example data and the
+##' following call: fit_res <- osar(fit). This example
+##' osar object is included purely to speed up examples where an osar object is required
+##' but estimating residuals is not the focus of the example.
+##'
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
