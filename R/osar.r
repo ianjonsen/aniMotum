@@ -1,6 +1,6 @@
 ##' @title calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
 ##'
-##' @param x a compound \code{fG} tbl or a \code{foieGras} individual fit object
+##' @param x a compound \code{fG} tbl fit object
 ##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
 ##'
 ##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version)
@@ -11,7 +11,7 @@
 ##' ## see summary fit output
 ##' ## load example foieGras fit object (to save time)
 ##' data(fit)
-##' osar(fit$ssm[[1]])
+##' osar(fit)
 ##'
 ##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
 ##' @importFrom tibble as_tibble
@@ -37,26 +37,15 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
   }
 
   if(inherits(x, "fG")) {
-    cat("parallel processing...\n")
     plan("multisession")
     r <- x$ssm %>%
       future_map(~ try(fmap_fn(.x)))
 
   } else if(inherits(x, "foieGras")) {
-    sub <- which(rep(x$isd, each = 2))
-    r <- oneStepPredict(
-      x$tmb,
-      "Y",
-      "keep",
-      method = method,
-      subset = sub,
-      discrete = FALSE,
-      parallel = TRUE,
-      ...
-    )
+    stop("provide an fG compound tbl: `osar(fit)`")
   }
 
-  if(inherits(r, "list")) {
+
     out <- lapply(1:length(r), function(i) {
       z <- r[[i]] %>%
         mutate(id = x$id[i]) %>%
@@ -71,19 +60,6 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
       as_tibble() %>%
       rename(obs = "observation", resid = "residual")
 
-  } else {
-    z <- r %>%
-      mutate(id = x$id) %>%
-      select(id, everything())
-    x.z <- z %>% slice(seq(1, nrow(z), by = 2))
-    y.z <- z %>% slice(seq(2, nrow(z), by = 2))
-
-    out <- bind_rows(x.z, y.z) %>%
-      mutate(coord = rep(c("x","y"), each=nrow(z)/2)) %>%
-      as_tibble() %>%
-      rename(obs = "observation", resid = "residual")
-
-  }
 
   class(out) <- append("osar", class(out))
   return(out)
