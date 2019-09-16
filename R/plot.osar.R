@@ -13,7 +13,7 @@
 ##'
 ##' @examples
 ##' ## load example osar output (to save time)
-##' data(fit_osar)
+##' data(fit_res)
 ##' plot(osar, "qq")
 ##'
 ##' @export
