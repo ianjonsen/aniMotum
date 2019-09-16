@@ -57,7 +57,7 @@ NULL
 ##' following call: fit <- fit_ssm(ellie, model="rw", time.step=24). This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
-##'
+NULL
 
 ##' @name fit_res
 ##' @docType data
@@ -68,7 +68,7 @@ NULL
 ##' following call: fit_res <- osar(fit). This example
 ##' osar object is included purely to speed up examples where an osar object is required
 ##' but estimating residuals is not the focus of the example.
-##'
+NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
