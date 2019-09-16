@@ -18,8 +18,7 @@
 ##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
-##' @importFrom furrr future_map
-##' @importFrom future plan
+##' @importFrom purrr map
 ##' @export
 
 osar <- function(x, method = "oneStepGaussianOffMode", ...)
@@ -33,15 +32,14 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
                    method = method,
                    subset = sub,
                    discrete = FALSE,
-                   parallel = FALSE,
+                   parallel = TRUE,
                    trace = FALSE,
                    ...)
   }
 
   if(inherits(x, "fG")) {
-    plan("multisession", gc = TRUE)
     r <- x$ssm %>%
-      future_map(~ try(fmap_fn(.x)))
+      map(~ try(fmap_fn(.x)))
 
   } else if(inherits(x, "foieGras")) {
     stop("provide an fG compound tbl: `osar(fit)`")

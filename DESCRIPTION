@@ -35,8 +35,7 @@ Imports:
     stringr,
     magrittr,
     tidyr,
-    furrr,
-    future
+    purrr
 Suggests: 
     testthat,
     covr,
