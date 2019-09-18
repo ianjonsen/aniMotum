@@ -1,0 +1,10 @@
+.PHONY: all tmblib
+
+all: $(SHLIB)
+$(SHLIB): tmblib
+
+tmblib:
+	(cd TMB; $(R_HOME)/bin$(R_ARCH_BIN)/Rscript --no-save --no-restore compile.R)
+
+clean:
+	rm -rf *.dll *.o TMB/*.dll TMB/*.o
