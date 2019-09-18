@@ -76,7 +76,6 @@ sfilter <-
     }
 
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
-    ## add is.data flag (distinquish obs from reg states)
     if(fit.to.subset) xx <- x %>% filter(keep)
     else xx <- x
 
@@ -116,6 +115,7 @@ sfilter <-
     }
 
     ## merge data and interpolation times
+    ## add is.data flag (distinquish obs from reg states)
     d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%

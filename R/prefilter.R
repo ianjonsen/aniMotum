@@ -64,12 +64,17 @@ prefilter <-
   d <- data
   # check input data
   if (!inherits(d, "sf")) {
-    if (!ncol(d) %in% c(5, 8))
-      stop("\nData can only have 5 (for LS data) or 8 (for KF data) columns")
+    if (!ncol(d) %in% c(5, 7, 8))
+      stop("\nData can only have 5 (for LS data), 7 (for geolocation data), or 8 (for KF(S) data) columns")
 
     if ((ncol(d) == 5 &
          !isTRUE(all.equal(
            names(d), c("id", "date", "lc", "lon", "lat")
+         ))) ||
+        (ncol(d) == 7 &
+         !isTRUE(all.equal(
+           names(d),
+           c("id", "date", "lc", "lon", "lat", "lonerr", "laterr")
          ))) ||
         (ncol(d) == 8 &
          !isTRUE(all.equal(
@@ -80,7 +85,10 @@ prefilter <-
   } else if(inherits(d, "sf") && inherits(st_geometry(d), "sfc_POINT")){
     if((ncol(d) == 7 &
         !isTRUE(all.equal(
-      names(d), c("id", "date", "lc", "smaj", "smin", "eor", "geometry")))) ||
+          names(d), c("id", "date", "lc", "smaj", "smin", "eor", "geometry")))) ||
+      (ncol(d) ==  6 & 
+        !isTRUE(all.equal(
+          names(d), c("id", "date", "lc", "lonerr", "laterr", "geometry")))) ||
       (ncol(d) == 4 & !isTRUE(all.equal(
         names(d), c("id", "date", "lc", "geometry")))))
       stop("\nUnexpected column names in Data, type`?fit_ssm` for details")
@@ -93,34 +101,34 @@ prefilter <-
   if(!is.null(d$id)) d <- d %>% mutate(id = as.character(id))
 
   ## add KF error columns, if missing
-  if(ncol(d) %in% c(4,5)) {
+  if((ncol(d) %in% c(4,5,7) & !inherits(d, "sf")) | (ncol(d) == 6 & inherits(d, "sf"))) {
     d <- d %>%
       mutate(smaj = NA, smin = NA, eor = NA)
-  }
+  } 
 
   ##  convert dates to POSIXt
   ##  flag any duplicate date records,
   ##  order records by time,
   ##  flag records as either KF or LS,
-
   d <- d %>%
     mutate(date = ymd_hms(date, tz = "GMT")) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
     arrange(order(date)) %>%
-    mutate(obs.type = ifelse(is.na(smaj) | is.na(smin) | is.na(eor), "LS", "KF"))
-
+    mutate(obs.type = ifelse((is.na(smaj) | is.na(smin) | is.na(eor)) & lc != "G", "LS", 
+                             ifelse((!is.na(smaj) | !is.na(smin) | !is.na(eor)) & lc != "G", "KF", "GL")))
+ 
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
   d <- d %>%
     mutate(smaj = ifelse(smaj == 0 | smin == 0, NA, smaj),
            smin = ifelse(smin == 0 | is.na(smaj), NA, smin),
            eor = ifelse(is.na(smaj) | is.na(smin), NA, eor),
-           obs.type = ifelse(is.na(smaj) & is.na(smin), "LS", obs.type)) %>%
+           obs.type = ifelse(is.na(smaj) & is.na(smin) & obs.type != "GL", "LS", obs.type)) %>%
     mutate(smaj = smaj/1000,
            smin = smin/1000,
            eor = eor/180 * pi)
-
+  
   ## Use argosfilter::sdafilter to identify outlier locations
   if (spdf) {
     if(inherits(d, "sf") && st_is_longlat(d)) {
@@ -206,7 +214,7 @@ prefilter <-
       }
     }
   }
-
+  
   if(!inherits(d, "sf")) {
     ##  if lon spans -180,180 then shift to
     ##    0,360; else if lon spans 360,0 then shift to
@@ -252,7 +260,7 @@ prefilter <-
   }
 
   ## add LS error info to corresponding records
-  ## set emf's = NA if obs.type == "KF" - not essential but for clarity
+  ## set emf's = NA if obs.type %in% c("KF","GL") - not essential but for clarity
   if(is.null(emf)) {
       tmp <- emf()
   } else if(is.data.frame(emf)) {
@@ -265,8 +273,8 @@ prefilter <-
     mutate(lc = as.character(lc)) %>%
     left_join(., tmp, by = "lc") %>%
     mutate(
-      emf.x = ifelse(obs.type == "KF", NA, emf.x),
-      emf.y = ifelse(obs.type == "KF", NA, emf.y)
+      emf.x = ifelse(obs.type %in% c("KF","GL"), NA, emf.x),
+      emf.y = ifelse(obs.type %in% c("KF","GL"), NA, emf.y)
     ) %>%
     select(everything(), geometry)
 
@@ -274,7 +282,7 @@ prefilter <-
     stop(
       "\n NA's found in location class values"
     )
-
+  
   return(out)
 
 }
