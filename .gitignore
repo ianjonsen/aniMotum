@@ -1,2 +1,4 @@
 foieGras.Rproj
 .Rproj.user
+*.so
+*.o
