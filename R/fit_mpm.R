@@ -11,7 +11,6 @@
 ##' \item{\code{data}}{input dataframe}
 ##' \item{\code{tmb}}{the tmb object}
 ##' \item{\code{opt}}{the object returned by the optimizer}
-##' @useDynLib mpm
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom tibble data_frame
 ##' @export

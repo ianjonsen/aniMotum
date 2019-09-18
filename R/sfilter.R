@@ -27,7 +27,6 @@
 ##' (see ?TMB::MakeADFUN for additional details)
 ##' @param lpsi lower bound for the psi parameter
 ##'
-##' @useDynLib foieGras
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
 ##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols
@@ -232,6 +231,7 @@ sfilter <-
 
     ## TMB - data list
     data <- list(
+      model_name = "ssm",
       Y = switch(
         model,
         rw = rbind(d.all$x, d.all$y),
