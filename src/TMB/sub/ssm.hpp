@@ -17,7 +17,7 @@ Type ssm(objective_function<Type>* obj) {
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations vs. interpolation points
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
-  DATA_STRING(proc_mod);		       //	indicates which process model to be used: RW or CRW
+  DATA_INTEGER(proc_mod);		       //	indicates which process model to be used: RW or CRW
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   
   // for KF observation model
@@ -61,7 +61,7 @@ Type ssm(objective_function<Type>* obj) {
   Type jnll = 0.0;
   Type tiny = 1e-5;
   
-  if(proc_mod == "rw") {
+  if(proc_mod == 0) {
     // RW
     // 2 x 2 covariance matrix for innovations
     matrix<Type> cov(2, 2);
@@ -80,7 +80,7 @@ Type ssm(objective_function<Type>* obj) {
       nll_proc.setSigma(cov_dt);
       jnll += nll_proc(X.col(i) - X.col(i - 1));
     }
-  } else if(proc_mod == "crw"){
+  } else if(proc_mod == 1){
     // CRW
     // Setup object for evaluating multivariate normal likelihood
     matrix<Type> cov(4,4);
@@ -147,8 +147,8 @@ Type ssm(objective_function<Type>* obj) {
         // GLS observations
         Type sdLon = GLerr(i,0);
         Type sdLat = GLerr(i,1);
-        cov_obs(0,0) = sdLon;
-        cov_obs(1,1) = sdLat;
+        cov_obs(0,0) = sdLon * sdLon;
+        cov_obs(1,1) = sdLat * sdLat;
         cov_obs(0,1) = sdLon * sdLat * rho_o;
         cov_obs(1,0) = cov_obs(0,1);
       }
@@ -161,10 +161,10 @@ Type ssm(objective_function<Type>* obj) {
     }
   }
   
-  if(proc_mod == "rw") {
+  if(proc_mod == 0) {
     ADREPORT(rho_p);
     ADREPORT(sigma);
-  } else if(proc_mod == "crw") {
+  } else if(proc_mod == 1) {
     ADREPORT(D);
   }
   ADREPORT(rho_o);

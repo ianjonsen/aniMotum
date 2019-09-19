@@ -89,7 +89,7 @@ fmap <- function(x,
     ylim(bounds[c("ymin","ymax")])
 
   if(obs)
-    p <- p + geom_sf(data = sf_data, colour = "orange2", size = 1, shape = 9, alpha = 0.75)
+    p <- p + geom_sf(data = sf_data, colour = grey(0.7), size = 1, shape = 9, alpha = 0.75)
 
   if(length(unique(x$id)) > 1) {
 

@@ -60,12 +60,12 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, out
     p <- ggplot(pd, aes(date, value))
 
     if(lc) {
-      p <- p + geom_point(col="firebrick", size = 0.6) +
+      p <- p + geom_point(col="goldenrod1", size = 0.6) +
         geom_point(data = dd, aes(date, value, colour = lc), alpha = 0.5, size = 1.25)
     } else {
       p <- p + geom_point(data = dd, aes(date, value), colour = "dodgerblue",
                           alpha = 0.7, size = 1.25) +
-        geom_point(col="firebrick", size = 0.6)
+        geom_point(col="goldenrod1", size = 0.6)
     }
       p <- p + geom_rug(data = dd, aes(date), col = "dodgerblue", alpha=0.75, sides = "b") +
         facet_wrap(id ~ coord, scales = "free", ncol=2,
@@ -79,8 +79,8 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, out
     } else if (type == 2) {
 
     p <- ggplot() +
-      geom_path(data = ssm, aes(lon, lat), col = grey(0.7), alpha = 0.5, lwd = 0.5) +
-      geom_point(data = ssm, aes(lon, lat), col = grey(0.7), alpha = 0.5, size = 0.9)
+      geom_path(data = ssm, aes(lon, lat), col = "goldenrod1", alpha = 0.5, lwd = 0.25) +
+      geom_point(data = ssm, aes(lon, lat), col = "goldenrod1", alpha = 0.5, size = 0.9)
 
       if(lc) {
         p <- p + geom_point(data = d, aes(lon, lat, colour = lc), size = 1.25)

@@ -260,7 +260,7 @@ sfilter <-
       state0 = state0,
       dt = dt,
       isd = as.integer(d.all$isd),
-      proc_mod = model,
+      proc_mod = ifelse(model == "rw", 0, 1),
       obs_mod = obs_mod,
       m = d.all$smin,
       M = d.all$smaj,

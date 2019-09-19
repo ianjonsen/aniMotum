@@ -132,7 +132,9 @@ prefilter <-
            obs.type = ifelse(is.na(smaj) & is.na(smin) & obs.type != "GL", "LS", obs.type)) %>%
     mutate(smaj = smaj/1000,
            smin = smin/1000,
-           eor = eor/180 * pi)
+           eor = eor/180 * pi) %>%
+    mutate(lonerr = lonerr * 6366.71 / 180 * pi,
+           laterr = laterr * 6366.71 / 180 * pi) # convert from lon/lat to km (crude)
   
   ## Use argosfilter::sdafilter to identify outlier locations
   if (spdf) {
