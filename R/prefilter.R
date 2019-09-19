@@ -96,7 +96,7 @@ prefilter <-
     if(is.na(st_crs(d))) stop("\nCRS info is missing from input data sf object")
   }
 
-  if(length(unique(d$id)) > 1) stop("Multiple individual tracks in Data, use `fit_ssm`")
+  if(length(unique(d$id)) > 1) stop("Multiple individual tracks in Data, use `fit_ssm(..., pf = TRUE)`")
 
   if(!is.null(d$id)) d <- d %>% mutate(id = as.character(id))
 
@@ -105,6 +105,11 @@ prefilter <-
     d <- d %>%
       mutate(smaj = NA, smin = NA, eor = NA)
   } 
+  ## add GL error columns, if missing
+  if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf"))) {
+    d <- d %>%
+      mutate(lonerr = NA, laterr = NA)
+  }
 
   ##  convert dates to POSIXt
   ##  flag any duplicate date records,

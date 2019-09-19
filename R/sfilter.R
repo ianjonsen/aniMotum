@@ -174,7 +174,7 @@ sfilter <-
     }
 
     ## calculate prop'n of obs that are LS-derived
-    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF"), labels = c("LS","KF")))
+    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GL"), labels = c("LS","KF","GL")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
     automap <- switch(model,
                   rw = {
@@ -184,9 +184,16 @@ sfilter <-
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if (pls == 0) {
+                    } else if (pls == 0 & unique(d$obs.type) == "KF") {
                       list(l_tau = factor(c(NA, NA)),
                            l_rho_o = factor(NA),
+                           logD = factor(NA),
+                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                           )
+                    } else if(pls == 0 & unqiue(d$obs.type == "GL")) {
+                      list(l_tau = factor(c(NA, NA)),
+                           l_psi = factor(NA),
                            logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
@@ -206,7 +213,7 @@ sfilter <-
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_psi = factor(NA)
                       )
-                    } else if (pls == 0) {
+                    } else if (pls == 0 & unique(d$obs.type) == "KF") {
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
@@ -214,7 +221,16 @@ sfilter <-
                         l_tau = factor(c(NA, NA)),
                         l_rho_o = factor(NA)
                       )
-                    } else if (pls > 0 & pls < 1) {
+                    } else if (pls == 0 & unique(d$obs.type) == "GL") {
+                      list(
+                        l_sigma = factor(c(NA, NA)),
+                        l_rho_p = factor(NA),
+                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                        l_tau = factor(c(NA, NA)),
+                        l_psi = factor(NA)
+                      )
+                    }
+                    else if (pls > 0 & pls < 1) {
                       list(l_sigma = factor(c(NA, NA)),
                            l_rho_p = factor(NA),
                            X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
@@ -230,6 +246,10 @@ sfilter <-
     }
 
     ## TMB - data list
+    obs_mod <- ifelse(d.all$obs.type == "LS", 0, 
+                      ifelse(d.all$obs.type == "KF", 1, 2)
+                      )
+    
     data <- list(
       model_name = "ssm",
       Y = switch(
@@ -240,12 +260,13 @@ sfilter <-
       state0 = state0,
       dt = dt,
       isd = as.integer(d.all$isd),
-      proc_mod = switch(model, rw = 0, crw = 1),
-      obs_mod = ifelse(d.all$obs.type == "LS", 0, 1),
+      proc_mod = model,
+      obs_mod = obs_mod,
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
-      K = cbind(d.all$emf.x, d.all$emf.y)
+      K = cbind(d.all$emf.x, d.all$emf.y),
+      GLerr = cbind(d.all$lonerr, d.all$laterr)
     )
 
     ## TMB - create objective function
