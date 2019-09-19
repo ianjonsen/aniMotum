@@ -5,6 +5,7 @@
 ##' @param x a fG compound tibble
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
+##' @param ncol number of columns to use for facetting. Default is ncol = 2 but this may be increased for large compound fit objects
 ##' @param lc display Argos location classes
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @param ... additional arguments to be ignored
@@ -23,7 +24,7 @@
 ##'
 ##' @export
 
-plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, outlier = FALSE, ...)
+plot.fG <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = FALSE, outlier = FALSE, ...)
 {
 
   if (length(list(...)) > 0) {
@@ -60,15 +61,15 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, out
     p <- ggplot(pd, aes(date, value))
 
     if(lc) {
-      p <- p + geom_point(col="goldenrod1", size = 0.6) +
+      p <- p + geom_point(col="darkgoldenrod3", size = 0.6) +
         geom_point(data = dd, aes(date, value, colour = lc), alpha = 0.5, size = 1.25)
     } else {
       p <- p + geom_point(data = dd, aes(date, value), colour = "dodgerblue",
                           alpha = 0.7, size = 1.25) +
-        geom_point(col="goldenrod1", size = 0.6)
+        geom_point(col="darkgoldenrod3", size = 0.6)
     }
       p <- p + geom_rug(data = dd, aes(date), col = "dodgerblue", alpha=0.75, sides = "b") +
-        facet_wrap(id ~ coord, scales = "free", ncol=2,
+        facet_wrap(id ~ coord, scales = "free", ncol = ncol,
                    labeller = labeller(id = label_both, coord = label_value))
 
     if(lc) {
@@ -79,8 +80,8 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, out
     } else if (type == 2) {
 
     p <- ggplot() +
-      geom_path(data = ssm, aes(lon, lat), col = "goldenrod1", alpha = 0.5, lwd = 0.25) +
-      geom_point(data = ssm, aes(lon, lat), col = "goldenrod1", alpha = 0.5, size = 0.9)
+      geom_path(data = ssm, aes(lon, lat), col = "darkgoldenrod3", alpha = 0.5, lwd = 0.25) +
+      geom_point(data = ssm, aes(lon, lat), col = "darkgoldenrod3", alpha = 0.5, size = 0.9)
 
       if(lc) {
         p <- p + geom_point(data = d, aes(lon, lat, colour = lc), size = 1.25)
@@ -88,7 +89,7 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, lc = FALSE, out
         p <- p + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
                             size = 1.25, alpha = 0.7)
       }
-    p <- p + facet_wrap( ~ id, scales = "free", ncol = 2,
+    p <- p + facet_wrap( ~ id, scales = "free", ncol = ncol,
                          labeller = labeller(id = label_both))
 
     if(lc) {

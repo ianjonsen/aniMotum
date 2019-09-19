@@ -5,7 +5,7 @@
 \title{plot}
 \usage{
 \method{plot}{fG}(x, what = c("fitted", "predicted"), type = 1,
-  lc = FALSE, outlier = FALSE, ...)
+  ncol = 2, lc = FALSE, outlier = FALSE, ...)
 }
 \arguments{
 \item{x}{a fG compound tibble}
@@ -13,6 +13,8 @@
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
+
+\item{ncol}{number of columns to use for facetting. Default is ncol = 2 but this may be increased for large compound fit objects}
 
 \item{lc}{display Argos location classes}
 
