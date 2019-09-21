@@ -14,13 +14,13 @@ Type mpm(objective_function<Type>* obj) {
   DATA_FACTOR(idx);                // cumsum of number of locations for each animal
   
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
-  PARAMETER_VECTOR(log_sigma);	    // Innovation variance (log scale)
-  PARAMETER(log_sigma_g);           // logistic scale parameter of rw on lg (log scale)
+  PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
+  PARAMETER_VECTOR(l_sigma_g);      // logistic scale parameter of rw on lg (log scale)
   
   // Backtransform parameters from link scale
   vector<Type> gamma = Type(1.0) / (Type(1.0) + exp(-lg));
-  vector<Type> sigma = exp(log_sigma);
-  Type sigma_g = exp(log_sigma_g);
+  vector<Type> sigma = exp(l_sigma);
+  vector<Type> sigma_g = exp(l_sigma_g);
   
   // 2x2 covariance matrix for innovations
   matrix<Type> cov(2,2);
@@ -37,7 +37,7 @@ Type mpm(objective_function<Type>* obj) {
   
   for(i = 0; i < A; ++i) {
     for(j = (idx(i)+1); j < idx(i+1); ++j) {
-      jnll -= dnorm(lg(j), lg(j-1), sigma_g, TRUE);  // RW on logit(gamma)
+      jnll -= dnorm(lg(j), lg(j-1), sigma_g(i), TRUE);  // RW on logit(gamma)
     }
     
     for(j = (idx(i)+2); j < idx(i+1); ++j){

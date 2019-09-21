@@ -34,8 +34,8 @@ fit_mpm <- function(x,
   
   parameters <- list(
     lg = rep(0, dim(x)[1]),
-    log_sigma = c(0, 0),
-    log_sigma_g = 0
+    l_sigma = c(0, 0),
+    l_sigma_g = rep(0, A)
   )
   
   ## TMB - create objective function
@@ -83,18 +83,19 @@ fit_mpm <- function(x,
                             ))))
   
   ## Parameters, states and the fitted values
-  rep <- suppressWarnings(try(sdreport(obj)))
+  rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))
   fxd <- summary(rep, "report")
   fxd_log <- summary(rep, "fixed")
   rdm <- summary(rep, "random")
   
   lg <- rdm[rownames(rdm) %in% "lg", ]
+  browser()
   
   fitted <- data_frame(
     id = x$id,
     date = x$date,
     g = plogis(lg[, 1]),
-    g.se = lg[, 2]
+    g.se = lg[,2]      ## FIXME: rescale this to SE of prob
   )
   
   if (optim == "nlminb") {
@@ -102,7 +103,8 @@ fit_mpm <- function(x,
   } else if (optim == "optim") {
     aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
   }
-  row.names(fxd)[2:3] <- c("sigma_lon", "sigma_lat")
+
+  row.names(fxd)[(nrow(fxd)-1):nrow(fxd)] <- c("sigma_lon", "sigma_lat")
   
   list(
     fitted = fitted,
