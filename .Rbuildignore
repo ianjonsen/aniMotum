@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
+^\.github$
+^codecov\.yml$
+^cran\-comments\.md$
