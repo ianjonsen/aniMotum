@@ -1,7 +1,7 @@
 #define TMB_LIB_INIT R_init_foieGras
 #include <TMB.hpp>
-#include "sub/ssm.hpp"
-#include "sub/mpm.hpp"
+#include "TMB/sub/ssm.hpp"
+#include "TMB/sub/mpm.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() ()
