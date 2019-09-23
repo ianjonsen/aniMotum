@@ -13,6 +13,7 @@
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom tibble data_frame
+##' @importFrom stats plogis
 ##' @export
 fit_mpm <- function(x,
                     optim = c("nlminb", "optim"),
@@ -89,7 +90,6 @@ fit_mpm <- function(x,
   rdm <- summary(rep, "random")
   
   lg <- rdm[rownames(rdm) %in% "lg", ]
-  browser()
   
   fitted <- data_frame(
     id = x$id,
