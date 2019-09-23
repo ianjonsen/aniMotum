@@ -37,6 +37,7 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
                    ...)
   }
 
+  ## FIXME: find a way to better parallelise this. parallel = TRUE only uses 2 cores & is too slow
   if(inherits(x, "fG")) {
     r <- x$ssm %>%
       map(~ try(fmap_fn(.x)))
