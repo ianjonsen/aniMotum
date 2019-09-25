@@ -1,5 +1,5 @@
-#ifndef mpm_hpp
-#define mpm_hpp 1
+#ifndef joint_mpm_hpp
+#define joint_mpm_hpp 1
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
@@ -7,10 +7,12 @@
 using namespace density;
 
 template <class Type>
-Type mpm(objective_function<Type>* obj) {
+Type joint_mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
-
+  DATA_INTEGER(A);                  // number of animals
+  DATA_FACTOR(idx);                // cumsum of number of locations for each animal
+  
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
   PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
   PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
@@ -31,16 +33,18 @@ Type mpm(objective_function<Type>* obj) {
   vector<Type> mu(2);
   
   MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
-  int j;
+  int i,j;
   
-    for(j = 1; j < x.rows(); ++j) {
+  for(i = 0; i < A; ++i) {
+    for(j = (idx(i)+1); j < idx(i+1); ++j) {
       jnll -= dnorm(lg(j), lg(j-1), sigma_g, TRUE);  // RW on logit(gamma)
     }
     
-    for(j = 2; j < x.rows(); ++j){
+    for(j = (idx(i)+2); j < idx(i+1); ++j){
       mu = x.row(j) - x.row(j-1) - gamma(j-1) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
       jnll += nll_dens(mu);
     }
+  }
   
   ADREPORT(sigma_g);
   ADREPORT(sigma);

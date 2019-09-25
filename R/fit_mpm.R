@@ -1,6 +1,7 @@
 ##' @title fit a a Move Persistence Model (mpm)
 ##' @description fit a random walk with time-varying move persistence to location data (e.g., output from \code{fit_ssm})
 ##' @param x a data frame of observations (see details)
+##' @param model mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})
 ##' @param optim numerical optimizer
 ##' @param verbose report progress during minimization
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
@@ -16,29 +17,41 @@
 ##' @importFrom stats plogis
 ##' @export
 fit_mpm <- function(x,
+                    model = c("mpm", "jmpm"),
                     optim = c("nlminb", "optim"),
                     verbose = FALSE,
                     control = NULL,
                     inner.control = NULL) {
   
   optim <- match.arg(optim)
+  model <- match.arg(model)
   
-  A <- length(unique(x$id))
-  idx <- c(0, cumsum(as.numeric(table(x$id))))
-  
-  data.tmb <- list(
-    model_name = "mpm",
-    x = cbind(x$lon, x$lat),
-    A = A,
-    idx = idx
-  )
-  
+  switch(model,
+         jmpm = {
+           A <- length(unique(x$id))
+           idx <- c(0, cumsum(as.numeric(table(x$id))))
+           
+           data.tmb <- list(
+             model_name = model,
+             x = cbind(x$lon, x$lat),
+             A = A,
+             idx = idx
+           )
+           
+         },
+         mpm = {
+           data.tmb <- list(
+             model_name = model,
+             x = cbind(x$lon, x$lat)
+           )
+         })
+
   parameters <- list(
     lg = rep(0, dim(x)[1]),
     l_sigma = c(0, 0),
-    l_sigma_g = rep(0, A)
-  )
-  
+    l_sigma_g = 0
+  ) 
+
   ## TMB - create objective function
   if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
     inner.control <- list(smartsearch = TRUE)
@@ -52,9 +65,6 @@ fit_mpm <- function(x,
       silent = !verbose,
       inner.control = inner.control
     )
-  
-  
-  obj$env$tracemgc <- verbose
   
   ## add par values to trace if verbose = TRUE
   myfn <- function(x) {
@@ -82,6 +92,7 @@ fit_mpm <- function(x,
                                 control = control
                               )
                             ))))
+
   
   ## Parameters, states and the fitted values
   rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))

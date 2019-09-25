@@ -4,11 +4,13 @@
 \alias{fit_mpm}
 \title{fit a a Move Persistence Model (mpm)}
 \usage{
-fit_mpm(x, optim = c("nlminb", "optim"), verbose = FALSE,
-  control = NULL, inner.control = NULL)
+fit_mpm(x, model = c("mpm", "joint_mpm"), optim = c("nlminb", "optim"),
+  verbose = FALSE, control = NULL, inner.control = NULL)
 }
 \arguments{
 \item{x}{a data frame of observations (see details)}
+
+\item{model}{mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{joint_mpm} with a single, pooled random variance parameter (\code{sigma_g})}
 
 \item{optim}{numerical optimizer}
 
