@@ -18,13 +18,15 @@
 ##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
-##' @importFrom purrr map
+##' @importFrom future makeClusterPSOCK availableCores plan cluster
+##' @importFrom parallel stopCluster
+##' @importFrom furrr future_map
 ##' @export
 
 osar <- function(x, method = "oneStepGaussianOffMode", ...)
 {
 
-  fmap_fn <- function(f) {
+  map_fn <- function(f) {
     sub <- which(rep(f$isd, each = 2))
     oneStepPredict(obj = f$tmb,
                    observation.name = "Y",
@@ -39,13 +41,18 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
 
   ## FIXME: find a way to better parallelise this. parallel = TRUE only uses 2 cores & is too slow
   if(inherits(x, "fG")) {
+    cat("running in parallel but this could take a while...\n")
+    cl <- makeClusterPSOCK(availableCores())
+    plan(cluster, workers = cl)
+    
     r <- x$ssm %>%
-      map(~ try(fmap_fn(.x)))
-
+      future_map(~ try(map_fn(.x)), .progress = TRUE)
+    
+    stopCluster(cl)
+    
   } else if(inherits(x, "foieGras")) {
     stop("provide an fG compound tbl: `osar(fit)`")
   }
-
 
     out <- lapply(1:length(r), function(i) {
       z <- r[[i]] %>%

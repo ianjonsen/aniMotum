@@ -280,7 +280,7 @@ sfilter <-
         parameters,
         map = map,
         random = rnd,
-        hessian = TRUE,
+        hessian = FALSE,
         method = "L-BFGS-B",
         DLL = "foieGras",
         silent = !verbose,
