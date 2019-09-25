@@ -41,7 +41,7 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
 
   ## FIXME: find a way to better parallelise this. parallel = TRUE only uses 2 cores & is too slow
   if(inherits(x, "fG")) {
-    cat("running in parallel but this could take a while...\n")
+    cat("running in parallel, this could take a while...\n")
     cl <- makeClusterPSOCK(availableCores())
     plan(cluster, workers = cl)
     
@@ -53,22 +53,38 @@ osar <- function(x, method = "oneStepGaussianOffMode", ...)
   } else if(inherits(x, "foieGras")) {
     stop("provide an fG compound tbl: `osar(fit)`")
   }
+  
+  cr <- sapply(r, function(.) inherits(., "try-error"))
 
+  if (any(cr)) {
+    warning(
+      sprintf(
+        "\n failed to calculate OSA residuals for the following individuals: %s \n",
+        x$id[which(cr)]
+      ), immediate. = TRUE, call. = FALSE
+    )
+    r <- r[-which(cr)]
+  }
+  
+  if (length(r) == 0) {
+    stop("no residuals calculated", call. = FALSE)
+  } else {
     out <- lapply(1:length(r), function(i) {
       z <- r[[i]] %>%
         mutate(id = x$id[i]) %>%
         select(id, everything())
       x.z <- z %>% slice(seq(1, nrow(z), by = 2))
       y.z <- z %>% slice(seq(2, nrow(z), by = 2))
-
+      
       bind_rows(x.z, y.z) %>%
-        mutate(coord = rep(c("x","y"), each=nrow(z)/2))
-      }) %>%
+        mutate(coord = rep(c("x", "y"), each = nrow(z) / 2))
+    }) %>%
       do.call(rbind, .) %>%
       as_tibble() %>%
       rename(obs = "observation", resid = "residual")
-
-
-  class(out) <- append("osar", class(out))
-  return(out)
+    
+    
+    class(out) <- append("osar", class(out))
+    return(out)
+  }
 }
