@@ -1,6 +1,7 @@
 Package: foieGras
 Title: Fit Continuous-Time State-Space Models for Filtering Argos Satellite (and Other) Telemetry Data
 Version: 0.3.1.9135
+Date: 2019-09-25
 Authors@R: 
     c(
       person(given = "Ian",
