@@ -29,13 +29,13 @@ plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, .
 
   switch(type,
          qqnorm = {
-           p <- ggplot(x %>% filter(!is.na(resid)), aes(sample = resid)) +
+           p <- ggplot(x %>% filter(!is.na(residual)), aes(sample = residual)) +
              geom_qq() +
              geom_qq_line(col = "firebrick") +
              facet_grid(id ~ coord)
          },
          histogram = {
-           p <- ggplot(x %>% filter(!is.na(resid)), aes(x = resid)) +
+           p <- ggplot(x %>% filter(!is.na(residual)), aes(x = residual)) +
              geom_histogram(binwidth = bw, col = grey(0.9), lwd = 0.5) +
              geom_vline(xintercept = 0, lty = 2, col = "firebrick") +
              facet_grid(id ~ coord)
