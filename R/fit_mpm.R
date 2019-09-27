@@ -12,8 +12,15 @@
 ##' \item{\code{data}}{input dataframe}
 ##' \item{\code{tmb}}{the tmb object}
 ##' \item{\code{opt}}{the object returned by the optimizer}
+##' 
+##' ##' @examples
+##' ## fit mpm to single individual
+##' data(fit)
+##' dmp <- grab(fit, "predicted", as_sf=FALSE)
+##' dmp <- select(dmp, id,date,lon,lat)
+##' fmp <- fit_mpm(dmp, model = "mpm")
+##' 
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom tibble data_frame
 ##' @importFrom dplyr "%>%" group_by ungroup do mutate select
 ##' @export
 fit_mpm <- function(x,

@@ -18,7 +18,7 @@
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
-##' @importFrom tibble as_tibble
+##' @importFrom tibble tibble
 ##' @importFrom stats plogis
 ##'
 ##' @export
@@ -119,7 +119,7 @@ fmpm <-
     
     lg <- rdm[rownames(rdm) %in% "lg", ]
     
-    fitted <- data_frame(
+    fitted <- tibble(
       id = x$id,
       date = x$date,
       g = plogis(lg[, 1]),

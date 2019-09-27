@@ -19,7 +19,7 @@
 ##'
 ##' @export
 
-plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, ...)
+plot.fG_osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")

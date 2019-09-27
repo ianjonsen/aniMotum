@@ -81,9 +81,9 @@ fit$ssm[[1]]
 and a summary `plot` method allows a quick visual of the SSM fit to the data:
 ```{r fit plot, fig.width=7,fig.height=7}
 # plot time-series of the predicted values
-plot(fit$ssm[[1]], what = "predicted")
+plot(fit, what = "predicted", type = 1)
 ```
-The predicted values are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). Fitted values (not shown) are the state estimates corresponding to the time of each observation; their time-series are plotted by default - `plot(fit$ssm[[1]])`.
+The predicted values are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). Fitted values (not shown) are the state estimates corresponding to the time of each observation; their time-series are plotted by default - `plot(fit)`.
 
 Estimated tracks can be mapped using the `foieGras`-applied projection (here EPSG 3395). We use the `foieGras::grab()` function to access the SSM-predicted values. The (low-res) land is added using the `rnaturalearth` package. The `ggspatial` package's `annotation_spatial` and `layer_spatial` functions ease plotting of `sf` class data.
 ```{r ggplot map, fig.width=7, fig.height=7, message=FALSE}
@@ -91,7 +91,7 @@ library(rnaturalearth)
 library(ggspatial)
 
 ## change units from km to m (attempt to avoid win-builder error)
-ploc_sf <- grab(fit, what = "predicted") %>% st_transform(., crs = "+init=epsg:3395 +units=m")
+ploc_sf <- grab(fit, what = "predicted") %>% st_transform(., crs = "+init=epsg:3395")
 
 ## get coastline data
 coast <- ne_countries(scale=110, returnclass = "sf") 
