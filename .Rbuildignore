@@ -1,12 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-<<<<<<< HEAD
 ^cran-comments\.md$
 ^\.travis\.yml$
 ^codecov\.yml$
-=======
 ^\.travis\.yml$
 ^\.github$
 ^codecov\.yml$
 ^cran\-comments\.md$
->>>>>>> dev

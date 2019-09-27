@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
@@ -7,11 +6,8 @@ src/*.o
 src/*.so
 src/*.dll
 foieGras.Rproj
-=======
-foieGras.Rproj
 .Rproj.user
 *.so
 *.o
 .Rhistory
 data/petrel.RDS
->>>>>>> dev
