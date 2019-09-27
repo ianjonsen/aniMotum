@@ -57,14 +57,8 @@ osar <- function(x, method = "fullGaussian", ...)
   
   cr <- sapply(r, function(.) inherits(., "try-error"))
 
-  ## throw warning if any try-errors but preserve successful results
+  ## if any try-errors then retry using oneStepGaussianOffMode but preserve successful results
   if (any(cr)) {
-    warning(
-      sprintf(
-        "\n failed to calculate OSA residuals for the following individuals: %s \n trying with `oneStepGaussianOffMode` method",
-        x$id[which(cr)]
-      ), immediate. = TRUE, call. = FALSE
-    )
     ## re-try on failures
     redo <- x[which(cr), ]
     if(nrow(redo) > 1) {

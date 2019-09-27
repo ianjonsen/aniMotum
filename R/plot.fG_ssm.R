@@ -13,7 +13,7 @@
 ##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value
 ##' @importFrom tidyr gather
 ##' @importFrom dplyr "%>%" select bind_cols rename filter
-##' @importFrom tibble as_tibble
+##' @importFrom tibble enframe
 ##' @method plot fG_ssm
 ##'
 ##' @examples
@@ -48,7 +48,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, l
     
     if(type == 1) {
       foo <- ssm %>% select(id, lon, lat) %>% gather(., key = "coord", value = "value", lon, lat)
-      bar <- rep(ssm$date, 2) %>% as_tibble() %>% rename(date = "value")
+      bar <- rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
       
       foo.d <- d %>% select(id, lon, lat) %>% gather(., key = "coord", value = "value", lon, lat)
       bar.d <- d %>% select(date, lc) %>% bind_rows(., .)
@@ -97,7 +97,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, l
           theme_dark()
       }
     }
-    print(p)
+    return(p)
     
   } else {
     stop("x must be a fG_ssm compound tibble")

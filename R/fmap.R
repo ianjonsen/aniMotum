@@ -43,12 +43,18 @@ fmap <- function(x,
   if (is.null(crs)) prj <- st_crs(sf_locs)
   else {
     prj <- crs
-    if(length(grep("+units=km", prj, fixed = TRUE)) == 0) prj <- paste(prj, "+units=km")
+    if(!is.character(prj)) prj <- paste0("+init=epsg:", prj)
+
+    if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
+      prj <- paste(prj, "+units=km")
+    }
+    sf_locs <- st_transform(sf_locs, crs = prj)
   }
     
   
   if (obs) {
-    sf_data <- grab(x, "data")
+    sf_data <- grab(x, "data") %>%
+      st_transform(., crs = prj)
     bounds <- st_bbox(sf_data)
   } else {
     bounds <- st_bbox(sf_locs)
@@ -65,8 +71,6 @@ fmap <- function(x,
   ## get coastline
   coast <- rnaturalearth::ne_countries(scale=10, returnclass = "sf") %>%
     st_transform(crs = prj)
-
-  browser()
   
   p <- ggplot() +
     geom_sf(data = coast,
@@ -92,12 +96,10 @@ fmap <- function(x,
                      ) +
     scale_colour_viridis_d() +
       theme(legend.position = "bottom",
-            legend.text = element_text(size = 7, vjust = 0),
-            plot.title = element_text(size = 10),
-            plot.subtitle = element_text(size = 5)
+            legend.text = element_text(size = 8, vjust = 0)
       )
   } else {
-    lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
+    lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 4))) %>% as.Date()
 
     p <- p +
       geom_sf(data = sf_lines,
@@ -110,11 +112,9 @@ fmap <- function(x,
       scale_colour_viridis_c(breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
       theme(legend.position = "bottom",
             legend.title = element_blank(),
-            legend.text = element_text(size = 6, vjust = 0),
-            legend.key.width = unit(1.75, "cm"),
-            legend.key.height = unit(0.5, "cm"),
-            plot.title = element_text(size = 10),
-            plot.subtitle = element_text(size = 5)
+            legend.text = element_text(size = 8, vjust = 0),
+            legend.key.width = unit(0.12, "npc"),
+            legend.key.height = unit(0.025, "npc")
       )
   }
 
