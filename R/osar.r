@@ -38,7 +38,7 @@ osar <- function(x, method = "fullGaussian", ...)
                    ...)
   }
 
-  if(inherits(x, "fG")) {
+  if(all(inherits(x, c("foieGras", "ssm"), which = TRUE) %in% 1:2)) {
     if(nrow(x) > 1) {
     cat("running in parallel, this could take a while...\n")
     cl <- makeClusterPSOCK(availableCores())
@@ -51,8 +51,8 @@ osar <- function(x, method = "fullGaussian", ...)
     } else {
       r <- list(try(map_fn(x$ssm[[1]], method), silent = TRUE))
     }
-  } else if(inherits(x, "foieGras")) {
-    stop("provide an fG compound tbl: `osar(fit)`")
+  } else {
+    stop("a foieGras ssm compound tbl is required")
   }
   
   cr <- sapply(r, function(.) inherits(., "try-error"))
@@ -116,6 +116,7 @@ osar <- function(x, method = "fullGaussian", ...)
       as_tibble() 
     
     class(out) <- append("osar", class(out))
+    class(out) <- append("foieGras", class(out))
     return(out)
   }
 }

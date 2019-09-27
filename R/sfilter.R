@@ -29,8 +29,7 @@
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
-##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols
-##' @importFrom magrittr "%>%"
+##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##'
@@ -459,6 +458,5 @@ sfilter <-
       )
     }
 
-    class(out) <- append("foieGras", class(out))
     out
   }

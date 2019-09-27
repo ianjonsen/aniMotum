@@ -8,7 +8,7 @@
   bw = 0.5, ...)
 }
 \arguments{
-\item{x}{a compound fG tibble or an individual foieGras fitted object}
+\item{x}{a foieGras osar tibble}
 
 \item{type}{type of residual plot to generate; either qqnorm (default), histogram or boxplot}
 
@@ -17,7 +17,7 @@
 \item{...}{additional arguments to be ignored}
 }
 \description{
-plot One-Step-Ahead (prediction) residuals from a foieGras fit
+plot One-Step-Ahead (prediction) residuals from a foieGras ssm fit
 }
 \examples{
 ## load example osar output (to save time)

@@ -1,19 +1,19 @@
-##' @title print \code{foieGras} object summary information
+##' @title print \code{foieGras} \code{ssm} object summary information
 ##'
 ##' @method print foieGras
 ##'
-##' @param x a \code{ctrw} fit object
+##' @param x a foieGras ssm fit object
 ##' @param ... unused. For compatibility with the generic method.
 ##'
 ##' @examples
 ##' ## see summary fit output
-##' ## load example foieGras fit object (to save time)
+##' ## load example foieGras ssm fit object (to save time)
 ##' data(fit)
 ##' fit
 ##'
 ##' @export
 
-print.foieGras <- function(x, ...)
+print.foieGras.ssm <- function(x, ...)
 {
   pm <- x$pm
   timeStep <- ifelse(length(x$ts) == 1, x$ts, "multiple time.steps")

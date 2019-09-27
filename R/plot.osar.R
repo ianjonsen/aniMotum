@@ -1,8 +1,8 @@
 ##' @title plot
 ##'
-##' @description plot One-Step-Ahead (prediction) residuals from a foieGras fit
+##' @description plot One-Step-Ahead (prediction) residuals from a foieGras ssm fit
 ##'
-##' @param x a compound fG tibble or an individual foieGras fitted object
+##' @param x a foieGras osar tibble
 ##' @param type type of residual plot to generate; either qqnorm (default), histogram or boxplot
 ##' @param bw binwidth for histogram plots (see ggplot2::geom_histogram for details)
 ##' @param ... additional arguments to be ignored
@@ -27,6 +27,8 @@ plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, .
 
   type <- match.arg(type)
 
+  if(all(inherits(x, c("foieGras", "osar"), which = TRUE) %in% 1:2)) {
+  
   switch(type,
          qqnorm = {
            p <- ggplot(x %>% filter(!is.na(residual)), aes(sample = residual)) +
@@ -49,4 +51,7 @@ plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, .
          })
 
   print(p)
+  } else {
+    stop("a foieGras osar class object is required")
+  }
 }

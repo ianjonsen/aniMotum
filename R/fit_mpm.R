@@ -14,117 +14,77 @@
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom tibble data_frame
-##' @importFrom stats plogis
 ##' @export
 fit_mpm <- function(x,
                     model = c("mpm", "jmpm"),
                     optim = c("nlminb", "optim"),
-                    verbose = FALSE,
+                    verbose = 1,
                     control = NULL,
                     inner.control = NULL) {
   
   optim <- match.arg(optim)
   model <- match.arg(model)
   
+  if(verbose == 1)
+    cat("\nfitting mpm...\n")
+  if (verbose %in% 0:1)
+    verb <-  FALSE
+  else
+    verb <- TRUE
+  
   switch(model,
-         jmpm = {
-           A <- length(unique(x$id))
-           idx <- c(0, cumsum(as.numeric(table(x$id))))
-           
-           data.tmb <- list(
-             model_name = model,
-             x = cbind(x$lon, x$lat),
-             A = A,
-             idx = idx
-           )
-           
-         },
          mpm = {
-           data.tmb <- list(
-             model_name = model,
-             x = cbind(x$lon, x$lat)
-           )
+           fit <- x %>%
+             group_by(id) %>%
+             do(mpm = try(fmpm(
+               .,
+               model = model,
+               optim = optim,
+               verbose = verb,
+               control = control,
+               inner.control = inner.control
+             ),
+             silent = TRUE)
+             )
+           
+           fit <- fit %>%
+             ungroup(.) %>%
+             mutate(converged = sapply(.$mpm, function(x)
+               if(length(x) == 7) {
+                 x$opt$convergence == 0
+               } else if(length(x) < 7) {
+                 FALSE
+               })) %>%
+             select(., id, mpm, converged)
+           class(fit) <- append("mpm", class(fit))
+         },
+         jmpm = {
+           fit <- x %>%
+             do(mpm = try(fmpm(
+               .,
+               model = model,
+               optim = optim,
+               verbose = verb,
+               control = control,
+               inner.control = inner.control
+             ),
+             silent = TRUE)
+             )
+           
+           fit <- fit %>%
+             mutate(converged = sapply(.$mpm, function(x)
+               if(length(x) == 7) {
+                 x$opt$convergence == 0
+               } else if(length(x) < 7) {
+                 FALSE
+               })) %>%
+             select(., mpm, converged)
+           class(fit) <- append("jmpm", class(fit))
          })
 
-  parameters <- list(
-    lg = rep(0, dim(x)[1]),
-    l_sigma = c(0, 0),
-    l_sigma_g = 0
-  ) 
+  class(fit) <- append("mpm", class(fit))  
+  class(fit) <- append("foieGras", class(fit))
 
-  ## TMB - create objective function
-  if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
-    inner.control <- list(smartsearch = TRUE)
-  }
-  obj <-
-    MakeADFun(
-      data = data.tmb,
-      parameters = parameters,
-      random = c("lg"),
-      DLL = "foieGras",
-      silent = !verbose,
-      inner.control = inner.control
-    )
-  
-  ## add par values to trace if verbose = TRUE
-  myfn <- function(x) {
-    print("pars:")
-    print(x)
-    obj$fn(x)
-  }
-  
-  ## Minimize objective function
-  opt <-
-    suppressWarnings(switch(optim,
-                            nlminb = try(nlminb(obj$par,
-                                                obj$fn,
-                                                #myfn,
-                                                obj$gr,
-                                                control = control
-                            )),
-                            optim = try(do.call(
-                              optim,
-                              args = list(
-                                par = obj$par,
-                                fn = obj$fn,
-                                gr = obj$gr,
-                                method = "L-BFGS-B",
-                                control = control
-                              )
-                            ))))
-
-  
-  ## Parameters, states and the fitted values
-  rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))
-  fxd <- summary(rep, "report")
-  fxd_log <- summary(rep, "fixed")
-  rdm <- summary(rep, "random")
-  
-  lg <- rdm[rownames(rdm) %in% "lg", ]
-  
-  fitted <- data_frame(
-    id = x$id,
-    date = x$date,
-    g = plogis(lg[, 1]),
-    g.se = lg[,2]      ## FIXME: rescale this to SE of prob
-  )
-  
-  if (optim == "nlminb") {
-    aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
-  } else if (optim == "optim") {
-    aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
-  }
-
-  row.names(fxd)[(nrow(fxd)-1):nrow(fxd)] <- c("sigma_lon", "sigma_lat")
-  
-  list(
-    fitted = fitted,
-    par = fxd,
-    data = x,
-    tmb = obj,
-    opt = opt,
-    rep = rep,
-    aic = aic
-  )
+return(fit)
   
 }

@@ -64,8 +64,7 @@
 ##' plot(fls$ssm[[3]], what = "predicted")
 ##'}
 ##'
-##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
-##' @importFrom magrittr "%>%"
+##' @importFrom dplyr group_by do rowwise ungroup select mutate slice "%>%"
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -150,6 +149,7 @@ fit_ssm <- function(d,
           })) %>%
       select(., id, ssm, converged)
   }
-  class(fit) <- append("fG", class(fit))
+  class(fit) <- append("ssm", class(fit))
+  class(fit) <- append("foieGras", class(fit))
   return(fit)
 }

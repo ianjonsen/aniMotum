@@ -28,45 +28,31 @@ fmap <- function(x,
 {
   what <- match.arg(what)
 
-  if(all(class(x) %in% c("foieGras", "list"))) {
-    switch(what,
-         fitted = {
-           sf_locs <- x$fitted
-         },
-         predicted = {
-           sf_locs <- x$predicted
-         })
-  } else if(class(x)[1] == "sf"){
-    sf_locs <- x
-    what <- substitute(x)
-
-  } else if(all(class(x) %in% c("fG", "tbl_df", "tbl", "data.frame"))) {
+  if(all(class(x)[1:2] == c("foieGras", "ssm"))) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
       sf_locs <- grab(x, what=what)
 
     else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
-      stop("individual fit objects with differing projections not currently supported by `quickmap()`")
+      stop("individual fit objects with differing projections not currently supported by `fmap()`")
     }
 
   } else {
-    stop("input must be either an `fG` compound tibble, an individual `foieGras` fit object, or the output of `foieGras::grab()`")
+    stop("input must be either an `foieGras` compound tibble or the output of `foieGras::grab()`")
   }
 
-  if(is.null(crs)) {
+  if (is.null(crs)) {
     prj <- st_crs(sf_locs)
-    if(class(x)[1] == "foieGras")
-      sf_data <- x$data
-    else if(class(x)[1] == "fG")
+    if (all(class(x)[1:2] == c("foieGras", "ssm"))) {
       sf_data <- grab(x, "data")
     } else {
-    sf_locs <- sf_locs %>% st_transform(., crs)
-    prj <- st_crs(sf_locs)
-    if(class(x)[1] == "foieGras")
-      sf_data <- x$data %>% st_transform(., crs)
-    else if(class(x)[1] == "fG")
-      sf_data <- grab(x, "data") %>% st_transform(., crs)
+      sf_locs <- sf_locs %>% st_transform(., crs)
+      prj <- st_crs(sf_locs)
+      if (all(class(x)[1:2] == c("foieGras", "ssm"))) {
+        sf_data <- grab(x, "data") %>% st_transform(., crs)
+      }
     }
-
+  }
+    
   if(obs) bounds <- st_bbox(sf_data)
   else bounds <- st_bbox(sf_locs)
   bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = ext.rng[1])
