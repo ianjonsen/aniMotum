@@ -7,7 +7,7 @@
 grab(x, what = "fitted", as_sf = TRUE)
 }
 \arguments{
-\item{x}{a foieGras fitted model object}
+\item{x}{a \code{foieGras} ssm fitted model object}
 
 \item{what}{the tibble to be grabbed; either `fitted`, `predicted`, or
 `data` (single letters can be used)}

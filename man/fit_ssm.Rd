@@ -82,7 +82,7 @@ and predict locations at user-specified time intervals (regular or irregular)
 ## fit crw model to multiple individuals with Argos LS data
 data(ellie)
 fit <- fit_ssm(ellie, model = "rw", time.step = 24)
-plot(fit$ssm[[1]])
+plot(fit, what = "predicted", type = 1)
 
 \donttest{
 data(rope)
@@ -90,7 +90,7 @@ fls <- fit_ssm(rope, model = "crw", time.step = 12)
 
 ## simple diagnostic plot for individual 3,
 ## showing predicted value time-series
-plot(fls$ssm[[3]], what = "predicted")
+plot(fls, what = "predicted", type = 2)
 }
 
 }

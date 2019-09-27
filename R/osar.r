@@ -4,7 +4,7 @@
 ##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
 ##' @param ... other arguments to TMB::oneStepPrediction
 ##'
-##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version)
+##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version). \code{osar} tries the "fullGaussian" (fastest) method first and falls back to the "oneStepGaussianOffMode" (slower) method for any failures. Subsequent failures are dropped from the output and a warning message is given. Note, OSA residuals can take a considerable time to calculate if there are many individual fits and/or deployments are long. The method is automatically parallelized across 2 x the number of individual fits, up to the number of processor cores available.
 ##'
 ##' @references Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and A. Neilsen. 2017. Validation of ecological state space models using the Laplace approximation. Environmental and Ecological Statistics 24:317–339.
 ##'
@@ -18,49 +18,98 @@
 ##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
-##' @importFrom purrr map
+##' @importFrom future makeClusterPSOCK availableCores plan cluster
+##' @importFrom parallel stopCluster
+##' @importFrom furrr future_map
 ##' @export
 
-osar <- function(x, method = "oneStepGaussianOffMode", ...)
+osar <- function(x, method = "fullGaussian", ...)
 {
 
-  fmap_fn <- function(f) {
-    sub <- which(rep(f$isd, each = 2))
+  map_fn <- function(f, method) {
     oneStepPredict(obj = f$tmb,
                    observation.name = "Y",
                    data.term.indicator = "keep",
                    method = method,
-                   subset = sub,
+                   subset = which(rep(f$isd, each = 2)),
                    discrete = FALSE,
                    parallel = TRUE,
                    trace = FALSE,
                    ...)
   }
 
-  if(inherits(x, "fG")) {
+  if(inherits(x, "fG_ssm")) {
+    if(nrow(x) > 1) {
+    cat("running in parallel, this could take a while...\n")
+    cl <- makeClusterPSOCK(availableCores())
+    plan(cluster, workers = cl)
+    
     r <- x$ssm %>%
-      map(~ try(fmap_fn(.x)))
+      future_map(~ try(map_fn(.x, method), silent = TRUE))
+    
+    stopCluster(cl)
+    } else {
+      r <- list(try(map_fn(x$ssm[[1]], method), silent = TRUE))
+    }
+  } else {
+    stop("a foieGras ssm compound tbl is required")
+  }
+  
+  cr <- sapply(r, function(.) inherits(., "try-error"))
 
-  } else if(inherits(x, "foieGras")) {
-    stop("provide an fG compound tbl: `osar(fit)`")
+  ## if any try-errors then retry using oneStepGaussianOffMode but preserve successful results
+  if (any(cr)) {
+    ## re-try on failures
+    redo <- x[which(cr), ]
+    if(nrow(redo) > 1) {
+      cat("running in parallel, this could take a while...\n")
+      cl <- makeClusterPSOCK(availableCores())
+      plan(cluster, workers = cl)
+      
+      r.redo <- redo$ssm %>%
+        future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")))
+      
+      stopCluster(cl)
+    } else {
+      r.redo <- list(try(map_fn(redo$ssm[[1]], method = "oneStepGaussianOffMode")))
+    }
+    ## check for repeat failures & throw warning but preserve all successful results
+    cr.redo <- sapply(r.redo, function(.) inherits(., "try-error"))
+    if (any(cr.redo)) {
+      warning(
+        sprintf(
+          "\n failed to calculate OSA residuals for the following individuals: %s \n",
+          x$id[which(cr.redo)]
+        ), immediate. = TRUE, call. = FALSE
+      )
+    r.redo <- r.redo[-which(cr.redo)]  
+    }
+    
+    ## combine original successes with redo successes
+    if(length(r.redo) > 0) r[which(cr)] <- r.redo
+    else {
+     r <- r[-which(cr)]
+    }
   }
 
-
+  ## return error if no successful results, otherwise return OSA resid object
+  if (length(r) == 0) {
+    stop("no residuals calculated", call. = FALSE)
+  } else {
     out <- lapply(1:length(r), function(i) {
       z <- r[[i]] %>%
         mutate(id = x$id[i]) %>%
         select(id, everything())
       x.z <- z %>% slice(seq(1, nrow(z), by = 2))
       y.z <- z %>% slice(seq(2, nrow(z), by = 2))
-
+      
       bind_rows(x.z, y.z) %>%
-        mutate(coord = rep(c("x","y"), each=nrow(z)/2))
-      }) %>%
+        mutate(coord = rep(c("x", "y"), each = nrow(z) / 2))
+    }) %>%
       do.call(rbind, .) %>%
-      as_tibble() %>%
-      rename(obs = "observation", resid = "residual")
-
-
-  class(out) <- append("osar", class(out))
-  return(out)
+      as_tibble() 
+    
+    class(out) <- append("fG_osar", class(out))
+    return(out)
+  }
 }

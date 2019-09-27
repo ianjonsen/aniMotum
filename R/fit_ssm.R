@@ -53,7 +53,7 @@
 ##' ## fit crw model to multiple individuals with Argos LS data
 ##' data(ellie)
 ##' fit <- fit_ssm(ellie, model = "rw", time.step = 24)
-##' plot(fit$ssm[[1]])
+##' plot(fit, what = "predicted", type = 1)
 ##'
 ##' \donttest{
 ##' data(rope)
@@ -61,11 +61,10 @@
 ##'
 ##' ## simple diagnostic plot for individual 3,
 ##' ## showing predicted value time-series
-##' plot(fls$ssm[[3]], what = "predicted")
+##' plot(fls, what = "predicted", type = 2)
 ##'}
 ##'
-##' @importFrom dplyr group_by do rowwise ungroup select mutate slice
-##' @importFrom magrittr "%>%"
+##' @importFrom dplyr group_by do rowwise ungroup select mutate slice "%>%"
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -150,6 +149,7 @@ fit_ssm <- function(d,
           })) %>%
       select(., id, ssm, converged)
   }
-  class(fit) <- append("fG", class(fit))
+
+  class(fit) <- append("fG_ssm", class(fit))
   return(fit)
 }
