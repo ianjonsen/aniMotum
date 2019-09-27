@@ -27,7 +27,7 @@ plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, .
 
   type <- match.arg(type)
 
-  if(all(inherits(x, c("foieGras", "osar"), which = TRUE) %in% 1:2)) {
+  if(inherits(x, "fG_osar")) {
   
   switch(type,
          qqnorm = {
@@ -52,6 +52,6 @@ plot.osar <- function(x, type = c("qqnorm", "histogram", "boxplot"), bw = 0.5, .
 
   print(p)
   } else {
-    stop("a foieGras osar class object is required")
+    stop("an fG_osar class object is required")
   }
 }

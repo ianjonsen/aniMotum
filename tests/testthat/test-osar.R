@@ -3,8 +3,8 @@ context("test osar")
 data(fit)
 
 r <- osar(fit)
-test_that("r has s3 classes `osar`, `tbl_df`, `tbl`, `data.frame`", {
-  expect_s3_class(r, c("osar","tbl_df","tbl","data.frame"))
+test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
+  expect_s3_class(r, c("fG_osar","tbl_df","tbl","data.frame"))
 })
 
 ## plot residuals

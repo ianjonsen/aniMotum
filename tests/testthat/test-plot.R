@@ -7,17 +7,17 @@ f <- fit_ssm(dkf, model = "crw", time.step = 24)
 
 ## plot fitted value ts
 test_that("plot completes silently - fitted", {
-  expect_silent(plot(f$ssm[[1]], what = "fitted"))
+  expect_silent(plot(f, what = "fitted"))
 })
 
 ## plot predicted value ts
 test_that("plot completes silently - predicted", {
-  expect_silent(plot(f$ssm[[1]], what = "predicted"))
+  expect_silent(plot(f, what = "predicted"))
 })
 
 ## plot predicted value ts w outliers
 test_that("plot completes silently - predicted w outlier", {
-  expect_silent(plot(f$ssm[[1]], what = "predicted", outlier = TRUE))
+  expect_silent(plot(f, what = "predicted", outlier = TRUE))
 })
 
 system("rm Rplots.pdf")

@@ -4,7 +4,7 @@
 ##' from a compound tbl created when fitting to multiple individual data sets.
 ##' The specified tbl's are appended to a single output tbl.
 ##'
-##' @param x a foieGras fitted model object
+##' @param x a \code{foieGras} ssm fitted model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted`, or
 ##' `data` (single letters can be used)
 ##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
@@ -12,8 +12,7 @@
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'
-##' @importFrom dplyr tbl_df arrange mutate select bind_rows
-##' @importFrom magrittr "%>%"
+##' @importFrom dplyr tbl_df arrange mutate select bind_rows "%>%"
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'
@@ -28,8 +27,10 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
+  if(!inherits(x, "fG_ssm")) 
+    stop("a foieGras ssm fit object with class `fG_ssm` must be supplied")
   if(!what %in% c("fitted","predicted","data"))
-    stop("Only `fitted`, `predicted` or `data` objects can be grabbed")
+    stop("only `fitted`, `predicted` or `data` objects can be grabbed")
 
 
   ## remove convergence failures from extraction

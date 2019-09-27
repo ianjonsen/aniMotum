@@ -149,7 +149,7 @@ fit_ssm <- function(d,
           })) %>%
       select(., id, ssm, converged)
   }
-  class(fit) <- append("ssm", class(fit))
-  class(fit) <- append("foieGras", class(fit))
+
+  class(fit) <- append("fG_ssm", class(fit))
   return(fit)
 }

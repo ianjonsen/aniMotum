@@ -28,33 +28,32 @@ fmap <- function(x,
 {
   what <- match.arg(what)
 
-  if(all(class(x)[1:2] == c("foieGras", "ssm"))) {
+  if(inherits(x, "fG_ssm")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
       sf_locs <- grab(x, what=what)
 
     else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
-      stop("individual fit objects with differing projections not currently supported by `fmap()`")
+      stop("individual fit objects with differing projections not currently supported")
     }
 
   } else {
-    stop("input must be either an `foieGras` compound tibble or the output of `foieGras::grab()`")
+    stop("input must be a foieGras ssm fit object with class `fG_ssm`")
   }
 
-  if (is.null(crs)) {
-    prj <- st_crs(sf_locs)
-    if (all(class(x)[1:2] == c("foieGras", "ssm"))) {
-      sf_data <- grab(x, "data")
-    } else {
-      sf_locs <- sf_locs %>% st_transform(., crs)
-      prj <- st_crs(sf_locs)
-      if (all(class(x)[1:2] == c("foieGras", "ssm"))) {
-        sf_data <- grab(x, "data") %>% st_transform(., crs)
-      }
-    }
+  if (is.null(crs)) prj <- st_crs(sf_locs)
+  else {
+    prj <- crs
+    if(length(grep("+units=km", prj, fixed = TRUE)) == 0) prj <- paste(prj, "+units=km")
   }
     
-  if(obs) bounds <- st_bbox(sf_data)
-  else bounds <- st_bbox(sf_locs)
+  
+  if (obs) {
+    sf_data <- grab(x, "data")
+    bounds <- st_bbox(sf_data)
+  } else {
+    bounds <- st_bbox(sf_locs)
+  }
+ 
   bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = ext.rng[1])
   bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = ext.rng[2])
 
@@ -67,6 +66,8 @@ fmap <- function(x,
   coast <- rnaturalearth::ne_countries(scale=10, returnclass = "sf") %>%
     st_transform(crs = prj)
 
+  browser()
+  
   p <- ggplot() +
     geom_sf(data = coast,
             fill = grey(0.6),

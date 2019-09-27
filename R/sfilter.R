@@ -457,6 +457,6 @@ sfilter <-
         errmsg = opt
       )
     }
-
+    class(out) <- append("ssm", class(out))
     out
   }

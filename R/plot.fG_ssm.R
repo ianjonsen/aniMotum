@@ -2,7 +2,7 @@
 ##'
 ##' @description visualise multiple fits from an fG compound tibble
 ##'
-##' @param x a foieGras ssm compound tibble
+##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param ncol number of columns to use for facetting. Default is ncol = 2 but this may be increased for large compound fit objects
@@ -14,7 +14,7 @@
 ##' @importFrom tidyr gather
 ##' @importFrom dplyr "%>%" select bind_cols rename filter
 ##' @importFrom tibble as_tibble
-##' @method plot fG
+##' @method plot fG_ssm
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
@@ -24,7 +24,7 @@
 ##'
 ##' @export
 
-plot.fG <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = FALSE, outlier = FALSE, ...)
+plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = FALSE, outlier = FALSE, ...)
 {
   
   if (length(list(...)) > 0) {
@@ -33,7 +33,7 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = 
   
   what <- match.arg(what)
   
-  if(all(inherits(x, c("foieGras", "ssm"), which = TRUE) %in% 1:2)) {
+  if(inherits(x, "fG_ssm")) {
     switch(what,
            fitted = {
              ssm <- grab(x, "fitted", as_sf = FALSE)
@@ -100,6 +100,6 @@ plot.fG <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = 
     print(p)
     
   } else {
-    stop("x must be a foieGras ssm compound tibble")
+    stop("x must be a fG_ssm compound tibble")
   }
 }

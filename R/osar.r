@@ -38,7 +38,7 @@ osar <- function(x, method = "fullGaussian", ...)
                    ...)
   }
 
-  if(all(inherits(x, c("foieGras", "ssm"), which = TRUE) %in% 1:2)) {
+  if(inherits(x, "fG_ssm")) {
     if(nrow(x) > 1) {
     cat("running in parallel, this could take a while...\n")
     cl <- makeClusterPSOCK(availableCores())
@@ -115,8 +115,7 @@ osar <- function(x, method = "fullGaussian", ...)
       do.call(rbind, .) %>%
       as_tibble() 
     
-    class(out) <- append("osar", class(out))
-    class(out) <- append("foieGras", class(out))
+    class(out) <- append("fG_osar", class(out))
     return(out)
   }
 }

@@ -14,6 +14,7 @@
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom tibble data_frame
+##' @importFrom dplyr "%>%" group_by ungroup do mutate select
 ##' @export
 fit_mpm <- function(x,
                     model = c("mpm", "jmpm"),
@@ -82,8 +83,7 @@ fit_mpm <- function(x,
            class(fit) <- append("jmpm", class(fit))
          })
 
-  class(fit) <- append("mpm", class(fit))  
-  class(fit) <- append("foieGras", class(fit))
+  class(fit) <- append("fG_mpm", class(fit))  
 
 return(fit)
   
