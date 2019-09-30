@@ -58,13 +58,12 @@ fit_mpm <- function(x,
            fit <- fit %>%
              ungroup(.) %>%
              mutate(converged = sapply(.$mpm, function(x)
-               if(length(x) == 7) {
+               if(length(x) == 8) {
                  x$opt$convergence == 0
-               } else if(length(x) < 7) {
+               } else if(length(x) < 8) {
                  FALSE
                })) %>%
              select(., id, mpm, converged)
-           class(fit) <- append("mpm", class(fit))
          },
          jmpm = {
            fit <- x %>%
@@ -81,13 +80,12 @@ fit_mpm <- function(x,
            
            fit <- fit %>%
              mutate(converged = sapply(.$mpm, function(x)
-               if(length(x) == 7) {
+               if(length(x) == 8) {
                  x$opt$convergence == 0
-               } else if(length(x) < 7) {
+               } else if(length(x) < 8) {
                  FALSE
                })) %>%
              select(., mpm, converged)
-           class(fit) <- append("jmpm", class(fit))
          })
 
   class(fit) <- append("fG_mpm", class(fit))  

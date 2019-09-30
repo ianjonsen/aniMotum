@@ -137,6 +137,7 @@ fmpm <-
     out <- list(
       fitted = fitted,
       par = fxd,
+      model = model,
       data = x,
       tmb = obj,
       opt = opt,
