@@ -15,8 +15,8 @@
 ##' 
 ##' ##' @examples
 ##' ## fit mpm to single individual
-##' data(fit)
-##' dmp <- grab(fit, "predicted", as_sf=FALSE)
+##' data(fite)
+##' dmp <- grab(fite, "predicted", as_sf=FALSE)
 ##' dmp <- select(dmp, id,date,lon,lat)
 ##' fmp <- fit_mpm(dmp, model = "mpm")
 ##' 
