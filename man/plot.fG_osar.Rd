@@ -21,8 +21,8 @@ plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 }
 \examples{
 ## load example osar output (to save time)
-data(fit_res)
-plot(fit_res, "qq")
-plot(fit_res, "hist")
+data(fite_res)
+plot(fite_res, "qq")
+plot(fite_res, "hist")
 
 }

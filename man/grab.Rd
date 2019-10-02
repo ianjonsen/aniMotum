@@ -25,7 +25,7 @@ The specified tbl's are appended to a single output tbl.
 }
 \examples{
 ## load example foieGras fit object (to save time)
-data(fit)
+data(fite)
 ## grab predicted values as an unprojected tibble
-preds <- grab(fit, what = "p", as_sf = FALSE)
+preds <- grab(fite, what = "p", as_sf = FALSE)
 }

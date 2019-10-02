@@ -27,8 +27,8 @@ visualise multiple fits from an fG compound tibble
 }
 \examples{
 ## load example foieGras fit object (to save time)
-data(fit)
-plot(fit, what = "f", type = 1)
-plot(fit, what = "p", type = 2, lc = TRUE)
+data(fite)
+plot(fite, what = "f", type = 1)
+plot(fite, what = "p", type = 2, lc = TRUE)
 
 }
