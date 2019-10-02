@@ -23,15 +23,17 @@ library(sf)
 This vignette is an extended set of examples to highlight the `foieGras` package's functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
 
 ### foieGras models
-This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system. `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolcation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
 
 - a simple Random Walk model, `rw`
 - a Correlated Random Walk model, `crw`  
 
 Both models are continuous-time models, that is, they account for time intervals between successive observations, thereby naturally accounting for the irregularly-timed nature of most Argos data. We won't dwell on the details of the models here, those will come in a future paper, except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.
 
+Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see Jonsen et al. 2019 Ecology 100:e02566 for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple individual track simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements.
+
 ### input data
-`foieGras` expects data to be provided in one of four possible formats.
+`foieGras` expects data to be provided in one of several possible formats.
 
 1) a `data.frame` or `tibble` that looks like this
 ```{r data 1, echo = FALSE}
@@ -55,13 +57,21 @@ head(ellie)
 ```
 in this situation, `foieGras` treats observations with missing error ellipse information as though they are LS-based observations.
 
-4) a `sf` object where observations have any of the previous 3 structures and also include `CRS` information
+4) an `sf` object where observations have any of the previous 3 structures and also include `CRS` information
 ```{r data 4, echo = FALSE, message=FALSE}
 data(ellie, package = "foieGras")
 foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = 4326) 
 foo <- sf::st_transform(foo, crs = "+init=epsg:3031 +units=km")
 head(foo)
 ```
+
+5) a `data.frame`, `tibble` or `sf` object where processed GLS data are provided and include longitude and latitude error SD's (in degrees)
+```{r data 5, echo = FALSE}
+
+
+```
+
+
 
 ### fitting a foieGras model
 model fitting is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `argsofilter::sdafilter` to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
