@@ -48,26 +48,61 @@ NULL
 ##' @description Example penguin Argos tracking data.
 NULL
 
-##' @name fit
+##' @name fite
 ##' @docType data
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example foieGras fit object, using ellie example data and the
-##' following call: fit <- fit_ssm(ellie, model="rw", time.step=24). This example
+##' following call: fite <- fit_ssm(ellie, vmax=4, model="crw", time.step=24). This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
 
-##' @name fit_res
+##' @name fite_res
+##' @docType data
+##' @title foieGras example osar (One-Step-Ahead residuals) object
+##' @format .RData
+##' @keywords data
+##' @description Example osar object, using ellie example data and the
+##' following call: fite_res <- osar(fite). This example
+##' osar object is included purely to speed up examples where an osar object is required
+##' but estimating residuals is not the focus of the example.
+NULL
+
+##' @name fitr
+##' @docType data
+##' @title foieGras example fit object
+##' @format .RData
+##' @keywords data
+##' @description Example foieGras ssm fit object, using rope example data and the
+##' following call: fitr <- fit_ssm(rope, vmax=10, model="crw", time.step=12). This example
+##' fit is included purely to speed up examples where a fit object is required
+##' but fitting to data is not the focus of the example.
+NULL
+
+##' @name fitr_res
 ##' @docType data
 ##' @title foieGras example osar (One-Step-Ahead residuals) object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example osar object, using rope example data and the
-##' following call: fit_res <- osar(fit). This example
+##' following call: fit_res <- osar(fitr). This example
 ##' osar object is included purely to speed up examples where an osar object is required
 ##' but estimating residuals is not the focus of the example.
+NULL
+
+##' @name fmp
+##' @docType data
+##' @title foieGras example mpm fit object
+##' @format .RData
+##' @keywords data
+##' @description Example foieGras fit object, using rope example data and the
+##' following call: fmp <- fitr %>% grab(., "p", as_sf = FALSE) %>% 
+##' select(id,date,lon,lat) %>% 
+##' fit_mpm(., model="mpm") 
+##' This example fit is included purely to speed up examples where a fit object is required
+##' but fitting to data is not the focus of the example.
 NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
@@ -79,4 +114,4 @@ geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
 obs.type <- emf.x <- emf.y <- lon <- lat <- rename <- X <- Y <- "shut.up"
 y.z <- x.z <- z <- out <- r <- sub <- isd <- digits <- "shut.up"
 lonerr <- laterr <- coord <- value <- resid <- "shut.up"
-mpm <- residual <- "shut.up"
+g <- g.se <- id1 <- mpm <- residual <- "shut.up"
