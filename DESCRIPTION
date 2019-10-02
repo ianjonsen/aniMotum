@@ -35,7 +35,6 @@ Imports:
     TMB,
     sf,
     stringr,
-    magrittr,
     tidyr,
     future,
     furrr,

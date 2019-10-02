@@ -144,5 +144,7 @@ fmpm <-
       rep = rep,
       aic = aic
     )   
+    
+    class(out) <- append("mpm", class(out))
     return(out)
   }
