@@ -6,7 +6,6 @@
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param ncol number of columns to use for facetting. Default is ncol = 1 but this may be increased for large compound fit objects
-##' @param lc display Argos location classes
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @param ... additional arguments to be ignored
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank geom_rug geom_path
@@ -24,7 +23,7 @@
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, lc = FALSE, outlier = FALSE, ...)
+plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, outlier = FALSE, ...)
 {
   
   if (length(list(...)) > 0) {
@@ -58,43 +57,24 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, l
       dd <- bind_cols(foo.d, bar.d) %>%
         select(id, date, lc, coord, value)
       
-      p <- ggplot(pd, aes(date, value))
-      
-      if(lc) {
-        p <- p + geom_point(col="darkorange1", size = 0.6) +
-          geom_point(data = dd, aes(date, value, colour = lc), alpha = 0.5, size = 1.25)
-      } else {
-        p <- p + geom_point(data = dd, aes(date, value), colour = "dodgerblue",
-                            alpha = 0.7, size = 1.25) +
-          geom_point(col="darkorange1", size = 0.6)
-      }
-      p <- p + geom_rug(data = dd, aes(date), col = "dodgerblue", alpha=0.75, sides = "b") +
+      p <- ggplot(pd, aes(date, value)) + 
+        geom_point(data = dd, aes(date, value), colour = "dodgerblue",
+                            alpha = 0.7, size = 1.25) + 
+        geom_point(col="darkorange1", size = 0.6) + 
+        geom_rug(data = dd, aes(date), col = "dodgerblue", alpha=0.75, sides = "b") + 
         facet_wrap(id ~ coord, scales = "free", ncol = ncol,
                    labeller = labeller(id = label_both, coord = label_value))
-      
-      if(lc) {
-        p <- p + scale_colour_brewer(type = "seq", palette = "YlGnBu") +
-          theme_dark()
-      }
+
       
     } else if (type == 2) {
       
-      p <- ggplot()
-        if(lc) {
-          p <- p + geom_point(data = d, aes(lon, lat, colour = lc), size = 1.25)
-        } else {
-          p <- p + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
+      p <- ggplot() + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
                               size = 1.25, alpha = 0.7)
-        }
       
       p <- p + geom_path(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, lwd = 0.25) +
         geom_point(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, size = 0.9) + 
         facet_wrap( ~ id, scales = "free", ncol = ncol, labeller = labeller(id = label_both))
       
-      if(lc) {
-        p <- p + scale_colour_brewer(type = "seq", palette = "YlGnBu") +
-          theme_dark()
-      }
     }
     return(p)
     

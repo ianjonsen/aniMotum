@@ -5,7 +5,7 @@
 \title{plot}
 \usage{
 \method{plot}{fG_ssm}(x, what = c("fitted", "predicted"), type = 1,
-  ncol = 1, lc = FALSE, outlier = FALSE, ...)
+  ncol = 1, outlier = FALSE, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
@@ -15,8 +15,6 @@
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
 
 \item{ncol}{number of columns to use for facetting. Default is ncol = 1 but this may be increased for large compound fit objects}
-
-\item{lc}{display Argos location classes}
 
 \item{outlier}{include all extreme outliers flagged by prefilter in plots (logical)}
 
