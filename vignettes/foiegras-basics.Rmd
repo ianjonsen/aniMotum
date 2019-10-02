@@ -128,7 +128,7 @@ plocs
 # load royal penguin example data
 data(rope)
 
-fitr <- fit_ssm(rope, vmax = 10, model = "crw", time.step = 6)
+fitr <- fit_ssm(rope, vmax = 10, model = "crw", time.step = 12)
 
 # list fit outcomes for all penguins
 fitr
@@ -140,4 +140,60 @@ individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2n
 ## map predicted values and observations
 fmap(fitr, "p", obs = TRUE)
 ```
+
+A behavioural index can be estimated from locations provided they occur regularly in time and they either have minimal location error (i.e. GPS data) or they have been ssm filtered. We can fit the `mpm` to `foieGras` ssm-predicted locations. Here we use the ssm fits to the Royal penguin data
+```{r fit mpm, message=FALSE}
+## fit mpm separately to each individual track
+fmp <- fitr %>% 
+  grab(., "p", as_sf = FALSE) %>%
+  select(id, date, lon, lat) %>%
+  fit_mpm(., model = "mpm")
+
+fmp
+```
+
+We can visualise the estimated behavioural index (move persistence) as a time series for each penguin. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
+```{r plot mpm ts 1, fig.width=7, fig.height=5, message=FALSE}
+## plot mpm estimates by individual penguin
+grab(fmp, "fitted") %>% 
+  ggplot() +
+  geom_point(aes(date, g, colour = g)) +
+  scale_colour_viridis_c(option = "C") +
+  ylim(0,1) +
+  facet_wrap(~ id, scales = "free_x", ncol = 1)
+
+```
+
+Note that there appears to be little information to estimate any change in move persistence for penguin `r11`. We can try fitting the joint move persistence model `jmpm` to borrow strength across all the data and better resolve move persistence for `r11`
+```{r plot mpm ts 2, fig.width=7, fig.height=5, message=FALSE}
+
+## fit mpm jointly to all tracks
+fjmp <- fitr %>% 
+  grab(., "p", as_sf = FALSE) %>%
+  select(id, date, lon, lat) %>%
+  fit_mpm(., model = "jmpm")
+
+fjmp
+
+## plot move persistence time series
+grab(fjmp, "fitted") %>% 
+  ggplot() +
+  geom_point(aes(date, g, colour = g)) +
+  scale_colour_viridis_c(option = "C") +
+  ylim(0,1) +
+  facet_wrap(~ id, scales = "free_x", ncol = 1)
+```
+
+The `joint mpm` is able to resolve some varibility in $g_t$ for `r11` but not much change in movement pattern was detected. We can explore this further by plotting the $g_t$ values along each penguin's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
+```{r plot mpm track, fig.width=7, fig.height=5, message=FALSE}
+
+## join ssm predicted locations and move persistence values together
+fjmp_locs <- join(fitr, fjmp, as_sf = FALSE)
+
+ggplot(fjmp_locs) +
+  geom_point(aes(lon, lat, colour = g)) +
+  scale_colour_viridis_c(option = "C") +
+  facet_wrap( ~ id, nrow = 2, ncol = 2)
+```
+
 
