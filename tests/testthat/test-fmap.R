@@ -1,39 +1,44 @@
 context("test fmap")
 
 ## grab returns either a sf object or a tibble
-data(fit)
+data(fite)
 
-mp <- fmap(fit, what = "fitted")
+mp <- fmap(fite, what = "fitted")
 test_that("mp with fitted locs has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted")
+mp <- fmap(fite, what = "predicted")
 test_that("mp with predicted locs has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted", obs = TRUE)
+mp <- fmap(fite, what = "predicted", obs = TRUE)
 test_that("mp with obs plotted has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted", crs = "+init=epsg:3031 +lon_0=85")
+mp <- fmap(fite, what = "predicted", crs = "+init=epsg:3031 +lon_0=85")
 test_that("mp with new crs has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted", ext.rng = c(0.1, 0.05))
+mp <- fmap(fite, what = "predicted", ext.rng = c(0.1, 0.05))
 test_that("mp with extended plot range has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted", size = 1.5)
+mp <- fmap(fite, what = "predicted", size = 1.5)
 test_that("mp with resized points has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fit, what = "predicted", obs = TRUE, crs=3031, ext.rng=c(0.025, 0.075), size = 1.5)
+mp <- fmap(fite, what = "predicted", obs = TRUE, crs=3031, ext.rng=c(0.025, 0.075), size = 1.5)
 test_that("mp with all arg's exercised has s3 classes `gg`, `ggplot`", {
+  expect_s3_class(mp, c("gg","ggplot"))
+})
+
+mp <- fmap(fitr, what = "predicted")
+test_that("mp with 3 tracks has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })

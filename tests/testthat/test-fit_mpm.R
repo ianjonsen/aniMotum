@@ -3,8 +3,8 @@ context("test fit_mpm")
 ## fit_mpm output is a compound tibble with class `fG_mpm`
 ##  tests expect that fit$mpm are 7-element lists (if optimiser does not crash)
 ##  that have S3 class foieGras
-data(fit)
-dmp <- fit %>% 
+data(fite)
+dmp <- fite %>% 
   grab(., "predicted", as_sf = FALSE) %>%
   select(id,date,lon,lat)
 

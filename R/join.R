@@ -10,6 +10,7 @@
 ##' @return a single tbl with all individuals
 ##'
 ##' @importFrom dplyr bind_cols select "%>%"
+##' @importFrom tibble as_tibble
 ##'
 ##' @export
 
@@ -23,7 +24,14 @@ join <- function(ssm, mpm, as_sf = TRUE) {
   
   if(nrow(x) != nrow(y)) stop("something went wrong, nrow(ssm) != nrow(mpm)")
   
-  xy <- bind_cols(x, y) %>% select(-id1)
+  if(as_sf) {
+    xy <- bind_cols(x, y) %>% 
+      select(-id1)
+  } else {
+    xy <- bind_cols(x, y) %>%
+      select(-id1) %>%
+      as_tibble()
+  }
   
   class(xy) <- append(class(xy), "fG_ssmp", after = 0)
   return(xy)
