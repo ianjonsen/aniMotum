@@ -5,7 +5,7 @@
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
-##' @param ncol number of columns to use for facetting. Default is ncol = 2 but this may be increased for large compound fit objects
+##' @param ncol number of columns to use for facetting. Default is ncol = 1 but this may be increased for large compound fit objects
 ##' @param lc display Argos location classes
 ##' @param outlier include all extreme outliers flagged by prefilter in plots (logical)
 ##' @param ... additional arguments to be ignored
@@ -24,7 +24,7 @@
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, lc = FALSE, outlier = FALSE, ...)
+plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, lc = FALSE, outlier = FALSE, ...)
 {
   
   if (length(list(...)) > 0) {
@@ -79,18 +79,17 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 2, l
       
     } else if (type == 2) {
       
-      p <- ggplot() +
-        geom_path(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, lwd = 0.25) +
-        geom_point(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, size = 0.9)
+      p <- ggplot()
+        if(lc) {
+          p <- p + geom_point(data = d, aes(lon, lat, colour = lc), size = 1.25)
+        } else {
+          p <- p + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
+                              size = 1.25, alpha = 0.7)
+        }
       
-      if(lc) {
-        p <- p + geom_point(data = d, aes(lon, lat, colour = lc), size = 1.25)
-      } else {
-        p <- p + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
-                            size = 1.25, alpha = 0.7)
-      }
-      p <- p + facet_wrap( ~ id, scales = "free", ncol = ncol,
-                           labeller = labeller(id = label_both))
+      p <- p + geom_path(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, lwd = 0.25) +
+        geom_point(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, size = 0.9) + 
+        facet_wrap( ~ id, scales = "free", ncol = ncol, labeller = labeller(id = label_both))
       
       if(lc) {
         p <- p + scale_colour_brewer(type = "seq", palette = "YlGnBu") +
