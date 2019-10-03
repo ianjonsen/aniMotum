@@ -79,18 +79,18 @@ fits either a simple random walk or a correlated random walk
 and predict locations at user-specified time intervals (regular or irregular)
 }
 \examples{
-## fit crw model to multiple individuals with Argos LS data
+## fit rw model to one seal with Argos KF data
 data(ellie)
 fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+
+## time series plots of predicted value fits
 plot(fit, what = "predicted", type = 1)
 
-\donttest{
-data(rope)
-fls <- fit_ssm(rope, model = "crw", time.step = 12)
+## fit crw model to both seals, with Argos KF & LS data 
+data(ellies)
+fits <- fit_ssm(ellies, model = "crw", time.step = 24)
 
-## simple diagnostic plot for individual 3,
-## showing predicted value time-series
-plot(fls, what = "predicted", type = 2)
-}
+## track plots of fits for both seals
+plot(fits, what = "predicted", type = 2)
 
 }

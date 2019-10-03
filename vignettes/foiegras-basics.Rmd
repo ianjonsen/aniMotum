@@ -44,8 +44,8 @@ where the Argos data are provided via CLS Argos' Kalman filter model (KF) and in
 
 2) a `data.frame` or `tibble` that looks like this
 ```{r data 2, echo = FALSE}
-data(rope, package = "foieGras")
-head(rope)
+data(ellies, package = "foieGras")
+head(ellies)
 ```
 where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do not include error ellipse information.
 
@@ -85,7 +85,7 @@ model fitting for quality control of locations is comprised of 2 steps: a prefil
 ## load foieGras example data
 data(ellie)
 ## prefilter and fit Random Walk SSM using a 24 h time step
-fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+fit <- fit_ssm(ellie, model = "rw", time.step = 24, verbose = 0)
 ```
 these are the minimum arguments required: the input data, the model ("rw" or "crw") and the time.step (in h) to which locations are predicted. Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative, usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
 
@@ -100,24 +100,41 @@ and a summary `plot` method allows a quick visual of the SSM fit to the data:
 plot(fit, what = "predicted", type = 1)
 plot(fit, what = "fitted", type = 2)
 ```
-The predicted values (orange) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the prefilter stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
+The predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the prefilter stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
+
+As SSMs are latent variable models, evaluating their goodness of fit is less straightforward than simpler statistical models without latent variables. We can use One-Step-Ahead (prediction) residuals via `foieGras::osar`. Here we use `osar` to compare SSM fits of the `rw` and `crw` model to the same example southern elephant seal data.
+```{r osar comp, fig.width=7, fig.height=5, message=FALSE}
+
+## fit crw SSM
+fitc <- fit_ssm(ellie, model = "crw", time.step = 24, verbose = 0)
+
+## calculate OSA resids for both models
+fit_res <- osar(fit)
+fitc_res <- osar(fitc)
+
+## plot residuals
+plot(fit_res)
+plot(fitc_res)
+```
+The `crw` model appears provide a better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require *considerable* computation time, especially when calculating across multiple individual fits.  
 
 Estimated tracks can be mapped using the `fmap` function, which uses the `foieGras`-applied projection (here EPSG 3395). Projections can be changed easily via the `crs` argument in the form of a proj4string (as in the example, below) or just an EPSG code (e.g., `crs = 4326`).
 ```{r ggplot map, fig.width=5, fig.height=5, message=FALSE}
 ## map ssm-predicted values without observations
-fmap(fit, what = "predicted", obs = FALSE)
+fmap(fitc, what = "predicted", obs = FALSE)
 
-## change projection to Antarctic Polar Stereographic centred on the approximate mid-point of the track
-fmap(fit, what = "fitted", crs = "+init=epsg:3031 +lon_0=85")
+## change projection to Antarctic Polar Stereographic centred on 
+##  the approximate mid-point of the track
+fmap(fitc, what = "predicted", crs = "+init=epsg:3031 +lon_0=85")
 ```
 
-The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected sf object or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
+The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
 ```{r grab}
 ## grab fitted locations from fit object as a projected sf object 
-plocs_sf <- grab(fit, what = "f")
+plocs_sf <- grab(fitc, what = "f")
 
 ## grab predicted locations in unprojected form, returning as a tibble
-plocs <- grab(fit, "p", as_sf = FALSE)
+plocs <- grab(fitc, "p", as_sf = FALSE)
 
 ## unprojected form looks like this
 plocs
@@ -125,26 +142,26 @@ plocs
 
 `fit_ssm` can be applied to single tracks as shown, it can also fit to multiple individual tracks in a single input `tibble` opr `data.frame`. The SSM is fit to each individual separately. The resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
 ```{r multi-fits}
-# load royal penguin example data
-data(rope)
+# load 2 southern elephant seal example data
+data(ellies)
 
-fitr <- fit_ssm(rope, vmax = 10, model = "crw", time.step = 12)
+fit2 <- fit_ssm(ellies, vmax = 10, model = "crw", time.step = 48, verbose = 0)
 
-# list fit outcomes for all penguins
-fitr
+# list fit outcomes for both seals
+fit2
 ```
 individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, and `convergence` status of each model fit is displayed in the 3rd column
 
 `fmap` automatically handles ssm fit objects with multiple individuals, plotting all on a single map
 ```{r ggplot map 2, fig.width=5, fig.height=5, message=FALSE}
 ## map predicted values and observations
-fmap(fitr, "p", obs = TRUE)
+fmap(fit2, "p", obs = TRUE)
 ```
 
-A behavioural index can be estimated from locations provided they occur regularly in time and they either have minimal location error (i.e. GPS data) or they have been ssm filtered. We can fit the `mpm` to `foieGras` ssm-predicted locations. Here we use the ssm fits to the Royal penguin data
+A behavioural index can be estimated from locations provided they occur regularly in time and they either have minimal location error (i.e. GPS data) or they have been ssm filtered. We can fit the `mpm` to `foieGras` ssm-predicted locations. Here we use the ssm fits to the s. elephant seal data
 ```{r fit mpm, message=FALSE}
 ## fit mpm separately to each individual track
-fmp <- fitr %>% 
+fmp <- fit2 %>% 
   grab(., "p", as_sf = FALSE) %>%
   select(id, date, lon, lat) %>%
   fit_mpm(., model = "mpm")
@@ -152,48 +169,29 @@ fmp <- fitr %>%
 fmp
 ```
 
-We can visualise the estimated behavioural index (move persistence) as a time series for each penguin. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
+We can visualise the estimated behavioural index (move persistence) as a time series for each seal. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
 ```{r plot mpm ts 1, fig.width=7, fig.height=5, message=FALSE}
-## plot mpm estimates by individual penguin
+## plot mpm estimates by individual seal
 grab(fmp, "fitted") %>% 
   ggplot() +
   geom_point(aes(date, g, colour = g)) +
-  scale_colour_viridis_c(option = "C") +
+  scale_colour_viridis_c(limits = c(0,1)) +
   ylim(0,1) +
   facet_wrap(~ id, scales = "free_x", ncol = 1)
 
 ```
 
-Note that there appears to be little information to estimate any change in move persistence for penguin `r11`. We can try fitting the joint move persistence model `jmpm` to borrow strength across all the data and better resolve move persistence for `r11`
-```{r plot mpm ts 2, fig.width=7, fig.height=5, message=FALSE}
+A joint move persistence model `jmpm` is also available for fitting to multiple individuals. This model fits to all individuals simultaneously, estimating a joint random walk variance paramter that can often better resolve subtle variations in $g_t$. 
 
-## fit mpm jointly to all tracks
-fjmp <- fitr %>% 
-  grab(., "p", as_sf = FALSE) %>%
-  select(id, date, lon, lat) %>%
-  fit_mpm(., model = "jmpm")
-
-fjmp
-
-## plot move persistence time series
-grab(fjmp, "fitted") %>% 
-  ggplot() +
-  geom_point(aes(date, g, colour = g)) +
-  scale_colour_viridis_c(option = "C") +
-  ylim(0,1) +
-  facet_wrap(~ id, scales = "free_x", ncol = 1)
-```
-
-The `joint mpm` is able to resolve some varibility in $g_t$ for `r11` but not much change in movement pattern was detected. We can explore this further by plotting the $g_t$ values along each penguin's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
+We can explore the spatio-temporal variation in movement behaviour by plotting the $g_t$ values along each seal's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
 ```{r plot mpm track, fig.width=7, fig.height=5, message=FALSE}
 
 ## join ssm predicted locations and move persistence values together
-fjmp_locs <- join(fitr, fjmp, as_sf = FALSE)
+fmp_locs <- join(fit2, fmp, as_sf = FALSE)
 
-ggplot(fjmp_locs) +
+ggplot(fmp_locs) +
   geom_point(aes(lon, lat, colour = g)) +
-  scale_colour_viridis_c(option = "C") +
-  facet_wrap( ~ id, nrow = 2, ncol = 2)
+  scale_colour_viridis_c(limits = c(0,1))
 ```
 
 

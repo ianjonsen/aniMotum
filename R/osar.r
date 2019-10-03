@@ -39,7 +39,7 @@ osar <- function(x, method = "fullGaussian", ...)
   }
 
   if(inherits(x, "fG_ssm")) {
-    if(nrow(x) > 1) {
+    if(nrow(x) > 3) {
     cat("running in parallel, this could take a while...\n")
     cl <- makeClusterPSOCK(availableCores())
     plan(cluster, workers = cl)
@@ -49,7 +49,9 @@ osar <- function(x, method = "fullGaussian", ...)
     
     stopCluster(cl)
     } else {
-      r <- list(try(map_fn(x$ssm[[1]], method), silent = TRUE))
+      r <- lapply(1:nrow(x), function(i) {
+        try(map_fn(x$ssm[[i]], method), silent = TRUE)
+    })
     }
   } else {
     stop("a foieGras ssm compound tbl is required")
@@ -71,7 +73,9 @@ osar <- function(x, method = "fullGaussian", ...)
       
       stopCluster(cl)
     } else {
-      r.redo <- list(try(map_fn(redo$ssm[[1]], method = "oneStepGaussianOffMode")))
+      r.redo <- lapply(1:nrow(redo), function(i) {
+        try(map_fn(redo$ssm[[i]], method = "oneStepGaussianOffMode"), silent = TRUE)
+      })
     }
     ## check for repeat failures & throw warning but preserve all successful results
     cr.redo <- sapply(r.redo, function(.) inherits(., "try-error"))
