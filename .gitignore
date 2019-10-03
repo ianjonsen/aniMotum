@@ -14,3 +14,4 @@ data/petrel.RDS
 vignettes/*.html
 .DS_Store
 src/.DS_Store
+data/ellie_IMOS.RDS

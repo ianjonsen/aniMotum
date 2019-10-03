@@ -4,15 +4,15 @@
 \alias{plot.fG_osar}
 \title{plot}
 \usage{
-\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram", "boxplot"),
-  bw = 0.5, ...)
+\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram"), bw = 0.5,
+  ...)
 }
 \arguments{
 \item{x}{a \code{foieGras osar} object with class `fG_osar`}
 
-\item{type}{type of residual plot to generate; either qqnorm (default), histogram or boxplot}
+\item{type}{type of residual plot to generate; either qqnorm (default) or histogram}
 
-\item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details)}
+\item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"}
 
 \item{...}{additional arguments to be ignored}
 }
