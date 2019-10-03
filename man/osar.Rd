@@ -22,9 +22,9 @@ One-step-ahead residuals are useful for assessing goodness-of-fit in latent vari
 \examples{
 ## see summary fit output
 ## load example foieGras fit object (to save time)
-data(fite)
-fite_res <- osar(fite)
-plot(fite_res)
+data(ssm_fits)
+fit_res <- osar(ssm_fits)
+plot(fit_res)
 
 }
 \references{

@@ -57,7 +57,7 @@ The location class designations can be the standard Argos lc values: 3, 2, 1, 0,
 }
 \examples{
 data(ellie)
-pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
+pf <- prefilter(ellie, vmax=4, ang=c(15,25), min.dt=120)
 pf
 
 }

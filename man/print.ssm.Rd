@@ -17,7 +17,7 @@ print \code{ssm} fit object summary information
 \examples{
 ## see summary fit output
 ## load example foieGras ssm fit object (to save time)
-data(fite)
-fite$ssm[[1]]
+data(ssm_fits)
+ssm_fits$ssm[[1]]
 
 }
