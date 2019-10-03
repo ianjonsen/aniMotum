@@ -22,8 +22,3 @@ test_that("plot completes silently", {
 test_that("plot completes silently", {
   expect_silent(plot(r, "hist"))
 })
-
-## plot residuals
-test_that("plot completes silently", {
-  expect_silent(plot(r, "boxplot"))
-})
