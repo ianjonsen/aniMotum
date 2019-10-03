@@ -18,7 +18,7 @@ Author: Ian Jonsen [aut, cre],
 Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
 Description: Fits continuous-time random walk and correlated random walk state-space models to filter Argos satellite location data. Template Model Builder ('TMB') is used for fast estimation. The Argos data can be: (older) least squares-based locations; (newer) Kalman filter-based locations with error ellipse information; or a mixture of both. Separate measurement models are used for these two data types. The models estimate two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular). Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology 100:e02566 <doi:10.1002/ecy.2566>.
 URL: https://cran.r-project.org/package=foieGras
-License: MIT
+License: MIT + File LICENSE
 LazyData: true
 Encoding: UTF-8
 RoxygenNote: 6.1.1
