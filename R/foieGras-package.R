@@ -31,7 +31,7 @@ NULL
 
 ##' @name ellie
 ##' @docType data
-##' @title Elephant seal Argos satellite data (1 individual)
+##' @title Southern elephant seal Argos satellite data (1 individual)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
@@ -40,67 +40,37 @@ NULL
 ##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name rope
+##' @name ellies
 ##' @docType data
-##' @title Royal penguin Argos satellite data (13 individuals)
+##' @title Southern elephant seal Argos satellite data (2 individuals)
 ##' @format .RData
 ##' @keywords data
-##' @description Example penguin Argos tracking data.
+##' @description Example elephant seal Argos tracking data. Data were sourced from
+##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
+##' Australian Government through the National Collaborative Research Infrastructure
+##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name fite
-##' @docType data
-##' @title foieGras example fit object
-##' @format .RData
-##' @keywords data
-##' @description Example foieGras fit object, using ellie example data and the
-##' following call: fite <- fit_ssm(ellie, vmax=4, model="crw", time.step=24). This example
-##' fit is included purely to speed up examples where a fit object is required
-##' but fitting to data is not the focus of the example.
-NULL
-
-##' @name fite_res
-##' @docType data
-##' @title foieGras example osar (One-Step-Ahead residuals) object
-##' @format .RData
-##' @keywords data
-##' @description Example osar object, using ellie example data and the
-##' following call: fite_res <- osar(fite). This example
-##' osar object is included purely to speed up examples where an osar object is required
-##' but estimating residuals is not the focus of the example.
-NULL
-
-##' @name fitr
+##' @name ssm_fits
 ##' @docType data
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data
-##' @description Example foieGras ssm fit object, using rope example data and the
-##' following call: fitr <- fit_ssm(rope, vmax=10, model="crw", time.step=12). This example
+##' @description Example foieGras fit object, using ellies example data and the
+##' following call: ssm_fits <- fit_ssm(ellies, vmax=4, model="crw", time.step=48). This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
 
-##' @name fitr_res
-##' @docType data
-##' @title foieGras example osar (One-Step-Ahead residuals) object
-##' @format .RData
-##' @keywords data
-##' @description Example osar object, using rope example data and the
-##' following call: fit_res <- osar(fitr). This example
-##' osar object is included purely to speed up examples where an osar object is required
-##' but estimating residuals is not the focus of the example.
-NULL
-
-##' @name fmp
+##' @name mpm_fits
 ##' @docType data
 ##' @title foieGras example mpm fit object
 ##' @format .RData
 ##' @keywords data
-##' @description Example foieGras fit object, using rope example data and the
-##' following call: fmp <- fitr %>% grab(., "p", as_sf = FALSE) %>% 
+##' @description Example foieGras fit object, using ssm_fits example data and the
+##' following call: fjmp <- ssm_fits %>% grab(., "p", as_sf = FALSE) %>% 
 ##' select(id,date,lon,lat) %>% 
-##' fit_mpm(., model="mpm") 
+##' fit_mpm(., model="jmpm") 
 ##' This example fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL

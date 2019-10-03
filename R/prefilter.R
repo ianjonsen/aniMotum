@@ -46,7 +46,7 @@
 ##'
 ##' @examples
 ##' data(ellie)
-##' pf <- prefilter(ellie, vmax=10, ang=c(15,25), min.dt=120)
+##' pf <- prefilter(ellie, vmax=4, ang=c(15,25), min.dt=120)
 ##' pf
 ##'
 ##' @export

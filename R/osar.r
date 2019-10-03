@@ -11,9 +11,9 @@
 ##' @examples
 ##' ## see summary fit output
 ##' ## load example foieGras fit object (to save time)
-##' data(fite)
-##' fite_res <- osar(fite)
-##' plot(fite_res)
+##' data(ssm_fits)
+##' fit_res <- osar(ssm_fits)
+##' plot(fit_res)
 ##'
 ##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
 ##' @importFrom tibble as_tibble
