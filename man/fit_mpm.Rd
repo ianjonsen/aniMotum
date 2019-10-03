@@ -27,14 +27,16 @@ a list with components
 \item{\code{data}}{input dataframe}
 \item{\code{tmb}}{the tmb object}
 \item{\code{opt}}{the object returned by the optimizer}
-
-##' @examples
-## fit mpm to single individual
-data(fite)
-dmp <- grab(fite, "predicted", as_sf=FALSE)
-dmp <- select(dmp, id,date,lon,lat)
-fmp <- fit_mpm(dmp, model = "mpm")
 }
 \description{
 fit a random walk with time-varying move persistence to location data (e.g., output from \code{fit_ssm})
+}
+\examples{
+## fit jmpm to two southern elephant seals
+data(fits)
+dmp <- grab(fits, "predicted", as_sf=FALSE)
+dmp <- select(dmp, id,date,lon,lat)
+fjmp <- fit_mpm(dmp, model = "jmpm")
+
+
 }

@@ -13,12 +13,13 @@
 ##' \item{\code{tmb}}{the tmb object}
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' 
-##' ##' @examples
-##' ## fit mpm to single individual
-##' data(fite)
-##' dmp <- grab(fite, "predicted", as_sf=FALSE)
+##' @examples
+##' ## fit jmpm to two southern elephant seals
+##' data(fits)
+##' dmp <- grab(fits, "predicted", as_sf=FALSE)
 ##' dmp <- select(dmp, id,date,lon,lat)
-##' fmp <- fit_mpm(dmp, model = "mpm")
+##' fjmp <- fit_mpm(dmp, model = "jmpm")
+##' 
 ##' 
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom dplyr "%>%" group_by ungroup do mutate select
