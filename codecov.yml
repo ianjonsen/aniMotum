@@ -3,6 +3,10 @@ comment: false
 codecov:
   token: 972cfe9f-2f9b-4092-8241-2453c0475deb
 
+ignore:
+  - "R/print.ssm.R" 
+  - "R/roxygentags.R"
+
 coverage:
   status:
     project:

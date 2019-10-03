@@ -46,10 +46,10 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, o
     if(!outlier) d <- d %>% filter(keep)
     
     if(type == 1) {
-      foo <- ssm %>% select(id, lon, lat) %>% gather(., key = "coord", value = "value", lon, lat)
+      foo <- ssm %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
       bar <- rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
       
-      foo.d <- d %>% select(id, lon, lat) %>% gather(., key = "coord", value = "value", lon, lat)
+      foo.d <- d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
       bar.d <- d %>% select(date, lc) %>% bind_rows(., .)
       
       pd <- bind_cols(foo, bar) %>%
@@ -68,11 +68,11 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, o
       
     } else if (type == 2) {
       
-      p <- ggplot() + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
+      p <- ggplot() + geom_point(data = d, aes(x, y), colour = "dodgerblue",
                               size = 1.25, alpha = 0.7)
       
-      p <- p + geom_path(data = ssm, aes(lon, lat), col = "firebrick", alpha = 0.5, lwd = 0.25) +
-        geom_point(data = ssm, aes(lon, lat), col = "firebrick", alpha = 0.5, size = 0.6) + 
+      p <- p + geom_path(data = ssm, aes(x, y), col = "firebrick", alpha = 0.5, lwd = 0.25) +
+        geom_point(data = ssm, aes(x, y), col = "firebrick", alpha = 0.5, size = 0.6) + 
         facet_wrap( ~ id, scales = "free", ncol = ncol, labeller = labeller(id = label_both))
       
     }
