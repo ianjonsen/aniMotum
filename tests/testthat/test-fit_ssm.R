@@ -6,7 +6,7 @@ context("test fit_ssm")
 data(ellie)
 dkf <- ellie
 ## drop KF error ellipse info to exercise LS portions of code
-dls <- dkf %>% dplyr::select(1:5)
+dls <- dkf[, 1:5]
 
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw
@@ -25,7 +25,7 @@ test_that("fit_ssm defaults + crw + LS return foieGras list w 15 elements", {
 })
 
 ## minimum specified arguments - rw + KF
-f <- fit_ssm(dkf, model = "rw", time.step = 48)
+f <- fit_ssm(dkf, model = "rw", time.step = 48, map = list(psi = as.factor(NA)))
 test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
@@ -109,7 +109,7 @@ test_that("fit_ssm inner.control + crw return foieGras list w 15 elements", {
 data(ellies)
 f <- fit_ssm(ellies, vmax=4, model="crw", time.step=48)
 test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
-  expect_equal(nrow(f), 3)
+  expect_equal(nrow(f), 2)
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
