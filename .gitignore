@@ -13,4 +13,4 @@ foieGras.Rproj
 data/petrel.RDS
 vignettes/*.html
 .DS_Store
-src/*.DS_Store
+src/.DS_Store
