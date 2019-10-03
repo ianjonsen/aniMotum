@@ -1,14 +1,13 @@
 context("test osar")
 
-data(fitr)
-data(fite)
+data(ssm_fits)
 
-r <- osar(fite)
+r <- osar(ssm_fits[1,])
 test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(r, c("fG_osar","tbl_df","tbl","data.frame"))
 })
 
-r <- osar(fitr)
+r <- osar(ssm_fits)
 test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(r, c("fG_osar","tbl_df","tbl","data.frame"))
 })
