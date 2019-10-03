@@ -18,9 +18,10 @@
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
-##' data(fite)
+##' data(ssm_fits)
 ##' ## grab predicted values as an unprojected tibble
-##' preds <- grab(fite, what = "p", as_sf = FALSE)
+##' preds <- grab(ssm_fits, what = "predicted", as_sf = FALSE)
+##' 
 ##' @export
 ##'
 grab <- function(x, what = "fitted", as_sf = TRUE) {

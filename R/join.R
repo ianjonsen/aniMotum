@@ -11,7 +11,13 @@
 ##'
 ##' @importFrom dplyr bind_cols select "%>%"
 ##' @importFrom tibble as_tibble
-##'
+##' @examples
+##' ## load example foieGras fit objects (to save time)
+##' data(ssm_fits)
+##' data(mpm_fits)
+##' ## join predicted values as an unprojected tibble
+##' fsmp <- join(ssm_fits, mpm_fits, as_sf = FALSE)
+##' fsmp
 ##' @export
 
 join <- function(ssm, mpm, as_sf = TRUE) {
