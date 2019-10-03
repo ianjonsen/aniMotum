@@ -1,10 +1,9 @@
 ## Submission
-This version addresses an error discovered on a reverse dependency check for the `sf` package. The geometry column in sf objects is no longer guaranteed to be the last column and this situation resulted in failed tests built into `foieGras`. 
-* I have modified the test code to handle arbitrary positioning of the geometry column
+This version is a significant update that includes additional C++ source code.
 
 ## Test environments
-* local OS X install (10.14.4), R 3.6.0
-* ubuntu 16.04.5 (on travis-ci), R 3.6.0, R-devel
+* local OS X install (10.14.6), R 3.6.0
+* ubuntu 16.04.6 (on travis-ci), R 3.6.1, R-devel
 * fedora (via rhub), R-devel
 * windows (via rhub), x86_64-release, x86_64-devel
 
@@ -14,4 +13,4 @@ This version addresses an error discovered on a reverse dependency check for the
 
 NOTES:  
 
-1. installed C++ files total 12.3 Mb (OS X), 19.5 Mb (windows), 28.1 Mb (linux). I have been unable to reduce this further.  
+1. installed C++ files total 12.3 Mb (OS X), 19.6 Mb (windows), 28.1 Mb (linux). I have been unable to reduce this further.  
