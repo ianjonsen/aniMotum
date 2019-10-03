@@ -69,7 +69,7 @@ fmap <- function(x,
     st_cast("MULTILINESTRING")
 
   ## get coastline
-  coast <- rnaturalearth::ne_countries(scale=10, returnclass = "sf") %>%
+  coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
     st_transform(crs = prj)
   
   p <- ggplot() +

@@ -39,7 +39,8 @@ Imports:
     future,
     furrr,
     parallel,
-    rnaturalearth
+    rgeos,
+    rworldmap
 Suggests: 
     testthat,
     covr,
