@@ -12,3 +12,5 @@ foieGras.Rproj
 .Rhistory
 data/petrel.RDS
 vignettes/*.html
+.DS_Store
+src/*.DS_Store
