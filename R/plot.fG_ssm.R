@@ -60,7 +60,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, o
       p <- ggplot(pd, aes(date, value)) + 
         geom_point(data = dd, aes(date, value), colour = "dodgerblue",
                             alpha = 0.7, size = 1.25) + 
-        geom_point(col="darkorange1", size = 0.6) + 
+        geom_point(col="firebrick", size = 0.6) + 
         geom_rug(data = dd, aes(date), col = "dodgerblue", alpha=0.75, sides = "b") + 
         facet_wrap(id ~ coord, scales = "free", ncol = ncol,
                    labeller = labeller(id = label_both, coord = label_value))
@@ -71,8 +71,8 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, o
       p <- ggplot() + geom_point(data = d, aes(lon, lat), colour = "dodgerblue",
                               size = 1.25, alpha = 0.7)
       
-      p <- p + geom_path(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, lwd = 0.25) +
-        geom_point(data = ssm, aes(lon, lat), col = "darkorange1", alpha = 0.5, size = 0.9) + 
+      p <- p + geom_path(data = ssm, aes(lon, lat), col = "firebrick", alpha = 0.5, lwd = 0.25) +
+        geom_point(data = ssm, aes(lon, lat), col = "firebrick", alpha = 0.5, size = 0.6) + 
         facet_wrap( ~ id, scales = "free", ncol = ncol, labeller = labeller(id = label_both))
       
     }
