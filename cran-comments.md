@@ -2,7 +2,7 @@
 This update version includes additional C++ source code.
 
 ## Test environments
-* local OS X install (10.14.6), R 3.6.0
+* local OS X install (10.14.6), R 3.6.1
 * ubuntu 16.04.6 (via travis-ci), R 3.6.1, R-devel
 * windows (via win-builder), R-release, R-devel, R-oldrelease
 
