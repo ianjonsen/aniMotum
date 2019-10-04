@@ -10,7 +10,7 @@ dmp <- fssm %>%
 
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw
-fmp <- fit_mpm(dmp, model = "mpm")
+fmp <- fit_mpm(dmp, model = "jmpm")
 test_that("fit_mpm returns fG_mpm list w 8 elements", {
   expect_s3_class(fmp, "fG_mpm")
   expect_equal(length(fmp$mpm[[1]]), 8)

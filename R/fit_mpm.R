@@ -45,7 +45,7 @@ fit_mpm <- function(x,
          mpm = {
            fit <- x %>%
              group_by(id) %>%
-             do(mpm = try(fmpm(
+             do(mpm = try(mpmf(
                .,
                model = model,
                optim = optim,
@@ -68,7 +68,7 @@ fit_mpm <- function(x,
          },
          jmpm = {
            fit <- x %>%
-             do(mpm = try(fmpm(
+             do(mpm = try(mpmf(
                .,
                model = model,
                optim = optim,

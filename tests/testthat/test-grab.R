@@ -2,7 +2,6 @@ context("test grab")
 
 ## grab returns either a sf object or a tibble
 data(fssm)
-data(fmpm)
 
 p <- grab(fssm, what = "fitted")
 test_that("p has s3 classes `sf`, `fitted`, `data.frame`", {
@@ -19,6 +18,7 @@ test_that("p has s3 classes `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(p, c("tbl_df","tbl","data.frame"))
 })
 
+data(fmpm)
 p <- grab(fmpm, what = "fitted", as_sf = FALSE)
 test_that("p has s3 classes `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(p, c("tbl_df","tbl","data.frame"))

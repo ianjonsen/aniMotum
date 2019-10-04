@@ -21,10 +21,4 @@ test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
 
-## plot predicted value ts w outliers
-tp <- plot(fssm, what = "predicted", outlier = TRUE)
-test_that("plot completes silently - predicted w outlier", {
-  expect_s3_class(tp, c("gg","ggplot"))
-})
-
 system("rm Rplots.pdf")

@@ -23,7 +23,7 @@
 ##'
 ##' @export
 
-fmpm <-
+mpmf <-
   function(x,
            model = c("mpm", "jmpm"),
            optim = c("nlminb", "optim"),
