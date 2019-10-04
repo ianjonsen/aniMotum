@@ -91,7 +91,7 @@ fit_ssm <- function(d,
 
   if(!is.numeric(vmax)) stop("\nvmax must be a numeric value in m/s")
   if(!is.numeric(ang)) stop("\nang must be a numeric value in degrees, or -1 to ignore")
-  if(!is.numeric(distlim)) stop("\ndistlim must be two numeric values in m")
+  if(!is.numeric(distlim) | length(distlim) != 2) stop("\ndistlim must be two numeric values in m")
   if(!is.numeric(min.dt)) stop("\nmin.dt must be a numeric value in s")
 
   if(verbose %in% c(0,2)) options(dplyr.show_progress = FALSE)
