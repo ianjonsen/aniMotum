@@ -49,5 +49,5 @@ Suggests:
     units
 VignetteBuilder: knitr
 Depends: 
-    R (>= 3.5.3)
+    R (>= 3.5.0)
 SystemRequirements: GDAL (>= 2.0.1), GEOS (>= 3.4.0), PROJ (>= 4.8.0)
