@@ -12,4 +12,8 @@
 
 # foieGras 0.4.0
 
-* major update includes additional C++ source code, broader functionality
+* adds move persistence models for behavioural inference along animal tracks
+* adds ability to fit SSM's to processed light-level geolocation data
+* adds One-Step-Ahead prediction residuals to evaluation SSM fits 
+* adds diagnostic plot functions that handle multi-individual fits
+* adds `sf` enabled mapping function
