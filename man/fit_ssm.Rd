@@ -75,8 +75,9 @@ a list with components
 }
 \description{
 fits either a simple random walk or a correlated random walk
-(a random walk on velocity) in continuous time to filter Argos KF and/or LS data
-and predict locations at user-specified time intervals (regular or irregular)
+(a random walk on velocity) in continuous time to filter Argos KF and/or LS data, or 
+processed light-level geolocation data. predicts locations at user-specified 
+time intervals (regular or irregular).
 }
 \examples{
 ## fit rw model to one seal with Argos KF data

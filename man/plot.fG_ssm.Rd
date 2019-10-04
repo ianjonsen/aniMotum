@@ -5,7 +5,7 @@
 \title{plot}
 \usage{
 \method{plot}{fG_ssm}(x, what = c("fitted", "predicted"), type = 1,
-  ncol = 1, outlier = FALSE, ...)
+  ncol = 1, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
@@ -14,11 +14,14 @@
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
 
-\item{ncol}{number of columns to use for facetting. Default is ncol = 1 but this may be increased for large compound fit objects}
-
-\item{outlier}{include all extreme outliers flagged by prefilter in plots (logical)}
+\item{ncol}{number of columns to use for facetting. Default is ncol = 1 but this may be increased for multi-individual fit objects}
 
 \item{...}{additional arguments to be ignored}
+}
+\value{
+a ggplot object with either: (type = 1) 1-D time series of fits to data, 
+separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
+or (type = 2) 2-D fits to data (units = km)
 }
 \description{
 visualise multiple fits from an fG compound tibble
