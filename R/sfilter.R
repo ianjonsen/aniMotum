@@ -107,10 +107,6 @@ sfilter <-
       o.times <- which(d$date %in% ts$date)
       d[o.times, "date"] <- d[o.times, "date"] + 1
 
-      # warning(sprintf("\n1 s added to %d observation time(s) that exactly match prediction time(s)", length(o.times)),
-      #         call. = FALSE,
-      #         immediate. = FALSE,
-      #         noBreaks. = FALSE)
     }
 
     ## merge data and interpolation times
@@ -126,25 +122,24 @@ sfilter <-
     dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
 
     ## use approx & MA filter to obtain state initial values
-    x.init <-
+    x.init1 <-
       approx(x = select(d, date, x),
              xout = d.all$date,
              rule = 2)$y
     x.init <-
-      stats::filter(x.init, rep(1, 10) / 10) %>% as.numeric()
-    x.init[1:4] <- x.init[5]
-    x.init[which(is.na(x.init))] <-
-      x.init[which(is.na(x.init))[1] - 1]
+      stats::filter(x.init1, rep(1, 5) / 5) %>% as.numeric()
+    x.na <- which(is.na(x.init))
+    x.init[x.na] <- x.init1[x.na]
 
-    y.init <-
+    y.init1 <-
       approx(x = select(d, date, y),
              xout = d.all$date,
              rule = 2)$y
     y.init <-
-      stats::filter(y.init, rep(1, 10) / 10) %>% as.numeric()
-    y.init[1:4] <- y.init[5]
-    y.init[which(is.na(y.init))] <-
-      y.init[which(is.na(y.init))[1] - 1]
+      stats::filter(y.init1, rep(1, 5) / 5) %>% as.numeric()
+    y.na <- which(is.na(y.init))
+    y.init[y.na] <- y.init1[y.na]
+    
     xs <- cbind(x.init, y.init)
 
     state0 <- c(xs[1,1], xs[1,2], 0 , 0)
