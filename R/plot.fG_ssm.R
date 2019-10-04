@@ -13,7 +13,7 @@
 ##' or (type = 2) 2-D fits to data (units = km)
 ##' 
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank geom_rug geom_path
-##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value
+##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value geom_ribbon
 ##' @importFrom tidyr gather
 ##' @importFrom dplyr "%>%" select bind_cols rename filter
 ##' @importFrom tibble enframe
@@ -21,9 +21,9 @@
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
-##' data(ssm_fits)
-##' plot(ssm_fits, what = "f", type = 1)
-##' plot(ssm_fits, what = "p", type = 2)
+##' data(fssm)
+##' plot(fssm, what = "f", type = 1)
+##' plot(fssm, what = "p", type = 2)
 ##'
 ##' @export
 

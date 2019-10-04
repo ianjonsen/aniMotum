@@ -22,9 +22,9 @@ a single tbl with all individuals
 }
 \examples{
 ## load example foieGras fit objects (to save time)
-data(ssm_fits)
-data(mpm_fits)
+data(fssm)
+data(fmpm)
 ## join predicted values as an unprojected tibble
-fsmp <- join(ssm_fits, mpm_fits, as_sf = FALSE)
+fsmp <- join(fssm, fmpm, as_sf = FALSE)
 fsmp
 }

@@ -22,7 +22,7 @@
 ##' @importFrom argosfilter sdafilter
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
-##' @importFrom ggplot2 ggplot geom_point geom_path aes ggtitle theme_bw
+##' @importFrom ggplot2 ggplot geom_point geom_path geom_ribbon geom_qq geom_qq_line geom_histogram aes ggtitle theme_bw
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit
 ##' @importFrom ggplot2 element_text scale_colour_viridis_c
 ##' @importFrom gridExtra grid.arrange
@@ -51,24 +51,24 @@ NULL
 ##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name ssm_fits
+##' @name fssm
 ##' @docType data
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example foieGras fit object, using ellies example data and the
-##' following call: ssm_fits <- fit_ssm(ellies, vmax=4, model="crw", time.step=48). This example
+##' following call: fssm <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
 
-##' @name mpm_fits
+##' @name fmpm
 ##' @docType data
 ##' @title foieGras example mpm fit object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example foieGras fit object, using ssm_fits example data and the
-##' following call: fjmp <- ssm_fits %>% grab(., "p", as_sf = FALSE) %>% 
+##' following call: fmp <- fssm %>% grab(., "p", as_sf = FALSE) %>% 
 ##' select(id,date,lon,lat) %>% 
 ##' fit_mpm(., model="jmpm") 
 ##' This example fit is included purely to speed up examples where a fit object is required

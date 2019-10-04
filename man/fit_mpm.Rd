@@ -33,10 +33,10 @@ fit a random walk with time-varying move persistence to location data (e.g., out
 }
 \examples{
 ## fit jmpm to two southern elephant seals
-data(ssm_fits)
-dmp <- grab(ssm_fits, "predicted", as_sf=FALSE)
+data(fssm)
+dmp <- grab(fssm, "predicted", as_sf=FALSE)
 dmp <- dmp[, c("id", "date", "lon", "lat")]
-fjmp <- fit_mpm(dmp, model = "jmpm")
+fmpm <- fit_mpm(dmp, model = "jmpm")
 
 
 }

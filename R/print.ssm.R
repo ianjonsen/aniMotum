@@ -8,8 +8,8 @@
 ##' @examples
 ##' ## see summary fit output
 ##' ## load example foieGras ssm fit object (to save time)
-##' data(ssm_fits)
-##' ssm_fits$ssm[[1]]
+##' data(fssm)
+##' fssm$ssm[[1]]
 ##'
 ##' @export
 

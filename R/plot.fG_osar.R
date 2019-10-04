@@ -13,10 +13,10 @@
 ##'
 ##' @examples
 ##' ## load example osar output (to save time)
-##' data(ssm_fits)
-##' fit_res <- osar(ssm_fits)
-##' plot(fit_res, "qq")
-##' plot(fit_res, "hist")
+##' data(fssm)
+##' fres <- osar(fssm)
+##' plot(fres, "qq")
+##' plot(fres, "hist")
 ##'
 ##' @export
 
