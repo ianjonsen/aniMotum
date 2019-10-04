@@ -28,7 +28,7 @@ join <- function(ssm, mpm, as_sf = TRUE) {
   x <- grab(ssm, what = "predicted", as_sf = as_sf) 
   y <- grab(mpm, what = "fitted") %>% select(id, g, g.se)
   
-  if(nrow(x) != nrow(y)) stop("something went wrong, nrow(ssm) != nrow(mpm)")
+  if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
   if(as_sf) {
     xy <- bind_cols(x, y) %>% 

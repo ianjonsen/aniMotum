@@ -8,6 +8,26 @@ dkf <- ellie
 ## drop KF error ellipse info to exercise LS portions of code
 dls <- dkf[, 1:5]
 
+## error catch on wrong vmax
+test_that("fit_ssm catches error & returns appropriate msg", {
+  expect_error(fit_ssm(dkf, vmax = TRUE, model = "crw", time.step = 48), "\nvmax must be a numeric value in m/s")
+})
+
+## error catch on wrong ang
+test_that("fit_ssm catches error & returns appropriate msg", {
+  expect_error(fit_ssm(dkf, ang = FALSE, model = "crw", time.step = 48), "\nang must be a numeric value in degrees, or -1 to ignore")
+})
+
+## error catch on wrong distlim
+test_that("fit_ssm catches error & returns appropriate msg", {
+  expect_error(fit_ssm(dkf, distlim = 1000, model = "crw", time.step = 48), "\ndistlim must be two numeric values in m")
+})
+
+## error catch on wrong distlim
+test_that("fit_ssm catches error & returns appropriate msg", {
+  expect_error(fit_ssm(dkf, min.dt = FALSE, model = "crw", time.step = 48), "\nmin.dt must be a numeric value in s")
+})
+
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw
 f <- fit_ssm(dkf, model = "crw", time.step = 48)
@@ -114,3 +134,4 @@ test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
+
