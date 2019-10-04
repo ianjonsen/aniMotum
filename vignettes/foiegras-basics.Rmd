@@ -23,7 +23,7 @@ library(sf)
 This vignette is an extended set of examples to highlight the `foieGras` package's functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
 
 ### foieGras models
-This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolcation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
 
 - a simple Random Walk model, `rw`
 - a Correlated Random Walk model, `crw`  
@@ -89,7 +89,7 @@ fit <- fit_ssm(ellie, model = "rw", time.step = 24, verbose = 0)
 ```
 these are the minimum arguments required: the input data, the model ("rw" or "crw") and the time.step (in h) to which locations are predicted. Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative, usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
 
-### accessing and visualising model fit objects
+### accessing and visualizing model fit objects
 Simple summary information about the `foieGras` fit can be obtained by calling the fit object:
 ```{r fit summary}
 fit$ssm[[1]]
@@ -169,7 +169,7 @@ fmp <- fit2 %>%
 fmp
 ```
 
-We can visualise the estimated behavioural index (move persistence) as a time series for each seal. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
+We can visualize the estimated behavioural index (move persistence) as a time series for each seal. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
 ```{r plot mpm ts 1, fig.width=7, fig.height=5, message=FALSE}
 ## plot mpm estimates by individual seal
 grab(fmp, "fitted") %>% 
@@ -181,7 +181,7 @@ grab(fmp, "fitted") %>%
 
 ```
 
-A joint move persistence model `jmpm` is also available for fitting to multiple individuals. This model fits to all individuals simultaneously, estimating a joint random walk variance paramter that can often better resolve subtle variations in $g_t$. 
+A joint move persistence model `jmpm` is also available for fitting to multiple individuals. This model fits to all individuals simultaneously, estimating a joint random walk variance parameter that can often better resolve subtle variations in $g_t$. 
 
 We can explore the spatio-temporal variation in movement behaviour by plotting the $g_t$ values along each seal's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
 ```{r plot mpm track, fig.width=7, fig.height=5, message=FALSE}

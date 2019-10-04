@@ -2,13 +2,13 @@
 % Please edit documentation in R/mpmf.R
 \name{mpmf}
 \alias{mpmf}
-\title{fit the move persistence model to regularised location data}
+\title{fit the move persistence model to regularized location data}
 \usage{
 mpmf(x, model = c("mpm", "jmpm"), optim = c("nlminb", "optim"),
   verbose = FALSE, control = NULL, inner.control = NULL)
 }
 \arguments{
-\item{x}{temporally regularised location data, eg. output from \code{fit_ssm}}
+\item{x}{temporally regularized location data, eg. output from \code{fit_ssm}}
 
 \item{model}{specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s).}
 
@@ -24,7 +24,7 @@ mpmf(x, model = c("mpm", "jmpm"), optim = c("nlminb", "optim"),
 \description{
 generates initial values for model parameters and unobserved gamma's;
 structures data and initial values for C++ \code{TMB} template;
-fits move persistence model; minimises the joint log-likelihood via the selected
+fits move persistence model; minimizes the joint log-likelihood via the selected
 optimizer (\code{nlminb} or \code{optim}); structures and passes output
 object to \code{fit_mpm}
 }

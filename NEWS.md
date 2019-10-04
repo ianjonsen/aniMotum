@@ -8,7 +8,7 @@
 
 # foieGras 0.2.2
 
-* minor patch for compatability with latest sf version
+* minor patch for compatibility with latest sf version
 
 # foieGras 0.4.0
 

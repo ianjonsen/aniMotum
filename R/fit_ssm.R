@@ -24,9 +24,9 @@
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. Default behaviour is to use the factors supplied in foieGras::emf()
 ##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))
 ##' @param parameters a list of initial values for all model parameters and
-##' unobserved states, default is to let sfilter specifiy these. Only play with
+##' unobserved states, default is to let sfilter specify these. Only play with
 ##' this if you know what you are doing...
-##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
+##' @param fit.to.subset fit the SSM to the data subset determined by \code{prefilter}
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar
@@ -39,7 +39,7 @@
 ##' \item{\code{call}}{the matched call}
 ##' \item{\code{predicted}}{an sf tbl of predicted location states}
 ##' \item{\code{fitted}}{an sf tbl of fitted locations}
-##' \item{\code{par}}{model parameter summmary}
+##' \item{\code{par}}{model parameter summary}
 ##' \item{\code{data}}{an augmented sf tbl of the input data}
 ##' \item{\code{inits}}{a list of initial values}
 ##' \item{\code{pm}}{the process model fit, either "rw" or "crw"}
@@ -96,7 +96,7 @@ fit_ssm <- function(d,
 
   if(verbose %in% c(0,2)) options(dplyr.show_progress = FALSE)
   if(verbose == 1)
-    cat("\nprefiltering data...\n")
+    cat("\npre-filtering data...\n")
   fit <- d %>%
     group_by(id) %>%
     do(pf = prefilter(

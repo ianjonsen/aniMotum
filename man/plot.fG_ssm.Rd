@@ -14,7 +14,7 @@
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
 
-\item{ncol}{number of columns to use for facetting. Default is ncol = 1 but this may be increased for multi-individual fit objects}
+\item{ncol}{number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -24,7 +24,7 @@ separated into x and y components (units = km) with prediction uncertainty ribbo
 or (type = 2) 2-D fits to data (units = km)
 }
 \description{
-visualise multiple fits from an fG compound tibble
+visualize multiple fits from an fG compound tibble
 }
 \examples{
 ## load example foieGras fit object (to save time)

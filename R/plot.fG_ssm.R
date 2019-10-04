@@ -1,11 +1,11 @@
 ##' @title plot
 ##'
-##' @description visualise multiple fits from an fG compound tibble
+##' @description visualize multiple fits from an fG compound tibble
 ##'
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
-##' @param ncol number of columns to use for facetting. Default is ncol = 1 but this may be increased for multi-individual fit objects
+##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: (type = 1) 1-D time series of fits to data, 

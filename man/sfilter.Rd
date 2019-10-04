@@ -19,7 +19,7 @@ Alternatively, a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates.}
 
 \item{parameters}{a list of initial values for all model parameters and
-unobserved states, default is to let sfilter specifiy these. Only play with
+unobserved states, default is to let sfilter specify these. Only play with
 this if you know what you are doing...}
 
 \item{map}{a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))}

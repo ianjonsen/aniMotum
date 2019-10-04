@@ -1,14 +1,14 @@
-##' @title fit the move persistence model to regularised location data
+##' @title fit the move persistence model to regularized location data
 ##'
 ##' @description generates initial values for model parameters and unobserved gamma's;
 ##' structures data and initial values for C++ \code{TMB} template;
-##' fits move persistence model; minimises the joint log-likelihood via the selected
+##' fits move persistence model; minimizes the joint log-likelihood via the selected
 ##' optimizer (\code{nlminb} or \code{optim}); structures and passes output
 ##' object to \code{fit_mpm}
 ##'
 ##' @details called by \code{fit_mpm}, see ?fit_mpm.
 ##'
-##' @param x temporally regularised location data, eg. output from \code{fit_ssm}
+##' @param x temporally regularized location data, eg. output from \code{fit_ssm}
 ##' @param model specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s). 
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization

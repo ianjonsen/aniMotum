@@ -35,7 +35,7 @@
 ##'
 ##' \code{lc} {location class designations}
 ##'
-##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be ammeanable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
+##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be amenable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
 ##'
 ##' @return an sf object with all observations passed from \code{data} and the following appended columns
 ##' \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}

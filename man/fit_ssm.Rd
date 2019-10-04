@@ -41,10 +41,10 @@ specified as a data.frame with id and POSIXt dates.}
 \item{map}{a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))}
 
 \item{parameters}{a list of initial values for all model parameters and
-unobserved states, default is to let sfilter specifiy these. Only play with
+unobserved states, default is to let sfilter specify these. Only play with
 this if you know what you are doing...}
 
-\item{fit.to.subset}{fit the SSM to the data subset determined by prefilter
+\item{fit.to.subset}{fit the SSM to the data subset determined by \code{prefilter}
 (default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
@@ -62,7 +62,7 @@ a list with components
 \item{\code{call}}{the matched call}
 \item{\code{predicted}}{an sf tbl of predicted location states}
 \item{\code{fitted}}{an sf tbl of fitted locations}
-\item{\code{par}}{model parameter summmary}
+\item{\code{par}}{model parameter summary}
 \item{\code{data}}{an augmented sf tbl of the input data}
 \item{\code{inits}}{a list of initial values}
 \item{\code{pm}}{the process model fit, either "rw" or "crw"}

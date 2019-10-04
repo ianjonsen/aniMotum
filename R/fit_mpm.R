@@ -8,7 +8,7 @@
 ##' @param inner.control list of control parameters for the inner optimization
 ##' @return a list with components
 ##' \item{\code{fitted}}{a dataframe of fitted locations}
-##' \item{\code{par}}{model parameter summmary}
+##' \item{\code{par}}{model parameter summary}
 ##' \item{\code{data}}{input dataframe}
 ##' \item{\code{tmb}}{the tmb object}
 ##' \item{\code{opt}}{the object returned by the optimizer}
