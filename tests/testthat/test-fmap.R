@@ -38,7 +38,7 @@ test_that("mp with all arg's exercised has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fssm, what = "predicted")
-test_that("mp with 3 tracks has s3 classes `gg`, `ggplot`", {
+mp <- fmap(fssm[1,], what = "p")
+test_that("mp with 1 track has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
