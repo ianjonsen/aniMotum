@@ -9,3 +9,7 @@
 # foieGras 0.2.2
 
 * minor patch for compatability with latest sf version
+
+# foieGras 0.4.0
+
+* major update includes additional C++ source code, broader functionality
