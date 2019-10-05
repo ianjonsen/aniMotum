@@ -10,15 +10,15 @@ prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
 \arguments{
 \item{data}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
 
-\item{vmax}{max travel rate (m/s) - see ?argosfilter::sdafilter for details}
+\item{vmax}{max travel rate (m/s) - see \code{?argosfilter::sdafilter} for details}
 
-\item{ang}{angles of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+\item{ang}{angles of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details}
 
-\item{distlim}{lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details}
+\item{distlim}{lengths of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details}
 
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
-\item{min.dt}{minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM}
+\item{min.dt}{minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM}
 
 \item{emf}{optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details}
 }
@@ -39,7 +39,7 @@ an sf object with all observations passed from \code{data} and the following app
 (7) projects lonlat coords to mercator x,y coords (in km);
 (8) adds location error multiplication factors based on Argos location
 class (for type LS);
-(9) uses a argosfilter::sdafilter to identify potential outlier locations
+(9) uses a \code{argosfilter::sdafilter} to identify potential outlier locations
 (by distance only) to be ignored when fitting the \code{ctrw} model
 }
 \details{
