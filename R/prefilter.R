@@ -112,14 +112,14 @@ prefilter <-
   }
 
   ##  convert dates to POSIXt
-  ##  flag any duplicate date records,
   ##  order records by time,
+  ##  flag any duplicate date records,
   ##  flag records as either KF or LS,
   d <- d %>%
     mutate(date = ymd_hms(date, tz = "GMT")) %>%
+    arrange(date) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
-    arrange(order(date)) %>%
     mutate(obs.type = ifelse((is.na(smaj) | is.na(smin) | is.na(eor)) & lc != "G", "LS", 
                              ifelse((!is.na(smaj) | !is.na(smin) | !is.na(eor)) & lc != "G", "KF", "GL")))
  
