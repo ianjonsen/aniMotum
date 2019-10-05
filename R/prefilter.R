@@ -8,17 +8,17 @@
 ##' (7) projects lonlat coords to mercator x,y coords (in km);
 ##' (8) adds location error multiplication factors based on Argos location
 ##' class (for type LS);
-##' (9) uses a argosfilter::sdafilter to identify potential outlier locations
+##' (9) uses a \code{argosfilter::sdafilter} to identify potential outlier locations
 ##' (by distance only) to be ignored when fitting the \code{ctrw} model
 ##'
 ##' @details called by \code{fit_ssm}.
 ##'
 ##' @param data input data - must have 5 (LS), or 8 (KF) columns (see details)
-##' @param vmax max travel rate (m/s) - see ?argosfilter::sdafilter for details
-##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter for details
-##' @param distlim lengths of outlier location "spikes" - see ?argosfilter::sdafilter for details
+##' @param vmax max travel rate (m/s) - see \code{?argosfilter::sdafilter} for details
+##' @param ang angles of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details
+##' @param distlim lengths of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
-##' @param min.dt minimum allowable time difference between observations; dt < min.dt will be ignored by the SSM
+##' @param min.dt minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename "%>%" everything
@@ -147,7 +147,7 @@ prefilter <-
 
     } else if(inherits(d, "sf") && !st_is_longlat(d)) {
 
-      xy <- st_transform(d, 4326) %>%
+      xy <- st_transform(d, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") %>%
         st_coordinates() %>%
         as_tibble() %>%
         rename(lon = X, lat = Y)
@@ -232,27 +232,18 @@ prefilter <-
     mlon <- mean(dd$lon) %>% round(., 2)
 
     ## projection not provided by user so guess at best projection
-    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = 4326)
+    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 
     if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
-      prj <- "+init=epsg:3395 +units=km +lon_0=0"
+      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
     } else if (any(diff(wrap_lon(dd$lon,-180)) < -300) ||
                any(diff(wrap_lon(dd$lon,-180)) > 300)) {
-      prj <- "+init=epsg:3395 +units=km +lon_0=180"
+      prj <- "+proj=merc +lon_0=180 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
     } else {
-      prj <- "+init=epsg:3395 +units=km"
+      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
     }
 
     sf_locs <- sf_locs %>% st_transform(., prj)
-
-    # if (max(dd$lat) <= -60) {
-    #   prj <- paste0("+init=epsg:3031 +units=km +lon_0=", mlon)
-    #   sf_locs <- sf_locs %>% st_transform(., prj)
-    # } else if (min(dd$lat) >= 60) {
-    #   prj <- paste0("+init=epsg:3995 +units=km +lon_0=", mlon)
-    #   sf_locs <- sf_locs %>% st_transform(., prj)
-    # }
-
 
   } else {
     prj <- st_crs(d)

@@ -7,12 +7,13 @@
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param obs include Argos observations on map (logical)
 ##' (logical); ignored if `obs = FALSE`
-##' @param crs `proj4string` or `epsg` for reprojecting locations, if NULL the
-##' default projection (eg. 3395) for the fitting the SSM will be used
+##' @param crs `proj4string` for reprojecting locations, if NULL the
+##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
 ##' @param size size of estimated location points
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme element_blank scale_colour_viridis_c scale_colour_viridis_d
+##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
+##' @importFrom ggplot2 element_blank scale_colour_viridis_c scale_colour_viridis_d
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
@@ -43,9 +44,12 @@ fmap <- function(x,
   if (is.null(crs)) prj <- st_crs(sf_locs)
   else {
     prj <- crs
-    if(!is.character(prj)) prj <- paste0("+init=epsg:", prj)
+    if(!is.character(prj)) stop("\ncrs must be a proj4string, 
+                                \neg. `+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs`")
+      #prj <- paste0("+init=epsg:", prj)
 
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
+      cat("\nconverting units from m to km to match SSM output")
       prj <- paste(prj, "+units=km")
     }
     sf_locs <- st_transform(sf_locs, crs = prj)
