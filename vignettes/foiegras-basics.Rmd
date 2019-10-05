@@ -60,8 +60,8 @@ in this situation, `foieGras` treats observations with missing error ellipse inf
 4) an `sf` object where observations have any of the previous 3 structures and also include `CRS` information
 ```{r data 4, echo = FALSE, message=FALSE}
 data(ellie, package = "foieGras")
-foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = 4326) 
-foo <- sf::st_transform(foo, crs = "+init=epsg:3031 +units=km")
+foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") 
+foo <- sf::st_transform(foo, crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs")
 head(foo)
 ```
 
@@ -118,14 +118,15 @@ plot(fitc_res)
 ```
 The `crw` model appears provide a better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require *considerable* computation time, especially when calculating across multiple individual fits.  
 
-Estimated tracks can be mapped using the `fmap` function, which uses the `foieGras`-applied projection (here EPSG 3395). Projections can be changed easily via the `crs` argument in the form of a proj4string (as in the example, below) or just an EPSG code (e.g., `crs = 4326`).
+Estimated tracks can be mapped using the `fmap` function, which uses the `foieGras`-applied projection (Global Mercator). Projections can be changed easily via the `crs` argument in the form of a proj4string (as in the example, below).
 ```{r ggplot map, fig.width=5, fig.height=5, message=FALSE}
 ## map ssm-predicted values without observations
 fmap(fitc, what = "predicted", obs = FALSE)
 
 ## change projection to Antarctic Polar Stereographic centred on 
 ##  the approximate mid-point of the track
-fmap(fitc, what = "predicted", crs = "+init=epsg:3031 +lon_0=85")
+fmap(fitc, what = "predicted", 
+     crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=85 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs")
 ```
 
 The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
