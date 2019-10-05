@@ -33,7 +33,7 @@ test_that("mp with resized points has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
 
-mp <- fmap(fssm, what = "predicted", obs = TRUE, crs=3031, ext.rng=c(0.025, 0.075), size = 1.5)
+mp <- fmap(fssm, what = "predicted", obs = TRUE, crs="+init=epsg:3031 +lon_0=85", ext.rng=c(0.025, 0.075), size = 1.5)
 test_that("mp with all arg's exercised has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
