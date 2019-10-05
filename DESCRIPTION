@@ -39,14 +39,14 @@ Imports:
     future (>= 1.13.0),
     furrr (>= 0.1.0),
     parallel,
-    rgeos,
     rworldmap
 Suggests: 
     testthat,
     covr,
     knitr,
     rmarkdown,
-    units
+    units,
+    rgeos
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
