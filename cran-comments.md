@@ -12,4 +12,4 @@ This update version includes additional C++ source code.
 
 NOTES:  
 
-1. installed C++ files total 12.5 Mb (OS X), 19.6 Mb (windows), 33.1 Mb (linux). I have been unable to reduce this further.  
+1. installed C++ files total 12.3 Mb (OS X), 19.6 Mb (windows), 33.1 Mb (linux). I have been unable to reduce this further.  
