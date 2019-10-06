@@ -38,7 +38,8 @@ Imports:
     tidyr,
     future (>= 1.13.0),
     furrr (>= 0.1.0),
-    rworldmap
+    rworldmap,
+    parallel
 Suggests: 
     testthat,
     covr,
