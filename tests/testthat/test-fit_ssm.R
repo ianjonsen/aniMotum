@@ -1,4 +1,5 @@
 context("test fit_ssm")
+skip_on_cran()
 
 ## fit_ssm output is a compound tibble
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)

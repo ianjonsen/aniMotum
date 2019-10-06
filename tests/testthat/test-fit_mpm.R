@@ -1,4 +1,5 @@
 context("test fit_mpm")
+skip_on_cran()
 
 ## fit_mpm output is a compound tibble with class `fG_mpm`
 ##  tests expect that fit$mpm are 7-element lists (if optimiser does not crash)
