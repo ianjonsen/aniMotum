@@ -23,7 +23,7 @@ LazyData: true
 Encoding: UTF-8
 RoxygenNote: 6.1.1
 LinkingTo: 
-    TMB,
+    TMB (>= 1.7.15),
     RcppEigen
 Imports: 
     dplyr (>= 0.8.0),
@@ -38,7 +38,6 @@ Imports:
     tidyr,
     future (>= 1.13.0),
     furrr (>= 0.1.0),
-    parallel,
     rworldmap
 Suggests: 
     testthat,
