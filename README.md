@@ -11,6 +11,8 @@ fit latent variable movement models to animal tracking data
 
 master branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/ianjonsen/foieGras?branch=master&svg=true)](https://ci.appveyor.com/project/ianjonsen/foieGras)
+
 
 **foieGras** - fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
