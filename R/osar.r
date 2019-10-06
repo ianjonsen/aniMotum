@@ -109,10 +109,13 @@ osar <- function(x, method = "fullGaussian", ...)
       
       bind_rows(x.z, y.z) %>%
         mutate(coord = rep(c("x", "y"), each = nrow(z) / 2))
-    }) %>%
-      do.call(rbind, .) %>%
+    }) 
+    out <- lapply(out, function(x) {
+        x[, c("id", "residual", "coord")]
+      }) %>% 
+      do.call(rbind, .) %>% 
       as_tibble() 
-    
+
     class(out) <- append("fG_osar", class(out))
     return(out)
   }
