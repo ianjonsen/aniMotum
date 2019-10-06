@@ -33,7 +33,7 @@ osar <- function(x, method = "fullGaussian", ...)
                    method = method,
                    subset = which(rep(f$isd, each = 2)),
                    discrete = FALSE,
-                   parallel = TRUE,
+                   parallel = FALSE,
                    trace = FALSE,
                    ...)
   }
