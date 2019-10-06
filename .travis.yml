@@ -5,7 +5,6 @@ language: r
 r:
   - release
   - devel
-  - patched
 
 repos:
   CRAN: https://cloud.r-project.org
@@ -18,7 +17,7 @@ os:
   - linux
 
 sudo: true
-dist: Debian
+dist: ubuntu
 
 cache:
   - packages
