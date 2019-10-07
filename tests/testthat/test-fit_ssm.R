@@ -10,29 +10,22 @@ dls <- dkf[, 1:5]
 
 ## error catch on wrong vmax
 test_that("fit_ssm catches error & returns appropriate msg", {
-  f <- fit_ssm(dkf, vmax = TRUE, model = "crw", time.step = 48)
-  expect_error(f, "\nvmax must be a numeric value in m/s")
+  expect_error(fit_ssm(dkf, vmax = TRUE, model = "crw", time.step = 48), "\nvmax must be a numeric value in m/s")
 })
 
 ## error catch on wrong ang
 test_that("fit_ssm catches error & returns appropriate msg", {
-  skip_on_cran()
-  f <- fit_ssm(dkf, ang = FALSE, model = "crw", time.step = 48)
-  expect_error(f, "\nang must be a numeric value in degrees, or -1 to ignore")
+  expect_error(fit_ssm(dkf, ang = FALSE, model = "crw", time.step = 48), "\nang must be a numeric value in degrees, or -1 to ignore")
 })
 
 ## error catch on wrong distlim
 test_that("fit_ssm catches error & returns appropriate msg", {
-  skip_on_cran()
-  f <- fit_ssm(dkf, distlim = 1000, model = "crw", time.step = 48)
-  expect_error(f, "\ndistlim must be two numeric values in m")
+  expect_error(fit_ssm(dkf, distlim = 1000, model = "crw", time.step = 48), "\ndistlim must be two numeric values in m")
 })
 
 ## error catch on wrong distlim
 test_that("fit_ssm catches error & returns appropriate msg", {
-  skip_on_cran()
-  f <- fit_ssm(dkf, min.dt = FALSE, model = "crw", time.step = 48)
-  expect_error(f, "\nmin.dt must be a numeric value in s")
+  expect_error(fit_ssm(dkf, min.dt = FALSE, model = "crw", time.step = 48), "\nmin.dt must be a numeric value in s")
 })
 
 ## step through prefilter-specific arguments first
