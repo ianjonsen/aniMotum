@@ -63,7 +63,7 @@ osar <- function(x, method = "fullGaussian", ...)
   if (any(cr)) {
     ## re-try on failures
     redo <- x[which(cr), ]
-    if(nrow(redo) > 1) {
+    if(nrow(redo) > 3) {
       cat("running in parallel, this could take a while...\n")
       cl <- makeClusterPSOCK(availableCores())
       plan(cluster, workers = cl)

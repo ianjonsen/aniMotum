@@ -243,7 +243,6 @@ sfilter <-
     obs_mod <- ifelse(d.all$obs.type == "LS", 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
-    
     data <- list(
       model_name = "ssm",
       Y = switch(
