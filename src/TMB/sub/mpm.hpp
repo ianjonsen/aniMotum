@@ -10,7 +10,7 @@ template <class Type>
 Type mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
-
+  DATA_INTEGER(N);                  // number of time.steps to iterate over
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
   PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
   PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
@@ -33,11 +33,11 @@ Type mpm(objective_function<Type>* obj) {
   MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
   int j;
   
-    for(j = 1; j < x.rows(); ++j) {
+    for(j = 1; j < N; ++j) {
       jnll -= dnorm(lg(j), lg(j-1), sigma_g, TRUE);  // RW on logit(gamma)
     }
     
-    for(j = 2; j < x.rows(); ++j){
+    for(j = 2; j < N; ++j){
       mu = x.row(j) - x.row(j-1) - gamma(j-1) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
       jnll += nll_dens(mu);
     }

@@ -50,15 +50,16 @@ mpmf <-
              data.tmb <- list(
                model_name = model,
                x = cbind(x$lon, x$lat),
-               A = A,
-               idx = idx
+               A = as.integer(A),
+               idx = as.integer(idx)
              )
              
            },
            mpm = {
              data.tmb <- list(
                model_name = model,
-               x = cbind(x$lon, x$lat)
+               x = cbind(x$lon, x$lat),
+               N = as.integer(nrow(x))
              )
            })
     

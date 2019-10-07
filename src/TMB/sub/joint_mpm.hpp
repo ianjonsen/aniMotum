@@ -11,7 +11,7 @@ Type joint_mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
   DATA_INTEGER(A);                  // number of animals
-  DATA_FACTOR(idx);                // cumsum of number of locations for each animal
+  DATA_IVECTOR(idx);                // cumsum of number of locations for each animal
   
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
   PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
