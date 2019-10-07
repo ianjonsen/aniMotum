@@ -14,6 +14,7 @@ Type ssm(objective_function<Type>* obj) {
   // DATA
   DATA_ARRAY(Y);	                  //  (x, y) observations
   DATA_VECTOR(dt);         	        //  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
+  DATA_INTEGER(N);                  //  the number of time.steps to iterate over
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations vs. interpolation points
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
@@ -55,8 +56,6 @@ Type ssm(objective_function<Type>* obj) {
   Type psi = exp(l_psi);
   Type D = exp(logD);
   
-  int timeSteps = dt.size();
-  
   /* Define likelihood */
   Type jnll = 0.0;
   Type tiny = 1e-5;
@@ -75,7 +74,7 @@ Type ssm(objective_function<Type>* obj) {
     MVNORM_t<Type> nll_proc(cov);
     
     // RW PROCESS MODEL
-    for(int i = 1; i < timeSteps; i++) {
+    for(int i = 1; i < N; i++) {
       cov_dt = dt(i) * dt(i) * cov;
       nll_proc.setSigma(cov_dt);
       jnll += nll_proc(X.col(i) - X.col(i - 1));
@@ -98,7 +97,7 @@ Type ssm(objective_function<Type>* obj) {
     
     // CRW PROCESS MODEL
     vector<Type> x_t(4);
-    for(int i = 1; i < timeSteps; i++) {
+    for(int i = 1; i < N; i++) {
       // process cov at time t
       cov.setZero();
       cov(0,0) = tiny;
@@ -122,7 +121,7 @@ Type ssm(objective_function<Type>* obj) {
   matrix<Type> cov_obs(2, 2);
   MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
   
-  for(int i = 0; i < timeSteps; ++i) {
+  for(int i = 0; i < N; ++i) {
     if(isd(i) == 1) {
       if(obs_mod(i) == 0) {
         // Argos Least Squares observations
