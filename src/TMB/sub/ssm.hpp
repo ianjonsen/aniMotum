@@ -135,13 +135,14 @@ Type ssm(objective_function<Type>* obj) {
       } else if(obs_mod(i) == 1) {
         // Argos Kalman Filter (or Kalman Filtered & Smoothed) observations
         double z = sqrt(2.);
+        double h = 0.5;
         Type s2c = sin(c(i)) * sin(c(i));
         Type c2c = cos(c(i)) * cos(c(i));
         Type M2  = (M(i) / z) * (M(i) / z);
         Type m2 = (m(i) * psi / z) * (m(i) * psi / z);
         cov_obs(0,0) = (M2 * s2c + m2 * c2c);
         cov_obs(1,1) = (M2 * c2c + m2 * s2c);
-        cov_obs(0,1) = (0.5 * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
+        cov_obs(0,1) = (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
         cov_obs(1,0) = cov_obs(0,1);
       } else if(obs_mod(i) == 2) {
         // GLS observations
