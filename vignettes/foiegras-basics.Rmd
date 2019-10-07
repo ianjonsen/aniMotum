@@ -38,14 +38,14 @@ Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a b
 1) a `data.frame` or `tibble` that looks like this
 ```{r data 1, echo = FALSE}
 data(ellie, package = "foieGras")
-head(ellie)
+head(data.frame(ellie))
 ```
 where the Argos data are provided via CLS Argos' Kalman filter model (KF) and include error ellipse information for each observed location.  
 
 2) a `data.frame` or `tibble` that looks like this
 ```{r data 2, echo = FALSE}
 data(ellies, package = "foieGras")
-head(ellies)
+head(data.frame(ellies))
 ```
 where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do not include error ellipse information.
 
@@ -53,7 +53,7 @@ where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do
 ```{r data 3, echo = FALSE}
 data(ellie, package = "foieGras")
 ellie[3:5, c("smaj","smin","eor")] <- NA
-head(ellie)
+head(data.frame(ellie))
 ```
 in this situation, `foieGras` treats observations with missing error ellipse information as though they are LS-based observations.
 
@@ -62,13 +62,13 @@ in this situation, `foieGras` treats observations with missing error ellipse inf
 data(ellie, package = "foieGras")
 foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") 
 foo <- sf::st_transform(foo, crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs")
-head(foo)
+head(data.frame(foo))
 ```
 
 5) a `data.frame`, `tibble` or `sf` object where processed GLS data are provided and include longitude and latitude error SD's (in degrees)
 ```{r data 5, echo = FALSE}
 
-  tibble(
+  data.frame(
   id = rep(54632, 5),
   date = seq(Sys.time(), by = "12 hours", length.out = 5),
   lc = rep("G", 5),
