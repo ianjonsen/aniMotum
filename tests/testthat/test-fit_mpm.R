@@ -1,5 +1,4 @@
 context("test fit_mpm")
-skip_on_cran()
 
 ## fit_mpm output is a compound tibble with class `fG_mpm`
 ##  tests expect that fit$mpm are 7-element lists (if optimiser does not crash)
@@ -11,14 +10,18 @@ dmp <- fssm %>%
 
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw
-fmp <- fit_mpm(dmp, model = "jmpm")
+
 test_that("fit_mpm returns fG_mpm list w 8 elements", {
+  skip_on_cran()
+  fmp <- fit_mpm(dmp, model = "jmpm")
   expect_s3_class(fmp, "fG_mpm")
   expect_equal(length(fmp$mpm[[1]]), 8)
 })
 
-fmp <- fit_mpm(dmp, model = "mpm")
+
 test_that("fit_mpm returns fG_mpm list w 8 elements", {
+  skip_on_cran()
+  fmp <- fit_mpm(dmp, model = "mpm")
   expect_s3_class(fmp, "fG_mpm")
   expect_equal(length(fmp$mpm[[1]]), 8)
 })
