@@ -1,5 +1,5 @@
 ## Submission
-This update addresses errors found by CRAN incoming automated checks on previous submission. The update also fixes the last released version's errors listed under CRAN check results on most linux platforms, however, I am currently unable to test R-devel on the following platforms (via R-hub): Debian gcc; clang-UBSAN.
+This update addresses errors found by CRAN incoming automated checks on previous submission. The update also fixes the last released version's errors listed under CRAN check results on most linux platforms, however, I am currently unable to test R-devel on the following platforms (via R-hub): Debian gcc; Linux clang-UBSAN.
 
 ## Test environments
 * local OS X install (10.14.6), R 3.6.1
