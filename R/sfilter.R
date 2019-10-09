@@ -243,6 +243,7 @@ sfilter <-
     obs_mod <- ifelse(d.all$obs.type == "LS", 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
+ 
     data <- list(
       model_name = "ssm",
       Y = switch(
@@ -253,7 +254,7 @@ sfilter <-
       dt = dt,
       N = length(dt),
       state0 = state0,
-      isd = as.integer(d.all$isd),
+      isd = d.all$isd,
       obs_mod = obs_mod,
       proc_mod = ifelse(model == "rw", 0, 1),
       m = d.all$smin,
