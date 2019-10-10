@@ -170,6 +170,7 @@ sfilter <-
     ## calculate prop'n of obs that are LS-derived
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GL"), labels = c("LS","KF","GL")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
+    browser()
     automap <- switch(model,
                   rw = {
                     if (pls == 1) {
