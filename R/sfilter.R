@@ -170,7 +170,7 @@ sfilter <-
     ## calculate prop'n of obs that are LS-derived
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GL"), labels = c("LS","KF","GL")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
-    browser()
+
     automap <- switch(model,
                   rw = {
                     if (pls == 1) {
@@ -179,21 +179,21 @@ sfilter <-
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if (pls == 0 & unique(d$obs.type) == "KF") {
+                    } else if (pls == 0 && unique(d$obs.type) == "KF") {
                       list(l_tau = factor(c(NA, NA)),
                            l_rho_o = factor(NA),
                            logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if(pls == 0 & unique(d$obs.type == "GL")) {
+                    } else if(pls == 0 && unique(d$obs.type == "GL")) {
                       list(l_tau = factor(c(NA, NA)),
                            l_psi = factor(NA),
                            logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if (pls > 0 & pls < 1) {
+                    } else if (pls > 0 && pls < 1) {
                       list(logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
@@ -208,7 +208,7 @@ sfilter <-
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_psi = factor(NA)
                       )
-                    } else if (pls == 0 & unique(d$obs.type) == "KF") {
+                    } else if (pls == 0 && unique(d$obs.type) == "KF") {
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
@@ -216,7 +216,7 @@ sfilter <-
                         l_tau = factor(c(NA, NA)),
                         l_rho_o = factor(NA)
                       )
-                    } else if (pls == 0 & unique(d$obs.type) == "GL") {
+                    } else if (pls == 0 && unique(d$obs.type) == "GL") {
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
@@ -225,7 +225,7 @@ sfilter <-
                         l_psi = factor(NA)
                       )
                     }
-                    else if (pls > 0 & pls < 1) {
+                    else if (pls > 0 && pls < 1) {
                       list(l_sigma = factor(c(NA, NA)),
                            l_rho_p = factor(NA),
                            X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
