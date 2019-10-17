@@ -186,7 +186,7 @@ sfilter <-
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if(pls == 0 && unique(d$obs.type == "GL")) {
+                    } else if(pls == 0 && unique(d$obs.type) == "GL") {
                       list(l_tau = factor(c(NA, NA)),
                            l_psi = factor(NA),
                            logD = factor(NA),
