@@ -17,7 +17,7 @@ os:
   - linux
 
 sudo: true
-dist: ubuntu
+dist: bionic
 
 cache:
   - packages
