@@ -180,7 +180,7 @@ sfilter <-
                            )
                     } else if (pls == 0 & unique(d$obs.type) == "KF") {
                       list(l_tau = factor(c(NA, NA)),
- #                          l_rho_o = factor(NA),
+                           l_rho_o = factor(NA),
                            logD = factor(NA),
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
@@ -213,7 +213,7 @@ sfilter <-
                         l_rho_p = factor(NA),
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_tau = factor(c(NA, NA)),
-#                        l_rho_o = factor(NA)
+                        l_rho_o = factor(NA)
                       )
                     } else if (pls == 0 & unique(d$obs.type) == "GL") {
                       list(

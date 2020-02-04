@@ -141,7 +141,7 @@ Type ssm(objective_function<Type>* obj) {
         Type m2 = (m(i) * psi / z) * (m(i) * psi / z);
         cov_obs(0,0) = (M2 * s2c + m2 * c2c);
         cov_obs(1,1) = (M2 * c2c + m2 * s2c);
-        cov_obs(0,1) = rho_o * (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
+        cov_obs(0,1) = (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
         cov_obs(1,0) = cov_obs(0,1);
       } else if(obs_mod(i) == 2) {
         // GLS observations
