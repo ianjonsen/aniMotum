@@ -4,8 +4,15 @@
 \alias{prefilter}
 \title{Prepare Argos data for fitting state-space model}
 \usage{
-prefilter(data, vmax = 50, ang = -1, distlim = c(2500, 5000),
-  spdf = TRUE, min.dt = 60, emf = NULL)
+prefilter(
+  data,
+  vmax = 50,
+  ang = -1,
+  distlim = c(2500, 5000),
+  spdf = TRUE,
+  min.dt = 60,
+  emf = NULL
+)
 }
 \arguments{
 \item{data}{input data - must have 5 (LS), or 8 (KF) columns (see details)}

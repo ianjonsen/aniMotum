@@ -4,10 +4,19 @@
 \alias{sfilter}
 \title{fit the state-space model to \code{prefilter}-ed data}
 \usage{
-sfilter(x, model = c("rw", "crw"), time.step = 6, parameters = NULL,
-  map = NULL, fit.to.subset = TRUE, optim = c("nlminb", "optim"),
-  verbose = FALSE, control = NULL, inner.control = NULL,
-  lpsi = -10)
+sfilter(
+  x,
+  model = c("rw", "crw"),
+  time.step = 6,
+  parameters = NULL,
+  map = NULL,
+  fit.to.subset = TRUE,
+  optim = c("nlminb", "optim"),
+  verbose = FALSE,
+  control = NULL,
+  inner.control = NULL,
+  lpsi = -10
+)
 }
 \arguments{
 \item{x}{Argos data passed through prefilter()}

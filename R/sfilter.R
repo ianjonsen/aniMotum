@@ -118,7 +118,7 @@ sfilter <-
 
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
-      as.numeric() / 24
+      as.numeric()
     dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
 
     ## use approx & MA filter to obtain state initial values
