@@ -158,7 +158,7 @@ sfilter <-
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
         X = t(xs),
-        logD = 10,
+        logD = 0,
         mu = t(xs),
         v = t(xs) * 0,
         l_psi = 0,
