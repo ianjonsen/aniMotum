@@ -11,6 +11,7 @@ Type joint_mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
   DATA_INTEGER(A);                  // number of animals
+  DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
   DATA_IVECTOR(idx);                // cumsum of number of locations for each animal
   
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
@@ -24,15 +25,15 @@ Type joint_mpm(objective_function<Type>* obj) {
   
   // 2x2 covariance matrix for innovations
   matrix<Type> cov(2,2);
-  cov(0,0) = sigma(0) * sigma(0);
-  cov(0,1) = 0.0;
-  cov(1,0) = 0.0;
-  cov(1,1) = sigma(1) * sigma(1);
+//  cov(0,0) = sigma(0) * sigma(0);
+//  cov(0,1) = 0.0;
+//  cov(1,0) = 0.0;
+//  cov(1,1) = sigma(1) * sigma(1);
   
   Type jnll = 0.0;
   vector<Type> mu(2);
   
-  MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
+  
   int i,j;
   
   for(i = 0; i < A; ++i) {
@@ -41,7 +42,14 @@ Type joint_mpm(objective_function<Type>* obj) {
     }
     
     for(j = (idx(i)+2); j < idx(i+1); ++j){
-      mu = x.row(j) - x.row(j-1) - gamma(j-1) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
+      // var-cov depends on time interval
+      cov.setZero();
+      cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);
+      cov(1,1) = sigma(1) * sigma(1) * dt(j) * dt(j);
+      
+      mu = x.row(j) - x.row(j-1) - gamma(j-1) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
+      
+      MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
       jnll += nll_dens(mu);
     }
   }
