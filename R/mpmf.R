@@ -52,6 +52,11 @@ mpmf <-
     
     # get index of start and end of tracks
     x <- x %>% mutate(idtid = paste(id, tid, sep=""))
+    idx <- x$idtid %>%
+      table() %>%
+      as.numeric() %>%
+      cumsum() %>%
+      c(0, .)
     
     # Create dt vector
     # dt = t_i - t_{i-1} and include in data.tmb
@@ -64,11 +69,6 @@ mpmf <-
            jmpm = {
              # Number of tracks (or individual if only one track per individual)
              A <- nrow(count(x, id, tid))
-             idx <- x$idtid %>%
-               table() %>%
-               as.numeric() %>%
-               cumsum() %>%
-               c(0, .)
              data.tmb <- list(
                model_name = model,
                x = cbind(x$lon, x$lat),
@@ -85,7 +85,7 @@ mpmf <-
                N = as.integer(nrow(x))
              )
            })
-    
+  
     parameters <- list(
       lg = rep(0, dim(x)[1]),
       l_sigma = c(0, 0),

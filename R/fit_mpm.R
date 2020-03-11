@@ -40,20 +40,19 @@ fit_mpm <- function(x,
     verb <-  FALSE
   else
     verb <- TRUE
-  
+
   switch(model,
          mpm = {
            fit <- x %>%
              group_by(id) %>%
-             do(mpm = try(mpmf(
+             do(mpm = try(mpmf(   
                .,
                model = model,
                optim = optim,
                verbose = verb,
                control = control,
                inner.control = inner.control
-             ),
-             silent = TRUE)
+             ), silent = TRUE)
              )
            
            fit <- fit %>%
@@ -68,15 +67,15 @@ fit_mpm <- function(x,
          },
          jmpm = {
            fit <- x %>%
-             do(mpm = try(mpmf(
+             ungroup() %>%
+             do(mpm = try(mpmf( 
                .,
                model = model,
                optim = optim,
                verbose = verb,
                control = control,
                inner.control = inner.control
-             ),
-             silent = TRUE)
+             ), silent = TRUE)
              )
            
            fit <- fit %>%
