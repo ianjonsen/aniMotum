@@ -4,14 +4,8 @@
 \alias{fit_mpm}
 \title{fit a a Move Persistence Model (mpm)}
 \usage{
-fit_mpm(
-  x,
-  model = c("mpm", "jmpm"),
-  optim = c("nlminb", "optim"),
-  verbose = 1,
-  control = NULL,
-  inner.control = NULL
-)
+fit_mpm(x, model = c("mpm", "jmpm"), optim = c("nlminb", "optim"),
+  verbose = 1, control = NULL, inner.control = NULL)
 }
 \arguments{
 \item{x}{a data frame of observations (see details)}

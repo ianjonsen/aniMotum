@@ -4,14 +4,8 @@
 \alias{fmap}
 \title{fmap}
 \usage{
-fmap(
-  x,
-  what = c("fitted", "predicted"),
-  obs = FALSE,
-  crs = NULL,
-  ext.rng = c(0.05, 0.05),
-  size = 1
-)
+fmap(x, what = c("fitted", "predicted"), obs = FALSE, crs = NULL,
+  ext.rng = c(0.05, 0.05), size = 1)
 }
 \arguments{
 \item{x}{a foieGras fitted object}
