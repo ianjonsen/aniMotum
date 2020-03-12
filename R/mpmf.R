@@ -17,7 +17,7 @@
 ##' (see ?TMB::MakeADFUN for additional details)
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
+##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%" count
 ##' @importFrom tibble tibble
 ##' @importFrom stats plogis
 ##'

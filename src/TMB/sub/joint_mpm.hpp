@@ -38,7 +38,7 @@ Type joint_mpm(objective_function<Type>* obj) {
   
   for(i = 0; i < A; ++i) {
     for(j = (idx(i)+1); j < idx(i+1); ++j) {
-      jnll -= dnorm(lg(j), lg(j-1), sigma_g, TRUE);  // RW on logit(gamma)
+      jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }
     
     for(j = (idx(i)+2); j < idx(i+1); ++j){
@@ -47,7 +47,7 @@ Type joint_mpm(objective_function<Type>* obj) {
       cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);
       cov(1,1) = sigma(1) * sigma(1) * dt(j) * dt(j);
       
-      mu = x.row(j) - x.row(j-1) - gamma(j-1) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
+      mu = x.row(j) - x.row(j-1) - gamma(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
       
       MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
       jnll += nll_dens(mu);

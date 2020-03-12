@@ -34,7 +34,7 @@ Type mpm(objective_function<Type>* obj) {
   int j;
   
     for(j = 1; j < N; ++j) {
-      jnll -= dnorm(lg(j), lg(j-1), sigma_g, TRUE);  // RW on logit(gamma)
+      jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }
     
     for(j = 2; j < N; ++j){
@@ -43,7 +43,7 @@ Type mpm(objective_function<Type>* obj) {
       cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);
       cov(1,1) = sigma(1) * sigma(1) * dt(j) * dt(j);
       // first diff RW on locations
-      mu = x.row(j) - x.row(j-1) - gamma(j-1) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  
+      mu = x.row(j) - x.row(j-1) - gamma(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  
       
       MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
       jnll += nll_dens(mu);
