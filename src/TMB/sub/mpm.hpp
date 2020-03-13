@@ -31,8 +31,8 @@ Type mpm(objective_function<Type>* obj) {
   
   Type jnll = 0.0;
   vector<Type> mu(2);
-  int j;
-  
+  int j; 
+    jnll -= dnorm(lg(0), Type(0.0), sigma_g, TRUE);
     for(j = 1; j < N; ++j) {
       jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }

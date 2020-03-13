@@ -37,6 +37,7 @@ Type joint_mpm(objective_function<Type>* obj) {
   int i,j;
   
   for(i = 0; i < A; ++i) {
+    jnll -= dnorm(lg(i), Type(0.0), sigma_g, TRUE);
     for(j = (idx(i)+1); j < idx(i+1); ++j) {
       jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }
