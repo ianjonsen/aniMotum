@@ -17,7 +17,7 @@
 ##' (see ?TMB::MakeADFUN for additional details)
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
+##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%" count
 ##' @importFrom tibble tibble
 ##' @importFrom stats plogis
 ##'
@@ -42,27 +42,50 @@ mpmf <-
         stop("'control' argument must be a named list")
     }
    
-    switch(model,
+    # Create a tid column if there is none specified
+    if(all(colnames(x) != "tid")){
+      x$tid <- NA
+    }
+    
+    # ordering the data to make sure we have continuous tracks and ids are ordered
+    x <- x %>% arrange(id, tid, date)
+    
+    # get index of start and end of tracks
+    x <- x %>% mutate(idtid = paste(id, tid, sep=""))
+    idx <- x$idtid %>%
+      table() %>%
+      as.numeric() %>%
+      cumsum() %>%
+      c(0, .)
+    
+    # Create dt vector
+    # dt = t_i - t_{i-1} and include in data.tmb
+    x$dt <- c(NA, diff(x$date))
+    x$dt[idx[1:(length(idx)-1)] + 1] <- NA
+    # Scale to median
+    x$dt <- x$dt / median(x$dt, na.rm=TRUE)
+
+        switch(model,
            jmpm = {
-             A <- length(unique(x$id))
-             idx <- c(0, cumsum(as.numeric(table(x$id))))
-             
+             # Number of tracks (or individual if only one track per individual)
+             A <- nrow(count(x, id, tid))
              data.tmb <- list(
                model_name = model,
                x = cbind(x$lon, x$lat),
+               dt = x$dt,
                A = as.integer(A),
                idx = as.integer(idx)
              )
-             
            },
            mpm = {
              data.tmb <- list(
                model_name = model,
                x = cbind(x$lon, x$lat),
+               dt = x$dt,
                N = as.integer(nrow(x))
              )
            })
-    
+  
     parameters <- list(
       lg = rep(0, dim(x)[1]),
       l_sigma = c(0, 0),
