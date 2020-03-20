@@ -4,7 +4,8 @@
 \alias{plot.fG_ssm}
 \title{plot}
 \usage{
-\method{plot}{fG_ssm}(x, what = c("fitted", "predicted"), type = 1, ncol = 1, ...)
+\method{plot}{fG_ssm}(x, what = c("fitted", "predicted"), type = 1,
+  ncol = 1, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
