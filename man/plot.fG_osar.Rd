@@ -4,8 +4,7 @@
 \alias{plot.fG_osar}
 \title{plot}
 \usage{
-\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram"), bw = 0.5,
-  ...)
+\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram"), bw = 0.5, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras osar} object with class `fG_osar`}
