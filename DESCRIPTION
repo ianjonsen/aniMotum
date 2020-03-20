@@ -1,11 +1,7 @@
 Package: foieGras
 Title: Fit Continuous-Time State-Space and Latent Variable Models for Filtering Argos Satellite (and Other) Telemetry Data and Estimating Movement Behaviour
-<<<<<<< HEAD
-Version: 0.4.01
-=======
-Version: 0.4.01-3.9520
->>>>>>> staging
-Date: 2019-10-06
+Version: 0.4.01-3
+Date: 2020-03-20
 Authors@R: 
     c(
       person(given = "Ian",
