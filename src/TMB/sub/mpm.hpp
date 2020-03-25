@@ -12,13 +12,14 @@ Type mpm(objective_function<Type>* obj) {
   DATA_MATRIX(x);                   // locations
   DATA_INTEGER(N);                  // number of time.steps to iterate over
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
-  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
+  PARAMETER_VECTOR(g);		          // Autocorrelation parameter 
   PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
   PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
   
   
-  // Backtransform parameters from link scale
-  vector<Type> gamma = Type(1.0) / (Type(1.0) + exp(-lg));
+  // transform parameters
+  //vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  vector<Type> lg = log(g / (Type(1.0) - g));
   vector<Type> sigma = exp(l_sigma);
   Type sigma_g = exp(l_sigma_g);
   
@@ -43,7 +44,7 @@ Type mpm(objective_function<Type>* obj) {
       cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);
       cov(1,1) = sigma(1) * sigma(1) * dt(j) * dt(j);
       // first diff RW on locations
-      mu = x.row(j) - x.row(j-1) - gamma(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  
+      mu = x.row(j) - x.row(j-1) - g(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  
       
       MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
       jnll += nll_dens(mu);

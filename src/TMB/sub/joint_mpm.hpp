@@ -14,12 +14,13 @@ Type joint_mpm(objective_function<Type>* obj) {
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
   DATA_IVECTOR(idx);                // cumsum of number of locations for each animal
   
-  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
+  PARAMETER_VECTOR(g);		          // Autocorrelation parameter (link scale)
   PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
   PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
   
   // Backtransform parameters from link scale
-  vector<Type> gamma = Type(1.0) / (Type(1.0) + exp(-lg));
+  //vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  vector<Type> lg = log(g / (Type(1.0) - g));
   vector<Type> sigma = exp(l_sigma);
   Type sigma_g = exp(l_sigma_g);
   
@@ -48,7 +49,7 @@ Type joint_mpm(objective_function<Type>* obj) {
       cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);
       cov(1,1) = sigma(1) * sigma(1) * dt(j) * dt(j);
       
-      mu = x.row(j) - x.row(j-1) - gamma(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
+      mu = x.row(j) - x.row(j-1) - g(j) * (dt(j)/dt(j-1)) * (x.row(j-1) - x.row(j-2));  // first diff RW on locations
       
       MVNORM_t<Type> nll_dens(cov);   // Multivariate Normal density
       jnll += nll_dens(mu);

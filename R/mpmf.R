@@ -87,7 +87,7 @@ mpmf <-
            })
   
     parameters <- list(
-      lg = rep(0, dim(x)[1]),
+      g = rep(0.2, dim(x)[1]),
       l_sigma = c(0, 0),
       l_sigma_g = 0
     ) 
@@ -101,7 +101,7 @@ mpmf <-
       MakeADFun(
         data = data.tmb,
         parameters = parameters,
-        random = c("lg"),
+        random = "g",
         DLL = "foieGras",
         silent = !verbose,
         inner.control = inner.control
@@ -134,21 +134,30 @@ mpmf <-
                                 )
                               ))))
     
-    
     ## Parameters, states and the fitted values
     rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))
     fxd <- summary(rep, "report")
     fxd_log <- summary(rep, "fixed")
     rdm <- summary(rep, "random")
     
-    lg <- rdm[rownames(rdm) %in% "lg", ]
+    gs <- rdm[rownames(rdm) %in% "g", ]
     
-    fitted <- tibble(
-      id = x$id,
-      date = x$date,
-      g = plogis(lg[, 1]),
-      g.se = lg[,2]      ## FIXME: rescale this to SE of prob
-    )
+    if(all(is.na(x$tid))) {
+      fitted <- tibble(
+        id = x$id,
+        date = x$date,
+        g = gs[, 1],
+        g.se = gs[, 2]      
+      )
+    } else {
+      fitted <- tibble(
+        id = x$id,
+        tid = x$tid,
+        date = x$date,
+        g = gs[, 1],
+        g.se = gs[, 2]     
+      )
+    }
     
     if (optim == "nlminb") {
       aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
