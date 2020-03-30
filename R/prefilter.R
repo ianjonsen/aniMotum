@@ -110,7 +110,7 @@ prefilter <-
     d <- d %>%
       mutate(lonerr = NA, laterr = NA)
   }
-
+  
   ##  convert dates to POSIXt
   ##  order records by time,
   ##  flag any duplicate date records,
@@ -120,8 +120,8 @@ prefilter <-
     arrange(date) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
-    mutate(obs.type = ifelse((is.na(smaj) | is.na(smin) | is.na(eor)) & lc != "G", "LS", 
-                             ifelse((!is.na(smaj) | !is.na(smin) | !is.na(eor)) & lc != "G", "KF", "GL")))
+    mutate(obs.type = ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & lc == "G", "LS", 
+                             ifelse(any(!is.na(smaj) & !is.na(smin) & !is.na(eor)) & lc != "G", "KF", "GL")))
  
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
