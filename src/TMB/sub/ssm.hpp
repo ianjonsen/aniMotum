@@ -25,7 +25,7 @@ Type ssm(objective_function<Type>* obj) {
   DATA_VECTOR(m);                 //  m is the semi-minor axis length
   DATA_VECTOR(M);                 //  M is the semi-major axis length
   DATA_VECTOR(c);                 //  c is the orientation of the error ellipse
-  // for LS observation model
+  // for LS/GPS observation model
   DATA_MATRIX(K);                 // error weighting factors for LS obs model
   // for GL observation model
   DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
@@ -44,7 +44,7 @@ Type ssm(objective_function<Type>* obj) {
   // OBSERVATION PARAMETERS
   // for KF OBS MODEL
   PARAMETER(l_psi); 				  // error SD scaling parameter to account for possible uncertainty in Argos error ellipse variables
-  // for LS OBS MODEL
+  // for LS/GPS OBS MODEL
   PARAMETER_VECTOR(l_tau);     	// error dispersion for LS obs model (log scale)
   PARAMETER(l_rho_o);             // error correlation
   
