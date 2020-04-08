@@ -110,7 +110,7 @@ prefilter <-
     d <- d %>%
       mutate(lonerr = NA, laterr = NA)
   }
-  
+
   ##  convert dates to POSIXt
   ##  order records by time,
   ##  flag any duplicate date records,
@@ -120,16 +120,18 @@ prefilter <-
     arrange(date) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
-    mutate(obs.type = ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & lc == "G", "LS", 
-                             ifelse(any(!is.na(smaj) & !is.na(smin) & !is.na(eor)) & lc != "G", "KF", "GL")))
+    mutate(obs.type = ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc != "GL"), "LS", 
+                             ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc == "GL"), "GLS", 
+                                    ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc =="G" & lc != "GL"), "GPS", stop))))
  
+  
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
   d <- d %>%
     mutate(smaj = ifelse(smaj == 0 | smin == 0, NA, smaj),
            smin = ifelse(smin == 0 | is.na(smaj), NA, smin),
            eor = ifelse(is.na(smaj) | is.na(smin), NA, eor),
-           obs.type = ifelse(is.na(smaj) & is.na(smin) & obs.type != "GL", "LS", obs.type)) %>%
+           obs.type = ifelse(is.na(smaj) & is.na(smin) & (obs.type != "GLS" & obs.type != "GPS"), "LS", obs.type)) %>%
     mutate(smaj = smaj/1000,
            smin = smin/1000,
            eor = eor/180 * pi) %>%
