@@ -32,13 +32,15 @@ plot.fG_osar <- function(x, type = c("qqnorm", "histogram"), bw = 0.5, ...)
   
   switch(type,
          qqnorm = {
-           p <- ggplot(x %>% filter(!is.na(residual)), aes(sample = residual)) +
+           x <- x[!is.na(x$residual), ]
+           p <- ggplot(x, aes(sample = residual)) +
              geom_qq() +
              geom_qq_line(col = "firebrick") +
              facet_grid(id ~ coord)
          },
          histogram = {
-           p <- ggplot(x %>% filter(!is.na(residual)), aes(x = residual)) +
+           x <- x[!is.na(x$residual), ]
+           p <- ggplot(x, aes(x = residual)) +
              geom_histogram(binwidth = bw, col = grey(0.9), lwd = 0.5) +
              geom_vline(xintercept = 0, lty = 2, col = "firebrick") +
              facet_grid(id ~ coord)

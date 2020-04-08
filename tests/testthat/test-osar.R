@@ -16,8 +16,3 @@ test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
 test_that("plot completes silently", {
   expect_silent(plot(r, "qq"))
 })
-
-## plot residuals
-test_that("plot completes silently", {
-  expect_silent(plot(r, "hist"))
-})
