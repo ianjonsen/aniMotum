@@ -122,7 +122,8 @@ prefilter <-
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
     mutate(obs.type = ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc != "GL"), "LS", 
                              ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc == "GL"), "GLS", 
-                                    ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc =="G" & lc != "GL"), "GPS", stop))))
+                                    ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc =="G" & lc != "GL"), "GPS", 
+                                           ifelse(all(!is.na(smaj) & !is.na(smin) & !is.na(eor)), "KF", stop("observation type classification error"))))))
  
   
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
