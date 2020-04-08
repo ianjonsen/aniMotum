@@ -168,7 +168,7 @@ sfilter <-
     }
 
     ## calculate prop'n of obs that are LS-derived
-    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GL"), labels = c("LS","KF","GL")))
+    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
     pls <- table(d$obs.type)["LS"] / nrow(d)
 
     automap <- switch(model,
@@ -179,6 +179,12 @@ sfilter <-
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
+                    } else if (pls == 0 && unique(d$obs.type) == "GPS") {
+                      list(l_psi = factor(NA),
+                           logD = factor(NA),
+                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                      )
                     } else if (pls == 0 && unique(d$obs.type) == "KF") {
                       list(l_tau = factor(c(NA, NA)),
                            l_rho_o = factor(NA),
@@ -186,7 +192,7 @@ sfilter <-
                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                            )
-                    } else if(pls == 0 & unique(d$obs.type) == "GL") {
+                    } else if(pls == 0 & unique(d$obs.type) == "GLS") {
                       list(l_tau = factor(c(NA, NA)),
                            l_psi = factor(NA),
                            logD = factor(NA),
@@ -208,6 +214,13 @@ sfilter <-
                         X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                         l_psi = factor(NA)
                       )
+                    } else if (pls == 0 && unique(d$obs.type) == "GPS") {
+                      list(
+                        l_sigma = factor(c(NA, NA)),
+                        l_rho_p = factor(NA),
+                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                        l_psi = factor(NA)
+                      )
                     } else if (pls == 0 && unique(d$obs.type) == "KF") {
                       list(
                         l_sigma = factor(c(NA, NA)),
@@ -216,7 +229,7 @@ sfilter <-
                         l_tau = factor(c(NA, NA)),
                         l_rho_o = factor(NA)
                       )
-                    } else if (pls == 0 && unique(d$obs.type) == "GL") {
+                    } else if (pls == 0 && unique(d$obs.type) == "GLS") {
                       list(
                         l_sigma = factor(c(NA, NA)),
                         l_rho_p = factor(NA),
@@ -241,10 +254,10 @@ sfilter <-
     }
 
     ## TMB - data list
-    obs_mod <- ifelse(d.all$obs.type == "LS", 0, 
+    obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
- 
+
     data <- list(
       model_name = "ssm",
       Y = switch(
