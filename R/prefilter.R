@@ -53,7 +53,7 @@
 
 prefilter <-
   function(data,
-           vmax = 50,
+           vmax = 5,
            ang = -1,
            distlim = c(2500, 5000),
            spdf = TRUE,
@@ -120,10 +120,11 @@ prefilter <-
     arrange(date) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
-    mutate(obs.type = ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc != "GL"), "LS", 
-                             ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc != "G" & lc == "GL"), "GLS", 
-                                    ifelse(any(is.na(smaj) & is.na(smin) & is.na(eor)) & (lc =="G" & lc != "GL"), "GPS", 
-                                           ifelse(all(!is.na(smaj) & !is.na(smin) & !is.na(eor)), "KF", stop("observation type classification error"))))))
+    mutate(obs.type = NA) %>%
+    mutate(obs.type = ifelse(!is.na(smaj) & !is.na(smin) & !is.na(eor), "KF", obs.type)) %>%
+    mutate(obs.type = ifelse(lc %in% c(3,2,1,0,"A","B","Z") & (is.na(smaj) | is.na(smin) |is.na(eor)), "LS", obs.type)) %>%
+    mutate(obs.type = ifelse(lc == "G" & (is.na(smaj) | is.na(smin) |is.na(eor)), "GPS", obs.type)) %>%
+    mutate(obs.type = ifelse(lc == "GL" & (is.na(smaj) | is.na(smin) |is.na(eor)) & (!is.na(lonerr) & !is.na(laterr)), "GLS", obs.type))
  
   
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
@@ -131,7 +132,7 @@ prefilter <-
   d <- d %>%
     mutate(smaj = ifelse(smaj == 0 | smin == 0, NA, smaj),
            smin = ifelse(smin == 0 | is.na(smaj), NA, smin),
-           eor = ifelse(is.na(smaj) | is.na(smin), NA, eor),
+           eor = ifelse(is.na(smaj) & is.na(smin), NA, eor),
            obs.type = ifelse(is.na(smaj) & is.na(smin) & (obs.type != "GLS" & obs.type != "GPS"), "LS", obs.type)) %>%
     mutate(smaj = smaj/1000,
            smin = smin/1000,
