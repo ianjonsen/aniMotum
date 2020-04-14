@@ -4,7 +4,9 @@
 \name{fssm}
 \alias{fssm}
 \title{foieGras example fit object}
-\format{.RData}
+\format{
+.RData
+}
 \description{
 Example foieGras fit object, using ellies example data and the
 following call: fssm <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example

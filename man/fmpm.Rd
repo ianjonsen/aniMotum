@@ -4,7 +4,9 @@
 \name{fmpm}
 \alias{fmpm}
 \title{foieGras example mpm fit object}
-\format{.RData}
+\format{
+.RData
+}
 \description{
 Example foieGras fit object, using ssm_fits example data and the
 following call: fmp <- fssm %>% grab(., "p", as_sf = FALSE) %>% 

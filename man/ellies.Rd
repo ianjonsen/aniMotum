@@ -4,7 +4,9 @@
 \name{ellies}
 \alias{ellies}
 \title{Southern elephant seal Argos satellite data (2 individuals)}
-\format{.RData}
+\format{
+.RData
+}
 \description{
 Example elephant seal Argos tracking data. Data were sourced from
 the Integrated Marine Observing System (IMOS) - IMOS is supported by the

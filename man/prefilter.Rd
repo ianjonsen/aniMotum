@@ -6,7 +6,7 @@
 \usage{
 prefilter(
   data,
-  vmax = 50,
+  vmax = 10,
   ang = -1,
   distlim = c(2500, 5000),
   spdf = TRUE,
