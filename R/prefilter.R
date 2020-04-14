@@ -151,7 +151,7 @@ prefilter <-
 
     } else if(inherits(d, "sf") && !st_is_longlat(d)) {
 
-      xy <- st_transform(d, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") %>%
+      xy <- st_transform(d, crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")) %>%
         st_coordinates() %>%
         as_tibble() %>%
         rename(lon = X, lat = Y)
@@ -236,7 +236,7 @@ prefilter <-
     mlon <- mean(dd$lon) %>% round(., 2)
 
     ## projection not provided by user so guess at best projection
-    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
     if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
       prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
@@ -247,18 +247,18 @@ prefilter <-
       prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
     }
 
-    sf_locs <- sf_locs %>% st_transform(., prj)
+    sf_locs <- sf_locs %>% st_transform(., st_crs(prj))
 
   } else {
     prj <- st_crs(d)
     # if data CRS units are m then change to km, otherwise optimiser may choke
-    if (str_detect(prj$proj4string, "units=m")) {
-      prj$proj4string <-
-        str_replace(prj$proj4string, "units=m", "units=km")
+    if (str_detect(prj$input, "units=m")) {
+      prj$input <-
+        str_replace(prj$input, "units=m", "units=km")
     }
     sf_locs <- d %>%
       select(-lon,-lat) %>%
-      st_transform(prj)
+      st_transform(st_crs(prj))
   }
 
   ## add LS error info to corresponding records
@@ -275,8 +275,8 @@ prefilter <-
     mutate(lc = as.character(lc)) %>%
     left_join(., tmp, by = "lc") %>%
     mutate(
-      emf.x = ifelse(obs.type %in% c("KF","GL"), NA, emf.x),
-      emf.y = ifelse(obs.type %in% c("KF","GL"), NA, emf.y)
+      emf.x = ifelse(obs.type %in% c("KF","GLS"), NA, emf.x),
+      emf.y = ifelse(obs.type %in% c("KF","GLS"), NA, emf.y)
     ) %>%
     select(everything(), geometry)
 
