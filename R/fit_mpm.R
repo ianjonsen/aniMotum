@@ -26,7 +26,7 @@
 ##' @export
 fit_mpm <- function(x,
                     model = c("mpm", "jmpm"),
-                    optim = c("nlminb", "optim"),
+                    optim = c("optim","nlminb"),
                     verbose = 1,
                     control = NULL,
                     inner.control = NULL) {
@@ -35,7 +35,7 @@ fit_mpm <- function(x,
   model <- match.arg(model)
   
   if(verbose == 1)
-    cat("\nfitting mpm...\n")
+    cat(paste0("\nfitting ", model, "...\n"))
   if (verbose %in% 0:1)
     verb <-  FALSE
   else

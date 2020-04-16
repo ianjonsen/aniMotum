@@ -86,11 +86,23 @@ mpmf <-
              )
            })
   
-    parameters <- list(
-      g = rep(0.2, dim(x)[1]),
-      l_sigma = c(0, 0),
-      l_sigma_g = 0
-    ) 
+    parameters <- switch(model, 
+                         jmpm = {
+                           list(
+                             lg = rep(0, dim(x)[1]),
+                             log_sigma = c(0, 0),
+                             log_sigma_g = 0
+                             )
+                           },
+                           mpm = {
+                             list(
+                               lg = rep(0, dim(x)[1]),
+                               log_sigma = c(0, 0),
+                               log_sigma_g = 0
+                             )
+                           })
+    
+#    rnd <- switch(model, mpm = "lg", jmpm = c("lg","u"))
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -101,7 +113,7 @@ mpmf <-
       MakeADFun(
         data = data.tmb,
         parameters = parameters,
-        random = "g",
+        random = "lg",
         DLL = "foieGras",
         silent = !verbose,
         inner.control = inner.control
@@ -133,29 +145,29 @@ mpmf <-
                                   control = control
                                 )
                               ))))
-    
+
     ## Parameters, states and the fitted values
     rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))
     fxd <- summary(rep, "report")
     fxd_log <- summary(rep, "fixed")
     rdm <- summary(rep, "random")
     
-    gs <- rdm[rownames(rdm) %in% "g", ]
-    
+    lgs <- rdm[rownames(rdm) %in% "lg", ]
+        
     if(all(is.na(x$tid))) {
       fitted <- tibble(
         id = x$id,
         date = x$date,
-        g = gs[, 1],
-        g.se = gs[, 2]      
+        g = plogis(lgs[, 1]),
+        g.se = lgs[, 2]      
       )
     } else {
       fitted <- tibble(
         id = x$id,
         tid = x$tid,
         date = x$date,
-        g = gs[, 1],
-        g.se = gs[, 2]     
+        g = plogis(lgs[, 1]),
+        g.se = lgs[, 2]     
       )
     }
     

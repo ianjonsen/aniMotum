@@ -7,7 +7,7 @@
 fit_mpm(
   x,
   model = c("mpm", "jmpm"),
-  optim = c("nlminb", "optim"),
+  optim = c("optim", "nlminb"),
   verbose = 1,
   control = NULL,
   inner.control = NULL

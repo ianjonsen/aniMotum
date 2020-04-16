@@ -12,16 +12,16 @@ Type mpm(objective_function<Type>* obj) {
   DATA_MATRIX(x);                   // locations
   DATA_INTEGER(N);                  // number of time.steps to iterate over
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
-  PARAMETER_VECTOR(g);		          // Autocorrelation parameter 
-  PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
-  PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
+  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter 
+  PARAMETER_VECTOR(log_sigma);	      // Innovation variance (log scale)
+  PARAMETER(log_sigma_g);             // logistic scale parameter of rw on lg (log scale)
   
   
   // transform parameters
-  //vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
-  vector<Type> lg = log(g / (Type(1.0) - g));
-  vector<Type> sigma = exp(l_sigma);
-  Type sigma_g = exp(l_sigma_g);
+  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  //vector<Type> lg = log(g / (Type(1.0) - g));
+  vector<Type> sigma = exp(log_sigma);
+  Type sigma_g = exp(log_sigma_g);
   
   // 2x2 covariance matrix for innovations
   matrix<Type> cov(2,2);
@@ -33,7 +33,7 @@ Type mpm(objective_function<Type>* obj) {
   Type jnll = 0.0;
   vector<Type> mu(2);
   int j; 
-    jnll -= dnorm(lg(0), Type(0.0), sigma_g, TRUE);
+    //jnll -= dnorm(lg(0), Type(0.0), sigma_g, TRUE);
     for(j = 1; j < N; ++j) {
       jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }

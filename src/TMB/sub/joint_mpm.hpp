@@ -14,16 +14,15 @@ Type joint_mpm(objective_function<Type>* obj) {
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
   DATA_IVECTOR(idx);                // cumsum of number of locations for each animal
   
-  PARAMETER_VECTOR(g);		          // Autocorrelation parameter (link scale)
-  PARAMETER_VECTOR(l_sigma);	      // Innovation variance (log scale)
-  PARAMETER(l_sigma_g);             // logistic scale parameter of rw on lg (log scale)
+  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
+  PARAMETER_VECTOR(log_sigma);	      // Innovation variance (log scale)
+  PARAMETER(log_sigma_g);             // logistic scale parameter of rw on lg (log scale)
   
   // Backtransform parameters from link scale
-  //vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
-  vector<Type> lg = log(g / (Type(1.0) - g));
-  vector<Type> sigma = exp(l_sigma);
-  Type sigma_g = exp(l_sigma_g);
-  
+  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  vector<Type> sigma = exp(log_sigma);
+  Type sigma_g = exp(log_sigma_g);
+    
   // 2x2 covariance matrix for innovations
   matrix<Type> cov(2,2);
 //  cov(0,0) = sigma(0) * sigma(0);
@@ -34,11 +33,9 @@ Type joint_mpm(objective_function<Type>* obj) {
   Type jnll = 0.0;
   vector<Type> mu(2);
   
-  
   int i,j;
   
   for(i = 0; i < A; ++i) {
-    jnll -= dnorm(lg(i), Type(0.0), sigma_g, TRUE);
     for(j = (idx(i)+1); j < idx(i+1); ++j) {
       jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }
