@@ -102,7 +102,7 @@ mpmf <-
                              )
                            })
     
-#    rnd <- switch(model, mpm = "lg", jmpm = c("lg","u"))
+##    rnd <- switch(model, mpm = "lg", jmpm = c("lg","log_sigma_g"))
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -121,7 +121,6 @@ mpmf <-
     
     ## add par values to trace if verbose = TRUE
     myfn <- function(x) {
-      print("pars:")
       print(x)
       obj$fn(x)
     }
@@ -140,12 +139,14 @@ mpmf <-
                                 args = list(
                                   par = obj$par,
                                   fn = obj$fn,
+                                  #fn = myfn,
                                   gr = obj$gr,
                                   method = "L-BFGS-B",
                                   control = control
                                 )
                               ))))
 
+    
     ## Parameters, states and the fitted values
     rep <- suppressWarnings(try(sdreport(obj, getReportCovariance = TRUE)))
     fxd <- summary(rep, "report")
