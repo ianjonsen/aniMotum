@@ -47,6 +47,8 @@ Suggests:
     knitr,
     rmarkdown,
     rgeos
+Remotes:
+    dplyr (>= 0.8.99.9002)
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
