@@ -30,13 +30,9 @@ join <- function(ssm, mpm, as_sf = TRUE) {
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
-  if(as_sf) {
-    xy <- bind_cols(x, y) %>% 
-      select(-id1)
-  } else {
-    xy <- bind_cols(x, y) %>%
-      select(-id1) %>%
-      as_tibble()
+  xy <- bind_cols(x, select(y, -id))
+  if(!as_sf) {
+    xy <- as_tibble(xy)
   }
   
   class(xy) <- append(class(xy), "fG_ssmp", after = 0)
