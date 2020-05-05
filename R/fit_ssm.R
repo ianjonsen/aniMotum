@@ -65,7 +65,8 @@
 ##' ## track plots of fits for both seals
 ##' plot(fits, what = "predicted", type = 2)
 ##'
-##' @importFrom dplyr group_by do rowwise ungroup select mutate slice "%>%"
+##' @importFrom dplyr nest_by rowwise select mutate slice "%>%"
+##' @importFrom tidyr unnest
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -98,22 +99,23 @@ fit_ssm <- function(d,
   if(verbose == 1)
     cat("\npre-filtering data...\n")
   fit <- d %>%
-    group_by(id) %>%
-    do(pf = prefilter(
-      .,
+    nest_by(id, .keep = TRUE) %>%
+    mutate(pf = list(prefilter(
+      data = data,
       vmax = vmax,
       ang = ang,
       distlim = distlim,
       spdf = spdf,
       min.dt = min.dt,
       emf = emf
-    ))
+    )), .keep = "none")
 
   if(pf){
-    pfd <- lapply(fit$pf, function(.) .)
-    fit <- try(do.call(rbind, pfd))
-    if(inherits(fit, "try-error")) stop("\n Cannot rbind multiple guessed projections in pre-filtered output. \n
-                                        Supply data as an `sf` object with a common projection across individuals.\n")
+    fit <- try(unnest(fit, cols = c(pf)))
+    
+    if(inherits(fit, "try-error")) 
+    stop("\n Cannot unnest multiple guessed projections in pre-filtered output. \n
+            Supply data as an `sf` object with a common projection across individuals.\n")
   } else {
     if(verbose == 1)
       cat("\nfitting SSM...\n")
@@ -121,9 +123,10 @@ fit_ssm <- function(d,
       verb <-  FALSE
     else
       verb <- TRUE
+    
     fit <- fit %>%
-      do(ssm = try(sfilter(
-        .$pf,
+      mutate(ssm = list(try(sfilter(
+        x = .$pf,
         model = model,
         time.step = time.step,
         parameters = parameters,
@@ -136,10 +139,10 @@ fit_ssm <- function(d,
         lpsi = lpsi
       ),
       silent = TRUE)
-      )
+      ), .keep = "none")
 
     fit <- fit %>%
-      ungroup(.) %>%
+      as_tibble() %>%
       mutate(id = sapply(.$ssm, function(x)
         x$data$id[1])) %>%
       mutate(converged = sapply(.$ssm, function(x)

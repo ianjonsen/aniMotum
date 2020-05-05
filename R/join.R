@@ -4,6 +4,7 @@
 ##'
 ##' @param ssm a \code{foieGras} ssm fitted model object
 ##' @param mpm a \code{foieGras} mpm fitted model object
+##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
 ##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
 ##' coordinates, otherwise return an sf tibble
 ##'
@@ -20,22 +21,21 @@
 ##' fsmp
 ##' @export
 
-join <- function(ssm, mpm, as_sf = TRUE) {
+join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
   
   if(!inherits(ssm, "fG_ssm")) stop("ssm must be a foieGras ssm fit object with class `fG_ssm`")
   if(!inherits(mpm, "fG_mpm")) stop("mpm must be a foieGras mpm fit object with class `fG_mpm`")
   
-  x <- grab(ssm, what = "predicted", as_sf = as_sf) 
-  y <- grab(mpm, what = "fitted") %>% select(id, g, g.se)
+  x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
+  y <- grab(mpm, what = "fitted") %>% select(g, g.se)
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
   if(as_sf) {
-    xy <- bind_cols(x, y) %>% 
-      select(-id1)
+    xy <- bind_cols(x, y)
+    names(xy)[1] <- "id"
   } else {
     xy <- bind_cols(x, y) %>%
-      select(-id1) %>%
       as_tibble()
   }
   

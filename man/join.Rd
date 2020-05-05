@@ -4,12 +4,14 @@
 \alias{join}
 \title{join an mpm-estimated behavioural index to ssm-predicted locations}
 \usage{
-join(ssm, mpm, as_sf = TRUE)
+join(ssm, mpm, what.ssm = "predicted", as_sf = TRUE)
 }
 \arguments{
 \item{ssm}{a \code{foieGras} ssm fitted model object}
 
 \item{mpm}{a \code{foieGras} mpm fitted model object}
+
+\item{what.ssm}{specifies whether ssm `predicted` or `fitted` values are to be extracted}
 
 \item{as_sf}{logical; if FALSE then return a tibble with unprojected lonlat
 coordinates, otherwise return an sf tibble}

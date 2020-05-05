@@ -29,7 +29,7 @@
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
-##' @importFrom dplyr mutate filter select full_join arrange lag bind_cols "%>%"
+##' @importFrom dplyr mutate select full_join arrange lag bind_cols "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##'
@@ -74,8 +74,11 @@ sfilter <-
         if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
 
+    ## unlist x
+    x <- x[[1]]
+    
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
-    if(fit.to.subset) xx <- x %>% filter(keep)
+    if(fit.to.subset) xx <- subset(x, keep)
     else xx <- x
 
     prj <- st_crs(xx)
@@ -97,8 +100,7 @@ sfilter <-
           length.out = max(index) + 2
         ))
     } else {
-      ts <- time.step %>%
-        filter(id == unique(d$id)) %>%
+      ts <- subset(time.step, id %in% unique(d$id)) %>% 
         select(date)
     }
 
@@ -387,16 +389,15 @@ sfilter <-
                loc <-
                  cbind(loc[seq(1, dim(loc)[1], by = 2),],
                        loc[seq(2, dim(loc)[1], by = 2),]) %>%
-                 data.frame() %>%
-                 select(1, 3, 2, 4)
+                 as.data.frame(., row.names = 1:nrow(.))
                names(loc) <- c("x", "y", "x.se", "y.se")
+                         
                vel <-
                  cbind(vel[seq(1, dim(vel)[1], by = 2),],
                        vel[seq(2, dim(vel)[1], by = 2),]) %>%
-                 data.frame() %>%
-                 select(1, 3, 2, 4)
+                 as.data.frame(., row.names = 1:nrow(.))
                names(vel) <- c("u", "v", "u.se", "v.se")
-
+               
                rdm <- bind_cols(loc, vel) %>%
                  mutate(
                    id = unique(d.all$id),
@@ -422,13 +423,11 @@ sfilter <-
              })
 
       ## Fitted values (estimated locations at observation times)
-      fv <- rdm %>%
-        filter(isd) %>%
+      fv <- subset(rdm, isd) %>%
         select(-isd)
 
       ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
-      pv <- rdm %>%
-        filter(!isd) %>%
+      pv <- subset(rdm, !isd) %>%
         select(-isd)
 
       if (optim == "nlminb") {
