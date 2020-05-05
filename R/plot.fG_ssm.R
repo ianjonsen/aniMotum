@@ -15,7 +15,7 @@
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank geom_rug geom_path
 ##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value geom_ribbon
 ##' @importFrom tidyr gather
-##' @importFrom dplyr "%>%" select bind_cols rename filter
+##' @importFrom dplyr "%>%" select bind_cols rename
 ##' @importFrom tibble enframe
 ##' @method plot fG_ssm
 ##'
@@ -49,7 +49,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, .
     
     if(type == 1) {
       foo <- ssm %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
-      foo.se <- ssm %>% select(id, x.se, y.se) %>% gather(., key = "coord", value = "se", x.se, y.se)
+      foo.se <- ssm %>% select(x.se, y.se) %>% gather(., key = "coord.se", value = "se", x.se, y.se)
       bar <- rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
       
       foo.d <- d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
