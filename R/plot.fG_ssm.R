@@ -29,7 +29,6 @@
 
 plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, ...)
 {
-  
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
@@ -56,7 +55,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, .
       foo.d <- d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
       bar.d <- d %>% select(date, lc) %>% bind_rows(., .)
       
-      pd <- bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
+      pd <- bind_cols(foo, select(foo.se, -id, -coord), bar) %>% select(id, date, coord, value, se)
       dd <- bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value)
          
       p <- ggplot() + 
