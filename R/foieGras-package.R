@@ -8,7 +8,9 @@
 ##' @author Ian Jonsen, Toby Patterson
 ##'
 ##' @seealso fit_ssm
-##' @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology 100:e02566
+##' @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) 
+##' Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. 
+##' Ecology 100:e02566
 ##'
 ##' @keywords foieGras
 ##' @importFrom utils data
@@ -79,7 +81,7 @@ NULL
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 
 ## stop R CMD check generating NOTES about global variables
-id <- ssm <- converged <- keep <- id <- y <- x.se <- y.se <- "shut.up"
+id <- ssm <- converged <- keep <- id <- y <- x <- x.se <- y.se <- "shut.up"
 geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
 obs.type <- emf.x <- emf.y <- lon <- lat <- rename <- X <- Y <- "shut.up"
 y.z <- x.z <- z <- out <- r <- sub <- isd <- digits <- "shut.up"
