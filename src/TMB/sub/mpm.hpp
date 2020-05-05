@@ -18,7 +18,7 @@ Type mpm(objective_function<Type>* obj) {
   
   
   // transform parameters
-  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  vector<Type> g = Type(0.001) + (Type(0.999) - Type(0.001)) * Type(1.0) / (Type(1.0) + exp(-lg)); // bounded b/w 0.001 - 0.999
   //vector<Type> lg = log(g / (Type(1.0) - g));
   vector<Type> sigma = exp(log_sigma);
   Type sigma_g = exp(log_sigma_g);

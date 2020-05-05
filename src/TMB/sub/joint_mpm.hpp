@@ -19,7 +19,7 @@ Type joint_mpm(objective_function<Type>* obj) {
   PARAMETER(log_sigma_g);             // logistic scale parameter of rw on lg (log scale)
   
   // Backtransform parameters from link scale
-  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg));
+  vector<Type> g = Type(0.001) + (Type(0.999) - Type(0.001)) * (Type(1.0) / (Type(1.0) + exp(-lg))); // bounded b/w 0.001 - 0.999
   vector<Type> sigma = exp(log_sigma);
   Type sigma_g = exp(log_sigma_g);
     
