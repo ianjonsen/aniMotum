@@ -31,7 +31,7 @@ join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
-  xy <- bind_cols(x, select(y, -id))
+  xy <- bind_cols(x, y) 
   if(!as_sf) {
     xy <- as_tibble(xy)
   }
