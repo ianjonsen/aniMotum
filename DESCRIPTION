@@ -47,7 +47,7 @@ Suggests:
     rmarkdown,
     rgeos
 Remotes:
-    dplyr (>= 0.8.99.9002)
+    github::tidyverse/dplyr
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
