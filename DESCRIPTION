@@ -39,7 +39,9 @@ Imports:
     future (>= 1.13.0),
     furrr (>= 0.1.0),
     rworldmap,
-    parallel
+    parallel,
+    purrr,
+    dplyr (>= 0.8.99.9002)
 Suggests: 
     testthat,
     covr,

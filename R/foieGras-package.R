@@ -81,7 +81,7 @@ NULL
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 
 ## stop R CMD check generating NOTES about global variables
-id <- ssm <- converged <- keep <- id <- y <- x <- x.se <- y.se <- "shut.up"
+id <- tid <- ssm <- converged <- keep <- id <- y <- x <- x.se <- y.se <- "shut.up"
 geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
 obs.type <- emf.x <- emf.y <- lon <- lat <- rename <- X <- Y <- "shut.up"
 y.z <- x.z <- z <- out <- r <- sub <- isd <- digits <- "shut.up"

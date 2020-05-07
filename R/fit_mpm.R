@@ -22,7 +22,8 @@
 ##' 
 ##' 
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr "%>%" group_by ungroup do mutate select
+##' @importFrom dplyr "%>%" mutate
+##' @importFrom purrr map
 ##' @export
 fit_mpm <- function(x,
                     model = c("mpm", "jmpm"),
@@ -43,49 +44,37 @@ fit_mpm <- function(x,
 
   switch(model,
          mpm = {
-           fit <- x %>%
-             group_by(id) %>%
-             do(mpm = try(mpmf(   
-               .,
-               model = model,
-               optim = optim,
-               verbose = verb,
-               control = control,
-               inner.control = inner.control
+           fit <- split(x, x$id) %>%
+             map(~ try(mpmf(.x, 
+                        model = model,
+                        optim = optim,
+                        verbose = verb,
+                        control = control,
+                        inner.control = inner.control
              ), silent = TRUE)
              )
-           
-           fit <- fit %>%
-             ungroup(.) %>%
-             mutate(converged = sapply(.$mpm, function(x)
-               if(length(x) == 8) {
-                 x$opt$convergence == 0
-               } else if(length(x) < 8) {
-                 FALSE
-               })) %>%
-             select(., id, mpm, converged)
+          fit <- tibble(id = names(fit), mpm = fit) %>%
+            mutate(converged = sapply(.$mpm, function(x) 
+              if(length(x) == 8) {
+                x$opt$convergence == 0
+              } else if(length(x) < 8) {
+                FALSE
+              })) %>%
+            mutate(model = sapply(.$mpm, function(x) x$model))
          },
          jmpm = {
-           fit <- x %>%
-             ungroup() %>%
-             do(mpm = try(mpmf( 
-               .,
+           fit <- try(mpmf( 
+               x = x,
                model = model,
                optim = optim,
                verbose = verb,
                control = control,
                inner.control = inner.control
              ), silent = TRUE)
-             )
            
-           fit <- fit %>%
-             mutate(converged = sapply(.$mpm, function(x)
-               if(length(x) == 8) {
-                 x$opt$convergence == 0
-               } else if(length(x) < 8) {
-                 FALSE
-               })) %>%
-             select(., mpm, converged)
+           fit <- tibble(mpm = list(fit)) %>%
+             mutate(converged = ifelse(length(.$mpm[[1]]) == 8, .$mpm[[1]]$opt$convergence == 0, FALSE)) %>%
+             mutate(model = fit$model)
          })
 
   class(fit) <- append("fG_mpm", class(fit))  
