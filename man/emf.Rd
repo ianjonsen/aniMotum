@@ -4,14 +4,36 @@
 \alias{emf}
 \title{emf}
 \usage{
-emf(gps = 0.1)
+emf(
+  gps = 0.1,
+  emf.x = c(1, 1.54, 3.72, 13.51, 23.9, 44.22),
+  emf.y = c(1, 1.29, 2.55, 14.99, 22, 32.53)
+)
+}
+\arguments{
+\item{gps}{error multiplication factor(s) for GPS locations, can be a scalar (x = y) or vector of length 2 (x != y)}
+
+\item{emf.x}{error multiplication factors for Argos longitude classes 3, 2, 1, 0, A, B (Z assumed equal to B)}
+
+\item{emf.y}{error multiplication factors for Argos latitude classes 3, 2, 1, 0, A, B (Z assumed equal to B)}
 }
 \description{
 emf
 }
 \details{
-Error Multiplication Factors for Argos (and GPS) locations. Called by \code{prefilter()}
+Error Multiplication Factors for Argos (and GPS) locations. Default assumption is that GPS locations are
+10x more accurate than Argos lc 3 in both x and y directions.
 }
 \examples{
-emf()
+data(ellie)
+## fit assuming all Argos lc classes have equal precision
+fit <- fit_ssm(ellie[, 1:5], vmax = 5, model = "crw", 
+emf = emf(emf.x = c(1, 1, 1, 1, 1, 1), emf.y  = c(1, 1, 1, 1, 1, 1)))
+
+## fit using default Argos lc class error multiplication factors
+fit1 <- fit_ssm(ellie[, 1:5], vmax = 5, model = "crw", 
+emf = emf())
+
+## compare AIC
+cbind(fit$ssm[[1]]$aic, fit1$ssm[[1]]$aic)
 }
