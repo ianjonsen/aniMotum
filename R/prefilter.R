@@ -21,7 +21,7 @@
 ##' @param min.dt minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
-##' @importFrom dplyr mutate distinct arrange filter select left_join lag rename "%>%" everything
+##' @importFrom dplyr mutate arrange select left_join lag rename "%>%" everything
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom argosfilter sdafilter vmask
 ##' @importFrom tibble as_tibble

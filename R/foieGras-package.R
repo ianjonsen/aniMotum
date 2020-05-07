@@ -11,19 +11,22 @@
 ##' @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) 
 ##' Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. 
 ##' Ecology 100:e02566
+##' @references Jonsen I, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, 
+##' Robinson PW, Votier SC, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid 
+##' quality-control of Argos locations from animal-borne tags. arXiv doi:arxiv:2005.00401
 ##'
 ##' @keywords foieGras
 ##' @importFrom utils data
-##' @importFrom dplyr group_by do rowwise %>% ungroup select mutate slice
+##' @importFrom dplyr %>% select mutate slice
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
-##' @importFrom tibble as_tibble
+##' @importFrom tibble as_tibble tibble
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
 ##' @importFrom argosfilter sdafilter
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom stats approx cov sd predict nlminb optim na.omit
+##' @importFrom stats approx cov sd predict nlminb optim na.omit median
 ##' @importFrom ggplot2 ggplot geom_point geom_path geom_ribbon geom_qq geom_qq_line geom_histogram aes ggtitle theme_bw
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit
 ##' @importFrom ggplot2 element_text scale_colour_viridis_c

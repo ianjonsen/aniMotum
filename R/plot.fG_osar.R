@@ -8,7 +8,6 @@
 ##' @param ... additional arguments to be ignored
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_histogram geom_boxplot geom_vline geom_hline
 ##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip
-##' @importFrom dplyr "%>%" filter
 ##' @method plot fG_osar
 ##'
 ##' @examples

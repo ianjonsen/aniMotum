@@ -4,7 +4,7 @@
 \alias{emf}
 \title{emf}
 \usage{
-emf()
+emf(gps = 0.1)
 }
 \description{
 emf

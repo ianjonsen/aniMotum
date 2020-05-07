@@ -12,7 +12,7 @@
 ##'
 ##' @return a tbl with all individual tbl's appended
 ##'
-##' @importFrom dplyr tbl_df arrange mutate select bind_rows "%>%"
+##' @importFrom dplyr select bind_rows "%>%"
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'

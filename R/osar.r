@@ -15,7 +15,7 @@
 ##' fres <- osar(fssm)
 ##' plot(fres)
 ##'
-##' @importFrom dplyr "%>%" select slice mutate rename bind_rows everything filter
+##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
 ##' @importFrom future makeClusterPSOCK availableCores plan cluster
