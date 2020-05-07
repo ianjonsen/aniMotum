@@ -12,6 +12,7 @@ foieGras.Rproj
 .Rhistory
 data/petrel.RDS
 vignettes/*.html
+vignettes/*.R
 .DS_Store
 src/.DS_Store
 data/ellie_IMOS.RDS
