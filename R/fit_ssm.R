@@ -65,8 +65,8 @@
 ##' ## track plots of fits for both seals
 ##' plot(fits, what = "predicted", type = 2)
 ##'
-##' @importFrom dplyr nest_by rowwise select mutate slice "%>%"
-##' @importFrom tidyr unnest
+##' @importFrom dplyr tibble mutate "%>%"
+##' @importFrom purrr map
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -98,24 +98,25 @@ fit_ssm <- function(d,
   if(verbose %in% c(0,2)) options(dplyr.show_progress = FALSE)
   if(verbose == 1)
     cat("\npre-filtering data...\n")
+
   fit <- d %>%
-    nest_by(id, .keep = TRUE) %>%
-    mutate(pf = list(prefilter(
-      data = data,
-      vmax = vmax,
-      ang = ang,
-      distlim = distlim,
-      spdf = spdf,
-      min.dt = min.dt,
-      emf = emf
-    )), .keep = "none")
+    split(., .$id) %>%
+    map(~ prefilter( 
+        data = .x,
+        vmax = vmax,
+        ang = ang,
+        distlim = distlim,
+        spdf = spdf,
+        min.dt = min.dt,
+        emf = emf))
 
   if(pf){
-    fit <- try(unnest(fit, cols = c(pf)))
+    fit <- try(fit %>% do.call(rbind, .))
     
     if(inherits(fit, "try-error")) 
     stop("\n Cannot unnest multiple guessed projections in pre-filtered output. \n
             Supply data as an `sf` object with a common projection across individuals.\n")
+    
   } else {
     if(verbose == 1)
       cat("\nfitting SSM...\n")
@@ -125,8 +126,8 @@ fit_ssm <- function(d,
       verb <- TRUE
     
     fit <- fit %>%
-      mutate(ssm = list(try(sfilter(
-        x = .$pf,
+      map(~ try(sfilter(
+        x = .x,
         model = model,
         time.step = time.step,
         parameters = parameters,
@@ -139,19 +140,16 @@ fit_ssm <- function(d,
         lpsi = lpsi
       ),
       silent = TRUE)
-      ), .keep = "none")
+      )
 
-    fit <- fit %>%
-      as_tibble() %>%
-      mutate(id = sapply(.$ssm, function(x)
-        x$data$id[1])) %>%
-      mutate(converged = sapply(.$ssm, function(x)
+    fit <- tibble(id = names(fit), ssm = fit) %>%
+      mutate(converged = sapply(.$ssm, function(x) 
         if(length(x) == 15) {
-        x$opt$convergence == 0
-          } else if(length(x) < 15) {
-            FALSE
-          })) %>%
-      select(., id, ssm, converged)
+          x$opt$convergence == 0
+        } else if(length(x) < 15) {
+          FALSE
+        })) %>%
+      mutate(p.model = sapply(.$ssm, function(x) x$pm))
   }
 
   class(fit) <- append("fG_ssm", class(fit))

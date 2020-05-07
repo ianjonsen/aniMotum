@@ -75,7 +75,7 @@ sfilter <-
     }
 
     ## unlist x
-    x <- x[[1]]
+   # x <- x[[1]]
     
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     if(fit.to.subset) xx <- subset(x, keep)
@@ -278,7 +278,7 @@ sfilter <-
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$lonerr, d.all$laterr)
     )
-
+    
     ## TMB - create objective function
     if (is.null(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
@@ -359,7 +359,7 @@ sfilter <-
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
-
+      
       switch(model,
              rw = {
                tmp <- summary(rep, "random")
@@ -390,13 +390,13 @@ sfilter <-
                  cbind(loc[seq(1, dim(loc)[1], by = 2),],
                        loc[seq(2, dim(loc)[1], by = 2),]) %>%
                  as.data.frame(., row.names = 1:nrow(.))
-               names(loc) <- c("x", "y", "x.se", "y.se")
+               names(loc) <- c("x", "x.se", "y", "y.se")
                          
                vel <-
                  cbind(vel[seq(1, dim(vel)[1], by = 2),],
                        vel[seq(2, dim(vel)[1], by = 2),]) %>%
                  as.data.frame(., row.names = 1:nrow(.))
-               names(vel) <- c("u", "v", "u.se", "v.se")
+               names(vel) <- c("u", "u.se", "v", "v.se")
                
                rdm <- bind_cols(loc, vel) %>%
                  mutate(
@@ -406,7 +406,7 @@ sfilter <-
                  ) %>%
                  select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
              })
-
+      
       ## coerce x,y back to sf object
       rdm <- rdm %>%
         st_as_sf(coords = c("x","y"), remove = FALSE) %>%
@@ -429,7 +429,7 @@ sfilter <-
       ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
       pv <- subset(rdm, !isd) %>%
         select(-isd)
-
+      
       if (optim == "nlminb") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
       } else if (optim == "optim") {
