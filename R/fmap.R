@@ -17,7 +17,7 @@
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
-##' @importFrom dplyr summarise "%>%"
+##' @importFrom dplyr summarise "%>%" group_by
 ##' @export
 
 fmap <- function(x,

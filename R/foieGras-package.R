@@ -17,7 +17,7 @@
 ##'
 ##' @keywords foieGras
 ##' @importFrom utils data
-##' @importFrom dplyr %>% select mutate slice
+##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
 ##' @importFrom tibble as_tibble tibble
