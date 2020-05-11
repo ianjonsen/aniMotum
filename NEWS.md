@@ -26,3 +26,4 @@
 * adds ability to fit to Argos and GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) data.frame for Least-Squares and/or GPS locations
 * removes reliance on dplyr::do, which is superseded (which presumably means 'almost deprecated') as of dplyr 1.0.0
+* looses dplyr progressbar when fitting SSM to multiple data set in default verbose mode 1
