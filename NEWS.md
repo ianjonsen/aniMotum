@@ -23,6 +23,6 @@
 
 * adds ability 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
-* adds ability to fit to Argos and GPS locations combined in a single input data.frame
+* adds ability to fit to Argos and GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) data.frame for Least-Squares and/or GPS locations
 * removes reliance on dplyr::do, which is superseded (which presumably means 'almost deprecated') as of dplyr 1.0.0
