@@ -18,3 +18,11 @@
 * adds diagnostic plot functions that handle multi-individual fits, via generic `plot()` method for `fG_ssm` fit objects
 * adds `sf`-enabled mapping function, via `fmap()`
 * fixes CRAN check errors from last version, where proj4string syntax "+init:epsg=" was not suppored in non-PROJ4 emulation mode on some linux platforms
+
+#foieGras 0.6.0
+
+* adds ability 
+* adds ability to fit move persistence models to temporally regular OR irregular location data
+* adds ability to fit to Argos and GPS locations combined in a single input data.frame
+* adds ability to specify an alternate emf (Error Multiplication Factor) data.frame for Least-Squares and/or GPS locations
+* removes reliance on dplyr::do, which is superseded (which presumably means 'almost deprecated') as of dplyr 1.0.0
