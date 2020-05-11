@@ -114,7 +114,7 @@ fit_ssm <- function(d,
     fit <- try(fit %>% do.call(rbind, .))
     
     if(inherits(fit, "try-error")) 
-    stop("\n Cannot unnest multiple guessed projections in pre-filtered output. \n
+    stop("\n Cannot bind tibbles with multiple guessed projections in pre-filtered output. \n
             Supply data as an `sf` object with a common projection across individuals.\n")
     
   } else {
