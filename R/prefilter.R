@@ -8,22 +8,23 @@
 ##' (7) projects lonlat coords to mercator x,y coords (in km);
 ##' (8) adds location error multiplication factors based on Argos location
 ##' class (for type LS);
-##' (9) uses a \code{argosfilter::sdafilter} to identify potential outlier locations
-##' (by distance only) to be ignored when fitting the \code{ctrw} model
+##' (9) uses a \code{trip::sda} to identify potential outlier locations. 
+##' \code{trip::sda} is a fast, vectorised version of \code{argosfilter::sdafilter}
+##' see \code{?argosfilter::sdafilter} for details on implementation
 ##'
 ##' @details called by \code{fit_ssm}.
 ##'
 ##' @param data input data - must have 5 (LS), or 8 (KF) columns (see details)
-##' @param vmax max travel rate (m/s) - see \code{?argosfilter::sdafilter} for details
-##' @param ang angles of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details
-##' @param distlim lengths of outlier location "spikes" - see \code{?argosfilter::sdafilter} for details
+##' @param vmax max travel rate (m/s)
+##' @param ang angles of outlier location "spikes" 
+##' @param distlim lengths of outlier location "spikes"
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate arrange select left_join lag rename "%>%" everything
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
-##' @importFrom argosfilter sdafilter vmask
+##' @importFrom trip sda speedfilter trip
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
 ##'
@@ -53,8 +54,8 @@
 
 prefilter <-
   function(data,
-           vmax = 10,
-           ang = -1,
+           vmax = 5,
+           ang = c(15,25),
            distlim = c(2500, 5000),
            spdf = TRUE,
            min.dt = 60,
@@ -140,7 +141,7 @@ prefilter <-
     mutate(lonerr = lonerr * 6366.71 / 180 * pi,
            laterr = laterr * 6366.71 / 180 * pi) # convert from lon/lat to km (crude)
   
-  ## Use argosfilter::sdafilter to identify outlier locations
+  ## Use trip::sda to identify outlier locations
   if (spdf) {
     if(inherits(d, "sf") && st_is_longlat(d)) {
 
@@ -157,66 +158,48 @@ prefilter <-
         rename(lon = X, lat = Y)
       d <- bind_cols(d, xy)
 
-    }
-
-    filt <- rep("not", nrow(d))
+    } 
+    
+    d.tr <- subset(d, keep) %>% 
+      select(lon,lat,date,id, everything()) %>% 
+      rename(x = lon, y = lat)
+    d.tr <- suppressWarnings(trip(d.tr, correct_all = FALSE))
+    
     tmp <-
-      suppressWarnings(try(with(
-        subset(d, keep),
-        sdafilter(
-          lat,
-          lon,
-          date,
-          lc,
-          vmax = vmax,
+      suppressWarnings(try(
+        sda(
+          d.tr,
+          smax = vmax * 3.6,    # convert m/s to km/h
           ang = ang,
-          distlim = distlim
-        )
-      ),
+          distlim = distlim / 1000     # convert m to km
+        ),
       silent = TRUE)
       )
     ## screen potential sdafilter errors
-    if (!inherits(tmp, "try-error"))
-    {
-      filt[d$keep] <- tmp
-      d <- d %>%
-        mutate(keep = ifelse(filt == "removed", FALSE, keep))
-
-    } else if (inherits(tmp, "try-error")) {
+    if (inherits(tmp, "try-error")) {
 
       warning(
         paste(
-          "\nargosfilter::sdafilter produced an error on id",
+          "\ntrip::sda produced an error on id",
           d$id[1],
-          "using argosfilter::vmask instead"
+          "using trip::speedfilter instead"
         ),
         immediate. = TRUE
       )
 
       tmp <-
-        suppressWarnings(try(with(
-          subset(d, keep),
-          vmask(
-            lat,
-            lon,
-            date,
-            vmax = vmax
-          )
+        suppressWarnings(try(
+          speedfilter(d.tr,
+            max.speed = vmax * 3.6    # convert m/s to km/h
         ),
         silent = TRUE)
         )
 
-      if (!inherits(tmp, "try-error"))
-      {
-        filt[d$keep] <- tmp
-        d <- d %>%
-          mutate(keep = ifelse(filt == "removed", FALSE, keep))
-
-      } else if (inherits(tmp, "try-error")) {
+    if (inherits(tmp, "try-error")) {
 
         warning(
           paste(
-            "\nargosfilter::vmask also produced an error on id",
+            "\ntrip::speedfilter also produced an error on id",
             d$id[1],
             "can not apply speed filter prior to SSM filtering"
           ),
@@ -224,6 +207,7 @@ prefilter <-
         )
       }
     }
+    d[d$keep, "keep"] <- tmp
   }
   
   if(!inherits(d, "sf")) {

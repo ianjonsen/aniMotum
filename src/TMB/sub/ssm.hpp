@@ -124,7 +124,7 @@ Type ssm(objective_function<Type>* obj) {
   for(int i = 0; i < N; ++i) {
     if(isd(i) == 1) {
       if(obs_mod(i) == 0) {
-        // Argos Least Squares observations
+        // Argos Least Squares & GPS observations
         Type s = tau(0) * K(i,0);
         Type q = tau(1) * K(i,1);
         cov_obs(0,0) = s * s;

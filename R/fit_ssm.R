@@ -1,20 +1,19 @@
 ##' @title Fit a continuous-time state-space model to filter Argos satellite geolocation data
 ##'
 ##' @description fits either a simple random walk or a correlated random walk
-##' (a random walk on velocity) in continuous time to filter Argos KF and/or LS data, or 
-##' processed light-level geolocation data. predicts locations at user-specified 
+##' (a random walk on velocity) in continuous time to filter Argos LS, and/or KF/KS location data, 
+##' processed light-level geolocation data (GLS), and/or GPS data. Location data of different types can
+##' combined in a single data frame (see details). Predicts locations at user-specified 
 ##' time intervals (regular or irregular).
 ##'
-##' @param d a data frame of observations including Argos KF error ellipse info
-##' @param vmax max travel rate (m/s) passed to argosfilter::sdafilter to define
+##' @param d a data frame of observations including Argos KF error ellipse info (when present)
+##' @param vmax max travel rate (m/s) passed to \code{trip::sda} to identify
 ##'  outlier locations
-##' @param ang angles of outlier location "spikes" - see ?argosfilter::sdafilter
-##'  for details
-##' @param distlim lengths of outlier location "spikes" - see
-##' ?argosfilter::sdafilter for details
-##' @param spdf (logical) turn argosfilter::sdafilter on (default; TRUE) or off
+##' @param ang angles (deg) of outlier location "spikes" 
+##' @param distlim lengths (m) of outlier location "spikes" 
+##' @param spdf (logical) turn \code{trip::sda} on (default; TRUE) or off
 ##' @param min.dt minimum allowable time difference between observations;
-##' dt <= min.dt will be ignored by the SSM
+##' \code{dt <= min.dt} will be ignored by the SSM
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit either a simple random walk ("rw") or correlated random walk
 ##' ("crw") as a continuous-time process model
@@ -22,7 +21,7 @@
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates.
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. Default behaviour is to use the factors supplied in foieGras::emf()
-##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))
+##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., \code{list(psi = factor(NA))}
 ##' @param parameters a list of initial values for all model parameters and
 ##' unobserved states, default is to let sfilter specify these. Only play with
 ##' this if you know what you are doing...
@@ -30,11 +29,22 @@
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
 ##' @param verbose report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar
-##' @param control list of control settings for the outer optimizer (see ?nlminb or ?optim for details)
-##' @param inner.control list of control settings for the inner optimizer (see ?TMB::MakeADFUN for additional details)
+##' @param control list of control settings for the outer optimizer (see \code{?nlminb} or \code{?optim} for details)
+##' @param inner.control list of control settings for the inner optimizer (see \code{?TMB::MakeADFUN} for additional details)
 ##' @param lpsi lower bound for the psi parameter
-
 ##'
+##' @details \code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
+##' Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
+##' object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
+##' can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Z class values are 
+##' assumed to have the same error variances as B class. By default, G class (GPS) locations are assumed to have error variances 10x smaller than
+##' Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. See \code{?prefilter} and 
+##' \code{?emf} for details on how to modify these assumptions. Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the 
+##' above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor"). Light-level 
+##' geolocation (GLS) locations can be modelled provided each longitude and latitude has a corresponding standard error. These data should have 
+##' 7 columns, including the above 5 plus "lonerr", "laterr" (in degrees). In this case, all lc values should be set to "GL". Multiple location
+##' data types can be combined in a single data frame (see the vignette for examples).
+##' 
 ##' @return a list with components
 ##' \item{\code{call}}{the matched call}
 ##' \item{\code{predicted}}{an sf tbl of predicted location states}
@@ -70,8 +80,8 @@
 ##'
 ##' @export
 fit_ssm <- function(d,
-                    vmax = 10,
-                    ang = -1,
+                    vmax = 5,
+                    ang = c(15,25),
                     distlim = c(2500,5000),
                     spdf = TRUE,
                     min.dt = 60,

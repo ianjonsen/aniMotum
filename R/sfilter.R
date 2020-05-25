@@ -171,82 +171,70 @@ sfilter <-
 
     ## calculate prop'n of obs that are LS-derived
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
-    pls <- table(d$obs.type)["LS"] / nrow(d)
-
-    automap <- switch(model,
-                  rw = {
-                    if (pls > 0 & pls < 1) {
-                      list(logD = factor(NA),
-                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                      )
-                    } else if (pls == 1) {
-                      list(l_psi = factor(NA),
-                           logD = factor(NA),
-                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                           )
-                    } else if (pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "GPS") {
-                      list(l_psi = factor(NA),
-                           logD = factor(NA),
-                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                      )
-                    } else if (pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "KF") {
-                      list(l_tau = factor(c(NA, NA)),
-                           l_rho_o = factor(NA),
-                           logD = factor(NA),
-                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                           )
-                    } else if(pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "GLS") {
-                      list(l_tau = factor(c(NA, NA)),
-                           l_psi = factor(NA),
-                           logD = factor(NA),
-                           mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                           v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                           )
-                    } 
-                  },
-                  crw = {
-                    if (pls > 0 & pls < 1) {
-                      list(l_sigma = factor(c(NA, NA)),
+    obst <- which(table(d$obs.type) > 0)
+    
+    automap <- switch(model, 
+                     rw = {
+                       list(
+                         list(l_psi = factor(NA),
+                            logD = factor(NA),
+                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            ),
+                         list(l_tau = factor(c(NA, NA)),
+                            l_rho_o = factor(NA),
+                            logD = factor(NA),
+                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            ),
+                         list(l_tau = factor(c(NA, NA)),
+                            l_psi = factor(NA),
+                            logD = factor(NA),
+                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            ),
+                         list(l_psi = factor(NA),
+                            logD = factor(NA),
+                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            )
+                         )
+                       },
+                     crw = {
+                       list(
+                         list(
+                           l_sigma = factor(c(NA, NA)),
                            l_rho_p = factor(NA),
-                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
-                      )
-                    } else if (pls == 1) {
-                      list(
-                        l_sigma = factor(c(NA, NA)),
-                        l_rho_p = factor(NA),
-                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        l_psi = factor(NA)
-                      )
-                    } else if (pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "GPS") {
-                      list(
-                        l_sigma = factor(c(NA, NA)),
-                        l_rho_p = factor(NA),
-                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        l_psi = factor(NA)
-                      )
-                    } else if (pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "KF") {
-                      list(
-                        l_sigma = factor(c(NA, NA)),
-                        l_rho_p = factor(NA),
-                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        l_tau = factor(c(NA, NA)),
-                        l_rho_o = factor(NA)
-                      )
-                    } else if (pls == 0 & length(unique(d$obs.type)) == 1 & unique(d$obs.type) == "GLS") {
-                      list(
-                        l_sigma = factor(c(NA, NA)),
-                        l_rho_p = factor(NA),
-                        X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                        l_tau = factor(c(NA, NA)),
-                        l_psi = factor(NA)
-                      )
-                    }
-                  })
-
+                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           l_psi = factor(NA)
+                         ),
+                         list(
+                           l_sigma = factor(c(NA, NA)),
+                           l_rho_p = factor(NA),
+                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           l_tau = factor(c(NA, NA)),
+                           l_rho_o = factor(NA)
+                         ),
+                         list(
+                           l_sigma = factor(c(NA, NA)),
+                           l_rho_p = factor(NA),
+                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           l_tau = factor(c(NA, NA)),
+                           l_psi = factor(NA)
+                         ),
+                         list(
+                           l_sigma = factor(c(NA, NA)),
+                           l_rho_p = factor(NA),
+                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
+                           l_psi = factor(NA)
+                         )
+                       )
+                     })
+    
+    mm <- unlist(automap[obst], recursive = FALSE)
+    mm[which(duplicated(names(mm)))] <- NULL
+    automap <- mm
+    
     if(!is.null(map)) {
       names(map) <- paste0("l_", names(map))
       map <- append(automap, map, after = 0)
