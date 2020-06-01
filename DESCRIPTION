@@ -40,7 +40,7 @@ Imports:
     rworldmap,
     parallel,
     purrr,
-    dplyr (>= 0.8.99.9002),
+    dplyr (>= 1.0.0),
     trip
 Suggests: 
     testthat,
