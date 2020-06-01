@@ -159,11 +159,10 @@ prefilter <-
       d <- bind_cols(d, xy)
 
     } 
-    
     d.tr <- subset(d, keep) %>% 
       select(lon,lat,date,id, everything()) %>% 
       rename(x = lon, y = lat)
-    d.tr <- suppressWarnings(trip(d.tr, correct_all = FALSE))
+    d.tr <- suppressWarnings(trip(d.tr, TORnames = c("date", "id"), correct_all = FALSE))
     
     tmp <-
       suppressWarnings(try(
