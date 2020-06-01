@@ -48,8 +48,6 @@ Suggests:
     knitr,
     rmarkdown,
     rgeos
-Remotes:
-    github::tidyverse/dplyr
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
