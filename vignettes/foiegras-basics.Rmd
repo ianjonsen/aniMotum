@@ -103,18 +103,18 @@ plot(fit, what = "fitted", type = 2)
 The predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the prefilter stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
 
 As SSMs are latent variable models, evaluating their goodness of fit is less straightforward than simpler statistical models without latent variables. We can use One-Step-Ahead (prediction) residuals via `foieGras::osar`. Here we use `osar` to compare SSM fits of the `rw` and `crw` model to the same example southern elephant seal data.
-```{r osar comp, eval = FALSE, fig.width=7, fig.height=5, message=FALSE}
+```{r osar comp, fig.width=7, fig.height=5, message=FALSE}
 
 ## fit crw SSM
 fitc <- fit_ssm(ellie, model = "crw", time.step = 24, verbose = 0)
 
 ## calculate OSA resids for both models
-fit_res <- osar(fit)
-fitc_res <- osar(fitc)
+#fit_res <- osar(fit)
+#fitc_res <- osar(fitc)
 
 ## plot residuals
-plot(fit_res)
-plot(fitc_res)
+#plot(fit_res)
+#plot(fitc_res)
 ```
 The `crw` model appears provide a better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require *considerable* computation time, especially when calculating across multiple individual fits.  
 
