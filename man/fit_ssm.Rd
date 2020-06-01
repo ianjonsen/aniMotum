@@ -28,7 +28,7 @@ fit_ssm(
 \arguments{
 \item{d}{a data frame of observations including Argos KF error ellipse info (when present)}
 
-\item{vmax}{max travel rate (m/s) passed to \code{trip::sda} to identify
+\item{vmax}{max travel rate (m/s) passed to \code{\link{sda}} to identify
 outlier locations}
 
 \item{ang}{angles (deg) of outlier location "spikes"}
@@ -64,9 +64,9 @@ this if you know what you are doing...}
 
 \item{verbose}{report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar}
 
-\item{control}{list of control settings for the outer optimizer (see \code{?nlminb} or \code{?optim} for details)}
+\item{control}{list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)}
 
-\item{inner.control}{list of control settings for the inner optimizer (see \code{?TMB::MakeADFUN} for additional details)}
+\item{inner.control}{list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)}
 
 \item{lpsi}{lower bound for the psi parameter}
 }
@@ -97,14 +97,22 @@ time intervals (regular or irregular).
 \code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
 Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
 object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
-can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Z class values are 
-assumed to have the same error variances as B class. By default, G class (GPS) locations are assumed to have error variances 10x smaller than
-Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. See \code{?prefilter} and 
-\code{?emf} for details on how to modify these assumptions. Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the 
-above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor"). Light-level 
-geolocation (GLS) locations can be modelled provided each longitude and latitude has a corresponding standard error. These data should have 
-7 columns, including the above 5 plus "lonerr", "laterr" (in degrees). In this case, all lc values should be set to "GL". Multiple location
-data types can be combined in a single data frame (see the vignette for examples).
+can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are 
+assumed to have the same error variances as class B. By default, class G (GPS) locations are assumed to have error variances 10x smaller than
+Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. See \code{\link{prefilter}} and 
+\code{\link{emf}} for details on how to modify these assumptions. 
+
+Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the 
+above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor"). 
+
+Light-level geolocation (GLS) locations can be modelled provided each longitude and latitude has a corresponding standard error. These data 
+should have 7 columns, including the above 5 plus "lonerr", "laterr" (in degrees). In this case, all lc values should be set to "GL". 
+
+Multiple location data types can be combined in a single data frame (see the vignette for examples). 
+
+When data are provided as an \code{sf-tibble}, the user-specified projection is respected. Otherwise, longlat data are reprojected internally 
+to a global Mercator grid and provided as the default output. An unprojected \code{tibble} of lon,lat and x,y location estimates can be 
+obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 }
 \examples{
 ## fit rw model to one seal with Argos KF data
@@ -121,4 +129,12 @@ fits <- fit_ssm(ellies, model = "crw", time.step = 24)
 ## track plots of fits for both seals
 plot(fits, what = "predicted", type = 2)
 
+}
+\references{
+Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robison PW, Votier SC. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. arXiv preprint arXiv:2005.00401. May 1.
+
+Jonsen ID, McMahon CR, Patterson TA, Auger‐Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
+}
+\seealso{
+\code{\link{prefilter}} \code{\link{sfilter}}
 }
