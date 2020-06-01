@@ -5,7 +5,6 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{foieGras-basics}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include = FALSE}
@@ -116,7 +115,7 @@ fitc <- fit_ssm(ellie, model = "crw", time.step = 24, verbose = 0)
 #plot(fit_res)
 #plot(fitc_res)
 ```
-The `crw` model appears provide a better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require *considerable* computation time, especially when calculating across multiple individual fits.  
+The `crw` model appears provide a better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require considerable computation time, especially when calculating across multiple individual fits.  
 
 Estimated tracks can be mapped using the `fmap` function, which uses the `foieGras`-applied projection (Global Mercator). Projections can be changed easily via the `crs` argument in the form of a proj4string (as in the example, below).
 ```{r ggplot map, fig.width=5, fig.height=5, message=FALSE}
@@ -170,7 +169,7 @@ fmp <- fit2 %>%
 fmp
 ```
 
-We can visualize the estimated behavioural index (move persistence) as a time series for each seal. The move persistence parameter $g_t$ ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
+We can visualize the estimated behavioural index (move persistence) as a time series for each seal. The move persistence parameter ($\gamma_t$) ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
 ```{r plot mpm ts 1, fig.width=7, fig.height=5, message=FALSE}
 ## plot mpm estimates by individual seal
 grab(fmp, "fitted") %>% 
@@ -182,9 +181,9 @@ grab(fmp, "fitted") %>%
 
 ```
 
-A joint move persistence model `jmpm` is also available for fitting to multiple individuals. This model fits to all individuals simultaneously, estimating a joint random walk variance parameter that can often better resolve subtle variations in $g_t$. 
+A joint move persistence model `jmpm` is also available for fitting to multiple individuals. This model fits to all individuals simultaneously, estimating a joint random walk variance parameter that can often better resolve subtle variations in $\gamma_t$. 
 
-We can explore the spatio-temporal variation in movement behaviour by plotting the $g_t$ values along each seal's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
+We can explore the spatio-temporal variation in movement behaviour by plotting the $\gamma_t$ values along each seal's track, but first we have to merge the ssm-predicted locations with the move persistence estimates using `foieGras::join()`
 ```{r plot mpm track, fig.width=7, fig.height=5, message=FALSE}
 
 ## join ssm predicted locations and move persistence values together
