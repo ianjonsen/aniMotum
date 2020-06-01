@@ -5,6 +5,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{foieGras-basics}
   %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include = FALSE}
@@ -27,9 +28,9 @@ This vignette provides a (very) brief overview of how to use `foieGras` to filte
 - a simple Random Walk model, `rw`
 - a Correlated Random Walk model, `crw`  
 
-Both models are continuous-time models, that is, they account for time intervals between successive observations, thereby naturally accounting for the irregularly-timed nature of most Argos data. We won't dwell on the details of the models here, those will come in a future paper, except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.
+Both models are continuous-time models, that is, they account for time intervals between successive observations, thereby naturally accounting for the irregularly-timed nature of most Argos data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.
 
-Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see Jonsen et al. 2019 Ecology 100:e02566 for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple individual track simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements.
+Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple individual track simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements.
 
 ### input data
 `foieGras` expects data to be provided in one of several possible formats.
@@ -125,7 +126,7 @@ fmap(fitc, what = "predicted", obs = FALSE)
 ## change projection to Antarctic Polar Stereographic centred on 
 ##  the approximate mid-point of the track
 fmap(fitc, what = "predicted", 
-     crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=85 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs")
+     crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=85 +ellps=WGS84 +units=km")
 ```
 
 The estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
