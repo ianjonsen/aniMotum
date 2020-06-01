@@ -28,10 +28,10 @@
 ##' @importFrom trip sda speedfilter
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median
+##' @importFrom utils flush.console
 ##' @importFrom ggplot2 ggplot geom_point geom_path geom_ribbon geom_qq geom_qq_line geom_histogram aes ggtitle theme_bw
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit
 ##' @importFrom ggplot2 element_text scale_colour_viridis_c
-##' @importFrom gridExtra grid.arrange
 ##' @importFrom grDevices extendrange grey
 NULL
 
