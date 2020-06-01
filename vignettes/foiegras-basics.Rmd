@@ -141,7 +141,7 @@ plocs <- grab(fitc, "p", as_sf = FALSE)
 plocs
 ```
 
-`fit_ssm` can be applied to single tracks as shown, it can also fit to multiple individual tracks in a single input `tibble` opr `data.frame`. The SSM is fit to each individual separately. The resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
+`fit_ssm` can be applied to single tracks as shown, it can also fit to multiple individual tracks in a single input `tibble` or `data.frame`. The SSM is fit to each individual separately. The resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
 ```{r multi-fits}
 # load 2 southern elephant seal example data
 data(ellies)

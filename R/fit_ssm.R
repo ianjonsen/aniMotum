@@ -28,7 +28,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by \code{prefilter}
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param verbose report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar
+##' @param verbose report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace
 ##' @param control list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)
 ##' @param inner.control list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)
 ##' @param lpsi lower bound for the psi parameter
@@ -78,7 +78,7 @@
 ##' @examples
 ##' ## fit rw model to one seal with Argos KF data
 ##' data(ellie)
-##' fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+##' fit <- fit_ssm(ellie, model = "rw", time.step = 24, optim = "nlminb")
 ##' 
 ##' ## time series plots of predicted value fits
 ##' plot(fit, what = "predicted", type = 1)
@@ -121,8 +121,8 @@ fit_ssm <- function(d,
   if(!is.numeric(min.dt)) stop("\nmin.dt must be a numeric value in s")
 
   if(verbose %in% c(0,2)) options(dplyr.show_progress = FALSE)
-  if(verbose == 1)
-    cat("\npre-filtering data...\n")
+##  if(verbose == 1)
+##    cat("\npre-filtering data...\n")
 
   fit <- d %>%
     split(., .$id) %>%
@@ -144,11 +144,7 @@ fit_ssm <- function(d,
     
   } else {
     if(verbose == 1)
-      cat("\nfitting SSM...\n")
-    if (verbose %in% 0:1)
-      verb <-  FALSE
-    else
-      verb <- TRUE
+      cat("fitting SSM...\n")
     
     fit <- fit %>%
       map(~ try(sfilter(
@@ -159,7 +155,7 @@ fit_ssm <- function(d,
         map = map,
         fit.to.subset = fit.to.subset,
         optim = optim,
-        verbose = verb,
+        verbose = verbose,
         control = control,
         inner.control = inner.control,
         lpsi = lpsi

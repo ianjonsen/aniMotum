@@ -21,7 +21,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param verbose report progress during minimization
+##' @param verbose report progress during minimization (0 = silent; 1 = show parameter trace; 2 = show optimizer trace)
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
@@ -48,7 +48,7 @@ sfilter <-
            map = NULL,
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
-           verbose = FALSE,
+           verbose = 1,
            control = NULL,
            inner.control = NULL,
            lpsi=-10) {
@@ -271,6 +271,7 @@ sfilter <-
     if (is.null(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
+    verb <- ifelse(verbose == 2, TRUE, FALSE)
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
     obj <-
       MakeADFun(
@@ -281,19 +282,19 @@ sfilter <-
         hessian = FALSE,
         method = "L-BFGS-B",
         DLL = "foieGras",
-        silent = !verbose,
+        silent = !verb,
         inner.control = inner.control
       )
     #    newtonOption(obj, trace = verbose, smartsearch = TRUE)
     #    obj$env$inner.control$trace <- verbose
     #    obj$env$inner.control$smartsearch <- FALSE
     #    obj$env$inner.control$maxit <- 1
-    obj$env$tracemgc <- verbose
+    obj$env$tracemgc <- verb
 
     ## add par values to trace if verbose = TRUE
     myfn <- function(x) {
-      print("pars:")
-      print(x)
+      cat("\r", "pars:  ", round(x, 5), "     ")
+      flush.console()
       obj$fn(x)
     }
 
@@ -321,7 +322,7 @@ sfilter <-
     opt <-
       suppressWarnings(switch(optim,
                               nlminb = try(nlminb(obj$par,
-                                                  obj$fn,
+                                                  ifelse(verbose == 1, myfn, obj$fn),
                                                   obj$gr,
                                                   control = control,
                                                   lower = L,
@@ -332,7 +333,7 @@ sfilter <-
                                 optim,
                                 args = list(
                                   par = obj$par,
-                                  fn = obj$fn,
+                                  fn = ifelse(verbose == 1, myfn, obj$fn),
                                   gr = obj$gr,
                                   method = "L-BFGS-B",
                                   control = control,

@@ -62,7 +62,7 @@ this if you know what you are doing...}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
-\item{verbose}{report progress during minimization; 0 for complete silence; 1 for progress bar only; 2 for minimizer trace but not progress bar}
+\item{verbose}{report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace}
 
 \item{control}{list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)}
 
@@ -117,7 +117,7 @@ obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 \examples{
 ## fit rw model to one seal with Argos KF data
 data(ellie)
-fit <- fit_ssm(ellie, model = "rw", time.step = 24)
+fit <- fit_ssm(ellie, model = "rw", time.step = 24, optim = "nlminb")
 
 ## time series plots of predicted value fits
 plot(fit, what = "predicted", type = 1)

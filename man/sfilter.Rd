@@ -12,7 +12,7 @@ sfilter(
   map = NULL,
   fit.to.subset = TRUE,
   optim = c("nlminb", "optim"),
-  verbose = FALSE,
+  verbose = 1,
   control = NULL,
   inner.control = NULL,
   lpsi = -10
@@ -38,7 +38,7 @@ this if you know what you are doing...}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
 
-\item{verbose}{report progress during minimization}
+\item{verbose}{report progress during minimization (0 = silent; 1 = show parameter trace; 2 = show optimizer trace)}
 
 \item{control}{list of control parameters for the outer optimization (type ?nlminb or ?optim for details)}
 
