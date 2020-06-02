@@ -2,7 +2,7 @@
 % Please edit documentation in R/sfilter.R
 \name{sfilter}
 \alias{sfilter}
-\title{fit the state-space model to \code{prefilter}-ed data}
+\title{fit the state-space model to data after passing through \code{prefilter}}
 \usage{
 sfilter(
   x,
@@ -55,7 +55,7 @@ optimizer (\code{nlminb} or \code{optim}); structures and passes output
 object to \code{fit_ssm}
 }
 \details{
-called by \code{fit_ssm}. \code{sfilter} can only fit to an
+called by \code{fit_ssm}, not intended for general use. \code{sfilter} can only fit to an
 individual track, use \code{fit_ssm} to fit to multiple tracks (see ?fit_ssm).
 }
 \examples{

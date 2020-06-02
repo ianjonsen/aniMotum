@@ -2,7 +2,7 @@
 % Please edit documentation in R/grab.R
 \name{grab}
 \alias{grab}
-\title{grab tbl's by name from a foieGras model object}
+\title{grab tibble's by name from a foieGras model object}
 \usage{
 grab(x, what = "fitted", as_sf = TRUE)
 }
@@ -16,12 +16,12 @@ grab(x, what = "fitted", as_sf = TRUE)
 coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.}
 }
 \value{
-a tbl with all individual tbl's appended
+a tibble with all individual tibble's appended
 }
 \description{
-`grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's
-from a compound tbl created when fitting to multiple individual data sets.
-The specified tbl's are appended to a single output tbl.
+`grab()` lets you obtain `fitted`, `predicted`, or `data` tibble's
+from a compound tibble created when fitting to multiple individual data sets.
+The specified tibble's are appended to a single output tibble.
 }
 \examples{
 ## load example foieGras fit object (to save time)

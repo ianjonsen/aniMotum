@@ -1,4 +1,4 @@
-##' @title fit the state-space model to \code{prefilter}-ed data
+##' @title fit the state-space model to data after passing through \code{prefilter}
 ##'
 ##' @description generates initial values for model parameters and unobserved states;
 ##' structures data and initial values for C++ \code{TMB} template;
@@ -6,7 +6,7 @@
 ##' optimizer (\code{nlminb} or \code{optim}); structures and passes output
 ##' object to \code{fit_ssm}
 ##'
-##' @details called by \code{fit_ssm}. \code{sfilter} can only fit to an
+##' @details called by \code{fit_ssm}, not intended for general use. \code{sfilter} can only fit to an
 ##' individual track, use \code{fit_ssm} to fit to multiple tracks (see ?fit_ssm).
 ##'
 ##' @param x Argos data passed through prefilter()

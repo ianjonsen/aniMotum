@@ -55,7 +55,7 @@ specified as a data.frame with id and POSIXt dates.}
 
 \item{parameters}{a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specify these. Only play with
-this if you know what you are doing...}
+this if you know what you are doing}
 
 \item{fit.to.subset}{fit the SSM to the data subset determined by \code{prefilter}
 (default is TRUE)}
@@ -133,7 +133,7 @@ plot(fits, what = "predicted", type = 2)
 \references{
 Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robison PW, Votier SC. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. arXiv preprint arXiv:2005.00401. May 1.
 
-Jonsen ID, McMahon CR, Patterson TA, Auger‐Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
+Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 }
 \seealso{
 \code{\link{prefilter}} \code{\link{sfilter}}

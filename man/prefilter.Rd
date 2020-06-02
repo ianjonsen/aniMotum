@@ -15,7 +15,7 @@ prefilter(
 )
 }
 \arguments{
-\item{data}{input data - must have 5 (LS), or 8 (KF) columns (see details)}
+\item{data}{input data, must have 5 (LS), or 8 (KF) columns (see details)}
 
 \item{vmax}{max travel rate (m/s)}
 

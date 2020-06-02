@@ -1,8 +1,8 @@
-##' @title grab tbl's by name from a foieGras model object
+##' @title grab tibble's by name from a foieGras model object
 ##'
-##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tbl's
-##' from a compound tbl created when fitting to multiple individual data sets.
-##' The specified tbl's are appended to a single output tbl.
+##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tibble's
+##' from a compound tibble created when fitting to multiple individual data sets.
+##' The specified tibble's are appended to a single output tibble.
 ##'
 ##' @param x a \code{foieGras} ssm or mpm model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
@@ -10,7 +10,7 @@
 ##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
 ##' coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
 ##'
-##' @return a tbl with all individual tbl's appended
+##' @return a tibble with all individual tibble's appended
 ##'
 ##' @importFrom dplyr select bind_rows "%>%"
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs

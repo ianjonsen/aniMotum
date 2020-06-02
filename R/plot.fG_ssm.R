@@ -8,9 +8,9 @@
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects
 ##' @param ... additional arguments to be ignored
 ##' 
-##' @return a ggplot object with either: (type = 1) 1-D time series of fits to data, 
+##' @return a ggplot object with either: (type = 1) 1-d time series of fits to data, 
 ##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
-##' or (type = 2) 2-D fits to data (units = km)
+##' or (type = 2) 2-d fits to data (units = km)
 ##' 
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank geom_rug geom_path
 ##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value geom_ribbon

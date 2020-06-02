@@ -14,7 +14,7 @@
 ##'
 ##' @details called by \code{fit_ssm}.
 ##'
-##' @param data input data - must have 5 (LS), or 8 (KF) columns (see details)
+##' @param data input data, must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s)
 ##' @param ang angles of outlier location "spikes" 
 ##' @param distlim lengths of outlier location "spikes"
