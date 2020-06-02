@@ -22,17 +22,17 @@ library(sf)
 ```
 
 ## Disclaimer
-This vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
+this vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
 
 ### foieGras models
-This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+this vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
 
 - a simple Random Walk model, `rw`
 - a Correlated Random Walk model, `crw`  
 
-Both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. 
+both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. 
 
-Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. 
+additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularised locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Methe et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter.
 
 ### input data
 `foieGras` expects data to be provided in one of several possible formats.
@@ -106,6 +106,76 @@ head(data.frame(foo))
     smin = c(NA, 45, NA, 1723, 3303),
     eor = c(NA, 77, NA, 101, 97)
   )
-
 ```
 
+### fitting a foieGras model
+model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
+```{r fit_ssm, message=FALSE}
+## load foieGras example data - 2 southern elephant seals
+data(ellies)
+## prefilter and fit Random Walk SSM using a 24 h time step
+fit <- fit_ssm(ellies, model = "rw", time.step = 24, verbose = 0)
+```
+these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `verbose = 0` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
+
+`fit_ssm` can be applied to single tracks or to multiple tracks, as shown above. The SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
+```{r multi-fits, message=FALSE}
+## list fit outcomes for both seals
+fit
+```
+individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, `convergence` status of each model fit is displayed in the 3rd column, and the specified process model (`rw` or `crw`) in the 4th column.
+
+### accessing and visualizing model fit objects
+simple summary information about the `foieGras` fit can be obtained by calling the fit object:
+```{r fit summary, message = FALSE}
+fit$ssm[[1]]
+```
+and a summary `plot` method allows a quick visual of the SSM fit to the data:
+```{r fit plot, fig.width=6,fig.height=8}
+# plot time-series of the predicted values
+plot(fit, what = "predicted", type = 1)
+plot(fit, what = "fitted", type = 2)
+```
+the predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the prefilter stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
+
+as SSMs are latent variable models, evaluating their goodness of fit is less straightforward than non-latent variable models. We can use One-Step-Ahead (prediction) residuals via `foieGras::osar`. Here we use `osar` to compare SSM fits of the `rw` and `crw` model to the same example southern elephant seal data. For speed, we'll just compare residuals for one of the two seals.
+```{r osar comp, fig.width=7, fig.height=5, message=FALSE}
+
+## fit crw SSM
+fitc <- fit_ssm(ellies %>% filter(id == "ct96-16-13"), model = "crw", time.step = 24, verbose = 0)
+
+## calculate OSA resids for both models
+fit_res <- osar(fit[2, ])
+fitc_res <- osar(fitc)
+
+## plot residuals
+plot(fit_res)
+plot(fitc_res)
+```
+the `crw` model appears provide a slightly better fit than the `rw` model, with standardized OSA residuals conforming more closely to a theoretical Normal distribution. One note of caution when calculating OSA residuals, the underlying `TMB::oneStepPredict` method is currently experimental and can require considerable computation time, especially when calculating across multiple individual fits.  
+
+estimated tracks can be mapped using the `fmap` function, which uses the `foieGras`-applied projection (Global Mercator). Projections can be changed easily via the `crs` argument in the form of a proj4string (as in the example, below).
+```{r ggplot map, fig.width=6, fig.height=5, message=FALSE}
+## map ssm-predicted values without observations
+fmap(fitc, what = "predicted")
+
+## change projection to Antarctic Polar Stereographic centred on 
+##  the approximate mid-point of the track
+fmap(fitc, what = "predicted", 
+     crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=100 +ellps=WGS84 +units=km")
+```
+
+the estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
+```{r grab}
+## grab fitted locations from fit object as a projected sf object 
+locs_sf <- grab(fitc, what = "f")
+
+## projected locations have this structure
+locs_sf
+
+## grab predicted locations in unprojected form, returning as a tibble
+locs <- grab(fitc, "p", as_sf = FALSE)
+
+## unprojected locations have this structure
+locs
+```
