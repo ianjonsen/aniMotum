@@ -16,3 +16,4 @@ vignettes/*.R
 .DS_Store
 src/.DS_Store
 data/ellie_IMOS.RDS
+inst/doc

@@ -1,0 +1,35 @@
+---
+title: "foiegras"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{foiegras}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(foieGras)
+library(dplyr)
+library(ggplot2)
+library(sf)
+```
+
+## Disclaimer
+This vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
+
+### foieGras models
+This vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+
+- a simple Random Walk model, `rw`
+- a Correlated Random Walk model, `crw`  
+
+Both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. 
+
+Additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. 
