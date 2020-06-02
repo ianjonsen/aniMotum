@@ -183,5 +183,29 @@ locs
 `fmap` automatically handles ssm fit objects with multiple individuals, plotting all on a single map
 ```{r ggplot map 2, fig.width=5, fig.height=5, message=FALSE}
 ## map predicted values and observations
-fmap(fit, "p", obs = TRUE, col = "orange")
+fmap(fit, "p", obs = TRUE)
+```
+
+### estimating behaviour along tracks
+a behavioural index can be estimated from locations provided they occur regularly in time and they either have minimal location error (i.e. GPS data) or they have been SSM-filtered. We can fit the `mpm` to `foieGras` ssm-predicted locations. Here we use the SSM fits to the southern elephant seal data
+```{r fit mpm, message=FALSE}
+## fit mpm separately to each individual track
+fmp <- fit %>% 
+  grab(., "p", as_sf = FALSE) %>%
+  select(id, date, lon, lat) %>%
+  fit_mpm(., model = "mpm")
+
+fmp
+```
+
+the estimated behavioural index (move persistence) can be visualized as a time series for each seal. The move persistence parameter ($\gamma_t$) ranges continuously from 0 (little persistence, indicative of area-restricted movements) to 1 (high persistence, indicative of directed movements).
+```{r plot mpm ts 1, fig.width=7, fig.height=5, message=FALSE}
+## plot mpm estimates by individual seal
+grab(fmp, "fitted") %>% 
+  ggplot() +
+  geom_point(aes(date, g, colour = g)) +
+  scale_colour_viridis_c(limits = c(0,1)) +
+  ylim(0,1) +
+  facet_wrap(~ id, scales = "free_x", ncol = 1)
+
 ```
