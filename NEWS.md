@@ -17,13 +17,13 @@
 * adds One-Step-Ahead prediction residuals for evaluating SSM fits, via `osar()` and generic `plot()` method for `osar` output
 * adds diagnostic plot functions that handle multi-individual fits, via generic `plot()` method for `fG_ssm` fit objects
 * adds `sf`-enabled mapping function, via `fmap()`
-* fixes CRAN check errors from last version, where proj4string syntax "+init:epsg=" was not suppored in non-PROJ4 emulation mode on some linux platforms
+* fixes CRAN check errors from last version, where proj4string syntax `+init:epsg=` was not suppored in non-PROJ4 emulation mode on some linux platforms
 
 #foieGras 0.6.0
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
 * adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
-* adds ability to specify an alternate emf (Error Multiplication Factor) data.frame for Least-Squares and/or GPS locations
-* removes reliance on dplyr::do, which is superseded (which presumably means 'almost deprecated') as of dplyr 1.0.0
+* adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
+* removes reliance on `dplyr::do`, which is superseded (which presumably means 'almost deprecated') as of `dplyr 1.0.0`
 * looses dplyr progressbar when fitting SSM to multiple data set in default verbose mode 1
-* replaces argosfilter::sdafilter in favour of trip::sda (which is a faster, vectorised version of the former) to pre-filter outlier locations
+* replaces `argosfilter::sdafilter` in favour of `trip::sda` (which is a faster, vectorised version of the former) to prefilter outlier locations
