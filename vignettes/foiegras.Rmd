@@ -204,8 +204,9 @@ the estimated behavioural index (move persistence) can be visualized as a time s
 grab(fmp, "fitted") %>% 
   ggplot() +
   geom_point(aes(date, g, colour = g)) +
-  scale_colour_viridis_c(limits = c(0,1)) +
+  scale_colour_viridis_c(option = "E", limits = c(0,1)) +
   ylim(0,1) +
   facet_wrap(~ id, scales = "free_x", ncol = 1)
 
 ```
+
