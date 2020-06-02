@@ -179,3 +179,9 @@ locs <- grab(fitc, "p", as_sf = FALSE)
 ## unprojected locations have this structure
 locs
 ```
+
+`fmap` automatically handles ssm fit objects with multiple individuals, plotting all on a single map
+```{r ggplot map 2, fig.width=5, fig.height=5, message=FALSE}
+## map predicted values and observations
+fmap(fit, "p", obs = TRUE, col = "orange")
+```

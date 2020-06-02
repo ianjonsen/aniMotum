@@ -10,7 +10,8 @@ fmap(
   obs = FALSE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
-  size = 1
+  size = 1,
+  col = "black"
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{ext.rng}{factors to extend the plot range in x and y dimensions
 (can exceed 1)}
 
-\item{size}{size of estimated location points}
+\item{size}{size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value}
 }
 \description{
 map foieGras fitted or predicted locations, with or without
