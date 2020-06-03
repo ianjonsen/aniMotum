@@ -5,6 +5,8 @@ language: r
 r:
   - release
   - devel
+  - oldrelease
+  - patched
 
 repos:
   CRAN: https://cloud.r-project.org
