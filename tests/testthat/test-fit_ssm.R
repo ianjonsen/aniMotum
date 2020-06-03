@@ -32,7 +32,7 @@ test_that("fit_ssm catches error & returns appropriate msg", {
 ## minimum specified arguments - crw
 test_that("fit_ssm defaults + crw + KF return foieGras list w 15 elements", {
   f <- fit_ssm(dkf, model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -41,7 +41,7 @@ test_that("fit_ssm defaults + crw + KF return foieGras list w 15 elements", {
 test_that("fit_ssm defaults + crw + LS return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dls, model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -50,7 +50,7 @@ test_that("fit_ssm defaults + crw + LS return foieGras list w 15 elements", {
 test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, model = "rw", time.step = 48, map = list(psi = as.factor(NA)), verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -59,7 +59,7 @@ test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
 test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dls, model = "rw", time.step = 48, map = list(psi = as.factor(NA)), verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -68,7 +68,7 @@ test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
 test_that("fit_ssm vmax + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -77,7 +77,7 @@ test_that("fit_ssm vmax + crw return foieGras list w 15 elements", {
 test_that("fit_ssm vmax,ang + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, ang=c(15,25), model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -86,7 +86,7 @@ test_that("fit_ssm vmax,ang + crw return foieGras list w 15 elements", {
 test_that("fit_ssm vmax,ang,min.dit + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, ang=c(15,25), min.dt=120, model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -95,7 +95,7 @@ test_that("fit_ssm vmax,ang,min.dit + crw return foieGras list w 15 elements", {
 test_that("fit_ssm no spd filter + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, spdf=FALSE, model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -105,7 +105,7 @@ test_that("fit_ssm no spd filter + crw return foieGras list w 15 elements", {
 test_that("fit_ssm optim + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, optim="optim", model = "crw", time.step = 48, verbose = 1)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -114,7 +114,7 @@ test_that("fit_ssm optim + crw return foieGras list w 15 elements", {
 test_that("fit_ssm full data + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, verbose=0, fit.to.subset=FALSE, model = "crw", time.step = 48)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -123,7 +123,7 @@ test_that("fit_ssm full data + crw return foieGras list w 15 elements", {
 test_that("fit_ssm verbose + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, verbose=2, model = "crw", time.step = 48)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -132,7 +132,7 @@ test_that("fit_ssm verbose + crw return foieGras list w 15 elements", {
 test_that("fit_ssm inner.control + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, inner.control=list(maxit=200), model = "crw", time.step = 48, verbose = 0)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
@@ -143,7 +143,7 @@ test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
   data(ellies)
   f <- fit_ssm(ellies, vmax=4, model="crw", time.step=48, verbose = 0)
   expect_equal(nrow(f), 2)
-  expect_s3_class(f$ssm[[1]], "fgssm")
+  expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
 })
