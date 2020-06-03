@@ -22,6 +22,7 @@
 #foieGras 0.6-04
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
+* adds ability to turn off prediction by setting `time.step=NA`, which causes locations to be estimated only at observation times
 * adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
 * removes reliance on `dplyr::do`, which is superseded as of `dplyr 1.0.0`
