@@ -41,7 +41,11 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, ncol = 1, .
              ssm <- grab(x, "fitted", as_sf = FALSE)
            },
            predicted = {
+             if(any(sapply(x$ssm, function(.) is.null(.$time.step)))) {
+               stop("\n there are no predicted locations because you used time.step = NA when fitting SSM")
+             } else {
              ssm <- grab(x, "predicted", as_sf = FALSE)
+             }
            })
     
     d <- grab(x, "data", as_sf = FALSE) %>%

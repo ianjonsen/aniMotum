@@ -17,9 +17,9 @@
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit either a simple random walk ("rw") or correlated random walk
 ##' ("crw") as a continuous-time process model
-##' @param time.step the regular time interval, in hours, to predict to.
-##' Alternatively, a vector of prediction times, possibly not regular, must be
-##' specified as a data.frame with id and POSIXt dates.
+##' @param time.step options: 1) the regular time interval, in hours, to predict to; 
+##' 2) a vector of prediction times, possibly not regular, must be
+##' specified as a data.frame with id and POSIXt dates; 3) NA - turns off prediction and locations are only estimated at observation times. 
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. Default behaviour is to use the factors supplied in foieGras::emf()
 ##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., \code{list(psi = factor(NA))}
 ##' @param parameters a list of initial values for all model parameters and

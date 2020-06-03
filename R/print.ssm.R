@@ -1,6 +1,6 @@
 ##' @title print \code{foieGras} fit object summary information
 ##'
-##' @method print fgssm
+##' @method print ssm
 ##'
 ##' @aliases print
 ##' @param x a foieGras ssm fit object
@@ -14,7 +14,7 @@
 ##'
 ##' @export
 
-print.fgssm <- function(x, ...)
+print.ssm <- function(x, ...)
 {
   pm <- x$pm
   timeStep <- ifelse(length(x$ts) == 1, x$ts, "multiple time.steps")

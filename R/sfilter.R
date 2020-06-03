@@ -66,10 +66,11 @@ sfilter <-
         stop("'control' argument must be a named list")
     }
 
-    if(is.null(time.step)) {
-      print("\nNo time.step specified, using 6 h as a default time step")
-      time.step <- 6
-    } else if(length(time.step) > 1 & !is.data.frame(time.step)) {
+#    if(is.null(time.step)) {
+#      print("\nNo time.step specified, using 6 h as a default time step")
+#      time.step <- 6
+#    } else 
+    if(length(time.step) > 1 & !is.data.frame(time.step)) {
         stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
     } else if(length(time.step) > 1 & is.data.frame(time.step)) {
         if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
@@ -89,7 +90,7 @@ sfilter <-
     d <- cbind(xx, loc) %>%
       mutate(isd = TRUE)
 
-    if (length(time.step) == 1) {
+    if (length(time.step) == 1 & !is.na(time.step)) {
       ## Interpolation times - assume on time.step-multiple of the hour
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
@@ -100,17 +101,16 @@ sfilter <-
           by = tsp,
           length.out = max(index) + 2
         ))
-    } else {
+    } else if (length(time.step) > 1 & !is.na(time.step)) {
       ts <- subset(time.step, id %in% unique(d$id)) %>% 
         select(date)
-    }
-
-    ## add 1 s to observation time(s) that exactly match prediction time(s) & throw a warning
-    if(sum(d$date %in% ts$date) > 0) {
-      o.times <- which(d$date %in% ts$date)
-      d[o.times, "date"] <- d[o.times, "date"] + 1
-
-    }
+    } 
+    if (!is.na(time.step)) {
+      ## add 1 s to observation time(s) that exactly match prediction time(s) & throw a warning
+      if (sum(d$date %in% ts$date) > 0) {
+        o.times <- which(d$date %in% ts$date)
+        d[o.times, "date"] <- d[o.times, "date"] + 1
+      }
 
     ## merge data and interpolation times
     ## add is.data flag (distinquish obs from reg states)
@@ -118,6 +118,9 @@ sfilter <-
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
       mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
+    } else {
+      d.all <- d
+    }
 
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
@@ -417,8 +420,12 @@ sfilter <-
         select(-isd)
 
       ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
+      if(!is.na(time.step)) {
       pv <- subset(rdm, !isd) %>%
         select(-isd)
+      } else {
+        pv <- NULL
+      }
       
       if (optim == "nlminb") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
@@ -455,6 +462,6 @@ sfilter <-
         errmsg = opt
       )
     }
-    class(out) <- append("fgssm", class(out))
+    class(out) <- append("ssm", class(out))
     out
   }

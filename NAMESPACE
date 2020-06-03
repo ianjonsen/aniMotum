@@ -2,7 +2,7 @@
 
 S3method(plot,fG_osar)
 S3method(plot,fG_ssm)
-S3method(print,fgssm)
+S3method(print,ssm)
 export(emf)
 export(fit_mpm)
 export(fit_ssm)

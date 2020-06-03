@@ -19,11 +19,11 @@
 * adds `sf`-enabled mapping function, via `fmap()`
 * fixes CRAN check errors from last version, where proj4string syntax `+init:epsg=` was not suppored in non-PROJ4 emulation mode on some linux platforms
 
-#foieGras 0.6.0
+#foieGras 0.6-04
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
 * adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
-* removes reliance on `dplyr::do`, which is superseded (which presumably means 'almost deprecated') as of `dplyr 1.0.0`
-* looses dplyr progressbar when fitting SSM to multiple data set in default verbose mode 1
+* removes reliance on `dplyr::do`, which is superseded as of `dplyr 1.0.0`
+* replaces dplyr progressbar with parameter trace when fitting SSM to single or multiple data sets in default verbose mode 1
 * replaces `argosfilter::sdafilter` in favour of `trip::sda` (which is a faster, vectorised version of the former) to prefilter outlier locations
