@@ -29,7 +29,6 @@ LinkingTo:
 Imports: 
     tibble (>= 2.1.3),
     ggplot2 (>= 3.0.0),
-    gridExtra,
     lubridate,
     TMB (>= 1.7.15),
     sf (>= 0.9-3),
