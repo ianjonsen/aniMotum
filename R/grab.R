@@ -34,8 +34,8 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
     stop("only `fitted`, `predicted` or `data` objects can be grabbed")
   if(inherits(x, "fG_mpm") & what == "predicted")
     stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
-  if(any(sapply(x$ssm, function(.) is.null(.$time.step))) & what == "predicted")
-    stop("\n there are no predicted locations because you used time.step = NA when fitting SSM")
+  if(any(sapply(x$ssm, function(.) is.na(.$ts))) & what == "predicted")
+    stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`")
   
   switch(class(x)[1],
          fG_ssm = {
