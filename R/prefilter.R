@@ -9,7 +9,7 @@
 ##' (8) adds location error multiplication factors based on Argos location
 ##' class (for type LS);
 ##' (9) uses a \code{trip::sda} to identify potential outlier locations. 
-##' \code{trip::sda} is a fast, vectorised version of \code{argosfilter::sdafilter}
+##' \code{trip::sda} is a fast, vectorized version of \code{argosfilter::sdafilter}
 ##' see \code{?argosfilter::sdafilter} for details on implementation
 ##'
 ##' @details called by \code{fit_ssm}.

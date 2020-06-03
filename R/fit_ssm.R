@@ -49,8 +49,8 @@
 ##' 
 ##' Multiple location data types can be combined in a single data frame (see the vignette for examples). 
 ##' 
-##' When data are provided as an \code{sf-tibble}, the user-specified projection is respected. Otherwise, longlat data are reprojected internally 
-##' to a global Mercator grid and provided as the default output. An unprojected \code{tibble} of lon,lat and x,y location estimates can be 
+##' When data are provided as an \code{sf-tibble}, the user-specified projection is respected. Otherwise, longlat data are re-projected internally 
+##' to a global Mercator grid and provided as the default output. An un-projected \code{tibble} of lon,lat and x,y location estimates can be 
 ##' obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 ##' 
 ##' @return a list with components
@@ -69,7 +69,7 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @references
-##' Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robison PW, Votier SC. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. arXiv preprint arXiv:2005.00401. May 1.
+##' Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. arXiv preprint arXiv:2005.00401. May 1.
 ##' 
 ##' Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 ##' 

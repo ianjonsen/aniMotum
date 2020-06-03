@@ -8,7 +8,7 @@
 ##' @author Ian Jonsen, Toby Patterson
 ##'
 ##' @seealso fit_ssm
-##' @references Jonsen I, McMahon CR, Patterson TA, Auger-Methe M, Harcourt R, Hindell MA, Bestley S (2019) 
+##' @references Jonsen I, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S (2019) 
 ##' Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. 
 ##' Ecology 100:e02566
 ##' @references Jonsen I, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, 

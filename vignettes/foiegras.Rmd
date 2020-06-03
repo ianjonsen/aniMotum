@@ -32,7 +32,7 @@ this vignette provides a (very) brief overview of how to use `foieGras` to filte
 
 both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. 
 
-additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularised locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Methe et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter.
+additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Méthé et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter.
 
 ### input data
 `foieGras` expects data to be provided in one of several possible formats.
@@ -165,7 +165,7 @@ fmap(fitc, what = "predicted",
      crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=100 +ellps=WGS84 +units=km")
 ```
 
-the estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple unprojected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
+the estimated locations can be accessed for further analysis, custom mapping, etc... by using the `grab` function. They can be returned as a projected `sf` tibble or as a simple un-projected tibble. Note, that for all `foieGras` outputs the `x`, `y`, `x.se` and `y.se` units are in km.
 ```{r grab}
 ## grab fitted locations from fit object as a projected sf object 
 locs_sf <- grab(fitc, what = "f")
@@ -173,10 +173,10 @@ locs_sf <- grab(fitc, what = "f")
 ## projected locations have this structure
 locs_sf
 
-## grab predicted locations in unprojected form, returning as a tibble
+## grab predicted locations in un-projected form, returning as a tibble
 locs <- grab(fitc, "p", as_sf = FALSE)
 
-## unprojected locations have this structure
+## un-projected locations have this structure
 locs
 ```
 
@@ -210,7 +210,7 @@ grab(fmp, "fitted") %>%
   facet_wrap(~ id, scales = "free_x", ncol = 1)
 ```
 
-spatio-temporal variation in movement behaviour can be visualised by plotting the estimated $\gamma_t$ values along each seal's track, but first we have to merge the SSM-fitted locations with the move persistence estimates using `foieGras::join()`
+spatio-temporal variation in movement behaviour can be visualized by plotting the estimated $\gamma_t$ values along each seal's track, but first we have to merge the SSM-fitted locations with the move persistence estimates using `foieGras::join()`
 ```{r plot mpm track, fig.width=7, fig.height=5, message=FALSE}
 ## join ssm predicted locations and move persistence values together
 ## and reproject to Antarctic Stereographic

@@ -7,7 +7,7 @@
 ##' @param x a \code{foieGras} ssm or mpm model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
 ##' `data` (single letters can be used)
-##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
+##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
 ##'
 ##' @return a tibble with all individual tibble's appended
@@ -19,7 +19,7 @@
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
 ##' data(fssm)
-##' ## grab predicted values as an unprojected tibble
+##' ## grab predicted values as an un-projected tibble
 ##' preds <- grab(fssm, what = "predicted", as_sf = FALSE)
 ##' 
 ##' @export

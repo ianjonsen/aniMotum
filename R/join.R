@@ -5,7 +5,7 @@
 ##' @param ssm a \code{foieGras} ssm fitted model object
 ##' @param mpm a \code{foieGras} mpm fitted model object
 ##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
-##' @param as_sf logical; if FALSE then return a tibble with unprojected lonlat
+##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble
 ##'
 ##' @return a single tbl with all individuals
@@ -16,7 +16,7 @@
 ##' ## load example foieGras fit objects (to save time)
 ##' data(fssm)
 ##' data(fmpm)
-##' ## join predicted values as an unprojected tibble
+##' ## join predicted values as an un-projected tibble
 ##' fsmp <- join(fssm, fmpm, as_sf = FALSE)
 ##' fsmp
 ##' @export
