@@ -19,7 +19,7 @@
 * adds `sf`-enabled mapping function, via `fmap()`
 * fixes CRAN check errors from last version, where proj4string syntax `+init:epsg=` was not suppored in non-PROJ4 emulation mode on some linux platforms
 
-#foieGras 0.6-04
+#foieGras 0.6-05
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
 * adds ability to turn off prediction by setting `time.step=NA`, which causes locations to be estimated only at observation times
