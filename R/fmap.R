@@ -12,6 +12,7 @@
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
 ##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value
+##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
 ##' @importFrom ggplot2 element_blank scale_colour_viridis_c scale_colour_viridis_d
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast

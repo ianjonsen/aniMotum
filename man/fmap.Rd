@@ -29,6 +29,8 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 (can exceed 1)}
 
 \item{size}{size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value}
+
+\item{col}{colour of observed locations (ignored if obs = FALSE)}
 }
 \description{
 map foieGras fitted or predicted locations, with or without

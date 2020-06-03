@@ -6,7 +6,7 @@
 ##' optimizer (\code{nlminb} or \code{optim}); structures and passes output
 ##' object to \code{fit_mpm}
 ##'
-##' @details called by \code{fit_mpm}, see ?fit_mpm.
+##' @details called by \code{fit_mpm}, not intended for general use. see ?fit_mpm.
 ##'
 ##' @param x temporally regularized location data, eg. output from \code{fit_ssm}
 ##' @param model specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s). 

@@ -35,5 +35,5 @@ optimizer (\code{nlminb} or \code{optim}); structures and passes output
 object to \code{fit_mpm}
 }
 \details{
-called by \code{fit_mpm}, see ?fit_mpm.
+called by \code{fit_mpm}, not intended for general use. see ?fit_mpm.
 }
