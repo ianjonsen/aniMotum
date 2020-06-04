@@ -16,10 +16,10 @@
 ##'
 ##' @param data input data, must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s)
-##' @param ang angles of outlier location "spikes" 
-##' @param distlim lengths of outlier location "spikes"
+##' @param ang angles of outlier location "spikes" (default is \code{c(15,25)} deg); \code{ang = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}
+##' @param distlim lengths of outlier location "spikes" (default is \code{c(2500, 5000)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
-##' @param min.dt minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM
+##' @param min.dt minimum allowable time difference in s between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate arrange select left_join lag rename "%>%" everything
@@ -27,6 +27,7 @@
 ##' @importFrom trip sda speedfilter trip
 ##' @importFrom tibble as_tibble
 ##' @importFrom stringr str_detect str_replace
+##' @importFrom assertthat assert_that
 ##'
 ##' @details User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
 ##'
@@ -62,8 +63,23 @@ prefilter <-
            emf = NULL
            ) {
 
+    ## check args
+    assert_that(is.numeric(vmax) & vmax > 0, 
+                msg = "vmax must be a positive, non-zero value representing an upper speed threshold in m/s")
+    assert_that(any((is.numeric(ang) & length(ang) == 2) || is.na(ang)), 
+                msg = "ang must be either a vector of `c(min, max)` angles in degree defining extreme spikes to be removed from trajectory or NA")
+    assert_that(any((is.numeric(distlim) & length(distlim) == 2) || is.na(distlim)),
+                msg = "distlim must be either a vector of `c(min, max)` in m defining distances of extreme spikes to be removed from trajectory or NA")
+    assert_that(is.logical(spdf), 
+                msg = "spdf must either TRUE to turn on, or FALSE to turn off speed filtering")
+    assert_that(is.numeric(min.dt) & min.dt >= 0,
+                msg = "min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
+    assert_that(any(is.null(emf) || (is.data.frame(emf) & nrow(emf) > 0)),
+                msg = "emf must be either NULL to use default emf (type `emf()` to see values), or a data.frame (see `?emf` for details")  
+
   d <- data
-  # check input data
+  
+  ## check data
   if (!inherits(d, "sf")) {
     if (!ncol(d) %in% c(5, 7, 8))
       stop("\nData can only have 5 (for LS data), 7 (for geolocation data), or 8 (for KF(S) data) columns")

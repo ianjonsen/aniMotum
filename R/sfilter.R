@@ -33,6 +33,7 @@
 ##' @importFrom dplyr mutate select full_join arrange lag bind_cols "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
+##' @importFrom assertthat assert_that
 ##'
 ##' @examples
 ##' data(ellie)
@@ -59,6 +60,8 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
+    ## check args handled by fit_ssm
+  
     ## populate control list if any parameters specified...
     if (length(control)) {
       nms <- names(control)
@@ -66,10 +69,6 @@ sfilter <-
         stop("'control' argument must be a named list")
     }
 
-#    if(is.null(time.step)) {
-#      print("\nNo time.step specified, using 6 h as a default time step")
-#      time.step <- 6
-#    } else 
     if(length(time.step) > 1 & !is.data.frame(time.step)) {
         stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
     } else if(length(time.step) > 1 & is.data.frame(time.step)) {

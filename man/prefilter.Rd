@@ -19,13 +19,13 @@ prefilter(
 
 \item{vmax}{max travel rate (m/s)}
 
-\item{ang}{angles of outlier location "spikes"}
+\item{ang}{angles of outlier location "spikes" (default is \code{c(15,25)} deg); \code{ang = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}}
 
-\item{distlim}{lengths of outlier location "spikes"}
+\item{distlim}{lengths of outlier location "spikes" (default is \code{c(2500, 5000)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.}
 
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
-\item{min.dt}{minimum allowable time difference between observations; \code{dt < min.dt} will be ignored by the SSM}
+\item{min.dt}{minimum allowable time difference in s between observations; \code{dt < min.dt} will be ignored by the SSM}
 
 \item{emf}{optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details}
 }
