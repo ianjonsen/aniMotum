@@ -186,6 +186,7 @@ sfilter <-
                             v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
                             ),
                          list(l_tau = factor(c(NA, NA)),
+                            l_psi = factor(NA),
                             l_rho_o = factor(NA),
                             logD = factor(NA),
                             mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
@@ -345,7 +346,7 @@ sfilter <-
                                   upper = U
                                 )
                               ))))
-
+    
     ## if error then exit with limited output to aid debugging
     rep <- suppressWarnings(try(sdreport(obj)))
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
@@ -462,6 +463,7 @@ sfilter <-
         errmsg = opt
       )
     }
+    
     class(out) <- append("ssm", class(out))
     out
   }

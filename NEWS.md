@@ -25,6 +25,7 @@
 * adds ability to turn off prediction by setting `time.step=NA`, which causes locations to be estimated only at observation times
 * adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
+* turns off estimation of psi parameter (ellipse semi-minor axis re-scaling factor) when `rw` process model is fit to Argos KF/KS data
 * removes reliance on `dplyr::do`, which is superseded as of `dplyr 1.0.0`
 * replaces dplyr progressbar with parameter trace when fitting SSM to single or multiple data sets in default verbose mode 1
 * replaces `argosfilter::sdafilter` in favour of `trip::sda` (which is a faster, vectorized version of the former) to prefilter outlier locations

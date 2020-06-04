@@ -12,8 +12,8 @@
 ##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
 ##' or (type = 2) 2-d fits to data (units = km)
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle theme_bw theme element_blank geom_rug geom_path
-##' @importFrom ggplot2 element_text xlab scale_colour_brewer theme_dark labeller label_both label_value geom_ribbon
+##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug
+##' @importFrom ggplot2 element_text xlab scale_colour_brewer labeller label_both label_value geom_ribbon
 ##' @importFrom tidyr gather
 ##' @importFrom dplyr "%>%" select bind_cols rename
 ##' @importFrom tibble enframe
