@@ -60,8 +60,25 @@ sfilter <-
     optim <- match.arg(optim)
     model <- match.arg(model)
 
-    ## check args handled by fit_ssm
-  
+    ## check args
+    assert_that(inherits(x, c("sf","tbl_df")), msg = "x must be an sf-tibble produced by `prefilter()`")
+    assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
+    assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
+                msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
+    assert_that(any(is.list(parameters) || is.null(parameters)),
+                msg = "parameters must be a named list of parameter initial values or NULL")
+    assert_that(any(is.list(map) || is.null(map)),
+                msg = "map must be a named list of parameters to fix (turn off) in estimation or NULL")
+    assert_that(is.logical(fit.to.subset), 
+                msg = "fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
+    assert_that(optim %in% c("nlminb", "optim"),
+                msg = "optimiser can only be either `nlminb` or `optim`")
+    assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
+                msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
+    assert_that(any(is.list(control) || is.null(control)), msg = "control must be a named list of valid optimiser control arguments or NULL")
+    assert_that(any(is.list(inner.control) || is.null(inner.control)), msg = "inner.control must be a named list of valid newtonOptimiser control arguments or NULL")
+    assert_that(is.numeric(lpsi), msg = "lpsi must be a numeric value defining the lower estimation bound (on log scale) for psi")
+    
     ## populate control list if any parameters specified...
     if (length(control)) {
       nms <- names(control)

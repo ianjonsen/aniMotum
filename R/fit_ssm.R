@@ -92,6 +92,7 @@
 ##'
 ##' @importFrom dplyr tibble mutate "%>%"
 ##' @importFrom purrr map
+##' @importFrom assertthat assert_that
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -115,26 +116,9 @@ fit_ssm <- function(d,
                     )
 {
 
-## check args - pf args handled by prefilter()
+## check args - most args handled by prefilter() & sfilter()
   assert_that(is.data.frame(d), msg = "x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
   assert_that(is.logical(pf), msg = "pf must be either FALSE (fit model) or TRUE (only run prefilter)")
-  assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
-  assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
-              msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
-  assert_that(any(is.list(parameters) || is.null(parameters)),
-              msg = "parameters must be a named list of parameter initial values or NULL")
-  assert_that(any(is.list(map) || is.null(map)),
-              msg = "map must be a named list of parameters to fix (turn off) in estimation or NULL")
-  assert_that(is.logical(fit.to.subset), 
-              msg = "fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
-  assert_that(optim %in% c("nlminb", "optim"),
-              msg = "optimiser can only be either `nlminb` or `optim`")
-  assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
-              msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
-  assert_that(any(is.list(control) || is.null(control)), msg = "control must be a named list of valid optimiser control arguments or NULL")
-  assert_that(any(is.list(inner.control) || is.null(inner.control)), msg = "inner.control must be a named list of valid newtonOptimiser control arguments or NULL")
-  assert_that(is.numeric(lpsi), msg = "lpsi must be a numeric value defining the lower estimation bound (on log scale) for psi")
-  
 
   fit <- d %>%
     split(., .$id) %>%
@@ -159,7 +143,7 @@ fit_ssm <- function(d,
       cat("fitting SSM...\n")
     
     fit <- fit %>%
-      map(~ try(sfilter(
+      map(~ sfilter(
         x = .x,
         model = model,
         time.step = time.step,
@@ -171,8 +155,7 @@ fit_ssm <- function(d,
         control = control,
         inner.control = inner.control,
         lpsi = lpsi
-      ),
-      silent = FALSE)
+      )
       )
 
     fit <- tibble(id = names(fit), ssm = fit) %>%
