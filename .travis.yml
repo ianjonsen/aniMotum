@@ -7,8 +7,8 @@ r:
   - oldrel
 
 repos:
-  CRAN: https://cloud.r-project.org
-
+  CRAN: https://cran.rstudio.com
+  
 warnings_are_errors: false
 
 deploy.skip_cleanup: true
@@ -24,7 +24,8 @@ cache:
 
 before_install:
     - sudo apt-get install -y udunits-bin libproj-dev libgdal-dev libgeos-dev libudunits2-dev gdal-bin
-
+    - R -e 'install.packages("rgdal", repos=c("http://R-Forge.R-project.org", "http://cran.rstudio.com"))'
+    
 latex: true
 pandoc: true
 
