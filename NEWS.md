@@ -25,7 +25,7 @@
 * adds ability to turn off predicted locations by setting `time.step=NA` causing locations to be estimated only at observation times
 * adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
-* adds human-readable errors and warnings with advice 
+* adds human-readable/understandable errors and warnings with (occasional) advice
 * turns off estimation of psi parameter (ellipse semi-minor axis re-scaling factor) when `rw` process model is fit to Argos KF/KS data
 * removes reliance on `dplyr::do`, which is superseded as of `dplyr 1.0.0`
 * replaces dplyr progressbar with parameter trace when fitting SSM to single or multiple data sets in default verbose mode 1

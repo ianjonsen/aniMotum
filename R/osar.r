@@ -54,7 +54,7 @@ osar <- function(x, method = "fullGaussian", ...)
     })
     }
   } else {
-    stop("a foieGras ssm compound tbl is required")
+    stop("a foieGras ssm fit object with class fG_ssm is required")
   }
   
   cr <- sapply(r, function(.) inherits(., "try-error"))

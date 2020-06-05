@@ -180,13 +180,16 @@ prefilter <-
       rename(x = lon, y = lat)
     d.tr <- suppressWarnings(trip(d.tr, TORnames = c("date", "id"), correct_all = FALSE))
     
+    if(any(is.na(ang))) ang <- c(0,0)
+    if(any(is.na(distlim))) distlim <- c(0,0)
+    
     tmp <-
       suppressWarnings(try(
         sda(
           d.tr,
           smax = vmax * 3.6,    # convert m/s to km/h
-          ang = ifelse(is.na(ang), c(0,0), ang),
-          distlim = ifelse(is.na(distlim), c(0,0), distlim / 1000)     # convert m to km
+          ang = ang,
+          distlim = distlim / 1000     # convert m to km
         ),
       silent = TRUE)
       )

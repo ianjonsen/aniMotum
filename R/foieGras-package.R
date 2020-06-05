@@ -16,16 +16,19 @@
 ##' quality-control of Argos locations from animal-borne tags. arXiv doi:arxiv:2005.00401
 ##'
 ##' @keywords foieGras
-##' @importFrom utils data
+##' @importFrom assertthat assert_that
+##' @importFrom utils data flush.console
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
+##' @importFrom furrr future_map
+##' @importFrom future availableCores cluster makeClusterPSOCK plan
 ##' @importFrom tibble as_tibble tibble
 ##' @importFrom lubridate ymd_hms
 ##' @importFrom purrr map
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
-##' @importFrom trip sda speedfilter
+##' @importFrom trip sda speedfilter trip
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median
 ##' @importFrom utils flush.console

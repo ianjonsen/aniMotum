@@ -36,18 +36,18 @@ fmap <- function(x,
       sf_locs <- grab(x, what=what)
 
     else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
-      stop("individual fit objects with differing projections not currently supported")
+      stop("individual foieGras fit objects with differing projections not currently supported")
     }
 
   } else {
-    stop("input must be a foieGras ssm fit object with class `fG_ssm`")
+    stop("input must be a foieGras ssm fit object with class fG_ssm")
   }
 
   if (is.null(crs)) prj <- st_crs(sf_locs)
   else {
     prj <- crs
     if(!is.character(prj)) stop("\ncrs must be a proj4string, 
-                                \neg. `+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=km +no_defs`")
+                                \neg. `+proj=stere +lat_0=-90 +lon_0=0 +ellps=WGS84 +units=km +no_defs`")
       #prj <- paste0("+init=epsg:", prj)
 
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
