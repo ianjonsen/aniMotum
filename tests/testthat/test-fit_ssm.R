@@ -120,12 +120,10 @@ test_that("fit_ssm optim + crw return foieGras list w 15 elements", {
   expect_s3_class(f, "fG_ssm")
 })
 
-## fit to full data - crw
+## fit to full data - rw
 test_that("fit_ssm full data + crw return foieGras list w 15 elements", {
   skip_on_cran()
-  f <- expect_warning(fit_ssm(dkf, verbose=0, fit.to.subset=FALSE, model = "crw", time.step = 48),
-                      "Hessian was not positive-definite so some standard errors could not be calculated. You could try a longer time.step",
-                      fixed = TRUE)
+  f <- fit_ssm(dkf, verbose=0, fit.to.subset=FALSE, model = "rw", time.step = 48)
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "fG_ssm")
