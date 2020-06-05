@@ -20,6 +20,7 @@
 ##' @param time.step options: 1) the regular time interval, in hours, to predict to; 
 ##' 2) a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates; 3) NA - turns off prediction and locations are only estimated at observation times. 
+##' @param scale scale location data for more efficient optimization. This should rarely be needed (default = FALSE)
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. Default behaviour is to use the factors supplied in foieGras::emf()
 ##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., \code{list(psi = factor(NA))}
 ##' @param parameters a list of initial values for all model parameters and
@@ -104,6 +105,7 @@ fit_ssm <- function(d,
                     pf = FALSE,
                     model = "crw",
                     time.step = 6,
+                    scale = FALSE,
                     emf = NULL,
                     map = NULL,
                     parameters = NULL,
@@ -165,7 +167,8 @@ fit_ssm <- function(d,
         } else if(length(x) < 15) {
           FALSE
         })) %>%
-      mutate(p.model = sapply(.$ssm, function(x) x$pm))
+      mutate(pdHess = sapply(.$ssm, function(x) x$rep$pdHess)) %>%
+      mutate(pmodel = sapply(.$ssm, function(x) x$pm))
   }
 
   class(fit) <- append("fG_ssm", class(fit))

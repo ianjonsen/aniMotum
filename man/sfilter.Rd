@@ -8,6 +8,7 @@ sfilter(
   x,
   model = c("rw", "crw"),
   time.step = 6,
+  scale = FALSE,
   parameters = NULL,
   map = NULL,
   fit.to.subset = TRUE,
@@ -26,6 +27,8 @@ sfilter(
 \item{time.step}{the regular time interval, in hours, to predict to.
 Alternatively, a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates.}
+
+\item{scale}{scale location data for more efficient optimization.}
 
 \item{parameters}{a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specify these. Only play with

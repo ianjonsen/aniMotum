@@ -31,20 +31,20 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
   if(!inherits(x, "fG_ssm") & !inherits(x, "fG_mpm")) 
     stop("a foieGras ssm or mpm model object with class `fG_ssm` of `fG_mpm`, respectively, must be supplied")
   if(!what %in% c("fitted","predicted","data"))
-    stop("only `fitted`, `predicted` or `data` objects can be grabbed")
+    stop("only `fitted`, `predicted` or `data` objects can be grabbed from an fG_ssm fit object")
   if(inherits(x, "fG_mpm") & what == "predicted")
     stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
-  if(inherits(x, "ssm")) {
-    if(any(sapply(x$ssm, function(.) is.na(.$ts))) & what == "predicted")
-      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`")
+  if(inherits(x, "fG_ssm")) {
+    if(any(sapply(x$ssm, function(.) is.na(.$ts))) && what == "predicted")
+      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. \n Either grab `fitted` values or re-fit with a positive-valued `time.step`")
   }
   
   switch(class(x)[1],
          fG_ssm = {
-           ## remove optimiser crash results from extraction
+           ## remove optimizer crash results from extraction
            nf <- which(sapply(x$ssm, length) < 15)
            if (length(nf) > 0) {
-             sprintf("%d optimiser crashes removed from output", length(nf))
+             sprintf("%d optimizer crashes removed from output", length(nf))
              sprintf("ids: %s", x[nf, "id"])
              x <- x[-nf,]
            }

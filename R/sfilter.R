@@ -14,6 +14,7 @@
 ##' @param time.step the regular time interval, in hours, to predict to.
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates.
+##' @param scale scale location data for more efficient optimization.
 ##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))
 ##' @param parameters a list of initial values for all model parameters and
 ##' unobserved states, default is to let sfilter specify these. Only play with
@@ -46,6 +47,7 @@ sfilter <-
   function(x,
            model = c("rw", "crw"),
            time.step = 6,
+           scale = FALSE,
            parameters = NULL,
            map = NULL,
            fit.to.subset = TRUE,
@@ -65,6 +67,7 @@ sfilter <-
     assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
     assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
                 msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
+    assert_that(is.logical(scale), msg = "scale must be TRUE or FALSE to run on/off location scaling")
     assert_that(any(is.list(parameters) || is.null(parameters)),
                 msg = "parameters must be a named list of parameter initial values or NULL")
     assert_that(any(is.list(map) || is.null(map)),
@@ -162,7 +165,14 @@ sfilter <-
     y.na <- which(is.na(y.init))
     y.init[y.na] <- y.init1[y.na]
     
-    xs <- cbind(x.init, y.init)
+    if(scale) {
+      xs <- cbind(x.init = x.init - mean(x.init, na.rm = TRUE) / sd(x.init, na.rm = TRUE), 
+                  y.init = y.init - mean(y.init, na.rm = TRUE) / sd(y.init, na.rm = TRUE)
+                  )
+    } else {
+      xs <- cbind(x.init, y.init)
+    }
+    
 
     state0 <- c(xs[1,1], xs[1,2], 0 , 0)
     attributes(state0) <- NULL
@@ -267,14 +277,17 @@ sfilter <-
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
-
+    
+    if(scale) {
+      d.all.tmp <- d.all
+      d.all <- d.all %>%
+        mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
+               y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
+    }
+      
     data <- list(
       model_name = "ssm",
-      Y = switch(
-        model,
-        rw = rbind(d.all$x, d.all$y),
-        crw = rbind(d.all$x, d.all$y)
-      ),
+      Y = rbind(d.all$x, d.all$y), 
       dt = dt,
       N = length(dt),
       state0 = state0,
@@ -287,6 +300,8 @@ sfilter <-
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$lonerr, d.all$laterr)
     )
+    
+    if(scale) d.all <- d.all.tmp
     
     ## TMB - create objective function
     if (is.null(inner.control)) {
@@ -362,13 +377,23 @@ sfilter <-
                                   upper = U
                                 )
                               ))))
+    cat("\n")
     
     ## if error then exit with limited output to aid debugging
-    rep <- suppressWarnings(try(sdreport(obj)))
+    options(warn = -1) ## turn warnings off but check if pdHess is FALSE at end and return warning
+    rep <- try(sdreport(obj))
+    
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
+      fxd <- fxd[which(fxd[, "Std. Error"] != 0), ]
+      if("sigma" %in% row.names(fxd)) {
+        row.names(fxd)[which(row.names(fxd) == "sigma")] <- c("sigma_x","sigma_y")
+      } 
+      if("tau" %in% row.names(fxd)) {
+        row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
+      }
       
       switch(model,
              rw = {
@@ -388,8 +413,14 @@ sfilter <-
                    id = unique(d.all$id),
                    date = d.all$date,
                    isd = d.all$isd
-                 ) %>%
-                 select(id, date, x, y, x.se, y.se, isd)
+                 )
+               if(scale) {
+                 rdm <- rdm %>%
+                   mutate(x = x * sd(d.all$x, na.rm = TRUE) + mean(d.all$x, na.rm = TRUE),
+                          y = y * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
+                 }
+                rdm <- rdm %>%
+                  select(id, date, x, y, x.se, y.se, isd)
 
              },
              crw = {
@@ -413,7 +444,13 @@ sfilter <-
                    id = unique(d.all$id),
                    date = d.all$date,
                    isd = d.all$isd
-                 ) %>%
+                 ) 
+               if(scale) {
+                 rdm <- rdm %>%
+                   mutate(x = x  * sd(d.all$x, na.rm = TRUE) + mean(d.all$x, na.rm = TRUE),
+                          y = y  * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
+               }
+               rdm <- rdm %>%
                  select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
              })
       
@@ -449,7 +486,7 @@ sfilter <-
       } else if (optim == "optim") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
       }
-
+      options(warn = 0) ## turn warnings back on
       out <- list(
         call = call,
         predicted = pv,
@@ -467,6 +504,7 @@ sfilter <-
         optimiser = optim,
         time = proc.time() - st
       )
+      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated. You could try a longer time.step", call. = FALSE)
     } else {
       ## if optimiser fails
       out <- list(

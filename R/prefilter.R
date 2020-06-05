@@ -67,15 +67,15 @@ prefilter <-
     assert_that(is.numeric(vmax) & vmax > 0, 
                 msg = "vmax must be a positive, non-zero value representing an upper speed threshold in m/s")
     assert_that(any((is.numeric(ang) & length(ang) == 2) || is.na(ang)), 
-                msg = "ang must be either a vector of `c(min, max)` angles in degree defining extreme spikes to be removed from trajectory or NA")
+                msg = "ang must be either a vector of c(min, max) angles in degrees defining extreme steps to be removed from trajectory, or NA")
     assert_that(any((is.numeric(distlim) & length(distlim) == 2) || is.na(distlim)),
-                msg = "distlim must be either a vector of `c(min, max)` in m defining distances of extreme spikes to be removed from trajectory or NA")
+                msg = "distlim must be either a vector of c(min, max) in m defining distances of extreme steps to be removed from trajectory, or NA")
     assert_that(is.logical(spdf), 
                 msg = "spdf must either TRUE to turn on, or FALSE to turn off speed filtering")
     assert_that(is.numeric(min.dt) & min.dt >= 0,
                 msg = "min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
     assert_that(any(is.null(emf) || (is.data.frame(emf) & nrow(emf) > 0)),
-                msg = "emf must be either NULL to use default emf (type `emf()` to see values), or a data.frame (see `?emf` for details")  
+                msg = "emf must be either NULL to use default emf (type emf() to see values), or a data.frame (see ?emf for details")  
 
   d <- data
   
@@ -185,8 +185,8 @@ prefilter <-
         sda(
           d.tr,
           smax = vmax * 3.6,    # convert m/s to km/h
-          ang = ang,
-          distlim = distlim / 1000     # convert m to km
+          ang = ifelse(is.na(ang), c(0,0), ang),
+          distlim = ifelse(is.na(distlim), c(0,0), distlim / 1000)     # convert m to km
         ),
       silent = TRUE)
       )
