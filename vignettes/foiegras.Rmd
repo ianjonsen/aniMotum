@@ -181,7 +181,7 @@ locs <- grab(fitc, "p", as_sf = FALSE)
 ## un-projected locations have this structure
 locs
 ```
-the `u`, `v`, `u.se` and `v.se` columns are instantaneous speed estimates in the x/lon and y/lat directions, respectively. 
+the `u` and `v`columns are speed estimates (km/h) in the x/lon and y/lat directions, respectively. The `u.se` and `v.se` columns are their standard errors. It is important to note that these are not estimates of the realized speeds between consecutive estimated locations, rather they are the deterministic component. The realized speed is the sum of the deterministic and stochastic (process variance, 2D$\Delta_t$) components.
 
 `fmap` automatically handles ssm fit objects with multiple individuals, plotting all on a single map
 ```{r ggplot map 2, fig.width=5, fig.height=5, message=FALSE}
