@@ -3,9 +3,9 @@ This update adds a number of new features and addresses errors listed under CRAN
 
 ## Test environments
 * local OS X install (10.15.5), R 4.0.0
-* ubuntu 16.04.6 (via travis-ci), R-release, R-devel, R-oldrelease
-* Debian clang (via R-hub), R-devel
-* windows (via win-builder), R-release, R-devel, R-oldrelease
+* ubuntu 16.04.6 (via travis-ci), r-release, r-devel, r-oldrelease
+* Debian clang (via R-hub), r-devel
+* windows (via win-builder), r-release, r-devel, r-oldrelease
 
 ## R CMD check results
 
