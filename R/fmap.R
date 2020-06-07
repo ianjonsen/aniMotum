@@ -7,7 +7,7 @@
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param obs include Argos observations on map (logical)
 ##' (logical); ignored if `obs = FALSE`
-##' @param crs `proj4string` for reprojecting locations, if NULL the
+##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)

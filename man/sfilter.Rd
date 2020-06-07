@@ -53,7 +53,7 @@ this if you know what you are doing...}
 \description{
 generates initial values for model parameters and unobserved states;
 structures data and initial values for C++ \code{TMB} template;
-fits state-space model; minimises the joint log-likelihood via the selected
+fits state-space model; minimizes the joint log-likelihood via the selected
 optimizer (\code{nlminb} or \code{optim}); structures and passes output
 object to \code{fit_ssm}
 }
