@@ -13,7 +13,6 @@
 ##' ## load example foieGras fit object (to save time)
 ##' data(fssm)
 ##' fres <- osar(fssm)
-##' plot(fres)
 ##'
 ##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
 ##' @importFrom tibble as_tibble
