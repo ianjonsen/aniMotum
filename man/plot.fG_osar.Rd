@@ -22,7 +22,6 @@ plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 ## load example osar output (to save time)
 data(fssm)
 fres <- osar(fssm)
-plot(fres, "qq")
-plot(fres, "hist")
+plot(fres)
 
 }
