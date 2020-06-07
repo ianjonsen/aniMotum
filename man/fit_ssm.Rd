@@ -118,22 +118,15 @@ to a global Mercator grid and provided as the default output. An un-projected \c
 obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 }
 \examples{
-## fit rw model to one seal with Argos KF data
-data(ellie)
-fit <- fit_ssm(ellie, model = "rw", time.step = 24)
-
-## time series plots of predicted value fits
-plot(fit, what = "predicted", type = 1)
-
-## fit crw model to both seals, with Argos KF & LS data 
+## fit crw model to two seals with Argos LS data
 data(ellies)
-fits <- fit_ssm(ellies, model = "crw", time.step = 24)
+fit <- fit_ssm(ellies, vmax = 5, model = "crw", time.step = 48)
 
-## time series plots of predicted value fits
-plot(fits, what = "predicted", type = 1)
+## time series plots of fitted value fits to both seals
+plot(fit, what = "fitted", type = 1)
 
-## track plots of fits for both seals
-plot(fits, what = "predicted", type = 2)
+## track plots of predicted value fits for both seals
+plot(fit, what = "predicted", type = 2)
 
 }
 \references{
