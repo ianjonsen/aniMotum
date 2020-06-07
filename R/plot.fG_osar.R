@@ -13,8 +13,9 @@
 ##' @examples
 ##' ## load example osar output (to save time)
 ##' data(fssm)
-##' fres <- osar(fssm)
-##' plot(fres)
+##' d <- fssm[1, ] ## just use first seal to save time
+##' dres <- osar(d)
+##' plot(dres, type = "qq")
 ##'
 ##' @export
 
