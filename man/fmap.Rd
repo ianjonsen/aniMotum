@@ -22,7 +22,7 @@ fmap(
 \item{obs}{include Argos observations on map (logical)
 (logical); ignored if `obs = FALSE`}
 
-\item{crs}{`proj4string` for reprojecting locations, if NULL the
+\item{crs}{`proj4string` for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used}
 
 \item{ext.rng}{factors to extend the plot range in x and y dimensions
