@@ -120,7 +120,7 @@ obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 \examples{
 ## fit rw model to one seal with Argos KF data
 data(ellie)
-fit <- fit_ssm(ellie, model = "rw", time.step = 24, optim = "nlminb")
+fit <- fit_ssm(ellie, model = "rw", time.step = 24)
 
 ## time series plots of predicted value fits
 plot(fit, what = "predicted", type = 1)
@@ -128,6 +128,9 @@ plot(fit, what = "predicted", type = 1)
 ## fit crw model to both seals, with Argos KF & LS data 
 data(ellies)
 fits <- fit_ssm(ellies, model = "crw", time.step = 24)
+
+## time series plots of predicted value fits
+plot(fits, what = "predicted", type = 1)
 
 ## track plots of fits for both seals
 plot(fits, what = "predicted", type = 2)

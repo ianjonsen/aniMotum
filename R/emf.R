@@ -11,16 +11,10 @@
 ##'
 ##' @examples
 ##' data(ellie)
-##' ## fit assuming all Argos lc classes have equal precision
-##' fit <- fit_ssm(ellie[, 1:5], vmax = 5, model = "crw", 
-##' emf = emf(emf.x = c(1, 1, 1, 1, 1, 1), emf.y  = c(1, 1, 1, 1, 1, 1)))
+##' ## fit assuming Argos lc class B is 10 x less precise than all other classes
+##' fit <- fit_ssm(ellie[, 1:5], vmax = 5, model = "rw", time.step = 48,
+##' emf = emf(emf.x = c(1, 1, 1, 1, 1, 10), emf.y  = c(1, 1, 1, 1, 1, 10)))
 ##' 
-##' ## fit using default Argos lc class error multiplication factors
-##' fit1 <- fit_ssm(ellie[, 1:5], vmax = 5, model = "crw", 
-##' emf = emf())
-##' 
-##' ## compare AIC
-##' cbind(fit$ssm[[1]]$aic, fit1$ssm[[1]]$aic)
 ##' @export
 
 emf <- function(gps = 0.1, 
