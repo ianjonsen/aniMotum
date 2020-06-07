@@ -1,11 +1,11 @@
 ## Submission
-This update adds a number of new features and addresses errors listed under CRAN check results (01/06/2020) on version 0.4.0. I am unable to test on a number of R-hub platforms due to sf source build issues.
+This update adds a number of new features and addresses errors listed under CRAN check results (01/06/2020) on version 0.4.0. I am unable to test on a number of R-hub platforms due to source build issues for a dependent R package (sf 0.9-3).
 
 ## Test environments
 * local OS X install (10.15.5), R 4.0.0
 * ubuntu 16.04.6 (via travis-ci), r-release, r-devel, r-oldrelease
 * Debian clang (via R-hub), r-devel
-* windows (via win-builder), r-release, r-devel
+* windows (via win-builder), r-release, r-devell
 
 ## R CMD check results
 
