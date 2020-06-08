@@ -23,7 +23,7 @@
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
 * adds ability to turn off predicted locations by setting `time.step=NA` causing locations to be estimated only at observation times
-* adds ability to fit to Argos, GLS, and/or GPS locations simultaneously when combined in a single input data.frame
+* adds ability to fit to Argos - GPS or Argos - GLS locations simultaneously when combined in a single input data.frame
 * adds ability to specify an alternate emf (Error Multiplication Factor) `data.frame` for Least-Squares and/or GPS locations
 * adds human-readable/understandable errors and warnings with (occasional) advice
 * turns off estimation of psi parameter (ellipse semi-minor axis re-scaling factor) when `rw` process model is fit to Argos KF/KS data
