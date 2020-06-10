@@ -2,6 +2,7 @@
 title: "foiegras"
 ---
 
+# foieGras
 fit latent variable movement models to animal tracking data
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
