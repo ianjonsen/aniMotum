@@ -160,7 +160,7 @@ Type ssm(objective_function<Type>* obj) {
       }
     } else if(isd(i) == 0) {
       continue;
-    } else if(isd(i) != isd(i)) {
+    } else if(isd(i) != isd(i)) {   // if isd == NA/NaN
       break;
     }
   }
