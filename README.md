@@ -1,6 +1,6 @@
 # foieGras
 fit latent variable movement models to animal tracking data
-
+<!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
@@ -11,7 +11,7 @@ fit latent variable movement models to animal tracking data
 
 master branch:  
 [![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
-
+<!-- badges: end -->
 
 **foieGras** - fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 

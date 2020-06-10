@@ -16,7 +16,7 @@ Type ssm(objective_function<Type>* obj) {
   DATA_VECTOR(dt);         	        //  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
   DATA_INTEGER(N);                  //  the number of time.steps to iterate over
   DATA_VECTOR(state0);              //  initial state
-  DATA_IVECTOR(isd);                //  indexes observations vs. interpolation points
+  DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_INTEGER(proc_mod);		       //	indicates which process model to be used: RW or CRW
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
@@ -158,6 +158,10 @@ Type ssm(objective_function<Type>* obj) {
       } else if(proc_mod == 1) {
         jnll += nll_obs(Y.col(i) - mu.col(i), keep.col(i));   // CRW innovations
       }
+    } else if(isd(i) == 0) {
+      continue;
+    } else if(isd(i) != isd(i)) {
+      break;
     }
   }
   

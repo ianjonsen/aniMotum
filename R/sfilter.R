@@ -132,7 +132,7 @@ sfilter <-
       }
 
     ## merge data and interpolation times
-    ## add is.data flag (distinquish obs from reg states)
+    ## add is.data flag (distinguish obs from reg states)
     d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
       mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
@@ -284,7 +284,7 @@ sfilter <-
         mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
-      
+
     data <- list(
       model_name = "ssm",
       Y = rbind(d.all$x, d.all$y), 
