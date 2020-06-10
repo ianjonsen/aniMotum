@@ -1,6 +1,4 @@
----
-title: "foiegras"
----
+--metadata pagetitle="foieGras"
 
 # foieGras
 fit latent variable movement models to animal tracking data
