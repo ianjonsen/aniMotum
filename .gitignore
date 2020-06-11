@@ -17,3 +17,5 @@ vignettes/*.R
 src/.DS_Store
 data/ellie_IMOS.RDS
 inst/doc
+cran-comments.md
+CRAN-RELEASE
