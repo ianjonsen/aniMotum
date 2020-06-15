@@ -14,7 +14,6 @@ Type ssm(objective_function<Type>* obj) {
   // DATA
   DATA_ARRAY(Y);	                  //  (x, y) observations
   DATA_VECTOR(dt);         	        //  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
-  DATA_INTEGER(N);                  //  the number of time.steps to iterate over
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
@@ -74,7 +73,7 @@ Type ssm(objective_function<Type>* obj) {
     MVNORM_t<Type> nll_proc(cov);
     
     // RW PROCESS MODEL
-    for(int i = 1; i < N; i++) {
+    for(int i = 1; i < dt.size(); i++) {
       cov_dt = dt(i) * dt(i) * cov;
       nll_proc.setSigma(cov_dt);
       jnll += nll_proc(X.col(i) - X.col(i - 1));
@@ -90,14 +89,14 @@ Type ssm(objective_function<Type>* obj) {
     cov(3,3) = 2 * D * dt(0);
     
     // loop over 2 coords and update nll of start location and velocities.
-    for(int i = 0; i < 2; i++) {
+    for(int i = 0; i < Y.rows(); i++) {
       jnll -= dnorm(mu(i,0), state0(i), tiny, true);
       jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
     }
     
     // CRW PROCESS MODEL
     vector<Type> x_t(4);
-    for(int i = 1; i < N; i++) {
+    for(int i = 1; i < dt.size(); i++) {
       // process cov at time t
       cov.setZero();
       cov(0,0) = tiny;
@@ -114,14 +113,16 @@ Type ssm(objective_function<Type>* obj) {
       x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
       jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
     }
+  } else {
+    Rf_error ("unexpected proc_mod value");
   }
   
   // OBSERVATION MODEL
   // 2 x 2 covariance matrix for observations
   matrix<Type> cov_obs(2, 2);
   MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
-  
-  for(int i = 0; i < N; ++i) {
+
+  for(int i = 0; i < dt.size(); ++i) {
     if(isd(i) == 1) {
       if(obs_mod(i) == 0) {
         // Argos Least Squares & GPS observations
@@ -151,17 +152,21 @@ Type ssm(objective_function<Type>* obj) {
         cov_obs(1,1) = sdLat * sdLat;
         cov_obs(0,1) = sdLon * sdLat * rho_o;
         cov_obs(1,0) = cov_obs(0,1);
-      }
+      } else { 
+        Rf_error ("unexpected obs_mod value");
+        }
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       if(proc_mod == 0) {
         jnll += nll_obs(Y.col(i) - X.col(i), keep.col(i));   // RW innovations
       } else if(proc_mod == 1) {
         jnll += nll_obs(Y.col(i) - mu.col(i), keep.col(i));   // CRW innovations
-      }
+      } else { 
+        Rf_error ("unexpected proc_mod value");
+        }
     } else if(isd(i) == 0) {
       continue;
-    } else if(isd(i) != isd(i)) {   // if isd == NA/NaN
-      break;
+    } else {  
+      Rf_error ("unexpected isd value");
     }
   }
   
@@ -170,6 +175,8 @@ Type ssm(objective_function<Type>* obj) {
     ADREPORT(sigma);
   } else if(proc_mod == 1) {
     ADREPORT(D);
+  } else{
+    Rf_error ("unexpected proc_mod value");
   }
   ADREPORT(rho_o);
   ADREPORT(tau);

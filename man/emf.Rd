@@ -24,10 +24,3 @@ emf
 Error Multiplication Factors for Argos (and GPS) locations. Default assumption is that GPS locations are
 10x more accurate than Argos lc 3 in both x and y directions.
 }
-\examples{
-data(ellie)
-## fit assuming Argos lc class B is 10 x less precise than all other classes
-fit <- fit_ssm(ellie[, 1:5], vmax = 5, model = "rw", time.step = 48,
-emf = emf(emf.x = c(1, 1, 1, 1, 1, 10), emf.y  = c(1, 1, 1, 1, 1, 10)))
-
-}

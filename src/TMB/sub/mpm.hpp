@@ -10,7 +10,6 @@ template <class Type>
 Type mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
-  DATA_INTEGER(N);                  // number of time.steps to iterate over
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
   PARAMETER_VECTOR(lg);		          // Autocorrelation parameter 
   PARAMETER_VECTOR(log_sigma);	      // Innovation variance (log scale)
@@ -31,13 +30,12 @@ Type mpm(objective_function<Type>* obj) {
   
   Type jnll = 0.0;
   vector<Type> mu(2);
-  int j; 
     //jnll -= dnorm(lg(0), Type(0.0), sigma_g, TRUE);
-    for(j = 1; j < N; ++j) {
+    for(int j = 1; j < x.rows(); ++j) {
       jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
     }
     
-    for(j = 2; j < N; ++j){
+    for(int j = 2; j < x.rows(); ++j){
       // var-cov depends on time interval
       cov.setZero();
       cov(0,0) = sigma(0) * sigma(0) * dt(j) * dt(j);

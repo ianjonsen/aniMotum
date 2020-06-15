@@ -1,5 +1,5 @@
 ---
-title: "foiegras"
+title: "basics"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{foiegras}
@@ -144,9 +144,9 @@ as SSMs are latent variable models, evaluating their goodness of fit is less str
 ```{r osar comp, fig.width=7, fig.height=5, message=FALSE}
 
 ## fit crw SSM
-fitc <- fit_ssm(ellies %>% filter(id == "ct96-16-13"), model = "crw", time.step = 24, verbose = 0)
+fitc <- fit_ssm(subset(ellies, id == "ct96-16-13"), model = "crw", time.step = 24, verbose = 0)
 
-## calculate OSA resids for both models
+## calculate OSA resids for 1 seal (for speed) and for both models
 fit_res <- osar(fit[2, ])
 fitc_res <- osar(fitc)
 

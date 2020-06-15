@@ -22,7 +22,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param verbose report progress during minimization (0 = silent; 1 = show parameter trace; 2 = show optimizer trace)
+##' @param verbose report progress during minimization (0 = silent; 1 = show parameter trace [default]; 2 = show optimizer trace)
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
@@ -289,11 +289,10 @@ sfilter <-
       model_name = "ssm",
       Y = rbind(d.all$x, d.all$y), 
       dt = dt,
-      N = length(dt),
       state0 = state0,
-      isd = d.all$isd,
-      obs_mod = obs_mod,
-      proc_mod = ifelse(model == "rw", 0, 1),
+      isd = as.integer(d.all$isd),
+      obs_mod = as.integer(obs_mod),
+      proc_mod = as.integer(ifelse(model == "rw", 0, 1)),
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,

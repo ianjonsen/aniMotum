@@ -81,8 +81,7 @@ mpmf <-
              data.tmb <- list(
                model_name = model,
                x = cbind(x$lon, x$lat),
-               dt = x$dt,
-               N = as.integer(nrow(x))
+               dt = x$dt
              )
            })
   
