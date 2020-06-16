@@ -277,6 +277,7 @@ sfilter <-
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
+    obs_mod <- ifelse(is.na(obs_mod), -999, obs_mod)
     
     if(scale) {
       d.all.tmp <- d.all
@@ -284,7 +285,14 @@ sfilter <-
         mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
-
+    if(model == "rw") {
+      pm <- 0
+    } else if(model == "crw") { 
+      pm <- 1
+    } else {
+      stop("\n incorrect process model called")
+    }
+    
     data <- list(
       model_name = "ssm",
       Y = rbind(d.all$x, d.all$y), 
@@ -292,7 +300,7 @@ sfilter <-
       state0 = state0,
       isd = as.integer(d.all$isd),
       obs_mod = as.integer(obs_mod),
-      proc_mod = as.integer(ifelse(model == "rw", 0, 1)),
+      proc_mod = pm,
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,

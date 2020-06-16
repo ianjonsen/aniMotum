@@ -2,7 +2,7 @@
 title: "basics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{foiegras}
+  %\VignetteIndexEntry{basics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,9 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, message = FALSE}
-library(foieGras)
 library(dplyr)
 library(ggplot2)
+library(foieGras)
 library(sf)
 ```
 
@@ -112,7 +112,7 @@ head(data.frame(foo))
 model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
 ## load foieGras example data - 2 southern elephant seals
-data(ellies)
+data("ellies")
 ## prefilter and fit Random Walk SSM using a 24 h time step
 fit <- fit_ssm(ellies, model = "rw", time.step = 24, verbose = 0)
 ```

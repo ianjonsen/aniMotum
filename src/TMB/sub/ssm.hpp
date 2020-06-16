@@ -152,14 +152,16 @@ Type ssm(objective_function<Type>* obj) {
         cov_obs(1,1) = sdLat * sdLat;
         cov_obs(0,1) = sdLon * sdLat * rho_o;
         cov_obs(1,0) = cov_obs(0,1);
-      } else { 
+      } else if(obs_mod(i) == -999){
+        continue;
+      } else{
         Rf_error ("unexpected obs_mod value");
         }
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       if(proc_mod == 0) {
-        jnll += nll_obs(Y.col(i) - X.col(i), keep.col(i));   // RW innovations
+        jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
       } else if(proc_mod == 1) {
-        jnll += nll_obs(Y.col(i) - mu.col(i), keep.col(i));   // CRW innovations
+        jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
       } else { 
         Rf_error ("unexpected proc_mod value");
         }

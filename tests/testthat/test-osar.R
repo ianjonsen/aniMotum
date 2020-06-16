@@ -7,8 +7,10 @@ test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(r, c("fG_osar","tbl_df","tbl","data.frame"))
 })
 
-r <- osar(fssm)
+
 test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
+  skip_on_cran()
+  r <- osar(fssm)
   expect_s3_class(r, c("fG_osar","tbl_df","tbl","data.frame"))
 })
 
