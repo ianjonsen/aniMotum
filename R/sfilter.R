@@ -274,13 +274,13 @@ sfilter <-
     }
 
     ## TMB - data list
-    ## where is.na(obs_mod) - prediction points - set to "LS". 
-    ## this won't matter as isd makes likelihood contribution goes to 0 in C++ code
-    obs_mod <- ifelse(is.na(obs_mod), "LS", obs_mod)
     ## convert from string to integer for C++
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
+    ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0). 
+    ## this won't matter as isd makes likelihood contribution goes to 0 in C++ code
+    obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
     
     if(scale) {
       d.all.tmp <- d.all
