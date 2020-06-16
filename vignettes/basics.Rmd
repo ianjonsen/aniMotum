@@ -1,0 +1,139 @@
+---
+title: "basics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{basics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(foieGras)
+```
+
+## Disclaimer
+this vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
+
+### foieGras models
+this vignette provides a (very) brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides two state-space models (SSM's) for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations):  
+
+- a simple Random Walk model, `rw`
+- a Correlated Random Walk model, `crw`  
+
+both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://arxiv.org/abs/2005.00401) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. 
+
+additionally, `foieGras` provides fast models (`mpm`, `jmpm`) for estimating a behavioural index along animals' tracks (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Méthé et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter.
+
+### input data
+`foieGras` expects data to be provided in one of several possible formats.
+
+1) a `data.frame` or `tibble` that looks like this
+```{r data 1, echo = FALSE}
+data(ellie, package = "foieGras")
+head(data.frame(ellie))
+```
+where the Argos data are provided via CLS Argos' Kalman filter model (KF) and include error ellipse information for each observed location.  
+
+2) a `data.frame` or `tibble` that looks like this
+```{r data 2, echo = FALSE}
+data(ellies, package = "foieGras")
+head(data.frame(ellies))
+```
+where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do not include error ellipse information.
+
+3) a `data.frame` or `tibble` that includes observations with missing KF error ellipse information
+```{r data 3, echo = FALSE}
+data(ellie, package = "foieGras")
+ellie[3:5, c("smaj","smin","eor")] <- NA
+head(data.frame(ellie))
+```
+in this situation, `foieGras` treats observations with missing error ellipse information as though they are LS-based observations.
+
+4) an `sf-tibble` where observations have any of the previous 3 structures and also include `CRS` information
+```{r data 4, echo = FALSE, message=FALSE}
+data(ellie, package = "foieGras")
+foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = "+proj=longlat +ellps=WGS84 +no_defs") 
+foo <- sf::st_transform(foo, crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +units=km +no_defs")
+head(data.frame(foo))
+```
+
+5) a `data.frame`, `tibble` or `sf-tibble` where processed GLS data are provided and include longitude and latitude error SD's (in degrees). In this case, the `lc` class is set to `GL` for all GLS locations.
+```{r data 5, echo = FALSE}
+
+  data.frame(
+  id = rep(54632, 5),
+  date = seq(Sys.time(), by = "12 hours", length.out = 5),
+  lc = rep("GL", 5),
+  lon = seq(100, by = 0.5, length = 5),
+  lat = seq(-55, by = 1, length = 5),
+  lonerr = rexp(5, 1 / 0.5),
+  laterr = rexp(5, 1 / 1.5)
+  )
+```
+
+6) a `data.frame`, `tibble` or `sf-tibble` where GPS data are provided. In this case, the `lc` class is set to `G` for all GPS locations.
+```{r data 6, echo = FALSE}
+
+  data.frame(
+  id = rep("F02-B-17", 5),
+  date = seq(Sys.time(), by = "1 hours", length.out = 5),
+  lc = rep("G", 5),
+  lon = seq(70.1, by = 0.5, length = 5),
+  lat = seq(-49.2, by = 1, length = 5)
+  )
+```
+
+7) a `data.frame`, `tibble` or `sf-tibble` where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations. 
+```{r data 7, echo = FALSE}
+
+  data.frame(
+    id = rep("F02-B-17", 5),
+    date = c("2017-09-17 05:20:00", "2017-10-04 14:35:01", "2017-10-05 04:03:25", "2017-10-05 06:28:20", "2017-10-05 10:21:18"),
+    lc = c("G","2","G","A","B"),
+    lon = c(70.1, 70.2, 70.1, 71.1, 70.8),
+    lat = c(-49.2, -49.1, -49.3, -48.7, -48.5),
+    smaj = c(NA, 1890, NA, 28532, 45546),
+    smin = c(NA, 45, NA, 1723, 3303),
+    eor = c(NA, 77, NA, 101, 97)
+  )
+```
+
+### fitting a foieGras model
+model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::prefilter` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, `prefilter` guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
+```{r fit_ssm, message=FALSE}
+## load foieGras example data - 2 southern elephant seals
+data("ellies")
+## prefilter and fit Random Walk SSM using a 24 h time step
+fit <- fit_ssm(ellies, model = "rw", time.step = 24, verbose = 0)
+```
+these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `verbose = 0` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
+
+`fit_ssm` can be applied to single tracks or to multiple tracks, as shown above. The SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
+```{r multi-fits, message=FALSE}
+## list fit outcomes for both seals
+fit
+```
+individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw` or `crw`) in the 4th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette]( https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions.
+
+### accessing and visualizing model fit objects
+simple summary information about the `foieGras` fit can be obtained by calling the fit object:
+```{r fit summary, message = FALSE}
+fit$ssm[[1]]
+```
+the table lists all estimated parameters, the specific ones listed depend on the process model selected and the data type. Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation between `sigma_x` and `sigma_y`, `tau_x` and `tau_y` are the observation error standard deviations, and `rho_o` is the correlation between them. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
+
+a summary `plot` method allows a quick visual of the SSM fit to the data:
+```{r fit plot, fig.width=6,fig.height=8}
+# plot time-series of the predicted values
+plot(fit, what = "predicted", type = 1)
+plot(fit, what = "fitted", type = 2)
+```
+the predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the `prefilter` stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
+
