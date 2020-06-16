@@ -1,6 +1,6 @@
 #include <cmath>
-#ifndef ssm_hpp
-#define ssm_hpp 1
+#ifndef crw_hpp
+#define crw_hpp 1
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
@@ -9,7 +9,7 @@ using namespace density;
 using std::sqrt;
 
 template <class Type>
-Type ssm(objective_function<Type>* obj) {
+Type crw(objective_function<Type>* obj) {
   
   // DATA
   DATA_ARRAY(Y);	                  //  (x, y) observations
@@ -17,7 +17,6 @@ Type ssm(objective_function<Type>* obj) {
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
-  DATA_STRING(proc_mod);		        //	indicates which process model to be used: "rw" or "crw"
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   
   // for KF observation model
@@ -30,11 +29,6 @@ Type ssm(objective_function<Type>* obj) {
   DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
   
   // PROCESS PARAMETERS
-  // for RW
-  PARAMETER_VECTOR(l_sigma);    //  Innovation variance (link scale)
-  PARAMETER(l_rho_p);           //  Innovation correlation (link scale)
-  PARAMETER_ARRAY(X);          //  Predicted locations TP - length(X) should be same as length(dt) - i.e. both interp & obs pos.
-  // for CRW
   PARAMETER(logD);				  // 1-d Diffusion coefficient
   // random variables
   PARAMETER_ARRAY(mu);     /* State location */
@@ -48,8 +42,6 @@ Type ssm(objective_function<Type>* obj) {
   PARAMETER(l_rho_o);             // error correlation
   
   // Transform parameters
-  vector<Type> sigma = exp(l_sigma);
-  Type rho_p = Type(2.0) / (Type(1.0) + exp(-l_rho_p)) - Type(1.0);
   vector<Type> tau = exp(l_tau);
   Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi = exp(l_psi);
@@ -59,69 +51,45 @@ Type ssm(objective_function<Type>* obj) {
   Type jnll = 0.0;
   Type tiny = 1e-5;
   
-  if(proc_mod == "rw") {
-    // RW
-    // 2 x 2 covariance matrix for innovations
-    matrix<Type> cov(2, 2);
-    matrix<Type> cov_dt(2, 2);            // tmp matrix for dt * cov calcs withn process loop
+  // Setup object for evaluating multivariate normal likelihood
+  matrix<Type> cov(4,4);
+  cov.setZero();
+  cov(0,0) = tiny;
+  cov(1,1) = tiny;
+  cov(2,2) = 2 * D * dt(0);
+  cov(3,3) = 2 * D * dt(0);
     
-    cov(0, 0) = sigma(0) * sigma(0);
-    cov(0, 1) = rho_p * sigma(0) * sigma(1);
-    cov(1, 0) = cov(0, 1);
-    cov(1, 1) = sigma(1) * sigma(1);
+  // loop over 2 coords and update nll of start location and velocities.
+  for(int i = 0; i < Y.rows(); i++) {
+    jnll -= dnorm(mu(i,0), state0(i), tiny, true);
+    jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
+  }
     
-    MVNORM_t<Type> nll_proc(cov);
-    
-    // RW PROCESS MODEL
-    for(int i = 1; i < dt.size(); i++) {
-      cov_dt = dt(i) * dt(i) * cov;
-      nll_proc.setSigma(cov_dt);
-      jnll += nll_proc(X.col(i) - X.col(i - 1));
-    }
-  } else if(proc_mod == "crw"){
-    // CRW
-    // Setup object for evaluating multivariate normal likelihood
-    matrix<Type> cov(4,4);
+  // CRW PROCESS MODEL
+  vector<Type> x_t(4);
+  for(int i = 1; i < dt.size(); i++) {
+    // process cov at time t
     cov.setZero();
     cov(0,0) = tiny;
     cov(1,1) = tiny;
-    cov(2,2) = 2 * D * dt(0);
-    cov(3,3) = 2 * D * dt(0);
-    
-    // loop over 2 coords and update nll of start location and velocities.
-    for(int i = 0; i < Y.rows(); i++) {
-      jnll -= dnorm(mu(i,0), state0(i), tiny, true);
-      jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
-    }
-    
-    // CRW PROCESS MODEL
-    vector<Type> x_t(4);
-    for(int i = 1; i < dt.size(); i++) {
-      // process cov at time t
-      cov.setZero();
-      cov(0,0) = tiny;
-      cov(1,1) = tiny;
-      cov(2,2) = 2 * D * dt(i);
-      cov(3,3) = 2 * D * dt(i);
+    cov(2,2) = 2 * D * dt(i);
+    cov(3,3) = 2 * D * dt(i);
       
-      // location innovations
-      x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
-      x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
+    // location innovations
+    x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
+    x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
       
-      // velocity innovations
-      x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
-      x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
-      jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
-    }
-  } else {
-    Rf_error ("C++: unexpected proc_mod string");
+    // velocity innovations
+    x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
+    x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
+    jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
   }
   
   // OBSERVATION MODEL
   // 2 x 2 covariance matrix for observations
   matrix<Type> cov_obs(2, 2);
   MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
-
+  
   for(int i = 0; i < dt.size(); ++i) {
     if(isd(i) == 1) {
       if(obs_mod(i) == 0) {
@@ -157,18 +125,11 @@ Type ssm(objective_function<Type>* obj) {
         
       } else{
         Rf_error ("C++: unexpected obs_mod value");
-        }
+      }
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
-      if(proc_mod == "rw") {
-        jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
+      jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
         
-      } else if(proc_mod == "crw") {
-        jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
-        
-      } else { 
-        Rf_error ("C++: unexpected proc_mod string");
-        }
     } else if(isd(i) == 0) {
       continue;
     } else {  
@@ -176,14 +137,8 @@ Type ssm(objective_function<Type>* obj) {
     }
   }
   
-  if(proc_mod == "rw") {
-    ADREPORT(rho_p);
-    ADREPORT(sigma);
-  } else if(proc_mod == "crw") {
-    ADREPORT(D);
-  } else{
-    Rf_error ("C++: unexpected proc_mod string");
-  }
+
+  ADREPORT(D);
   ADREPORT(rho_o);
   ADREPORT(tau);
   ADREPORT(psi);

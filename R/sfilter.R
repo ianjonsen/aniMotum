@@ -206,57 +206,33 @@ sfilter <-
     automap <- switch(model, 
                      rw = {
                        list(
-                         list(l_psi = factor(NA),
-                            logD = factor(NA),
-                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                         list(l_psi = factor(NA)
                             ),
                          list(l_tau = factor(c(NA, NA)),
                             l_psi = factor(NA),
-                            l_rho_o = factor(NA),
-                            logD = factor(NA),
-                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            l_rho_o = factor(NA)
                             ),
                          list(l_tau = factor(c(NA, NA)),
-                            l_psi = factor(NA),
-                            logD = factor(NA),
-                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                            l_psi = factor(NA)
                             ),
-                         list(l_psi = factor(NA),
-                            logD = factor(NA),
-                            mu = factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
-                            v =  factor(rbind(rep(NA, nrow(xs)), rep(NA, nrow(xs))))
+                         list(l_psi = factor(NA)
                             )
                          )
                        },
                      crw = {
                        list(
                          list(
-                           l_sigma = factor(c(NA, NA)),
-                           l_rho_p = factor(NA),
-                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            l_psi = factor(NA)
                          ),
                          list(
-                           l_sigma = factor(c(NA, NA)),
-                           l_rho_p = factor(NA),
-                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            l_tau = factor(c(NA, NA)),
                            l_rho_o = factor(NA)
                          ),
                          list(
-                           l_sigma = factor(c(NA, NA)),
-                           l_rho_p = factor(NA),
-                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            l_tau = factor(c(NA, NA)),
                            l_psi = factor(NA)
                          ),
                          list(
-                           l_sigma = factor(c(NA, NA)),
-                           l_rho_p = factor(NA),
-                           X = factor(cbind(rep(NA, nrow(xs)), rep(NA, nrow(xs)))),
                            l_psi = factor(NA)
                          )
                        )
@@ -292,13 +268,12 @@ sfilter <-
     
     
     data <- list(
-      model_name = "ssm",
+      model_name = model,
       Y = rbind(d.all$x, d.all$y), 
       dt = dt,
       state0 = state0,
       isd = as.integer(d.all$isd),
       obs_mod = as.integer(obs_mod),
-      proc_mod = model,
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
