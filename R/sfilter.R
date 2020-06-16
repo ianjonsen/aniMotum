@@ -285,13 +285,7 @@ sfilter <-
         mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
-    if(model == "rw") {
-      pm <- 0
-    } else if(model == "crw") { 
-      pm <- 1
-    } else {
-      stop("\n incorrect process model called")
-    }
+    
     
     data <- list(
       model_name = "ssm",
@@ -300,7 +294,7 @@ sfilter <-
       state0 = state0,
       isd = as.integer(d.all$isd),
       obs_mod = as.integer(obs_mod),
-      proc_mod = pm,
+      proc_mod = model,
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,

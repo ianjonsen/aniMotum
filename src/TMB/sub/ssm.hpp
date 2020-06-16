@@ -17,7 +17,7 @@ Type ssm(objective_function<Type>* obj) {
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
-  DATA_INTEGER(proc_mod);		       //	indicates which process model to be used: RW or CRW
+  DATA_STRING(proc_mod);		        //	indicates which process model to be used: "rw" or "crw"
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   
   // for KF observation model
@@ -59,7 +59,7 @@ Type ssm(objective_function<Type>* obj) {
   Type jnll = 0.0;
   Type tiny = 1e-5;
   
-  if(proc_mod == 0) {
+  if(proc_mod == "rw") {
     // RW
     // 2 x 2 covariance matrix for innovations
     matrix<Type> cov(2, 2);
@@ -78,7 +78,7 @@ Type ssm(objective_function<Type>* obj) {
       nll_proc.setSigma(cov_dt);
       jnll += nll_proc(X.col(i) - X.col(i - 1));
     }
-  } else if(proc_mod == 1){
+  } else if(proc_mod == "crw"){
     // CRW
     // Setup object for evaluating multivariate normal likelihood
     matrix<Type> cov(4,4);
@@ -114,7 +114,7 @@ Type ssm(objective_function<Type>* obj) {
       jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
     }
   } else {
-    Rf_error ("unexpected proc_mod value");
+    Rf_error ("C++: unexpected proc_mod string");
   }
   
   // OBSERVATION MODEL
@@ -158,12 +158,12 @@ Type ssm(objective_function<Type>* obj) {
         Rf_error ("unexpected obs_mod value");
         }
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
-      if(proc_mod == 0) {
+      if(proc_mod == "rw") {
         jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
-      } else if(proc_mod == 1) {
+      } else if(proc_mod == "crw") {
         jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
       } else { 
-        Rf_error ("unexpected proc_mod value");
+        Rf_error ("C++: unexpected proc_mod string");
         }
     } else if(isd(i) == 0) {
       continue;
@@ -172,13 +172,13 @@ Type ssm(objective_function<Type>* obj) {
     }
   }
   
-  if(proc_mod == 0) {
+  if(proc_mod == "rw") {
     ADREPORT(rho_p);
     ADREPORT(sigma);
-  } else if(proc_mod == 1) {
+  } else if(proc_mod == "crw") {
     ADREPORT(D);
   } else{
-    Rf_error ("unexpected proc_mod value");
+    Rf_error ("C++: unexpected proc_mod string");
   }
   ADREPORT(rho_o);
   ADREPORT(tau);
