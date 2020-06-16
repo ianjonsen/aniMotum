@@ -278,10 +278,11 @@ sfilter <-
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
                       )
-    ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0). 
-    ## this won't matter as isd makes likelihood contribution goes to 0 in C++ code
+    ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0) so
+    ##  NA's don't create an int overflow situation in C++ code. This won't matter 
+    ##  as isd makes likelihood contribution goes to 0 in C++ code
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
-    
+       
     if(scale) {
       d.all.tmp <- d.all
       d.all <- d.all %>%

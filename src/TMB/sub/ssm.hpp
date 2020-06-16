@@ -123,7 +123,7 @@ Type ssm(objective_function<Type>* obj) {
   MVNORM_t<Type> nll_obs; // Multivariate Normal for observations
 
   for(int i = 0; i < dt.size(); ++i) {
-//    if(isd(i) == 1) {
+    if(isd(i) == 1) {
       if(obs_mod(i) == 0) {
         // Argos Least Squares & GPS observations
         Type s = tau(0) * K(i,0);
@@ -161,19 +161,19 @@ Type ssm(objective_function<Type>* obj) {
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       if(proc_mod == "rw") {
-        jnll += nll_obs((Y.col(i) - X.col(i)) * isd(i), keep.col(i));   // RW innovations
+        jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
         
       } else if(proc_mod == "crw") {
-        jnll += nll_obs((Y.col(i) - mu.col(i)) * isd(i), keep.col(i));   // CRW innovations
+        jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
         
       } else { 
         Rf_error ("C++: unexpected proc_mod string");
         }
-//    } else if(isd(i) == 0) {
-//      continue;
-//    } else {  
-//      Rf_error ("unexpected isd value");
-//    }
+    } else if(isd(i) == 0) {
+      continue;
+    } else {  
+      Rf_error ("C++: unexpected isd value");
+    }
   }
   
   if(proc_mod == "rw") {
