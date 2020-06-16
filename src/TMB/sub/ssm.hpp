@@ -132,6 +132,7 @@ Type ssm(objective_function<Type>* obj) {
         cov_obs(1,1) = q * q;
         cov_obs(0,1) = s * q * rho_o;
         cov_obs(1,0) = cov_obs(0,1);
+        
       } else if(obs_mod(i) == 1) {
         // Argos Kalman Filter (or Kalman Filtered & Smoothed) observations
         double z = sqrt(2.);
@@ -144,6 +145,7 @@ Type ssm(objective_function<Type>* obj) {
         cov_obs(1,1) = (M2 * c2c + m2 * s2c);
         cov_obs(0,1) = (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
         cov_obs(1,0) = cov_obs(0,1);
+        
       } else if(obs_mod(i) == 2) {
         // GLS observations
         Type sdLon = GLerr(i,0);
@@ -152,6 +154,7 @@ Type ssm(objective_function<Type>* obj) {
         cov_obs(1,1) = sdLat * sdLat;
         cov_obs(0,1) = sdLon * sdLat * rho_o;
         cov_obs(1,0) = cov_obs(0,1);
+        
       } else{
         Rf_error ("C++: unexpected obs_mod value");
         }
