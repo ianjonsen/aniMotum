@@ -13,6 +13,7 @@ sfilter(
   map = NULL,
   fit.to.subset = TRUE,
   optim = c("nlminb", "optim"),
+  optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
   verbose = 1,
   control = NULL,
   inner.control = NULL,
@@ -40,6 +41,8 @@ this if you know what you are doing...}
 (default is TRUE)}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
+
+\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"}
 
 \item{verbose}{report progress during minimization (0 = silent; 1 = show parameter trace [default]; 2 = show optimizer trace)}
 

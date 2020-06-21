@@ -22,6 +22,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
+##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"
 ##' @param verbose report progress during minimization (0 = silent; 1 = show parameter trace [default]; 2 = show optimizer trace)
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
 ##' @param inner.control list of control settings for the inner optimization
@@ -52,6 +53,7 @@ sfilter <-
            map = NULL,
            fit.to.subset = TRUE,
            optim = c("nlminb", "optim"),
+           optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
            verbose = 1,
            control = NULL,
            inner.control = NULL,
@@ -60,6 +62,7 @@ sfilter <-
     st <- proc.time()
     call <- match.call()
     optim <- match.arg(optim)
+    optMeth <- match.arg(optMeth)
     model <- match.arg(model)
 
     ## check args
@@ -76,6 +79,8 @@ sfilter <-
                 msg = "fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
     assert_that(optim %in% c("nlminb", "optim"),
                 msg = "optimiser can only be either `nlminb` or `optim`")
+    assert_that(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
+                msg = "optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
     assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
                 msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
     assert_that(any(is.list(control) || is.null(control)), msg = "control must be a named list of valid optimiser control arguments or NULL")
@@ -296,7 +301,7 @@ sfilter <-
         map = map,
         random = rnd,
         hessian = FALSE,
-        method = "L-BFGS-B",
+        method = optMeth,
         DLL = "foieGras",
         silent = !verb,
         inner.control = inner.control
@@ -335,8 +340,10 @@ sfilter <-
     U <- U[!names(U) %in% names(map)]
 
     ## Minimize objective function
+    oldw <- getOption("warn")
+    options(warn = -1)  ## turn warnings off but check if optimizer crashed & return warning at end
     opt <-
-      suppressWarnings(switch(optim,
+      switch(optim,
                               nlminb = try(nlminb(obj$par,
                                                   ifelse(verbose == 1, myfn, obj$fn),
                                                   obj$gr,
@@ -351,17 +358,18 @@ sfilter <-
                                   par = obj$par,
                                   fn = ifelse(verbose == 1, myfn, obj$fn),
                                   gr = obj$gr,
-                                  method = "L-BFGS-B",
+                                  method = optMeth,
                                   control = control,
                                   lower = L,
                                   upper = U
                                 )
-                              ))))
+                              ), silent = TRUE))
     cat("\n")
-    
     ## if error then exit with limited output to aid debugging
-    options(warn = -1) ## turn warnings off but check if pdHess is FALSE at end and return warning
+    ## check if pdHess is FALSE at end and return warning
     rep <- try(sdreport(obj))
+    
+    options(warn = oldw) ## turn warnings back on
     
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
@@ -466,7 +474,6 @@ sfilter <-
       } else if (optim == "optim") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
       }
-      options(warn = 0) ## turn warnings back on
       out <- list(
         call = call,
         predicted = pv,
@@ -484,8 +491,10 @@ sfilter <-
         optimiser = optim,
         time = proc.time() - st
       )
-      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated. You could try a longer time.step", call. = FALSE)
+      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated. 
+                              You could try a different time.step, or use the map argument: map = list(psi = factor(NA)) to fix psi = 1", call. = FALSE)
     } else {
+      
       ## if optimiser fails
       out <- list(
         call = call,
@@ -496,6 +505,12 @@ sfilter <-
         tmb = obj,
         errmsg = opt
       )
+      if(model == "crw") {
+      warning("The optimiser wandered out of bounds and failed. Try simplifying the model by including the following argument: 
+                                 map = list(psi = factor(NA))", call. = FALSE)
+      } else {
+        warning("The optimiser wandered out of bounds and failed. You could try using a different time.step", call. = FALSE)
+      }
     }
     
     class(out) <- append("ssm", class(out))
