@@ -204,7 +204,7 @@ sfilter <-
       )
     }
 
-    ## calculate prop'n of obs that are LS-derived
+    ## start to work out which obs_mod to use for each observation
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
     obst <- which(table(d$obs.type) > 0)
     
