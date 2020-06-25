@@ -4,7 +4,14 @@
 \alias{plot.fG_ssm}
 \title{plot}
 \usage{
-\method{plot}{fG_ssm}(x, what = c("fitted", "predicted"), type = 1, ncol = 1, ...)
+\method{plot}{fG_ssm}(
+  x,
+  what = c("fitted", "predicted"),
+  type = 1,
+  outlier = TRUE,
+  ncol = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
@@ -12,6 +19,8 @@
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
+
+\item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects}
 
