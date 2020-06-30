@@ -48,7 +48,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
              if(any(sapply(x$ssm, function(.) is.na(.$ts)))) {
                ssm <- grab(x, "fitted", as_sf = FALSE)
                warning("there are no predicted locations because you used time.step = NA when calling `fit_ssm`, 
-                       plotting fitted locations instead")
+                       plotting fitted locations instead", call. = FALSE)
              } else {
              ssm <- grab(x, "predicted", as_sf = FALSE)
              }
