@@ -103,7 +103,7 @@ test_that("fit_ssm vmax,ang,min.dt + crw return foieGras list w 15 elements", {
 test_that("fit_ssm no spd filter + crw return foieGras list w 15 elements", {
   skip_on_cran()
   f <- expect_warning(fit_ssm(dkf, spdf=FALSE, model = "crw", time.step = 48, optim = "nlminb", verbose = 0),
-                      "Hessian was not positive-definite so some standard errors could not be calculated. You could try a longer time.step",
+                      "Hessian was not positive-definite so some standard errors could not be calculated.",
                       fixed = TRUE)
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
