@@ -1,3 +1,24 @@
+##' generate error ellipses from x,y coordinates, semi-major, semi-minor axes and ellipse orientation
+##' 
+##' @param x x-coordinate, usually in projected units (km)
+##' @param y y-coordinate, usually in projected units (km)
+##' @param a ellipse semi-major axis (km)
+##' @param b ellipse semi-minor axis (km)
+##' @param theta ellipse orientation from north (degrees)
+##'
+##' @keywords internal
+
+elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
+  m <- ifelse(!conf, 1, 1.96)
+  ln <- seq(0, 2*pi, l = 50)
+  theta <- (-1 * theta + 90) / 180 * pi   ## req'd rotation to get 0 deg pointing N
+  x1 <- m * a * cos(theta) * cos(ln) - m * b * sin(theta) * sin(ln)
+  y1 <- m * a * sin(theta) * cos(ln) + m * b * cos(theta) * sin(ln)
+  
+  cbind(c(x+x1, x+x1[1]), c(y+y1, y+y1[1]))
+}
+
+
 ##' @title plot
 ##'
 ##' @description visualize multiple fits from an fG compound tibble
@@ -6,18 +27,19 @@
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
-##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects
+##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: (type = 1) 1-d time series of fits to data, 
 ##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
 ##' or (type = 2) 2-d fits to data (units = km)
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug
-##' @importFrom ggplot2 element_text xlab labeller label_both label_value geom_ribbon
+##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars geom_polygon
+##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both label_value geom_ribbon facet_wrap
 ##' @importFrom tidyr gather
-##' @importFrom dplyr "%>%" select bind_cols rename filter
+##' @importFrom dplyr "%>%" select bind_cols rename filter bind_rows mutate
 ##' @importFrom tibble enframe
+##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom wesanderson wes_palette
 ##' @method plot fG_ssm
 ##'
@@ -29,7 +51,7 @@
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, ncol = 1, ...)
+plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, ncol = 2, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
@@ -37,7 +59,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
   
   what <- match.arg(what)
   
-  wpal <- wes_palette("Darjeeling2", n = 5, "discrete")
+  wpal <- wes_palette("Zissou1", n = 5, "discrete")
   
   if(inherits(x, "fG_ssm")) {
     switch(what,
@@ -75,45 +97,69 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       pd <- bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
       dd <- bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
       
+      ## plot SE ribbon first
+      p <- ggplot() + 
+        geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[1], alpha = 0.4)
+      
       if(outlier) {
-        p <- ggplot() + 
+        p <- p + 
           geom_point(data = dd %>% filter(!keep), aes(date, value), 
-                     size = 1, colour = wpal[5], alpha = 0.5, shape = 4) +
+                     colour = wpal[5], shape = 4) +
           geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     size = 1.25, colour = wpal[3], shape = 19, alpha = 0.8) +
-          geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[5], alpha = 0.5, sides = "b") + 
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[3], alpha=0.7, sides = "b")
+                     colour = wpal[4], shape = 19, size = 2) +
+          geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[5], sides = "b") + 
+          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[4], sides = "b")
       } else {
-        p <- ggplot() + 
+        p <- p + 
           geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     size = 1.25, colour = wpal[3], shape = 19, alpha = 0.8) +
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[3], alpha=0.7, sides = "b")
+                     colour = wpal[4], shape = 19, size = 2) +
+          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[4], sides = "b")
       }  
-       p <- p + 
-         geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[2], alpha = 0.25) + 
-         geom_point(data = pd, aes(date, value), col=wpal[2], size = 0.6) + 
-         facet_wrap(id ~ coord, scales = "free", ncol = ncol,
-                   labeller = labeller(id = label_both, coord = label_value))
+        p <- p + 
+         geom_point(data = pd, aes(date, value), col=wpal[1], shape = 20) + 
+         facet_wrap(facets = vars(id, coord), scales = "free",
+                   labeller = labeller(id = label_both, coord = label_value),
+                   ncol = ncol)
         
       
     } else if (type == 2) {
+      ssm.lst <- split(ssm, ssm$id)
+      conf_poly <- lapply(ssm.lst, function(x) {
+        conf <- lapply(1:nrow(x), function(i)
+          with(x, elps(x[i], y[i], x.se[i], y.se[i], 90))
+        )
+        lapply(conf, function(x) st_polygon(list(x))) %>%
+          st_multipolygon()
+      })
+      conf_sf <- st_as_sfc(conf_poly) %>%
+        st_as_sf() %>%
+        mutate(id = unique(ssm$id))
+
+      ## FIXME: NEED TO REVISE SO THAT INDIVIDUAL PANELS ARE GENERATED SEPARATELY 
+      ## FIXME: AND RENDERED AS A MULTIPANEL PLOT USING PATCHWORK
+      ## This is req'd b/c scales = "free" does not work with geom_sf/coord_sf 
       if(outlier) {
       p <- ggplot() + 
-        geom_point(data = d %>% filter(!keep), aes(x, y), 
-                   size = 1, colour = wpal[5], alpha = 0.5, shape = 4) +
-        geom_point(data = d %>% filter(keep), aes(x, y), 
-                              size = 1.25, colour = wpal[3], shape = 19, alpha = 0.8)
+        geom_point(data = d %>% filter(!keep), aes(x, y),
+                   size = 1, colour = wpal[5], shape = 4) +
+        geom_point(data = d %>% filter(keep), aes(x, y),
+                              size = 2, colour = wpal[4], shape = 19)
       } else {
         p <- ggplot() + 
-          geom_point(data = d %>% filter(keep), aes(x, y), 
-                     size = 1.25, colour = wpal[3], shape = 19, alpha = 0.8)
+          geom_point(data = d %>% filter(keep), aes(x, y),
+                     size = 2, colour = wpal[4], shape = 19)
       }
         p <- p + 
-          geom_path(data = ssm, aes(x, y), col = wpal[2], lwd = 0.2, alpha = 0.4) +
-          geom_point(data = ssm, aes(x, y), col = wpal[2], size = 0.6) + 
-          facet_wrap( ~ id, scales = "free", ncol = ncol, labeller = labeller(id = label_both))
+          geom_sf(data = conf_sf, col = NA, fill = wpal[2], alpha = 0.5) +
+          geom_path(data = ssm, aes(x, y), col = wpal[1], lwd = 0.2) +
+          geom_point(data = ssm, aes(x, y), col = wpal[1], shape = 20) + 
+          facet_wrap( ~ id, ncol = ncol, labeller = labeller(id = label_both))
       
     }
+    p <- p + 
+      xlab(element_blank()) + 
+      ylab(element_blank()) +
+      theme_minimal()
     return(p)
     
   } else {

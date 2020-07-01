@@ -9,7 +9,7 @@
   what = c("fitted", "predicted"),
   type = 1,
   outlier = TRUE,
-  ncol = 1,
+  ncol = 2,
   ...
 )
 }
@@ -22,7 +22,7 @@
 
 \item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
 
-\item{ncol}{number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual fit objects}
+\item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
 
 \item{...}{additional arguments to be ignored}
 }
