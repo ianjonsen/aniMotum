@@ -34,12 +34,13 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
 ##' or (type = 2) 2-d fits to data (units = km)
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars geom_polygon
+##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars labs
 ##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both label_value geom_ribbon facet_wrap
 ##' @importFrom tidyr gather
 ##' @importFrom dplyr "%>%" select bind_cols rename filter bind_rows mutate
 ##' @importFrom tibble enframe
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
+##' @importFrom patchwork wrap_plots
 ##' @importFrom wesanderson wes_palette
 ##' @method plot fG_ssm
 ##'
@@ -99,24 +100,24 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       
       ## plot SE ribbon first
       p <- ggplot() + 
-        geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[1], alpha = 0.4)
+        geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
       
       if(outlier) {
         p <- p + 
           geom_point(data = dd %>% filter(!keep), aes(date, value), 
-                     colour = wpal[5], shape = 4) +
+                     colour = wpal[4], shape = 4) +
           geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     colour = wpal[4], shape = 19, size = 2) +
-          geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[5], sides = "b") + 
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[4], sides = "b")
+                     colour = wpal[1], shape = 19, size = 2) +
+          geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
+          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
       } else {
         p <- p + 
           geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     colour = wpal[4], shape = 19, size = 2) +
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[4], sides = "b")
+                     colour = wpal[1], shape = 19, size = 2) +
+          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
       }  
         p <- p + 
-         geom_point(data = pd, aes(date, value), col=wpal[1], shape = 20) + 
+         geom_point(data = pd, aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
          facet_wrap(facets = vars(id, coord), scales = "free",
                    labeller = labeller(id = label_both, coord = label_value),
                    ncol = ncol)
@@ -138,31 +139,71 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       ## FIXME: NEED TO REVISE SO THAT INDIVIDUAL PANELS ARE GENERATED SEPARATELY 
       ## FIXME: AND RENDERED AS A MULTIPANEL PLOT USING PATCHWORK
       ## This is req'd b/c scales = "free" does not work with geom_sf/coord_sf 
-      if(outlier) {
+      
+      if(nrow(x) == 1) {
+      ## for a single track plot
       p <- ggplot() + 
+        geom_sf(data = conf_sf, col = NA, fill = wpal[5], alpha = 0.25)
+      
+      if(outlier) {
+      p <- p + 
         geom_point(data = d %>% filter(!keep), aes(x, y),
-                   size = 1, colour = wpal[5], shape = 4) +
+                   size = 1, colour = wpal[4], shape = 4) +
         geom_point(data = d %>% filter(keep), aes(x, y),
-                              size = 2, colour = wpal[4], shape = 19)
+                              size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
       } else {
-        p <- ggplot() + 
+        p <- p + 
           geom_point(data = d %>% filter(keep), aes(x, y),
-                     size = 2, colour = wpal[4], shape = 19)
+                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
       }
         p <- p + 
-          geom_sf(data = conf_sf, col = NA, fill = wpal[2], alpha = 0.5) +
-          geom_path(data = ssm, aes(x, y), col = wpal[1], lwd = 0.2) +
-          geom_point(data = ssm, aes(x, y), col = wpal[1], shape = 20) + 
-          facet_wrap( ~ id, ncol = ncol, labeller = labeller(id = label_both))
+          geom_path(data = ssm, aes(x, y), col = wpal[5], lwd = 0.2) +
+          geom_point(data = ssm, aes(x, y), col = wpal[5], shape = 20, size = 0.75) + 
+          labs(title = paste("id:", x$id))
       
-    }
     p <- p + 
       xlab(element_blank()) + 
       ylab(element_blank()) +
       theme_minimal()
+    
     return(p)
     
+    } else {
+      ## for multiple tracks, use cowplot instead of facet_wrap so we can have scales = "free" scenario
+    d.lst <- split(d, d$id)
+    ssm.lst <- split(ssm, ssm$id)
+
+    p <- lapply(1:nrow(x), function(i) {
+      m <- ggplot() + 
+        geom_sf(data = conf_sf %>% filter(id == unique(id)[i]), col = NA, fill = wpal[5], alpha = 0.25)
+      
+      if(outlier) {
+        m <- m + 
+          geom_point(data = d %>% filter(!keep & id == unique(id)[i]), aes(x, y),
+                     size = 1, colour = wpal[4], shape = 4) +
+          geom_point(data = d %>% filter(keep & id == unique(id)[i]), aes(x, y),
+                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
+      } else {
+        m <- m + 
+          geom_point(data = d %>% filter(keep & id == unique(id)[i]), aes(x, y),
+                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
+      }
+      m <- m + 
+        geom_path(data = ssm %>% filter(id == unique(id)[i]), aes(x, y), col = wpal[5], lwd = 0.2) +
+        geom_point(data = ssm %>% filter(id == unique(id)[i]), aes(x, y), col = wpal[5], shape = 20, size = 0.75) + 
+        labs(title = paste("id:", x[i, "id"]))
+      
+    m <- m + 
+      xlab(element_blank()) + 
+      ylab(element_blank()) +
+      theme_minimal()
+    m  
+    })
+    
+    wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))
+    }
   } else {
     stop("x must be a fG_ssm tibble")
+  }
   }
 }

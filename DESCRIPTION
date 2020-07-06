@@ -42,7 +42,8 @@ Imports:
     dplyr (>= 1.0.0),
     trip,
     assertthat,
-    wesanderson
+    wesanderson,
+    patchwork
 Suggests: 
     testthat,
     covr,
