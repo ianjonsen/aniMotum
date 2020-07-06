@@ -46,9 +46,9 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
-##' data(fssm)
-##' plot(fssm, what = "f", type = 1)
-##' plot(fssm, what = "p", type = 2)
+##' data(fs)
+##' plot(fs, what = "f", type = 1)
+##' plot(fs, what = "p", type = 2)
 ##'
 ##' @export
 

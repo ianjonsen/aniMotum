@@ -25,8 +25,8 @@ The specified tibble's are appended to a single output tibble.
 }
 \examples{
 ## load example foieGras fit object (to save time)
-data(fssm)
+data(fs)
 ## grab predicted values as an un-projected tibble
-preds <- grab(fssm, what = "predicted", as_sf = FALSE)
+preds <- grab(fs, what = "predicted", as_sf = FALSE)
 
 }
