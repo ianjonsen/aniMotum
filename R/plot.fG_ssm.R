@@ -27,6 +27,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
+##' @param pages plots if individuals on a single page (pages = 0; default) or each individual on a separate page (pages = 1) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
 ##' @param ... additional arguments to be ignored
 ##' 
@@ -52,7 +53,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, ncol = 2, ...)
+plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, pages = 0, ncol = 2, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
@@ -98,30 +99,37 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       pd <- bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
       dd <- bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
       
-      ## plot SE ribbon first
-      p <- ggplot() + 
-        geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
+      if(pages == 0) {
+        ## plot SE ribbon first
+        p <- ggplot() + 
+          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
       
-      if(outlier) {
-        p <- p + 
-          geom_point(data = dd %>% filter(!keep), aes(date, value), 
-                     colour = wpal[4], shape = 4) +
-          geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     colour = wpal[1], shape = 19, size = 2) +
-          geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
-      } else {
-        p <- p + 
-          geom_point(data = dd %>% filter(keep), aes(date, value), 
-                     colour = wpal[1], shape = 19, size = 2) +
-          geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
-      }  
-        p <- p + 
-         geom_point(data = pd, aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
-         facet_wrap(facets = vars(id, coord), scales = "free",
-                   labeller = labeller(id = label_both, coord = label_value),
-                   ncol = ncol)
+        if(outlier) {
+          p <- p + 
+            geom_point(data = dd %>% filter(!keep), aes(date, value), 
+                       colour = wpal[4], shape = 4) +
+            geom_point(data = dd %>% filter(keep), aes(date, value), 
+                       colour = wpal[1], shape = 19, size = 2) +
+            geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
+            geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+        } else {
+          p <- p + 
+            geom_point(data = dd %>% filter(keep), aes(date, value), 
+                       colour = wpal[1], shape = 19, size = 2) +
+            geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+        }  
+          p <- p + 
+           geom_point(data = pd, aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
+            facet_wrap(facets = vars(id, coord), scales = "free",
+                     labeller = labeller(id = label_both, coord = label_value),
+                     ncol = ncol)
+      } else if(pages == 1){
         
+        
+        
+      } 
+      
+      return(p)
       
     } else if (type == 2) {
       ssm.lst <- split(ssm, ssm$id)
