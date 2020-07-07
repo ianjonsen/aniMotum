@@ -29,7 +29,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by \code{prefilter}
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' ##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
+##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
 ##' @param verbose report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace
 ##' @param control list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)
 ##' @param inner.control list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)
