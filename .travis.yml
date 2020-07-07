@@ -25,10 +25,6 @@ cache:
 before_install:
     - sudo apt-get install -y udunits-bin libproj-dev libgdal-dev libgeos-dev libudunits2-dev gdal-bin
     - R -e 'install.packages("rgdal", repos=c("http://R-Forge.R-project.org", "http://cran.rstudio.com"))'
-    - echo "options(repos = c(CRAN = 'https://packagemanager.rstudio.com/all/__linux__/xenial/latest'))" >> ~/.Rprofile.site
-    - echo "options(HTTPUserAgent = paste0('R/', getRversion(), ' R (',
-       paste(getRversion(), R.version['platform'], R.version['arch'], R.version['os']),
-       ')'))" >> ~/.Rprofile.site
     
 latex: true
 pandoc: true
