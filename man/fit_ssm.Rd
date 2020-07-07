@@ -64,8 +64,9 @@ this if you know what you are doing}
 \item{fit.to.subset}{fit the SSM to the data subset determined by \code{prefilter}
 (default is TRUE)}
 
-\item{optim}{numerical optimizer to be used ("nlminb" or "optim")
-##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)}
+\item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
+
+\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)}
 
 \item{verbose}{report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace}
 
