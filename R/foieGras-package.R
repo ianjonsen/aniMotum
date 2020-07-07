@@ -61,24 +61,24 @@ NULL
 ##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name fs
+##' @name xs
 ##' @docType data
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example foieGras fit object, using ellies example data and the
-##' following call: fs <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example
+##' following call: xs <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
 
-##' @name fm
+##' @name xm
 ##' @docType data
 ##' @title foieGras example mpm fit object
 ##' @format .RData
 ##' @keywords data
 ##' @description Example foieGras fit object, using ssm_fits example data and the
-##' following call: fm <- fs %>% grab(., "p", as_sf = FALSE) %>% 
+##' following call: xm <- xs %>% grab(., "p", as_sf = FALSE) %>% 
 ##' select(id,date,lon,lat) %>% 
 ##' fit_mpm(., model="jmpm") 
 ##' This example fit is included purely to speed up examples where a fit object is required

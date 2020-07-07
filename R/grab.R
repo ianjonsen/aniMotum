@@ -18,9 +18,9 @@
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
-##' data(fs)
+##' data(xs)
 ##' ## grab predicted values as an un-projected tibble
-##' preds <- grab(fs, what = "predicted", as_sf = FALSE)
+##' preds <- grab(xs, what = "predicted", as_sf = FALSE)
 ##' 
 ##' @export
 ##'

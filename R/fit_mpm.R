@@ -15,8 +15,8 @@
 ##' 
 ##' @examples
 ##' ## fit jmpm to two southern elephant seals
-##' data(fs)
-##' dmp <- grab(fs, "predicted", as_sf=FALSE)
+##' data(xs)
+##' dmp <- grab(xs, "predicted", as_sf=FALSE)
 ##' dmp <- dmp[, c("id", "date", "lon", "lat")]
 ##' fmpm <- fit_mpm(dmp, model = "jmpm")
 ##' 
