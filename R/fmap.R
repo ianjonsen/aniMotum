@@ -14,11 +14,12 @@
 ##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
-##' @importFrom ggplot2 element_blank scale_colour_viridis_c scale_colour_viridis_d
+##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise "%>%" group_by
+##' @importFrom wesanderson wes_palette
 ##' @export
 
 fmap <- function(x,
@@ -78,6 +79,7 @@ fmap <- function(x,
   coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
     st_transform(crs = prj)
   
+  
   p <- ggplot() +
     geom_sf(data = coast,
             fill = grey(0.6),
@@ -86,10 +88,9 @@ fmap <- function(x,
     ylim(bounds[c("ymin","ymax")])
 
   if(obs)
-    p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], 0.5), shape = 9, alpha = 0.75)
+    p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], size), shape = 9, alpha = 0.75)
 
-  if(length(unique(x$id)) > 1) {
-
+  if(nrow(x) > 1) {
     p <- p +
       geom_sf(data = sf_lines,
               colour = "dodgerblue",
@@ -97,10 +98,10 @@ fmap <- function(x,
               ) +
       geom_sf(data = sf_locs,
               aes_string(colour = "id"),
-              size = ifelse(length(size) == 2, size[1], 1),
+              size = ifelse(length(size) == 2, size[1], size),
               show.legend = "point"
                      ) +
-    scale_colour_viridis_d() +
+      scale_colour_manual(values = wes_palette(name = "Zissou1", n = nrow(x), type = "continuous")) +
       theme(legend.position = "bottom",
             legend.text = element_text(size = 8, vjust = 0)
       )
@@ -115,7 +116,8 @@ fmap <- function(x,
                     aes(colour = as.numeric(as.Date(date))),
                      size = ifelse(length(size) == 2, size[1], 1)
                      ) +
-      scale_colour_viridis_c(breaks = as.numeric(lab_dates), option = "viridis", labels = lab_dates) +
+      scale_colour_gradientn(breaks = as.numeric(lab_dates), colours = wes_palette(name = "Zissou1", type = "continuous"), labels = lab_dates) +
+      labs(title = paste("id:", x$id)) +
       theme(legend.position = "bottom",
             legend.title = element_blank(),
             legend.text = element_text(size = 8, vjust = 0),

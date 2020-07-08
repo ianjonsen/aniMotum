@@ -11,8 +11,8 @@
 ##' @examples
 ##' ## see summary fit output
 ##' ## load example foieGras fit object (to save time)
-##' data(fssm)
-##' d <- fssm[1, ] ## just use the first seal to save time
+##' data(xs)
+##' d <- xs[1, ] ## just use the first seal to save time
 ##' dres <- osar(d)
 ##'
 ##' @importFrom dplyr "%>%" select slice mutate bind_rows everything

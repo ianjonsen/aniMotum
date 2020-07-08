@@ -18,9 +18,9 @@
 ##'
 ##' @examples
 ##' ## load example foieGras fit object (to save time)
-##' data(fssm)
+##' data(xs)
 ##' ## grab predicted values as an un-projected tibble
-##' preds <- grab(fssm, what = "predicted", as_sf = FALSE)
+##' preds <- grab(xs, what = "predicted", as_sf = FALSE)
 ##' 
 ##' @export
 ##'
@@ -84,7 +84,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  st_set_crs(4326) %>%
                  st_transform(., prj[[i]])
              }) %>%
-               do.call(rbind, .)
+               bind_rows(.)
              
              if (what != "data") {
                out <- switch(

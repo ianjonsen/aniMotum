@@ -29,6 +29,7 @@
 ##' @param fit.to.subset fit the SSM to the data subset determined by \code{prefilter}
 ##' (default is TRUE)
 ##' @param optim numerical optimizer to be used ("nlminb" or "optim")
+##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
 ##' @param verbose report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace
 ##' @param control list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)
 ##' @param inner.control list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)
@@ -107,6 +108,7 @@ fit_ssm <- function(d,
                     parameters = NULL,
                     fit.to.subset = TRUE,
                     optim = "optim",
+                    optMeth = "L-BFGS-B",
                     verbose = 1,
                     control = NULL,
                     inner.control = NULL,
@@ -149,6 +151,7 @@ fit_ssm <- function(d,
         map = map,
         fit.to.subset = fit.to.subset,
         optim = optim,
+        optMeth = optMeth,
         verbose = verbose,
         control = control,
         inner.control = inner.control,
@@ -163,7 +166,9 @@ fit_ssm <- function(d,
         } else if(length(x) < 15) {
           FALSE
         })) %>%
-      mutate(pdHess = sapply(.$ssm, function(x) x$rep$pdHess)) %>%
+      mutate(pdHess = sapply(.$ssm, function(x) 
+        length(x) == 15
+      )) %>%
       mutate(pmodel = sapply(.$ssm, function(x) x$pm))
   }
 

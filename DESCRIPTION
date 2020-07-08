@@ -41,7 +41,9 @@ Imports:
     purrr,
     dplyr (>= 1.0.0),
     trip,
-    assertthat
+    assertthat,
+    wesanderson,
+    patchwork
 Suggests: 
     testthat,
     covr,

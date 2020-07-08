@@ -14,11 +14,11 @@
 ##' @importFrom tibble as_tibble
 ##' @examples
 ##' ## load example foieGras fit objects (to save time)
-##' data(fssm)
-##' data(fmpm)
+##' data(xs)
+##' data(xm)
 ##' ## join predicted values as an un-projected tibble
-##' fsmp <- join(fssm, fmpm, as_sf = FALSE)
-##' fsmp
+##' xsm <- join(xs, xm, as_sf = FALSE)
+##' xsm
 ##' @export
 
 join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
