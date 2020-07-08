@@ -9,7 +9,7 @@
   what = c("fitted", "predicted"),
   type = 1,
   outlier = TRUE,
-  pages = 0,
+  pages = 1,
   ncol = 2,
   ...
 )
@@ -23,7 +23,7 @@
 
 \item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
 
-\item{pages}{plots if individuals on a single page (pages = 0; default) or each individual on a separate page (pages = 1)}
+\item{pages}{plots if individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
 
