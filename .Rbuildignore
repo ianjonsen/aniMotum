@@ -13,3 +13,4 @@
 ^docs$
 ^pkgdown$
 ^data\/rope\.RData$
+^sese\_map\.R$

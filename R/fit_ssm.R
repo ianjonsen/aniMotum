@@ -166,7 +166,9 @@ fit_ssm <- function(d,
         } else if(length(x) < 15) {
           FALSE
         })) %>%
-      mutate(pdHess = sapply(.$ssm, function(x) x$rep$pdHess)) %>%
+      mutate(pdHess = sapply(.$ssm, function(x) 
+        length(x) == 15
+      )) %>%
       mutate(pmodel = sapply(.$ssm, function(x) x$pm))
   }
 
