@@ -9,6 +9,7 @@
   what = c("fitted", "predicted"),
   type = 1,
   outlier = TRUE,
+  pages = 0,
   ncol = 2,
   ...
 )
@@ -21,6 +22,8 @@
 \item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
 
 \item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
+
+\item{pages}{plots if individuals on a single page (pages = 0; default) or each individual on a separate page (pages = 1)}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
 
