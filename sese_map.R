@@ -99,7 +99,7 @@ dlocs <- dlocs %>%
 
 ## map
 map <- ggplot() +
-  geom_sf(data = dlocs, size = 0.75, colour = wpal[1], alpha = 0.25) +
+  geom_sf(data = dlocs, size = 0.75, colour = wpal[2], alpha = 0.5) +
   geom_sf(data = plines, size = 0.2, colour = wpal[5]) +
   geom_sf(data = world_sf, fill = "snow2", lwd = 0, colour = NA) +
   coord_sf(xlim = bounds[c("xmin","xmax")], ylim = bounds[c("ymin","ymax")]) +
