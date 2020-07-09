@@ -1,3 +1,9 @@
+# foieGras 0.6-8
+
+* adds wesanderson::wes_palette("Zissou1") as default palette for plots/maps
+* generic plot method for fG_ssm objects can now plot individuals all on 1 page (pages = 1) or on separate pages (pages = 0)
+* 2-d (track) plots now include confidence ellipses on estimated locations
+
 # foieGras 0.6-7
 
 * adds ability to fit move persistence models to temporally regular OR irregular location data
