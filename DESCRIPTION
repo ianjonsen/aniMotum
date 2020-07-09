@@ -22,7 +22,7 @@ BugReports: https://github.com/ianjonsen/foieGras/issues
 License: MIT + file LICENSE
 LazyData: true
 Encoding: UTF-8
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 LinkingTo: 
     TMB (>= 1.7.15),
     RcppEigen
