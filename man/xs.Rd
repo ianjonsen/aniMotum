@@ -8,8 +8,7 @@
 .RData
 }
 \description{
-Example foieGras fit object, using ellies example data and the
-following call: xs <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example
+Example foieGras fit object. This example
 fit is included purely to speed up examples where a fit object is required
 but fitting to data is not the focus of the example.
 }

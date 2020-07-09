@@ -14,11 +14,11 @@
 ##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
-##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_buffer st_crs st_coordinates st_cast
+##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_manual
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
-##' @importFrom dplyr summarise "%>%" group_by
+##' @importFrom dplyr summarise "%>%" group_by mutate
 ##' @importFrom wesanderson wes_palette
 ##' @export
 
@@ -27,37 +27,51 @@ fmap <- function(x,
                      obs = FALSE,
                      crs = NULL,
                      ext.rng = c(0.05, 0.05),
-                     size = 1,
+                     size = 0.75,
                      col = "black")
 {
   what <- match.arg(what)
 
   if(inherits(x, "fG_ssm")) {
-    if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
+    if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
       sf_locs <- grab(x, what=what)
-
-    else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
+      locs <- grab(x, what=what, as_sf = FALSE)
+      
+    } else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
       stop("individual foieGras fit objects with differing projections not currently supported")
     }
 
   } else {
     stop("input must be a foieGras ssm fit object with class fG_ssm")
   }
-
+    
+  locs.lst <- split(locs, locs$id)
+  conf_poly <- lapply(locs.lst, function(x) {
+    conf <- lapply(1:nrow(x), function(i)
+      with(x, elps(x[i], y[i], x.se[i], y.se[i], 90))
+    )
+    lapply(conf, function(x) st_polygon(list(x))) %>%
+      st_multipolygon()
+  })
+  sf_conf <- st_as_sfc(conf_poly) %>%
+    st_as_sf(crs = st_crs(sf_locs)) %>%
+    mutate(id = unique(locs$id)) %>%
+    st_union(by_feature = TRUE) ## dissolve individual polygons where they overlap one another
+    
   if (is.null(crs)) prj <- st_crs(sf_locs)
   else {
     prj <- crs
     if(!is.character(prj)) stop("\ncrs must be a proj4string, 
                                 \neg. `+proj=stere +lat_0=-90 +lon_0=0 +ellps=WGS84 +units=km +no_defs`")
-      #prj <- paste0("+init=epsg:", prj)
-
+    #prj <- paste0("+init=epsg:", prj)
+    
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
       cat("\nconverting units from m to km to match SSM output")
       prj <- paste(prj, "+units=km")
     }
     sf_locs <- st_transform(sf_locs, crs = prj)
+    sf_conf <- st_transform(sf_conf, crs = prj)
   }
-    
   
   if (obs) {
     sf_data <- grab(x, "data") %>%
@@ -79,7 +93,6 @@ fmap <- function(x,
   coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
     st_transform(crs = prj)
   
-  
   p <- ggplot() +
     geom_sf(data = coast,
             fill = grey(0.6),
@@ -92,6 +105,7 @@ fmap <- function(x,
 
   if(nrow(x) > 1) {
     p <- p +
+      geom_sf(data = sf_conf, aes_string(fill = "id"), colour = NA, lwd = 0, alpha = 0.4, show.legend = FALSE) +
       geom_sf(data = sf_lines,
               colour = "dodgerblue",
               size = 0.1
@@ -102,6 +116,7 @@ fmap <- function(x,
               show.legend = "point"
                      ) +
       scale_colour_manual(values = wes_palette(name = "Zissou1", n = nrow(x), type = "continuous")) +
+      scale_fill_manual(values = wes_palette(name = "Zissou1", n = nrow(x), type = "continuous")) +
       theme(legend.position = "bottom",
             legend.text = element_text(size = 8, vjust = 0)
       )

@@ -10,7 +10,7 @@ fmap(
   obs = FALSE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
-  size = 1,
+  size = 0.75,
   col = "black"
 )
 }

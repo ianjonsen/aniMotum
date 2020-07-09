@@ -98,7 +98,7 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       
       pd <- bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
       dd <- bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
-      
+    
       if(pages == 1) {
         ## plot SE ribbon first
         p <- ggplot() + 
@@ -151,7 +151,8 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
             geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
             facet_wrap(facets = vars(coord), scales = "free",
                        labeller = labeller(coord = label_value),
-                       ncol = 2)
+                       ncol = 2) +
+            labs(title = paste("id:", x$id[i]))
           px
         })
         
@@ -171,10 +172,6 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       conf_sf <- st_as_sfc(conf_poly) %>%
         st_as_sf() %>%
         mutate(id = unique(ssm$id))
-
-      ## FIXME: NEED TO REVISE SO THAT INDIVIDUAL PANELS ARE GENERATED SEPARATELY 
-      ## FIXME: AND RENDERED AS A MULTIPANEL PLOT USING PATCHWORK
-      ## This is req'd b/c scales = "free" does not work with geom_sf/coord_sf 
       
       if(nrow(x) == 1) {
       ## for a single track plot

@@ -66,8 +66,7 @@ NULL
 ##' @title foieGras example fit object
 ##' @format .RData
 ##' @keywords data
-##' @description Example foieGras fit object, using ellies example data and the
-##' following call: xs <- fit_ssm(ellies, vmax=4, model="crw", time.step=36). This example
+##' @description Example foieGras fit object. This example
 ##' fit is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
@@ -77,11 +76,8 @@ NULL
 ##' @title foieGras example mpm fit object
 ##' @format .RData
 ##' @keywords data
-##' @description Example foieGras fit object, using ssm_fits example data and the
-##' following call: xm <- xs %>% grab(., "p", as_sf = FALSE) %>% 
-##' select(id,date,lon,lat) %>% 
-##' fit_mpm(., model="jmpm") 
-##' This example fit is included purely to speed up examples where a fit object is required
+##' @description Example foieGras mpm fit object. This example fit 
+##' is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
 NULL
 
