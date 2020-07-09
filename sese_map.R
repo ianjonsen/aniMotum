@@ -109,3 +109,4 @@ map <- ggplot() +
 
 ggsave(filename = "sese_map.png", plot = map)  
 
+fmap(fit, "p", crs = "+proj=stere +units=km +ellps=WGS84")

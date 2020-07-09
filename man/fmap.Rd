@@ -7,6 +7,7 @@
 fmap(
   x,
   what = c("fitted", "predicted"),
+  conf = TRUE,
   obs = FALSE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
@@ -19,8 +20,9 @@ fmap(
 
 \item{what}{specify which location estimates to map: fitted or predicted}
 
-\item{obs}{include Argos observations on map (logical)
-(logical); ignored if `obs = FALSE`}
+\item{conf}{include confidence regions around estimated location (logigal; default = TRUE)}
+
+\item{obs}{include Argos observations on map (logical; default = FALSE)}
 
 \item{crs}{`proj4string` for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used}
@@ -28,7 +30,7 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{ext.rng}{factors to extend the plot range in x and y dimensions
 (can exceed 1)}
 
-\item{size}{size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value}
+\item{size}{size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)}
 
 \item{col}{colour of observed locations (ignored if obs = FALSE)}
 }

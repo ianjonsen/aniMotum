@@ -5,13 +5,13 @@
 ##'
 ##' @param x a foieGras fitted object
 ##' @param what specify which location estimates to map: fitted or predicted
-##' @param obs include Argos observations on map (logical)
-##' (logical); ignored if `obs = FALSE`
+##' @param conf include confidence regions around estimated location (logigal; default = TRUE)
+##' @param obs include Argos observations on map (logical; default = FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
-##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value
+##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_manual
@@ -24,6 +24,7 @@
 
 fmap <- function(x,
                      what = c("fitted", "predicted"),
+                     conf = TRUE,
                      obs = FALSE,
                      crs = NULL,
                      ext.rng = c(0.05, 0.05),
@@ -35,7 +36,7 @@ fmap <- function(x,
   if(inherits(x, "fG_ssm")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
       sf_locs <- grab(x, what=what)
-      locs <- grab(x, what=what, as_sf = FALSE)
+      if(conf) locs <- grab(x, what=what, as_sf = FALSE)
       
     } else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
       stop("individual foieGras fit objects with differing projections not currently supported")
@@ -44,33 +45,34 @@ fmap <- function(x,
   } else {
     stop("input must be a foieGras ssm fit object with class fG_ssm")
   }
-    
-  locs.lst <- split(locs, locs$id)
-  conf_poly <- lapply(locs.lst, function(x) {
-    conf <- lapply(1:nrow(x), function(i)
-      with(x, elps(x[i], y[i], x.se[i], y.se[i], 90))
-    )
-    lapply(conf, function(x) st_polygon(list(x))) %>%
-      st_multipolygon()
-  })
-  sf_conf <- st_as_sfc(conf_poly) %>%
-    st_as_sf(crs = st_crs(sf_locs)) %>%
-    mutate(id = unique(locs$id)) %>%
-    st_union(by_feature = TRUE) ## dissolve individual polygons where they overlap one another
-    
+  
+  if(conf) {  
+    locs.lst <- split(locs, locs$id)
+    conf_poly <- lapply(locs.lst, function(x) {
+      conf <- lapply(1:nrow(x), function(i)
+        with(x, elps(x[i], y[i], x.se[i], y.se[i], 90))
+      )
+      lapply(conf, function(x) st_polygon(list(x))) %>%
+        st_multipolygon()
+    })
+    sf_conf <- st_as_sfc(conf_poly) %>%
+      st_as_sf(crs = st_crs(sf_locs)) %>%
+      mutate(id = unique(locs$id)) %>%
+      st_union(by_feature = TRUE) ## dissolve individual polygons where they overlap one another
+    }
+  
   if (is.null(crs)) prj <- st_crs(sf_locs)
   else {
     prj <- crs
     if(!is.character(prj)) stop("\ncrs must be a proj4string, 
                                 \neg. `+proj=stere +lat_0=-90 +lon_0=0 +ellps=WGS84 +units=km +no_defs`")
-    #prj <- paste0("+init=epsg:", prj)
     
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
       cat("\nconverting units from m to km to match SSM output")
       prj <- paste(prj, "+units=km")
     }
     sf_locs <- st_transform(sf_locs, crs = prj)
-    sf_conf <- st_transform(sf_conf, crs = prj)
+    if(conf) sf_conf <- st_transform(sf_conf, crs = prj)
   }
   
   if (obs) {
@@ -104,9 +106,15 @@ fmap <- function(x,
     p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], size), shape = 9, alpha = 0.75)
 
   if(nrow(x) > 1) {
-    p <- p +
-      geom_sf(data = sf_conf, aes_string(fill = "id"), colour = NA, lwd = 0, alpha = 0.4, show.legend = FALSE) +
-      geom_sf(data = sf_lines,
+    if(conf) {
+      p <- p + geom_sf(data = sf_conf, 
+                       aes_string(fill = "id"), 
+                       colour = NA, 
+                       lwd = 0, 
+                       alpha = 0.4, 
+                       show.legend = FALSE)
+      }
+      p <- p + geom_sf(data = sf_lines,
               colour = "dodgerblue",
               size = 0.1
               ) +
@@ -115,11 +123,23 @@ fmap <- function(x,
               size = ifelse(length(size) == 2, size[1], size),
               show.legend = "point"
                      ) +
-      scale_colour_manual(values = wes_palette(name = "Zissou1", n = nrow(x), type = "continuous")) +
-      scale_fill_manual(values = wes_palette(name = "Zissou1", n = nrow(x), type = "continuous")) +
+      scale_colour_manual(values = 
+                            wes_palette(name = "Zissou1", 
+                                        n = nrow(x), 
+                                        type = "continuous")
+                          ) +
       theme(legend.position = "bottom",
             legend.text = element_text(size = 8, vjust = 0)
-      )
+            )
+      
+      if(conf) {
+        p <- p + scale_fill_manual(values = 
+                                     wes_palette(name = "Zissou1", 
+                                                 n = nrow(x), 
+                                                 type = "continuous")
+        )
+      }
+      
   } else {
     lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 4))) %>% as.Date()
 
@@ -131,7 +151,10 @@ fmap <- function(x,
                     aes(colour = as.numeric(as.Date(date))),
                      size = ifelse(length(size) == 2, size[1], 1)
                      ) +
-      scale_colour_gradientn(breaks = as.numeric(lab_dates), colours = wes_palette(name = "Zissou1", type = "continuous"), labels = lab_dates) +
+      scale_colour_gradientn(breaks = as.numeric(lab_dates), 
+                             colours = wes_palette(name = "Zissou1", 
+                                                   type = "continuous"), 
+                             labels = lab_dates) +
       labs(title = paste("id:", x$id)) +
       theme(legend.position = "bottom",
             legend.title = element_blank(),
