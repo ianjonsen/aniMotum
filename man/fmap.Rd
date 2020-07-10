@@ -9,9 +9,10 @@ fmap(
   what = c("fitted", "predicted"),
   conf = TRUE,
   obs = FALSE,
+  by.date = FALSE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
-  size = 0.75,
+  size = 0.25,
   col = "black"
 )
 }
@@ -23,6 +24,8 @@ fmap(
 \item{conf}{include confidence regions around estimated location (logigal; default = TRUE)}
 
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
+
+\item{by.date}{when mapping single tracks, should locations be coloured by date (logical; default = FALSE)}
 
 \item{crs}{`proj4string` for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used}

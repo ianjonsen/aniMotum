@@ -7,6 +7,7 @@
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param conf include confidence regions around estimated location (logigal; default = TRUE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
+##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
@@ -14,7 +15,7 @@
 ##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
-##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_manual
+##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_gradientn scale_fill_manual element_line
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
@@ -26,9 +27,10 @@ fmap <- function(x,
                      what = c("fitted", "predicted"),
                      conf = TRUE,
                      obs = FALSE,
+                     by.date = FALSE,
                      crs = NULL,
                      ext.rng = c(0.05, 0.05),
-                     size = 0.75,
+                     size = 0.25,
                      col = "black")
 {
   what <- match.arg(what)
@@ -57,8 +59,9 @@ fmap <- function(x,
     })
     sf_conf <- st_as_sfc(conf_poly) %>%
       st_as_sf(crs = st_crs(sf_locs)) %>%
-      mutate(id = unique(locs$id)) %>%
-      st_union(by_feature = TRUE) ## dissolve individual polygons where they overlap one another
+      mutate(id = unique(locs$id))
+    ## dissolve individual polygons where they overlap one another
+    sf_conf <- st_union(sf_conf, by_feature = TRUE) 
     }
   
   if (is.null(crs)) prj <- st_crs(sf_locs)
@@ -86,10 +89,10 @@ fmap <- function(x,
   bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = ext.rng[1])
   bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = ext.rng[2])
 
-  sf_lines <- sf_locs %>%
-    group_by(id) %>%
-    summarise(do_union = FALSE) %>%
-    st_cast("MULTILINESTRING")
+  # sf_lines <- sf_locs %>%
+  #   group_by(id) %>%
+  #   summarise(do_union = FALSE) %>%
+  #   st_cast("MULTILINESTRING")
 
   ## get coastline
   coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
@@ -114,10 +117,10 @@ fmap <- function(x,
                        alpha = 0.4, 
                        show.legend = FALSE)
       }
-      p <- p + geom_sf(data = sf_lines,
-              colour = "dodgerblue",
-              size = 0.1
-              ) +
+#      p <- p + geom_sf(data = sf_lines,
+#              colour = "dodgerblue",
+#              size = 0.1
+#              ) +
       geom_sf(data = sf_locs,
               aes_string(colour = "id"),
               size = ifelse(length(size) == 2, size[1], size),
@@ -128,7 +131,8 @@ fmap <- function(x,
                                         n = nrow(x), 
                                         type = "continuous")
                           ) +
-      theme(legend.position = "bottom",
+        theme_minimal() + 
+        theme(legend.position = "bottom",
             legend.text = element_text(size = 8, vjust = 0)
             )
       
@@ -141,26 +145,55 @@ fmap <- function(x,
       }
       
   } else {
-    lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 4))) %>% as.Date()
+    ##FIXME:: need to add conf ellipses here too but not sure how to colour them,
+    ##FIXME:: given the track is coloured by date - perhaps make this optional but
+    ##FIXME:: if on then conf ellipse is a single colour, or colour ellipses by date
+    ##FIXME:: but don't dissolve them with st_union, otherwise colouring by date won't work...
+    if(by.date) lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
 
-    p <- p +
-      geom_sf(data = sf_lines,
-                     colour = "dodgerblue",
-                     size = 0.1) +
-      geom_sf(data = sf_locs,
+    if(conf & !by.date) {
+      p <- p + geom_sf(data = sf_conf, 
+                       fill = wes_palette("Zissou1", n=20, "continuous")[4],
+                       colour = NA, 
+                       lwd = 0, 
+                       alpha = 0.5, 
+                       show.legend = FALSE)
+    } else if(conf & by.date) {
+      p <- p + geom_sf(data = sf_conf, 
+                       fill = grey(0.7),
+                       colour = NA, 
+                       lwd = 0, 
+                       alpha = 0.25, 
+                       show.legend = FALSE)
+    }
+    # p <- p +
+    #   geom_sf(data = sf_lines,
+    #                  colour = "dodgerblue",
+    #                  size = 0.1) +
+    if(by.date) {
+      p <- p + geom_sf(data = sf_locs,
                     aes(colour = as.numeric(as.Date(date))),
-                     size = ifelse(length(size) == 2, size[1], 1)
+                     size = ifelse(length(size) == 2, size[1], size)
                      ) +
-      scale_colour_gradientn(breaks = as.numeric(lab_dates), 
-                             colours = wes_palette(name = "Zissou1", 
-                                                   type = "continuous"), 
-                             labels = lab_dates) +
-      labs(title = paste("id:", x$id)) +
-      theme(legend.position = "bottom",
+        scale_colour_gradientn(breaks = as.numeric(lab_dates), 
+                               colours = wes_palette(name = "Zissou1", 
+                                                     type = "continuous"), 
+                               labels = lab_dates)
+    } else {
+      p <- p + geom_sf(data = sf_locs,
+                       colour = wes_palette("Zissou1", n=5, "discrete")[5],
+                       size = 1)
+      
+    }
+      
+      p <- p + labs(title = paste("id:", x$id)) +
+        theme_minimal() +
+        theme(legend.position = "bottom",
             legend.title = element_blank(),
             legend.text = element_text(size = 8, vjust = 0),
             legend.key.width = unit(0.12, "npc"),
-            legend.key.height = unit(0.025, "npc")
+            legend.key.height = unit(0.025, "npc"),
+            panel.grid = element_line(size = 0.2)
       )
   }
 
