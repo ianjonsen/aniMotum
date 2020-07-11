@@ -46,7 +46,7 @@ st <- sapply(sese$data, function(x) min(x$date)) %>%
 
 ## parallelise foieGras::fit_ssm
 plan("multisession")
-fit <- sese$data %>%
+sese_fit <- sese$data %>%
   future_map(~ try(
     fit_ssm(
       d = .x,
@@ -59,19 +59,21 @@ fit <- sese$data %>%
   )
       
 ## drop convergence failures & cases where Hessian is not PD
-cH <- sapply(fit, function(x) class(x$pdHess))
+cH <- sapply(sese_fit, function(x) class(x$pdHess))
 idx <- which(cH == "list")
 if(length(idx) > 0) {
-  fit <- fit[-idx]
+  sese_fit <- sese_fit[-idx]
 } 
-fit <- fit %>%
+sese_fit <- sese_fit %>%
   bind_rows() %>%
   filter(converged)
 
+saveRDS(sese_fit, file = "data/sese_fit.RDS", compress = "xz")
+
 ## grab predicted & observed locations - can't use grab as projections differ among fits
-plocs <- lapply(fit$ssm, function(x) st_transform(x$predicted, crs = "+proj=stere +units=km +ellps=WGS84")) %>%
+plocs <- lapply(sese_fit$ssm, function(x) st_transform(x$predicted, crs = "+proj=stere +units=km +ellps=WGS84")) %>%
   bind_rows()
-dlocs <- lapply(fit$ssm, function(x) st_transform(x$data, crs = "+proj=stere +units=km +ellps=WGS84")) %>%
+dlocs <- lapply(sese_fit$ssm, function(x) st_transform(x$data, crs = "+proj=stere +units=km +ellps=WGS84")) %>%
   bind_rows()
 
 ## get world coastline
@@ -109,4 +111,4 @@ map <- ggplot() +
 
 ggsave(filename = "sese_map.png", plot = map)  
 
-fmap(fit, "p", crs = "+proj=stere +units=km +ellps=WGS84")
+fmap(sese_fit, "p", size=0.8, conf=F, crs = "+proj=stere +units=km +ellps=WGS84")
