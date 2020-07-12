@@ -121,7 +121,7 @@ fmap <- function(x,
 #              colour = "dodgerblue",
 #              size = 0.1
 #              ) +
-      geom_sf(data = sf_locs,
+      p <- p + geom_sf(data = sf_locs,
               aes_string(colour = "id"),
               size = ifelse(length(size) == 2, size[1], size),
               show.legend = "point"
@@ -160,7 +160,7 @@ fmap <- function(x,
                        show.legend = FALSE)
     } else if(conf & by.date) {
       p <- p + geom_sf(data = sf_conf, 
-                       fill = grey(0.7),
+                       fill = grey(0.5),
                        colour = NA, 
                        lwd = 0, 
                        alpha = 0.25, 
@@ -181,8 +181,9 @@ fmap <- function(x,
                                labels = lab_dates)
     } else {
       p <- p + geom_sf(data = sf_locs,
-                       colour = wes_palette("Zissou1", n=5, "discrete")[5],
-                       size = 1)
+                       colour = wes_palette("Zissou1", n=5, "discrete")[2],
+                       size = ifelse(length(size) == 2, size[1], size)
+      )
       
     }
       
