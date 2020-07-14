@@ -21,8 +21,7 @@ plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 \examples{
 ## load example osar output (to save time)
 data(xs)
-d <- xs[1, ] ## just use first seal to save time
-dres <- osar(d)
+dres <- osar(xs[1, ]) # only use first seal to save time
 plot(dres, type = "qq")
 
 }

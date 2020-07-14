@@ -8,13 +8,13 @@
 ##' @param ... additional arguments to be ignored
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_histogram geom_boxplot geom_vline geom_hline
 ##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip
+##' @importFrom wesanderson wes_palette
 ##' @method plot fG_osar
 ##'
 ##' @examples
 ##' ## load example osar output (to save time)
 ##' data(xs)
-##' d <- xs[1, ] ## just use first seal to save time
-##' dres <- osar(d)
+##' dres <- osar(xs[1, ]) # only use first seal to save time
 ##' plot(dres, type = "qq")
 ##'
 ##' @export
@@ -26,22 +26,23 @@ plot.fG_osar <- function(x, type = c("qqnorm", "histogram"), bw = 0.5, ...)
   }
 
   type <- match.arg(type)
-
+  wpal <- wes_palette("Zissou1", n = 5, "discrete")
+  
   if(inherits(x, "fG_osar")) {
   
   switch(type,
          qqnorm = {
            x <- x[!is.na(x$residual), ]
            p <- ggplot(x, aes(sample = residual)) +
-             geom_qq() +
-             geom_qq_line(col = "firebrick") +
+             geom_qq(colour = wpal[1]) +
+             geom_qq_line(colour = wpal[4]) +
              facet_grid(id ~ coord)
          },
          histogram = {
            x <- x[!is.na(x$residual), ]
            p <- ggplot(x, aes(x = residual)) +
-             geom_histogram(binwidth = bw, col = grey(0.9), lwd = 0.5) +
-             geom_vline(xintercept = 0, lty = 2, col = "firebrick") +
+             geom_histogram(binwidth = bw, col = grey(0.9), lwd = 0.5, fill = wpal[1]) +
+             geom_vline(xintercept = 0, colour = wpal[4]) +
              facet_grid(id ~ coord)
          })
 
