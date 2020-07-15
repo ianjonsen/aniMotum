@@ -27,7 +27,7 @@ mpmf <-
   function(x,
            model = c("mpm", "jmpm"),
            optim = c("nlminb", "optim"),
-           verbose = FALSE,
+           verbose = TRUE,
            control = NULL,
            inner.control = NULL) {
     
@@ -120,7 +120,8 @@ mpmf <-
     
     ## add par values to trace if verbose = TRUE
     myfn <- function(x) {
-      print(x)
+      cat("\r", "pars:  ", round(x, 5), "     ")
+      flush.console()
       obj$fn(x)
     }
     
@@ -128,8 +129,8 @@ mpmf <-
     opt <-
       suppressWarnings(switch(optim,
                               nlminb = try(nlminb(obj$par,
-                                                  obj$fn,
-                                                  #myfn,
+                                                  #obj$fn,
+                                                  myfn,
                                                   obj$gr,
                                                   control = control
                               )),
@@ -137,8 +138,8 @@ mpmf <-
                                 optim,
                                 args = list(
                                   par = obj$par,
-                                  fn = obj$fn,
-                                  #fn = myfn,
+                                  #fn = obj$fn,
+                                  fn = myfn,
                                   gr = obj$gr,
                                   method = "L-BFGS-B",
                                   control = control

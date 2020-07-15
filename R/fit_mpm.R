@@ -74,7 +74,7 @@ fit_mpm <- function(x,
            
            fit <- tibble(mpm = list(fit)) %>%
              mutate(converged = ifelse(length(.$mpm[[1]]) == 8, .$mpm[[1]]$opt$convergence == 0, FALSE)) %>%
-             mutate(model = fit$model)
+             mutate(model = model)
          })
 
   class(fit) <- append("fG_mpm", class(fit))  

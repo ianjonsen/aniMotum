@@ -23,7 +23,7 @@
 
 \item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
 
-\item{pages}{plots if individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
+\item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
 
@@ -35,7 +35,7 @@ separated into x and y components (units = km) with prediction uncertainty ribbo
 or (type = 2) 2-d fits to data (units = km)
 }
 \description{
-visualize multiple fits from an fG compound tibble
+visualize fits from an fG_ssm object
 }
 \examples{
 ## load example foieGras fit object (to save time)

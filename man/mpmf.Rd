@@ -8,7 +8,7 @@ mpmf(
   x,
   model = c("mpm", "jmpm"),
   optim = c("nlminb", "optim"),
-  verbose = FALSE,
+  verbose = TRUE,
   control = NULL,
   inner.control = NULL
 )

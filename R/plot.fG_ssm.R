@@ -21,13 +21,13 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 
 ##' @title plot
 ##'
-##' @description visualize multiple fits from an fG compound tibble
+##' @description visualize fits from an fG_ssm object
 ##'
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
-##' @param pages plots if individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
+##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
 ##' @param ... additional arguments to be ignored
 ##' 
