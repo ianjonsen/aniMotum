@@ -140,7 +140,7 @@ fit_ssm <- function(d,
     
   } else {
     if(verbose == 1)
-      cat("fitting SSM...\n")
+      cat(paste0("fitting ", model, "...\n"))
     
     fit <- fit %>%
       map(~ sfilter(

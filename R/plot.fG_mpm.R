@@ -62,8 +62,17 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 0, ncol = 1, ...)
         
    return(p)
     } else if(!is.null(y)) {
-      xy <- join(y, x, as_sf = FALSE) %>%
-        split(., .$id)
+      if(nrow(grab(y, "predicted")) != nrow(grab(x, "fitted"))) {
+        if(nrow(grab(y, "fitted")) != nrow(grab(x, "fitted"))) {
+          stop("x and y hav unequal numbers of estimated values")
+        } else {
+          xy <- join(y, x, what.ssm = "fitted", as_sf = FALSE) %>%
+            split(., .$id)
+        }
+      } else {
+        xy <- join(y, x, as_sf = FALSE) %>%
+          split(., .$id)
+      }
       
       p <- lapply(xy, function(x) {
         m <- ggplot(x) +

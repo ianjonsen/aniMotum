@@ -8,6 +8,7 @@ mpmf(
   x,
   model = c("mpm", "jmpm"),
   optim = c("nlminb", "optim"),
+  optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
   verbose = TRUE,
   control = NULL,
   inner.control = NULL
@@ -19,6 +20,8 @@ mpmf(
 \item{model}{specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s).}
 
 \item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
+
+\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"}
 
 \item{verbose}{report progress during minimization}
 

@@ -27,20 +27,16 @@
 ##' @export
 fit_mpm <- function(x,
                     model = c("mpm", "jmpm"),
-                    optim = c("optim","nlminb"),
+                    optim = "optim",
+                    optMeth = "L-BFGS-B",
                     verbose = 1,
                     control = NULL,
                     inner.control = NULL) {
   
-  optim <- match.arg(optim)
   model <- match.arg(model)
   
   if(verbose == 1)
-    cat(paste0("\nfitting ", model, "...\n"))
-  if (verbose %in% 0:1)
-    verb <-  FALSE
-  else
-    verb <- TRUE
+    cat(paste0("fitting ", model, "...\n"))
 
   switch(model,
          mpm = {
@@ -48,7 +44,8 @@ fit_mpm <- function(x,
              map(~ try(mpmf(.x, 
                         model = model,
                         optim = optim,
-                        verbose = verb,
+                        optMeth = optMeth,
+                        verbose = verbose,
                         control = control,
                         inner.control = inner.control
              ), silent = TRUE)
@@ -67,7 +64,8 @@ fit_mpm <- function(x,
                x = x,
                model = model,
                optim = optim,
-               verbose = verb,
+               optMeth = optMeth,
+               verbose = verbose,
                control = control,
                inner.control = inner.control
              ), silent = TRUE)

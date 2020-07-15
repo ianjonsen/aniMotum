@@ -289,7 +289,7 @@ sfilter <-
     if(scale) d.all <- d.all.tmp
     
     ## TMB - create objective function
-    if (is.null(inner.control)) {
+    if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
     verb <- ifelse(verbose == 2, TRUE, FALSE)
