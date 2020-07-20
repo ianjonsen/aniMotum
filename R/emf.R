@@ -4,12 +4,21 @@
 ##' @param emf.x error multiplication factors for Argos longitude classes 3, 2, 1, 0, A, B (Z assumed equal to B)
 ##' @param emf.y error multiplication factors for Argos latitude classes 3, 2, 1, 0, A, B (Z assumed equal to B)
 ##' @details Error Multiplication Factors for Argos (and GPS) locations. Default assumption is that GPS locations are
-##' 10x more accurate than Argos lc 3 in both x and y directions. 
+##' 10x more accurate than Argos lc 3 in both x and y directions.
+##'  
+##' User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
 ##'
+##' \code{emf.x} {emf values for the \code{x} direction}
+##'
+##' \code{emf.y} {emf values for \code{y} direction}
+##'
+##' \code{lc} {location class designations}
+##'
+##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be amenable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
+
 ##' @importFrom tibble as_tibble
 ##' @importFrom dplyr mutate "%>%"
 ##'
-##' 
 ##' @export
 
 emf <- function(gps = 0.1, 

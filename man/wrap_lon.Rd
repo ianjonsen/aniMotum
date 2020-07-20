@@ -24,3 +24,4 @@ lon1 <- wrap_lon(lon, 0)
 range(lon)
 range(lon1)
 }
+\keyword{internal}

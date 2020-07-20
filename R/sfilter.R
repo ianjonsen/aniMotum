@@ -37,12 +37,8 @@
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##' @importFrom assertthat assert_that
 ##'
-##' @examples
-##' data(ellie)
-##' pf <- prefilter(ellie, vmax=4, ang=c(15,25), min.dt=120)
-##' out <- sfilter(pf, model="rw", time.step=24)
 ##'
-##' @export
+##' @keywords internal
 
 sfilter <-
   function(x,

@@ -64,9 +64,4 @@ object to \code{fit_ssm}
 called by \code{fit_ssm}, not intended for general use. \code{sfilter} can only fit to an
 individual track, use \code{fit_ssm} to fit to multiple tracks (see ?fit_ssm).
 }
-\examples{
-data(ellie)
-pf <- prefilter(ellie, vmax=4, ang=c(15,25), min.dt=120)
-out <- sfilter(pf, model="rw", time.step=24)
-
-}
+\keyword{internal}

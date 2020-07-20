@@ -40,8 +40,9 @@
 ##' object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
 ##' can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are 
 ##' assumed to have the same error variances as class B. By default, class G (GPS) locations are assumed to have error variances 10x smaller than
-##' Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. See \code{\link{prefilter}} and 
-##' \code{\link{emf}} for details on how to modify these assumptions. 
+##' Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. 
+##' 
+##' See \code{\link{emf}} for details on how to modify these assumptions. 
 ##' 
 ##' Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the 
 ##' above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor"). 
@@ -75,7 +76,7 @@
 ##' 
 ##' Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 ##' 
-##' @seealso \code{\link{prefilter}} \code{\link{sfilter}}
+##' @seealso \code{\link{sfilter}}
 ##' 
 ##' @examples
 ##' ## fit crw model to two seals with Argos LS data

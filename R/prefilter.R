@@ -29,16 +29,6 @@
 ##' @importFrom stringr str_detect str_replace
 ##' @importFrom assertthat assert_that
 ##'
-##' @details User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
-##'
-##' \code{emf.x} {emf values for the \code{x} direction}
-##'
-##' \code{emf.y} {emf values for \code{y} direction}
-##'
-##' \code{lc} {location class designations}
-##'
-##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be amenable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
-##'
 ##' @return an sf object with all observations passed from \code{data} and the following appended columns
 ##' \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
 ##' \item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
@@ -46,12 +36,7 @@
 ##' \item{\code{emf_y}}{error multiplication factors for \code{y} direction}
 ##' \item{\code{geometry}}{sf POINT object giving \code{x,y} coordinates in km}
 ##'
-##' @examples
-##' data(ellie)
-##' pf <- prefilter(ellie, vmax=4, ang=c(15,25), min.dt=120)
-##' pf
-##'
-##' @export
+##' @keywords internal
 
 prefilter <-
   function(data,

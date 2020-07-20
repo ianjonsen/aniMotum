@@ -21,8 +21,7 @@
 ##' @importFrom dplyr mutate arrange "%>%" count
 ##' @importFrom tibble tibble
 ##' @importFrom stats plogis median
-##'
-##' @export
+##' @keywords internal
 
 mpmf <-
   function(x,

@@ -40,3 +40,4 @@ object to \code{fit_mpm}
 \details{
 called by \code{fit_mpm}, not intended for general use. see ?fit_mpm.
 }
+\keyword{internal}
