@@ -3,6 +3,7 @@
 ##' @param x a data frame of observations (see details)
 ##' @param model mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})
 ##' @param optim numerical optimizer
+##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
 ##' @param verbose report progress during minimization
 ##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
 ##' @param inner.control list of control parameters for the inner optimization
