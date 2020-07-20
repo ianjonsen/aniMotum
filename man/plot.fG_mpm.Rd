@@ -31,7 +31,7 @@ visualize fits from an fG_mpm object
 }
 \examples{
 # plot mpm fit object
-# 1-d timne-series plots
+# 1-d time-series plots
 plot(xm) 
 # 2-d track plots by adding ssm fit object
 plot(xm, xs) 

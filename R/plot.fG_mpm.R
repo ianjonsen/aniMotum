@@ -15,18 +15,17 @@
 ##' or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points having greater uncertainty (size is proportional to \code{SE^-2}). 
 ##' Plots can be rendered all on a single page (pages = 1) or on separate pages.
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars labs coord_fixed scale_size
-##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both label_value geom_ribbon facet_wrap
-##' @importFrom tidyr gather
-##' @importFrom dplyr "%>%" select bind_cols rename filter bind_rows mutate
-##' @importFrom tibble enframe
+##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs coord_fixed scale_size
+##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon facet_wrap
+##' @importFrom stats qlogis
+##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom wesanderson wes_palette
 ##' @method plot fG_mpm
 ##'
 ##' @examples
 ##' # plot mpm fit object
-##' # 1-d timne-series plots
+##' # 1-d time-series plots
 ##' plot(xm) 
 ##' # 2-d track plots by adding ssm fit object
 ##' plot(xm, xs) 
