@@ -21,6 +21,8 @@ fit_mpm(
 
 \item{optim}{numerical optimizer}
 
+\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)}
+
 \item{verbose}{report progress during minimization}
 
 \item{control}{list of control parameters for the outer optimization (type ?nlminb or ?optim for details)}
