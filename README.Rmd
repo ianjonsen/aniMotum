@@ -1,0 +1,80 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  message = FALSE
+)
+```
+
+**foieGras** - fit latent variable movement models to animal tracking data for location quality control and behavioural inference
+
+<!-- badges: start -->
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](http://www.r-pkg.org/pkg/foieGras)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](http://r-pkg.org/pkg/foieGras)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
+
+master branch:  
+[![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)  
+
+dev branch:  
+[![Build Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.org/ianjonsen/foieGras)
+<!-- badges: end -->
+
+
+`foieGras` is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (`TMB`) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.
+
+## Installation 
+First, ensure you have R version >= 3.6.0 installed (preferably R 4.0.0 or higher):
+
+```{r get-version, eval = FALSE}
+R.Version()
+```
+
+### From CRAN  
+`foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and can be downloaded within `R`, e.g., `install.packages("foieGras")` or, more completely: `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`  
+
+### From GitHub (source)  
+
+On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/) 
+
+On Mac's, ensure you have installed [Xcode](https://developer.apple.com/xcode/) and Xcode developer tools. If installation is needed, make sure you start Xcode after install to ensure final setup of developer tools is completed. Both Xcode and Xcode developer tools can be installed from the [Mac App Store](https://itunes.apple.com/au/app/xcode/id497799835?mt=12)
+
+To get the very latest `foieGras` stable version, you can install from GitHub:
+```{r gh-installation, eval = FALSE}
+remotes::install_github("ianjonsen/foieGras")
+```
+
+Note: there can be issues getting compilers to work properly, especially on a Mac with OS X 10.13.x or higher. If you encounter install and compile issues, I recommend you consult the excellent information on the [glmmTMB](https://github.com/glmmTMB/glmmTMB) GitHub.
+
+## Basic example
+
+`foieGras` is intended to be as easy to use as possible. Here's an example showing how to quality control Argos tracking data and infer a behavioural index along animal tracks:
+```{r example}
+library(tidyverse)
+library(foieGras)
+
+ellies
+
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0)
+plot(fit, what = "predicted")
+
+fmp <- fit %>% 
+  grab(what = "predicted", as_sf = FALSE) %>%
+  select(id, date, lon, lat) %>%
+  fit_mpm(model = "jmpm")
+
+plot(fmp)
+
+fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84")
+```

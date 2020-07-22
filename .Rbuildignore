@@ -9,6 +9,6 @@
 ^cran\-comments\.md$
 ^CRAN\-RELEASE$
 ^data\/rope\.RData$
-^sese\_map\.R$
-^sese\_map\.png$
 ^data\/sese\_fit\.RDS$
+^README\.Rmd$
+^README-.*\.png$

@@ -1,12 +1,11 @@
 ## Submission
-This update addresses the clang-UBSAN runtime errors found during two consecutive CRAN checks where NA's were passed from R to a C++ variable of type int. Testing via rocker/r-devel-ubsan-clang has resulted in successful Rdevel CMD check --as-cran. 
+This update adds new functionality to the package 
 
 ## Test environments
-* local OS X install (10.15.5), R 4.0.0
+* local OS X install (10.15.4), R 4.0.2
 * ubuntu 16.04.6 (via travis-ci), r-release, r-devel, r-oldrelease
 * Debian clang (via R-hub), r-devel
 * windows (via win-builder), r-release, r-devel
-* rocker/r-devel-ubsan-clang
 
 ## R CMD check results
 
