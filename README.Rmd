@@ -66,15 +66,24 @@ library(foieGras)
 
 ellies
 
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0)
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0) ## turn off parameter trace for tidy output
 plot(fit, what = "predicted")
 
 fmp <- fit %>% 
   grab(what = "predicted", as_sf = FALSE) %>%
   select(id, date, lon, lat) %>%
-  fit_mpm(model = "jmpm")
+  fit_mpm(model = "jmpm", verbose = 0) ## turn off parameter trace for tidy output
 
 plot(fmp)
 
 fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84")
 ```
+
+## Learn more
+foieGras can do a lot more. New vignettes, highlighting features are coming...
+
+## How to Contribute
+Contributions from anyone in the Movement Ecology/Bio-Logging communities are welcome. Consider submitting a feature request [here](https://github.com/ianjonsen/foieGras/issues/new/choose) to start a discussion. Alternatively, if your idea is well-developed then you can submit a pull request for me to evaluate [here](https://github.com/ianjonsen/foieGras/pulls). Unsure about what all this means but still want to discuss your idea? then have a look through the GitHub pages of community-built R packages like [tidyverse/dplyr](https://github.com/tidyverse/dplyr).
+
+## Code of Conduct
+Please note that the foieGras project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

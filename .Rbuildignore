@@ -12,3 +12,4 @@
 ^data\/sese\_fit\.RDS$
 ^README\.Rmd$
 ^README-.*\.png$
+^CODE_OF_CONDUCT\.md$

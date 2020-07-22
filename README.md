@@ -106,7 +106,7 @@ ellies
 #> 10 ct36-F-09 2009-02-16 20:29:14 B      70.9 -56.7
 #> # … with 278 more rows
 
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0)
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0) ## turn off parameter trace for tidy output
 plot(fit, what = "predicted")
 ```
 
@@ -117,9 +117,7 @@ plot(fit, what = "predicted")
 fmp <- fit %>% 
   grab(what = "predicted", as_sf = FALSE) %>%
   select(id, date, lon, lat) %>%
-  fit_mpm(model = "jmpm")
-#> fitting jmpm...
-#>  pars:   0 0 0       pars:   -10 -10 -7.79336       pars:   -3.14421 -3.14421 -2.45039       pars:   -1.45489 -1.45489 -1.13385       pars:   -3.57693 -7.50806 -4.16447       pars:   -2.0877 -3.25999 -2.0376       pars:   -1.72535 -2.22639 -1.52011       pars:   -1.8028 -2.60053 -1.61483       pars:   -1.75945 -2.3911 -1.56181       pars:   -1.83198 -2.38463 -1.5485       pars:   -1.80865 -2.39362 -1.51063       pars:   -1.78037 -2.40869 -1.35048       pars:   -1.75358 -2.43276 -0.89015       pars:   -1.77783 -2.43105 -0.59397       pars:   -1.83038 -2.38511 -0.60967       pars:   -1.85163 -2.4075 -0.62148       pars:   -1.85259 -2.41005 -0.61647       pars:   -1.85288 -2.41006 -0.61389       pars:   -1.85304 -2.40998 -0.61217       pars:   -1.85305 -2.40998 -0.61209
+  fit_mpm(model = "jmpm", verbose = 0) ## turn off parameter trace for tidy output
 
 plot(fmp)
 ```
