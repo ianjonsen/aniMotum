@@ -4,6 +4,7 @@
 * generic plot method for fG_ssm objects can now plot individuals all on 1 page (pages = 1) or on separate pages (pages = 0)
 * 2-d (track) plots now include confidence ellipses on estimated locations
 * generic plot method for fg_mpm objects now available
+* mapping function (fmap) can optionally take an fg_mpm object to colour locations by behavioural index (gamma_t)
 
 # foieGras 0.6-7
 
