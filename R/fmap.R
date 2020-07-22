@@ -120,7 +120,7 @@ fmap <- function(x, y = NULL,
     p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], size), shape = 9, alpha = 0.75)
 
   if(nrow(x) > 1) {
-    if(conf & is.null(y)) {
+    if(conf) {
       p <- p + geom_sf(data = sf_conf, 
                        aes_string(fill = "id"), 
                        colour = NA, 
@@ -128,10 +128,7 @@ fmap <- function(x, y = NULL,
                        alpha = 0.4, 
                        show.legend = FALSE)
       }
-#      p <- p + geom_sf(data = sf_lines,
-#              colour = "dodgerblue",
-#              size = 0.1
-#              ) +
+
     if(is.null(y)) {
       p <- p + geom_sf(data = sf_locs,
               aes_string(colour = "id"),
