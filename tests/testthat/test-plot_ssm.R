@@ -1,4 +1,4 @@
-context("test plot")
+context("test plot_ssm")
 
 ## expect plot is silent
 data(xs)
