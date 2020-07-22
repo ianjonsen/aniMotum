@@ -31,7 +31,7 @@ Imports:
     ggplot2 (>= 3.0.0),
     lubridate,
     TMB (>= 1.7.15),
-    sf (>= 0.9-3),
+    sf (>= 0.9-4),
     stringr,
     tidyr,
     future (>= 1.13.0),
