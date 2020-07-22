@@ -156,11 +156,11 @@ Contributions from anyone in the Movement Ecology/Bio-Logging
 communities are welcome. Consider submitting a feature request
 [here](https://github.com/ianjonsen/foieGras/issues/new/choose) to start
 a discussion. Alternatively, if your idea is well-developed then you can
-submit a pull request for me to evaluate
+submit a pull request for evaluation
 [here](https://github.com/ianjonsen/foieGras/pulls). Unsure about what
 all this means but still want to discuss your idea? then have a look
 through the GitHub pages of community-built R packages like
-[tidyverse/dplyr](https://github.com/tidyverse/dplyr).
+[tidyverse/dplyr](https://github.com/tidyverse/dplyr) for examples.
 
 ## Code of Conduct
 
