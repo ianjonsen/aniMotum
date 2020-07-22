@@ -1,0 +1,68 @@
+citHeader("To cite foieGras in publications, please, include these references:")
+
+citEntry(entry = "article",
+         title        = "A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags",
+         author       = personList(as.person("Ian D. Jonsen"),
+                                   as.person("Toby A. Patterson"),
+                                   as.person("Daniel P. Costa"),
+                                   as.person("Philip D. Doherty"),
+                                   as.person("Brendan J. Godley"),
+                                   as.person("W. James Grecian"),
+                                   as.person("Christophe Guinet"),
+                                   as.person("Xavier Hoenner"),
+                                   as.person("Sarah S. Kienle"),
+                                   as.person("Patrick W. Robinson"),
+                                   as.person("Stephen C. Votier"),
+                                   as.person("Scott Whiting"),
+                                   as.person("Matthew J. Witt"),
+                                   as.person("Mark A. Hindell"),
+                                   as.person("Robert G. Harcourt"),
+                                   as.person("Clive R. McMahon")),
+         journal      = "Movement Ecology",
+         year         = "2020",
+         volume       = "8",
+         pages        = "31",
+         doi          = "10.1186/s40462-020-00217-7",
+         url          = "https://doi.org/10.1186/s40462-020-00217-7",
+         
+         textVersion  =
+           paste("Jonsen, I.D., Patterson, T.A., Costa, D.P. et al. (2020) ",
+                 "A continuous-time state-space model for rapid quality control of argos locations from animal-borne tags.",
+                 " Movement Ecology 8:31. https://doi.org/10.1186/s40462-020-00217-7")
+)
+
+citEntry(entry = "article",
+         title        = "Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model",
+         author       = personList(as.person("Ian D. Jonsen"),
+                                   as.person("Clive R. McMahon"),
+                                   as.person("Toby A. Patterson"),
+                                   as.person("Marie Auger-Méthé"),
+                                   as.person("Robert G. Harcourt"),
+                                   as.person("Mark A. Hindell"),
+                                   as.person("Sophie Bestley")),
+         journal      = "Ecology",
+         year         = "2019",
+         volume       = "100",
+         pages        = "e02566",
+         doi          = "10.1002/ecy.2566",
+         url          = "https://doi.org/10.1002/ecy.2566",
+         
+         textVersion  =
+           paste("Jonsen, I.D., McMahon, C.R., Patterson, T.A. et al. (2019) ",
+                 "Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model.",
+                 " Ecology 100:e02566. https://doi.org/10.1002/ecy.2566")
+)
+
+citEntry(entry = "misc",
+         title        = "fit latent variable movement models to animal tracking data for location quality control and behavioural inference",
+         author       = personList(as.person("Ian D. Jonsen"),
+                                   as.person("Toby A. Patterson")),
+         year         = "2020",
+         doi          = "10.5281/zenodo.3899972",
+         url          = "https://doi.org/10.5281/zenodo.3899972",
+         
+         textVersion  =
+           paste("Ian Jonsen and Toby Patterson (2020).",
+                 "foieGras: fit latent variable movement models to animal tracking data for location quality control and behavioural inference",
+                 "Zenodo. https://doi.org/10.5281/zenodo.3899972")
+)

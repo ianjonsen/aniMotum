@@ -45,3 +45,8 @@ mp <- fmap(xs[1,], what = "p")
 test_that("mp with 1 track has s3 classes `gg`, `ggplot`", {
   expect_s3_class(mp, c("gg","ggplot"))
 })
+
+mp <- fmap(xs, xm, what = "p")
+test_that("mp with 1 track has s3 classes `gg`, `ggplot`", {
+  expect_s3_class(mp, c("gg","ggplot"))
+})

@@ -72,9 +72,9 @@
 ##' \item{\code{time}}{the processing time for sfilter}
 ##'
 ##' @references
-##' Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. arXiv preprint arXiv:2005.00401. May 1.
+##' Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 https://doi.org/10.1186/s40462-020-00217-7
 ##' 
-##' Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
+##' Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 https://doi.org/10.1002/ecy.2566
 ##' 
 ##' @seealso \code{\link{sfilter}}
 ##' 

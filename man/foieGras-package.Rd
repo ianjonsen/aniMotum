@@ -9,13 +9,9 @@
 fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
 }
 \references{
-Jonsen I, McMahon CR, Patterson TA, Auger-Méthé M, Harcourt R, Hindell MA, Bestley S (2019) 
-Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. 
-Ecology 100:e02566
+Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 https://doi.org/10.1186/s40462-020-00217-7
 
-Jonsen I, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, 
-Robinson PW, Votier SC, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid 
-quality-control of Argos locations from animal-borne tags. arXiv doi:arxiv:2005.00401
+Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 https://doi.org/10.1002/ecy.2566
 }
 \seealso{
 fit_ssm
