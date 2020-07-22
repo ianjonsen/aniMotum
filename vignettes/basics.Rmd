@@ -111,7 +111,7 @@ model fitting for quality control of locations is comprised of 2 steps: a prefil
 ## load foieGras example data - 2 southern elephant seals
 data("ellies")
 ## prefilter and fit Random Walk SSM using a 24 h time step
-fit <- fit_ssm(ellies, model = "rw", time.step = 24, verbose = 0)
+fit <- fit_ssm(ellies, model = "crw", time.step = 24, verbose = 0)
 ```
 these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `verbose = 0` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
 
@@ -130,7 +130,7 @@ fit$ssm[[1]]
 the table lists all estimated parameters, the specific ones listed depend on the process model selected and the data type. Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation between `sigma_x` and `sigma_y`, `tau_x` and `tau_y` are the observation error standard deviations, and `rho_o` is the correlation between them. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
 
 a summary `plot` method allows a quick visual of the SSM fit to the data:
-```{r fit plot, fig.width=6,fig.height=8}
+```{r fit plot, fig.width=6, fig.height=8}
 # plot time-series of the predicted values
 plot(fit, what = "predicted", type = 1)
 plot(fit, what = "fitted", type = 2)
