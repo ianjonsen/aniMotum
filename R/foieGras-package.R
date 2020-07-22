@@ -30,7 +30,7 @@
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
 ##' @importFrom trip sda speedfilter trip
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
-##' @importFrom stats approx cov sd predict nlminb optim na.omit median
+##' @importFrom stats approx cov sd predict nlminb optim na.omit median qlogis
 ##' @importFrom utils flush.console
 ##' @importFrom wesanderson wes_palette
 ##' @importFrom ggplot2 ggplot geom_point geom_path geom_ribbon geom_qq geom_qq_line geom_histogram aes ggtitle theme_bw

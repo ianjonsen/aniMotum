@@ -6,6 +6,7 @@
 \usage{
 fmap(
   x,
+  y = NULL,
   what = c("fitted", "predicted"),
   conf = TRUE,
   obs = FALSE,
@@ -17,11 +18,13 @@ fmap(
 )
 }
 \arguments{
-\item{x}{a foieGras fitted object}
+\item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
+
+\item{y}{optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; default is NULL}
 
 \item{what}{specify which location estimates to map: fitted or predicted}
 
-\item{conf}{include confidence regions around estimated location (logigal; default = TRUE)}
+\item{conf}{include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)}
 
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
 

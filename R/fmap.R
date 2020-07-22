@@ -3,9 +3,10 @@
 ##' @description map foieGras fitted or predicted locations, with or without
 ##' Argos observations, optionally apply a different projection
 ##'
-##' @param x a foieGras fitted object
+##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
+##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; default is NULL
 ##' @param what specify which location estimates to map: fitted or predicted
-##' @param conf include confidence regions around estimated location (logigal; default = TRUE)
+##' @param conf include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
 ##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
@@ -21,9 +22,10 @@
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise "%>%" group_by mutate
 ##' @importFrom wesanderson wes_palette
+##' @importFrom assertthat assert_that
 ##' @export
 
-fmap <- function(x,
+fmap <- function(x, y = NULL,
                      what = c("fitted", "predicted"),
                      conf = TRUE,
                      obs = FALSE,
@@ -35,18 +37,27 @@ fmap <- function(x,
 {
   what <- match.arg(what)
 
+  assert_that(inherits(x, "fG_ssm"), msg = "x must be a foieGras ssm fit object with class `fG_ssm`")
+  if(!inherits(y, "fG_mpm") & !is.null(y)) stop("y must either be NULL or a foieGras mpm fit object with class `fG_mpm`")
+  
   if(inherits(x, "fG_ssm")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
-      sf_locs <- grab(x, what=what)
-      if(conf) locs <- grab(x, what=what, as_sf = FALSE)
+      if(!is.null(y)) {
+        conf <- FALSE
+        ## increase geom_point size if left at default and y is supplied
+        if(size[1] == 0.25) size[1] <- 1
+        sf_locs <- try(join(x, y, what.ssm = what), silent = TRUE)
+        if(inherits(sf_locs, "try-error")) stop("number of rows in ssm object do not match the number of rows in mpm object, try modifying the `what` argument")
+      } else {
+        sf_locs <- grab(x, what=what)
+        if(conf) locs <- grab(x, what = what, as_sf = FALSE)
+      }
       
     } else if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) > 1) {
-      stop("individual foieGras fit objects with differing projections not currently supported")
+      stop("individual foieGras ssm fit objects with differing projections not currently supported")
     }
 
-  } else {
-    stop("input must be a foieGras ssm fit object with class fG_ssm")
-  }
+  } 
   
   if(conf) {  
     locs.lst <- split(locs, locs$id)
@@ -109,7 +120,7 @@ fmap <- function(x,
     p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], size), shape = 9, alpha = 0.75)
 
   if(nrow(x) > 1) {
-    if(conf) {
+    if(conf & is.null(y)) {
       p <- p + geom_sf(data = sf_conf, 
                        aes_string(fill = "id"), 
                        colour = NA, 
@@ -121,6 +132,7 @@ fmap <- function(x,
 #              colour = "dodgerblue",
 #              size = 0.1
 #              ) +
+    if(is.null(y)) {
       p <- p + geom_sf(data = sf_locs,
               aes_string(colour = "id"),
               size = ifelse(length(size) == 2, size[1], size),
@@ -130,8 +142,21 @@ fmap <- function(x,
                             wes_palette(name = "Zissou1", 
                                         n = nrow(x), 
                                         type = "continuous")
-                          ) +
-        theme_minimal() + 
+                          ) 
+    } else {
+      p <- p + geom_sf(data = sf_locs,
+                       aes_string(colour = "g"),
+                       size = ifelse(length(size) == 2, size[1], size)
+      ) +
+        scale_colour_gradientn(colours = 
+                              rev(wes_palette(name = "Zissou1", 
+                                          type = "continuous")),
+                              name = expression(gamma[t]),
+                              limits = c(0,1)
+        ) 
+    }
+      
+        p <- p + theme_minimal() + 
         theme(legend.position = "bottom",
             legend.text = element_text(size = 8, vjust = 0)
             )
