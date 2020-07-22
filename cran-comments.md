@@ -1,5 +1,5 @@
 ## Submission
-This update adds new functionality to the package 
+This update adds new functionality to the package but all C++ source code remains unchanged from the previous CRAN version (0.6-7)
 
 ## Test environments
 * local OS X install (10.15.4), R 4.0.2
