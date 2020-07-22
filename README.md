@@ -83,8 +83,8 @@ compile issues, I recommend you consult the excellent information on the
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here’s an
-example showing how to quality control Argos tracking data and infer a
-behavioural index along animal tracks:
+example showing how to quality-control Argos tracking data and infer a
+behavioural index along the estimated animal tracks:
 
 ``` r
 library(tidyverse)
