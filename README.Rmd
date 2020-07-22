@@ -59,7 +59,7 @@ Note: there can be issues getting compilers to work properly, especially on a Ma
 
 ## Basic example
 
-`foieGras` is intended to be as easy to use as possible. Here's an example showing how to quality control Argos tracking data and infer a behavioural index along animal tracks:
+`foieGras` is intended to be as easy to use as possible. Here's an example showing how to quality-control Argos tracking data and infer a behavioural index along the estimated animal tracks:
 ```{r example}
 library(tidyverse)
 library(foieGras)
