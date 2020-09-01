@@ -11,7 +11,7 @@ Authors@R:
            person(given = "Toby",
            family = "Patterson",
            role = c("aut", "ctb"),
-           email = "toby.patterson@cisro.au")
+           email = "toby.patterson@csiro.au")
            )
 Author: Ian Jonsen [aut, cre, cph],
   Toby Patterson [aut, ctb]
