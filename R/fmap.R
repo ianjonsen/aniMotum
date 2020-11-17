@@ -201,23 +201,37 @@ fmap <- function(x, y = NULL,
                                colours = wes_palette(name = "Zissou1", 
                                                      type = "continuous"), 
                                labels = lab_dates)
-    } else {
-      p <- p + geom_sf(data = sf_locs,
-                       colour = wes_palette("Zissou1", n=5, "discrete")[2],
-                       size = ifelse(length(size) == 2, size[1], size)
-      )
-      
-    }
       
       p <- p + labs(title = paste("id:", x$id)) +
         theme_minimal() +
         theme(legend.position = "bottom",
-            legend.title = element_blank(),
-            legend.text = element_text(size = 8, vjust = 0),
-            legend.key.width = unit(0.12, "npc"),
-            legend.key.height = unit(0.025, "npc"),
-            panel.grid = element_line(size = 0.2)
-      )
+              legend.title = element_blank(),
+              legend.text = element_text(size = 8, vjust = 0),
+              legend.key.width = unit(0.12, "npc"),
+              legend.key.height = unit(0.025, "npc"),
+              panel.grid = element_line(size = 0.2)
+        )
+      
+    } else {
+      p <- p + geom_sf(data = sf_locs,
+                       aes_string(colour = "g"),
+                       size = ifelse(length(size) == 2, size[1], size)
+      ) +
+        scale_colour_gradientn(colours = 
+                                 rev(wes_palette(name = "Zissou1", 
+                                                 type = "continuous")),
+                               name = expression(gamma[t]),
+                               limits = c(0,1)
+        )
+        
+      p <- p + labs(title = paste("id:", x$id)) +
+        theme_minimal() + 
+        theme(legend.position = "bottom",
+              legend.text = element_text(size = 8, vjust = 0)
+        )
+    }
+      
+      
   }
 
   return(p)
