@@ -118,7 +118,7 @@ prefilter <-
   ##  flag any duplicate date records,
   ##  flag records as either KF or LS,
   d <- d %>%
-    mutate(date = ymd_hms(date, tz = "GMT")) %>%
+    mutate(date = ymd_hms(date, tz = "UTC")) %>%
     arrange(date) %>%
     mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
     mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
