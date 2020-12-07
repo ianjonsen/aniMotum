@@ -14,7 +14,8 @@ fmap(
   crs = NULL,
   ext.rng = c(0.05, 0.05),
   size = 0.25,
-  col = "black"
+  col = "black",
+  lines = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{size}{size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)}
 
 \item{col}{colour of observed locations (ignored if obs = FALSE)}
+
+\item{lines}{logical indicating if lines are added to connect estimated locations (default = FALSE)}
 }
 \description{
 map foieGras fitted or predicted locations, with or without

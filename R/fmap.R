@@ -15,6 +15,7 @@
 ##' (can exceed 1)
 ##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
+##' @param lines logical indicating if lines are added to connect estimated locations (default = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_gradientn scale_fill_manual element_line
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
@@ -33,7 +34,8 @@ fmap <- function(x, y = NULL,
                      crs = NULL,
                      ext.rng = c(0.05, 0.05),
                      size = 0.25,
-                     col = "black")
+                     col = "black",
+                     lines = FALSE)
 {
   what <- match.arg(what)
 
@@ -100,10 +102,12 @@ fmap <- function(x, y = NULL,
   bounds[c("xmin","xmax")] <- extendrange(bounds[c("xmin","xmax")], f = ext.rng[1])
   bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = ext.rng[2])
 
-  # sf_lines <- sf_locs %>%
-  #   group_by(id) %>%
-  #   summarise(do_union = FALSE) %>%
-  #   st_cast("MULTILINESTRING")
+  if(lines) {
+   sf_lines <- sf_locs %>%
+     group_by(id) %>%
+     summarise(do_union = FALSE) %>%
+     st_cast("MULTILINESTRING")
+  } 
 
   ## get coastline
   coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
@@ -130,7 +134,14 @@ fmap <- function(x, y = NULL,
       }
 
     if(is.null(y)) {
-      p <- p + geom_sf(data = sf_locs,
+      if(lines) {
+        p <- p + geom_sf(data = sf_lines,
+                       aes_string(colour = "id"),
+                       lwd = 0.25
+                       )
+      }
+        
+       p <- p + geom_sf(data = sf_locs,
               aes_string(colour = "id"),
               size = ifelse(length(size) == 2, size[1], size),
               show.legend = "point"
@@ -141,6 +152,12 @@ fmap <- function(x, y = NULL,
                                         type = "continuous")
                           ) 
     } else {
+      if(lines) {
+        p <- p + geom_sf(data = sf_lines,
+                         aes_string(colour = "id"),
+                         lwd = 0.25
+        )
+      }
       p <- p + geom_sf(data = sf_locs,
                        aes_string(colour = "g"),
                        size = ifelse(length(size) == 2, size[1], size)
@@ -193,6 +210,12 @@ fmap <- function(x, y = NULL,
     #                  colour = "dodgerblue",
     #                  size = 0.1) +
     if(by.date) {
+      if(lines) {
+        p <- p + geom_sf(data = sf_lines,
+                         aes(colour = as.numeric(as.Date(date))),
+                         lwd = 0.25
+        )
+      }
       p <- p + geom_sf(data = sf_locs,
                     aes(colour = as.numeric(as.Date(date))),
                      size = ifelse(length(size) == 2, size[1], size)
@@ -213,6 +236,12 @@ fmap <- function(x, y = NULL,
         )
       
     } else {
+      if(lines) {
+        p <- p + geom_sf(data = sf_lines,
+                         aes(colour = "g"),
+                         lwd = 0.25
+        )
+      }
       p <- p + geom_sf(data = sf_locs,
                        aes_string(colour = "g"),
                        size = ifelse(length(size) == 2, size[1], size)
