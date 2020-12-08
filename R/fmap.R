@@ -8,12 +8,12 @@
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param conf include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
-##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = FALSE)
+##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
-##' @param size size of estimated location points; optionally a vector of length 2, with size of observed locations given by 2nd value (ignored if obs = FALSE)
+##' @param size size of estimated location points (size = NA will draw no points). Optionally, a vector of length 2 with size of observed locations given by 2nd value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @param lines logical indicating if lines are added to connect estimated locations (default = FALSE)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
@@ -30,7 +30,7 @@ fmap <- function(x, y = NULL,
                      what = c("fitted", "predicted"),
                      conf = TRUE,
                      obs = FALSE,
-                     by.date = FALSE,
+                     by.date = TRUE,
                      crs = NULL,
                      ext.rng = c(0.05, 0.05),
                      size = 0.25,
@@ -120,8 +120,14 @@ fmap <- function(x, y = NULL,
     xlim(bounds[c("xmin","xmax")]) +
     ylim(bounds[c("ymin","ymax")])
 
-  if(obs)
-    p <- p + geom_sf(data = sf_data, colour = col, size = ifelse(length(size) == 2, size[2], size), shape = 9, alpha = 0.75)
+  if(obs) {
+    if(length(size) == 1) {
+      cat(paste0("geom size not specified for observations, using 'size = c(", size, ", 0.8)'"))
+      size <- c(size, 0.8)
+    }
+    p <- p + geom_sf(data = sf_data, colour = col, size = size[2], shape = 9, alpha = 0.75)
+    
+  }
 
   if(nrow(x) > 1) {
     if(conf) {
@@ -130,23 +136,35 @@ fmap <- function(x, y = NULL,
                        colour = NA, 
                        lwd = 0, 
                        alpha = 0.4, 
-                       show.legend = FALSE)
+                       show.legend = ifelse(!lines & is.na(size), TRUE, FALSE)
+      )
       }
 
     if(is.null(y)) {
-      if(lines) {
+      if(lines & is.na(size)[1]) {
         p <- p + geom_sf(data = sf_lines,
                        aes_string(colour = "id"),
-                       lwd = 0.25
+                       lwd = 0.25,
+                       show.legend = "line"
                        )
-      }
+      } else if(lines & !is.na(size)[1]) {
+        p <- p + geom_sf(data = sf_lines,
+                         aes_string(colour = "id"),
+                         lwd = 0.25
+        ) + geom_sf(data = sf_locs,
+                    aes_string(colour = "id"),
+                    size = ifelse(length(size) == 2, size[1], size),
+                    show.legend = "point"
+        )
+      } else if(!lines & !is.na(size)[1]) {
         
        p <- p + geom_sf(data = sf_locs,
               aes_string(colour = "id"),
               size = ifelse(length(size) == 2, size[1], size),
               show.legend = "point"
-                     ) +
-      scale_colour_manual(values = 
+                     ) 
+       }
+      p <- p + scale_colour_manual(values = 
                             wes_palette(name = "Zissou1", 
                                         n = nrow(x), 
                                         type = "continuous")
@@ -183,20 +201,23 @@ fmap <- function(x, y = NULL,
         )
       }
       
-  } else {
+  } else if(nrow(x) == 1) {
     ##FIXME:: need to add conf ellipses here too but not sure how to colour them,
     ##FIXME:: given the track is coloured by date - perhaps make this optional but
     ##FIXME:: if on then conf ellipse is a single colour, or colour ellipses by date
     ##FIXME:: but don't dissolve them with st_union, otherwise colouring by date won't work...
-    if(by.date) lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
+    if(by.date) {
+      lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
+    }
 
     if(conf & !by.date) {
       p <- p + geom_sf(data = sf_conf, 
-                       fill = wes_palette("Zissou1", n=20, "continuous")[4],
+                       aes_string(fill = "id"),
                        colour = NA, 
                        lwd = 0, 
                        alpha = 0.5, 
                        show.legend = FALSE)
+      
     } else if(conf & by.date) {
       p <- p + geom_sf(data = sf_conf, 
                        fill = grey(0.5),
@@ -205,25 +226,25 @@ fmap <- function(x, y = NULL,
                        alpha = 0.25, 
                        show.legend = FALSE)
     }
-    # p <- p +
-    #   geom_sf(data = sf_lines,
-    #                  colour = "dodgerblue",
-    #                  size = 0.1) +
+    
     if(by.date) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
-                         aes(colour = as.numeric(as.Date(date))),
+                         colour = grey(0.5),
+                         alpha = 0.75,
                          lwd = 0.25
         )
       }
+      if(!is.na(size)[1]) {
       p <- p + geom_sf(data = sf_locs,
                     aes(colour = as.numeric(as.Date(date))),
-                     size = ifelse(length(size) == 2, size[1], size)
+                     size = size[1]
                      ) +
         scale_colour_gradientn(breaks = as.numeric(lab_dates), 
                                colours = wes_palette(name = "Zissou1", 
                                                      type = "continuous"), 
                                labels = lab_dates)
+      }
       
       p <- p + labs(title = paste("id:", x$id)) +
         theme_minimal() +
@@ -246,11 +267,10 @@ fmap <- function(x, y = NULL,
                        aes_string(colour = "g"),
                        size = ifelse(length(size) == 2, size[1], size)
       ) +
-        scale_colour_gradientn(colours = 
-                                 rev(wes_palette(name = "Zissou1", 
-                                                 type = "continuous")),
-                               name = expression(gamma[t]),
-                               limits = c(0,1)
+        scale_fill_manual(values = 
+                            wes_palette(name = "Zissou1", 
+                                        n = nrow(x), 
+                                        type = "continuous")
         )
         
       p <- p + labs(title = paste("id:", x$id)) +
