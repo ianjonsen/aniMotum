@@ -317,17 +317,17 @@ sfilter <-
 
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
-          l_rho_p=-Inf,
+          l_rho_p=-8,
           logD=-Inf,
           l_psi=lpsi,
           l_tau=c(-Inf,-Inf),
-          l_rho_o=-Inf)
+          l_rho_o=-8) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999329, 0.999329
     U = c(l_sigma=c(Inf,Inf),
-          l_rho_p=Inf,
+          l_rho_p=8,
           logD=Inf,
           l_psi=Inf,
           l_tau=c(Inf,Inf),
-          l_rho_o=Inf)
+          l_rho_o=8)
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
