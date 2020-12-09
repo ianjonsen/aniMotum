@@ -29,7 +29,7 @@ Type crw(objective_function<Type>* obj) {
   DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
   
   // PROCESS PARAMETERS
-  PARAMETER(logD);				  // 1-d Diffusion coefficient
+  PARAMETER(l_D);				  // 1-d Diffusion coefficient
   // random variables
   PARAMETER_ARRAY(mu);     /* State location */
   PARAMETER_ARRAY(v);      /* state velocities */
@@ -45,7 +45,7 @@ Type crw(objective_function<Type>* obj) {
   vector<Type> tau = exp(l_tau);
   Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi = exp(l_psi);
-  Type D = exp(logD);
+  Type D = exp(l_D);
   
   /* Define likelihood */
   Type jnll = 0.0;

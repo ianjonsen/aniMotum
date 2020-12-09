@@ -36,6 +36,7 @@
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
 ##' @importFrom assertthat assert_that
+##' @importFrom stringr str_split
 ##'
 ##'
 ##' @keywords internal
@@ -191,9 +192,9 @@ sfilter <-
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
         X = t(xs),
-        logD = 0,
         mu = t(xs),
         v = t(xs) * 0,
+        l_dif = 0,
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -207,16 +208,22 @@ sfilter <-
     automap <- switch(model, 
                      rw = {
                        list(
-                         list(l_psi = factor(NA)
+                         list(#l_dif = factor(NA),
+                              l_psi = factor(NA)
                             ),
-                         list(l_tau = factor(c(NA, NA)),
+                         list(
+                            #l_dif = factor(NA),
                             l_psi = factor(NA),
+                            l_tau = factor(c(NA, NA)),
                             l_rho_o = factor(NA)
                             ),
-                         list(l_tau = factor(c(NA, NA)),
-                            l_psi = factor(NA)
+                         list(
+                            #l_dif = factor(NA),
+                            l_psi = factor(NA),
+                            l_tau = factor(c(NA, NA))
                             ),
-                         list(l_psi = factor(NA)
+                         list(#l_dif = factor(NA),
+                              l_psi = factor(NA)
                             )
                          )
                        },
@@ -290,6 +297,7 @@ sfilter <-
     }
     verb <- ifelse(verbose == 2, TRUE, FALSE)
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
+
     obj <-
       MakeADFun(
         data,
@@ -317,23 +325,27 @@ sfilter <-
 
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
-          l_rho_p=-8,
-          logD=-Inf,
+          l_rho_p=-12,
+          l_D=-Inf,
           l_psi=lpsi,
           l_tau=c(-Inf,-Inf),
-          l_rho_o=-8) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999329, 0.999329
+          l_rho_o=-12) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.99999, 0.99999
     U = c(l_sigma=c(Inf,Inf),
-          l_rho_p=8,
-          logD=Inf,
+          l_rho_p=12,
+          l_D=Inf,
           l_psi=Inf,
           l_tau=c(Inf,Inf),
-          l_rho_o=8)
+          l_rho_o=12)
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
     # Remove inactive parameters from bounds
     L <- L[!names(L) %in% names(map)]
     U <- U[!names(U) %in% names(map)]
+    if(model == "rw") {
+      L <- L[names(L) != "l_D"] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
+      U <- U[names(U) != "l_D"]
+    }
 
     ## Minimize objective function
     oldw <- getOption("warn")
@@ -371,7 +383,7 @@ sfilter <-
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
-      fxd <- fxd[which(fxd[, "Std. Error"] != 0), ]
+      fxd <- fxd[which(!rownames(fxd) %in% str_split(names(map), "_", simplify=TRUE)[,2]), ]
       if("sigma" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "sigma")] <- c("sigma_x","sigma_y")
       } 
@@ -488,7 +500,7 @@ sfilter <-
         time = proc.time() - st
       )
       if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated. 
-                              You could try a different time.step, or use the map argument: map = list(psi = factor(NA)) to fix psi = 1", call. = FALSE)
+                              You could try a different time.step", call. = FALSE)
     } else {
       
       ## if optimiser fails
