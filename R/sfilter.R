@@ -194,7 +194,7 @@ sfilter <-
         X = t(xs),
         mu = t(xs),
         v = t(xs) * 0,
-        l_dif = 0,
+        l_D = 0,
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
