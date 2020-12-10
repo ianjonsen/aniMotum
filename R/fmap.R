@@ -171,7 +171,7 @@ fmap <- function(x, y = NULL,
                                         n = nrow(x), 
                                         type = "continuous")
                           ) 
-    } else {
+    } else if(!is.null(y)) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
                          aes_string(colour = "id"),
@@ -208,25 +208,24 @@ fmap <- function(x, y = NULL,
     ##FIXME:: given the track is coloured by date - perhaps make this optional but
     ##FIXME:: if on then conf ellipse is a single colour, or colour ellipses by date
     ##FIXME:: but don't dissolve them with st_union, otherwise colouring by date won't work...
+    if(is.null(y)) {
     if(by.date) {
       lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
     }
 
     if(conf & !by.date) {
       p <- p + geom_sf(data = sf_conf, 
-                       aes_string(fill = "id"),
+                       fill = "#78B7C5",
                        colour = NA, 
                        lwd = 0, 
-                       alpha = 0.5, 
-                       show.legend = FALSE)
+                       alpha = 0.5)
       
     } else if(conf & by.date) {
       p <- p + geom_sf(data = sf_conf, 
                        fill = grey(0.5),
                        colour = NA, 
                        lwd = 0, 
-                       alpha = 0.25, 
-                       show.legend = FALSE)
+                       alpha = 0.25)
     }
     
     if(by.date) {
@@ -238,11 +237,11 @@ fmap <- function(x, y = NULL,
         )
       }
       if(!is.na(size)[1]) {
-      p <- p + geom_sf(data = sf_locs,
+        p <- p + geom_sf(data = sf_locs,
                     aes(colour = as.numeric(as.Date(date))),
                      size = size[1]
                      ) +
-        scale_colour_gradientn(breaks = as.numeric(lab_dates), 
+          scale_colour_gradientn(breaks = as.numeric(lab_dates), 
                                colours = wes_palette(name = "Zissou1", 
                                                      type = "continuous"), 
                                labels = lab_dates)
@@ -257,8 +256,29 @@ fmap <- function(x, y = NULL,
               legend.key.height = unit(0.025, "npc"),
               panel.grid = element_line(size = 0.2)
         )
+    } else if(!by.date) {
+      if(lines) {
+        p <- p + geom_sf(data = sf_lines,
+                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[4],
+                         alpha = 0.75,
+                         lwd = 0.25
+        )
+      }
+      if(!is.na(size)[1]) {
+        p <- p + geom_sf(data = sf_locs,
+                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[3],
+                         size = size[1]
+        ) 
+      }
       
-    } else {
+      p <- p + labs(title = paste("id:", x$id)) +
+        theme_minimal() +
+        theme(legend.position = "none",
+              panel.grid = element_line(size = 0.2)
+        )
+    }
+      
+    } else if(!is.null(y)) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
                          aes(colour = "g"),
@@ -269,11 +289,12 @@ fmap <- function(x, y = NULL,
                        aes_string(colour = "g"),
                        size = ifelse(length(size) == 2, size[1], size)
       ) +
-        scale_fill_manual(values = 
-                            wes_palette(name = "Zissou1", 
-                                        n = nrow(x), 
-                                        type = "continuous")
-        )
+        scale_colour_gradientn(colours = 
+                                 rev(wes_palette(name = "Zissou1", 
+                                                 type = "continuous")),
+                               name = expression(gamma[t]),
+                               limits = c(0,1)
+        ) 
         
       p <- p + labs(title = paste("id:", x$id)) +
         theme_minimal() + 
