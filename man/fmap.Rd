@@ -15,7 +15,8 @@ fmap(
   ext.rng = c(0.05, 0.05),
   size = 0.25,
   col = "black",
-  lines = FALSE
+  lines = FALSE,
+  landfill = grey(0.6)
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{col}{colour of observed locations (ignored if obs = FALSE)}
 
 \item{lines}{logical indicating if lines are added to connect estimated locations (default = FALSE)}
+
+\item{landfill}{colour to use for land (default = grey(0.6))}
 }
 \description{
 map foieGras fitted or predicted locations, with or without

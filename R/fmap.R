@@ -16,6 +16,7 @@
 ##' @param size size of estimated location points (size = NA will draw no points). Optionally, a vector of length 2 with size of observed locations given by 2nd value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @param lines logical indicating if lines are added to connect estimated locations (default = FALSE)
+##' @param landfill colour to use for land (default = grey(0.6))
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_gradientn scale_fill_manual element_line
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
@@ -35,7 +36,8 @@ fmap <- function(x, y = NULL,
                      ext.rng = c(0.05, 0.05),
                      size = 0.25,
                      col = "black",
-                     lines = FALSE)
+                     lines = FALSE,
+                 landfill = grey(0.6))
 {
   what <- match.arg(what)
 
@@ -115,7 +117,7 @@ fmap <- function(x, y = NULL,
   
   p <- ggplot() +
     geom_sf(data = coast,
-            fill = grey(0.6),
+            fill = landfill,
             lwd=0) +
     xlim(bounds[c("xmin","xmax")]) +
     ylim(bounds[c("ymin","ymax")])
