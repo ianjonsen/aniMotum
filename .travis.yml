@@ -24,7 +24,7 @@ cache:
 
 before_install:
     - sudo apt-get update
-    - sudo apt-get install -y udunits-bin libproj-dev libgdal-dev libgeos-dev libudunits2-dev gdal-bin
+    - sudo apt-get install -y udunits-bin libproj-dev=7.2.0 libgdal-dev=3.2.0 libgeos-dev=3.8.1 libudunits2-dev gdal-bin
     - R -e 'install.packages("rgdal", repos=c("http://R-Forge.R-project.org", "http://cran.rstudio.com"))'
     
 latex: true
