@@ -153,7 +153,7 @@ prefilter <-
 
     } else if(inherits(d, "sf") && !st_is_longlat(d)) {
 
-      xy <- st_transform(d, crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")) %>%
+      xy <- st_transform(d, crs = st_crs("+proj=longlat +ellps=WGS84 +no_defs")) %>%
         st_coordinates() %>%
         as_tibble() %>%
         rename(lon = X, lat = Y)
@@ -223,15 +223,15 @@ prefilter <-
     mlon <- mean(dd$lon) %>% round(., 2)
 
     ## projection not provided by user so guess at best projection
-    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+    sf_locs <- st_as_sf(d, coords = c("lon", "lat"), crs = st_crs("+proj=longlat +ellps=WGS84 +no_defs"))
 
     if (any(diff(wrap_lon(dd$lon, 0)) > 300)) {
-      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
+      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +units=km +no_defs"
     } else if (any(diff(wrap_lon(dd$lon,-180)) < -300) ||
                any(diff(wrap_lon(dd$lon,-180)) > 300)) {
-      prj <- "+proj=merc +lon_0=180 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
+      prj <- "+proj=merc +lon_0=180 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +units=km +no_defs"
     } else {
-      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=km +no_defs"
+      prj <- "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +units=km +no_defs"
     }
 
     sf_locs <- sf_locs %>% st_transform(., st_crs(prj))
