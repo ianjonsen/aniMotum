@@ -281,7 +281,8 @@ fmap <- function(x, y = NULL,
     } else if(!is.null(y)) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
-                         aes(colour = "g"),
+                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[4],
+                         alpha = 0.75,
                          lwd = 0.25
         )
       }
