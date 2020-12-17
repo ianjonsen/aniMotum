@@ -10,6 +10,7 @@ fmap(
   what = c("fitted", "predicted"),
   conf = TRUE,
   obs = FALSE,
+  obs.shp = 17,
   by.date = TRUE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
@@ -29,6 +30,8 @@ fmap(
 \item{conf}{include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)}
 
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
+
+\item{obs.shp}{point shape for observations (default = 17)}
 
 \item{by.date}{when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)}
 
