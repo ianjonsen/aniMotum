@@ -8,6 +8,7 @@
 ##' @param what specify which location estimates to map: fitted or predicted
 ##' @param conf include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
+##' @param obs.shp point shape for observations (default = 17)
 ##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
@@ -127,7 +128,7 @@ fmap <- function(x, y = NULL,
       cat(paste0("geom size not specified for observations, using 'size = c(", size, ", 0.8)'"))
       size <- c(size, 0.8)
     }
-    p <- p + geom_sf(data = sf_data, colour = col, size = size[2], shape = 9, alpha = 0.75)
+    p <- p + geom_sf(data = sf_data, colour = col, size = size[2], shape = obs.shp, alpha = 0.75)
     
   }
 
