@@ -33,6 +33,7 @@ r_packages:
   - sf
   - rgdal
   - rgeos
+  - Matrix
 
 r_github_packages:
   - r-lib/covr
