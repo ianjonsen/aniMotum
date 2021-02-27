@@ -504,8 +504,7 @@ sfilter <-
         optimiser = optim,
         time = proc.time() - st
       )
-      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated. 
-                              You could try a different time.step", call. = FALSE)
+      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated.", call. = FALSE)
     } else {
       
       ## if optimiser fails
@@ -518,11 +517,15 @@ sfilter <-
         tmb = obj,
         errmsg = opt
       )
-      if(model == "crw") {
-      warning("The optimiser wandered out of bounds and failed. Try simplifying the model by including the following argument: 
+
+      if(model == "crw" & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) {
+        warning("The optimiser failed. Try simplifying the model with the following argument: 
                                  map = list(psi = factor(NA))", call. = FALSE)
+      } else if (all(is.na(x$smaj), is.na(x$smin), is.na(x$eor))){
+        warning("The optimiser failed. Try simplifying the model with the following argument: 
+                                 map = list(rho_o = factor(NA))", call. = FALSE)
       } else {
-        warning("The optimiser wandered out of bounds and failed. You could try using a different time.step", call. = FALSE)
+        warning("The optimiser failed. You could try using a different time.step", call. = FALSE)
       }
     }
     
