@@ -504,7 +504,11 @@ sfilter <-
         optimiser = optim,
         time = proc.time() - st
       )
-      if(!rep$pdHess) warning("Hessian was not positive-definite so some standard errors could not be calculated.", call. = FALSE)
+      if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:
+             map = list(psi = factor(NA))", call. = FALSE)
+    } else if (rep$pdHess & all(is.na(x$smaj), is.na(x$smin), is.na(x$eor))){
+      warning("Hessian was not positive-definite so some standard errors could not be calculated.", 
+              call. = FALSE)
     } else {
       
       ## if optimiser fails
