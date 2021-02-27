@@ -111,8 +111,8 @@ sfilter <-
     d <- cbind(xx, loc) %>%
       mutate(isd = TRUE)
 
-    if (length(time.step) == 1 & !is.na(time.step)) {
-      ## Interpolation times - assume on time.step-multiple of the hour
+    if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
+      ## prediction times - assume on time.step-multiple of the hour
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
@@ -122,18 +122,23 @@ sfilter <-
           by = tsp,
           length.out = max(index) + 2
         ))
-    } else if (length(time.step) > 1 & !is.na(time.step)) {
+      
+    } else if (inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ts <- subset(time.step, id %in% unique(d$id)) %>% 
         select(date)
-    } 
-    if (!is.na(time.step)) {
-      ## add 1 s to observation time(s) that exactly match prediction time(s) & throw a warning
+      
+    } else if (inherits(time.step, "data.frame") & any(is.na(time.step))) {
+      stop("NA's detected in user-supplied prediction times data.frame")
+    }
+    
+    if (all(!is.na(time.step))) {
+      ## add 1 s to observation time(s) that exactly match prediction time(s)
       if (sum(d$date %in% ts$date) > 0) {
         o.times <- which(d$date %in% ts$date)
         d[o.times, "date"] <- d[o.times, "date"] + 1
       }
 
-    ## merge data and interpolation times
+    ## merge data and prediction times
     ## add is.data flag (distinguish obs from reg states)
     d.all <- full_join(d, ts, by = "date") %>%
       arrange(date) %>%
@@ -470,7 +475,7 @@ sfilter <-
         select(-isd)
 
       ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
-      if(!is.na(time.step)) {
+      if(all(!is.na(time.step))) {
       pv <- subset(rdm, !isd) %>%
         select(-isd)
       } else {
