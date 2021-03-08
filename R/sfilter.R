@@ -395,7 +395,7 @@ sfilter <-
       if("tau" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
       }
-      
+  browser()    
       switch(model,
              rw = {
                tmp <- summary(rep, "random")
