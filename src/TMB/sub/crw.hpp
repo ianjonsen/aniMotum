@@ -31,8 +31,8 @@ Type crw(objective_function<Type>* obj) {
   // PROCESS PARAMETERS
   PARAMETER(l_D);				  // 1-d Diffusion coefficient
   // random variables
-  PARAMETER_ARRAY(mu);     /* State location */
-  PARAMETER_ARRAY(v);      /* state velocities */
+  PARAMETER_ARRAY(mu);     /* State location     */
+  PARAMETER_ARRAY(v);      /* State velocities   */
   
   // OBSERVATION PARAMETERS
   // for KF OBS MODEL
@@ -50,8 +50,7 @@ Type crw(objective_function<Type>* obj) {
   /* Define likelihood */
   Type jnll = 0.0;
   Type tiny = 1e-5;
-  
-  vector<double> sv = dt.size();
+  vector<Type> sv = dt.size();
   
   // Setup object for evaluating multivariate normal likelihood
   matrix<Type> cov(4,4);
@@ -66,6 +65,7 @@ Type crw(objective_function<Type>* obj) {
     jnll -= dnorm(mu(i,0), state0(i), tiny, true);
     jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
   }
+  sv(0) = sqrt(pow(v(0,0), 2) + pow(v(1,0), 2));
     
   // CRW PROCESS MODEL
   vector<Type> x_t(4);
@@ -86,7 +86,8 @@ Type crw(objective_function<Type>* obj) {
     x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
     
     // 2-D velocity
-    sv(i) = sqrt(pow(v(0,i) - v(0,i-1), 2) + pow(v(1,i) - v(1,i-1), 2)); 
+    sv(i) = sqrt(pow(v(0,i), 2) + pow(v(1,i), 2)); 
+    
     jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
   }
   
