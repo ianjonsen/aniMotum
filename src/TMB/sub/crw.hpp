@@ -51,7 +51,7 @@ Type crw(objective_function<Type>* obj) {
   Type jnll = 0.0;
   Type tiny = 1e-5;
   
-  vector<double> sv = dt.size();
+  vector<Type> sv = dt.size();
   
   // Setup object for evaluating multivariate normal likelihood
   matrix<Type> cov(4,4);

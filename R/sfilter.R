@@ -193,12 +193,14 @@ sfilter <-
       sigma <- sqrt(diag(V))
       rho <- V[1, 2] / prod(sigma)
 
+      v <- cbind(c(0,diff(x.init)), c(0,diff(y.init))) / dt
+      
       parameters <- list(
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
         X = t(xs),
         mu = t(xs),
-        v = t(xs) * 0,
+        v = t(v),
         l_D = 0,
         l_psi = 0,
         l_tau = c(0, 0),
@@ -395,7 +397,7 @@ sfilter <-
       if("tau" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
       }
-  browser()    
+
       switch(model,
              rw = {
                tmp <- summary(rep, "random")
@@ -428,6 +430,8 @@ sfilter <-
                tmp <- summary(rep, "random")
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
+               ss <- fxd[which(row.names(fxd) == "sv"), ] ## speeds
+               
                loc <-
                  cbind(loc[seq(1, dim(loc)[1], by = 2),],
                        loc[seq(2, dim(loc)[1], by = 2),]) %>%
@@ -439,6 +443,8 @@ sfilter <-
                        vel[seq(2, dim(vel)[1], by = 2),]) %>%
                  as.data.frame(., row.names = 1:nrow(.))
                names(vel) <- c("u", "u.se", "v", "v.se")
+               vel <- vel %>%
+                 mutate(s = ss[, 1], s.se = ss[, 2])
                
                rdm <- bind_cols(loc, vel) %>%
                  mutate(
@@ -452,7 +458,7 @@ sfilter <-
                           y = y  * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
                }
                rdm <- rdm %>%
-                 select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
+                 select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, s, s.se, isd)
              })
       
       ## coerce x,y back to sf object
@@ -467,7 +473,7 @@ sfilter <-
              },
              crw = {
                rdm <- rdm %>%
-                 select(id, date, x.se, y.se, u, v, u.se, v.se, isd)
+                 select(id, date, x.se, y.se, u, v, u.se, v.se, s, s.se, isd)
              })
 
       ## Fitted values (estimated locations at observation times)
@@ -487,6 +493,11 @@ sfilter <-
       } else if (optim == "optim") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
       }
+      ## drop sv's from fxd
+      if(model == "crw") {
+        fxd <- fxd[which(row.names(fxd) != "sv"), ]
+      }
+      
       out <- list(
         call = call,
         predicted = pv,
