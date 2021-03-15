@@ -90,7 +90,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = out %>% select(id, date, x.se, y.se, geometry),
-                 crw = out %>% select(id, date, u, v, u.se, v.se, s, s.se, x.se, y.se, geometry)
+                 crw = out %>% select(id, date, u, v, u.se, v.se, x.se, y.se, geometry)
                )
                
              } else {
@@ -114,7 +114,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = out %>% select(id, date, lon, lat, x, y, x.se, y.se),
-                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se, s, s.se)
+                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se)
                ) %>% as_tibble()
              } else {
                out <- out %>%
