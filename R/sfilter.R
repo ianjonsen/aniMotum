@@ -43,7 +43,7 @@
 
 sfilter <-
   function(x,
-           model = c("rw", "crw"),
+           model = c("rw", "crw", "crw2"),
            time.step = 6,
            scale = FALSE,
            parameters = NULL,
@@ -64,7 +64,7 @@ sfilter <-
 
     ## check args
     assert_that(inherits(x, c("sf","tbl_df")), msg = "x must be an sf-tibble produced by `prefilter()`")
-    assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
+    assert_that(model %in% c("rw","crw","crw2"), msg = "model can only be 1 of `rw` or `crw`")
     assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
                 msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
     assert_that(is.logical(scale), msg = "scale must be TRUE or FALSE to run on/off location scaling")
@@ -201,7 +201,7 @@ sfilter <-
         X = t(xs),
         mu = t(xs),
         v = t(v),
-        l_D = 0,
+        l_D = c(0,0),
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -281,7 +281,6 @@ sfilter <-
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
     
-    
     data <- list(
       model_name = model,
       Y = rbind(d.all$x, d.all$y), 
@@ -329,29 +328,29 @@ sfilter <-
       flush.console()
       obj$fn(x)
     }
-
+    
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
-          l_rho_p=-12,
-          l_D=-Inf,
+          l_rho_p=-6,
+          l_D=c(-Inf,-Inf),
           l_psi=lpsi,
           l_tau=c(-Inf,-Inf),
-          l_rho_o=-12) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.99999, 0.99999
+          l_rho_o=-6) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.9951, 0.9951
     U = c(l_sigma=c(Inf,Inf),
-          l_rho_p=12,
-          l_D=Inf,
+          l_rho_p=6,
+          l_D=c(Inf,Inf),
           l_psi=Inf,
           l_tau=c(Inf,Inf),
-          l_rho_o=12)
-    names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
+          l_rho_o=6)
+    names(L)[c(1:2,4:5,7:8)] <- c("l_sigma", "l_sigma", "l_D", "l_D", "l_tau", "l_tau")
+    names(U)[c(1:2,4:5,7:8)] <- c("l_sigma", "l_sigma", "l_D", "l_D", "l_tau", "l_tau")
 
     # Remove inactive parameters from bounds
     L <- L[!names(L) %in% names(map)]
     U <- U[!names(U) %in% names(map)]
     if(model == "rw") {
-      L <- L[names(L) != "l_D"] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
-      U <- U[names(U) != "l_D"]
+      L <- L[!names(L) %in% "l_D"] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
+      U <- U[names(U) %in% "l_D"]
     }
 
     ## Minimize objective function
@@ -396,6 +395,9 @@ sfilter <-
       } 
       if("tau" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
+      }
+      if("D" %in% row.names(fxd)) {
+        row.names(fxd)[which(row.names(fxd) == "D")] <- c("D_x","D_y")
       }
    
       switch(model,
@@ -493,11 +495,16 @@ sfilter <-
       } else if (optim == "optim") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
       }
+      
+      if(model == "crw") {
+        fxd <- fxd[which(row.names(fxd) != "sv"), ]
+      }
+      
       out <- list(
         call = call,
         predicted = pv,
         fitted = fv,
-        par = ifelse(model == "crw", fxd[which(row.names(fxd) != "sv"), ], fxd),
+        par = fxd,
         data = x,
         isd = d.all$isd,
         inits = parameters,
@@ -510,7 +517,8 @@ sfilter <-
         optimiser = optim,
         time = proc.time() - st
       )
-      if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:
+      
+    if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:
              map = list(psi = factor(NA))", call. = FALSE)
     } else if (rep$pdHess & all(is.na(x$smaj), is.na(x$smin), is.na(x$eor))){
       warning("Hessian was not positive-definite so some standard errors could not be calculated.", 
