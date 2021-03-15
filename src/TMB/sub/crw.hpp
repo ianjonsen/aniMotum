@@ -29,11 +29,10 @@ Type crw(objective_function<Type>* obj) {
   DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
   
   // PROCESS PARAMETERS
-  PARAMETER_VECTOR(l_D);          // 1-d Diffusion coefficients
-  
+  PARAMETER(l_D);				  // 1-d Diffusion coefficient
   // random variables
-  PARAMETER_ARRAY(mu);            /* State location     */
-  PARAMETER_ARRAY(v);             /* State velocities   */
+  PARAMETER_ARRAY(mu);     /* State location     */
+  PARAMETER_ARRAY(v);      /* State velocities   */
   
   // OBSERVATION PARAMETERS
   // for KF OBS MODEL
@@ -46,7 +45,7 @@ Type crw(objective_function<Type>* obj) {
   vector<Type> tau = exp(l_tau);
   Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi = exp(l_psi);
-  vector<Type> D = exp(l_D);
+  Type D = exp(l_D);
   
   /* Define likelihood */
   Type jnll = 0.0;
@@ -58,8 +57,8 @@ Type crw(objective_function<Type>* obj) {
   cov.setZero();
   cov(0,0) = tiny;
   cov(1,1) = tiny;
-  cov(2,2) = 2 * D(0) * dt(0);
-  cov(3,3) = 2 * D(1) * dt(0);
+  cov(2,2) = 2 * D * dt(0);
+  cov(3,3) = 2 * D * dt(0);
     
   // loop over 2 coords and update nll of start location and velocities.
   for(int i = 0; i < Y.rows(); i++) {
@@ -75,8 +74,8 @@ Type crw(objective_function<Type>* obj) {
     cov.setZero();
     cov(0,0) = tiny;
     cov(1,1) = tiny;
-    cov(2,2) = 2 * D(0) * dt(0);
-    cov(3,3) = 2 * D(1) * dt(0);
+    cov(2,2) = 2 * D * dt(i);
+    cov(3,3) = 2 * D * dt(i);
       
     // location innovations
     x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));

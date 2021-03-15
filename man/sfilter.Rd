@@ -6,7 +6,7 @@
 \usage{
 sfilter(
   x,
-  model = c("rw", "crw", "crw2"),
+  model = c("rw", "crw"),
   time.step = 6,
   scale = FALSE,
   parameters = NULL,
