@@ -102,7 +102,8 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       if(pages == 1) {
         ## plot SE ribbon first
         p <- ggplot() + 
-          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
+          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), 
+                      fill=wpal[5], alpha = 0.4)
       
         if(outlier) {
           p <- p + 
@@ -131,7 +132,9 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
         
        p <- lapply(1:nrow(x), function(i) {
           px <- ggplot() + 
-            geom_ribbon(data = pd.lst[[i]], aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
+            geom_ribbon(data = pd.lst[[i]], aes(date, ymin = value - 2 * se, 
+                                                ymax = value + 2 * se), 
+                        fill=wpal[5], alpha = 0.4)
           
           if(outlier) {
             px <- px + 
@@ -139,16 +142,20 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
                          colour = wpal[4], shape = 4) +
               geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
                          colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+              geom_rug(data = dd.lst[[i]] %>% filter(!keep), aes(date), 
+                       colour = wpal[4], sides = "b") + 
+              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
+                       colour = wpal[1], sides = "b")
           } else {
             px <- px + 
               geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
                          colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
+                       colour = wpal[1], sides = "b")
           }  
           px <- px + 
-            geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
+            geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], 
+                       shape = 20, size = 0.75) + 
             facet_wrap(facets = vars(coord), scales = "free",
                        labeller = labeller(coord = label_value),
                        ncol = 2) +

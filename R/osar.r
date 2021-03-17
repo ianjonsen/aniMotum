@@ -20,7 +20,7 @@
 ##' @importFrom TMB oneStepPredict
 ##' @importFrom future makeClusterPSOCK availableCores plan cluster
 ##' @importFrom parallel stopCluster
-##' @importFrom furrr future_map
+##' @importFrom furrr future_map furrr_options
 ##' @export
 
 osar <- function(x, method = "fullGaussian", ...)
@@ -45,7 +45,8 @@ osar <- function(x, method = "fullGaussian", ...)
     plan(cluster, workers = cl)
     
     r <- x$ssm %>%
-      future_map(~ try(map_fn(.x, method), silent = TRUE))
+      future_map(~ try(map_fn(.x, method), silent = TRUE), 
+                 .options = furrr_options(seed = TRUE))
     
     stopCluster(cl)
     } else {
@@ -69,7 +70,8 @@ osar <- function(x, method = "fullGaussian", ...)
       plan(cluster, workers = cl)
       
       r.redo <- redo$ssm %>%
-        future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")))
+        future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
+                   .options = furrr_options(seed = TRUE))
       
       stopCluster(cl)
     } else {
@@ -106,12 +108,13 @@ osar <- function(x, method = "fullGaussian", ...)
         select(id, everything())
       x.z <- z %>% slice(seq(1, nrow(z), by = 2))
       y.z <- z %>% slice(seq(2, nrow(z), by = 2))
-      
-      bind_rows(x.z, y.z) %>%
+      date <- x$ssm[[i]]$fitted$date
+      bind_rows(data.frame(date, x.z), data.frame(date, y.z)) %>%
         mutate(coord = rep(c("x", "y"), each = nrow(z) / 2))
     }) 
+    
     out <- lapply(out, function(x) {
-        x[, c("id", "residual", "coord")]
+        x[, c("id", "date", "residual", "coord")]
       }) %>% 
       do.call(rbind, .) %>% 
       as_tibble() 
