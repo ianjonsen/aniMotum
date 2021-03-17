@@ -4,12 +4,12 @@
 \alias{plot.fG_osar}
 \title{plot}
 \usage{
-\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram"), bw = 0.5, ...)
+\method{plot}{fG_osar}(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras osar} object with class `fG_osar`}
 
-\item{type}{type of residual plot to generate; either qqnorm (default) or histogram}
+\item{type}{type of residual plot to generate; time-series (ts), qqnorm (default, qq) or acf}
 
 \item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"}
 
