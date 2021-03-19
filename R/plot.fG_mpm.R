@@ -6,7 +6,7 @@
 ##' @param y optional \code{ssm} fit object with class \code{fG_ssm} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered 
 ##' otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
-##' @param asp used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1), or allow aspect ratio to vary between plots (asp = 0; default). 
+##' @param asp used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1; default), or allow aspect ratio to vary (asp = 0). 
 ##' Ignored if \code{y} is NULL and/or pages = 0
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0
 ##' @param ... additional arguments to be ignored
@@ -32,7 +32,7 @@
 ##'
 ##' @export
 
-plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 0, ncol = 1, ...)
+plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")

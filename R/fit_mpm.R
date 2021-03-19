@@ -1,6 +1,7 @@
 ##' @title fit a a Move Persistence Model (mpm)
 ##' @description fit a random walk with time-varying move persistence to location data (e.g., output from \code{fit_ssm})
-##' @param x a data frame of observations (see details)
+##' @param x a `fG_ssm` fit object or a data frame of observations (see details)
+##' @param what if a `fG_ssm` fit object is supplied then what determines whether fitted or predicted (default) values are mapped; ignored if x is a data frame
 ##' @param model mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})
 ##' @param optim numerical optimizer
 ##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
@@ -17,16 +18,14 @@
 ##' @examples
 ##' ## fit jmpm to two southern elephant seals
 ##' data(xs)
-##' dmp <- grab(xs, "predicted", as_sf=FALSE)
-##' dmp <- dmp[, c("id", "date", "lon", "lat")]
-##' fmpm <- fit_mpm(dmp, model = "jmpm")
-##' 
+##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr "%>%" mutate
+##' @importFrom dplyr "%>%" mutate select
 ##' @importFrom purrr map
 ##' @export
 fit_mpm <- function(x,
+                    what = "predicted",
                     model = c("mpm", "jmpm"),
                     optim = "optim",
                     optMeth = "L-BFGS-B",
@@ -39,6 +38,11 @@ fit_mpm <- function(x,
   if(verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
 
+  if(inherits(x, "fG_ssm")) {
+    x <- grab(x, what = what, as_sf = FALSE) %>%
+      select(id, date, lon, lat)
+  }
+  
   switch(model,
          mpm = {
            fit <- split(x, x$id) %>%
