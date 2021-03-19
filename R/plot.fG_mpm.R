@@ -58,8 +58,8 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, ...)
      xlab(element_blank()) +
      ylim(0,1) +
      theme_minimal()
-        
    return(p)
+   
     } else if(!is.null(y)) {
       if(nrow(grab(y, "predicted")) != nrow(grab(x, "fitted"))) {
         if(nrow(grab(y, "fitted")) != nrow(grab(x, "fitted"))) {
