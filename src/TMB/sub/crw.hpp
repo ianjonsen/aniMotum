@@ -134,7 +134,10 @@ Type crw(objective_function<Type>* obj) {
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
-        
+      
+      SIMULATE {
+        Y.col(i) = nll_obs.simulate() + mu.col(i);
+      }  
     } else if(isd(i) == 0) {
       continue;
     } else {  
@@ -142,7 +145,10 @@ Type crw(objective_function<Type>* obj) {
     }
   }
   
-
+  SIMULATE {
+    REPORT(Y);
+  }
+    
   ADREPORT(D);
   ADREPORT(rho_o);
   ADREPORT(tau);
