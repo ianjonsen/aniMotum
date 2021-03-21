@@ -28,15 +28,17 @@ simulate <- function(x = NULL,
                      tau = c(0.85, 0.55),
                      rho_o = 0.08,
                      error = c("ls","kf","dist"),
-                     t_dist = "rgamma",
+                     t_dist = "gamma",
                      tpar = c(1.5, 0.5)
                      ) {
   
   model <- match.arg(model)
   error <- match.arg(error)
   
-  assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
-  assert_that(error %in% c("ls","kf","dist"), msg = "error can only be 1 of `ls`, `kf`, or `dist`")
+  assert_that(model %in% c("rw","crw"), 
+              msg = "model can only be 1 of `rw` or `crw`")
+  assert_that(error %in% c("ls","kf","dist"), 
+              msg = "error can only be 1 of `ls`, `kf`, or `dist`")
   
   
   if(is.null(x)) {
@@ -47,15 +49,15 @@ simulate <- function(x = NULL,
     
     ## generate random time intervals (h)
     switch(t_dist, 
-           rlnorm = {
+           lnorm = {
              #3, 0.5
              dt <- c(0, rlnorm(N-1, tpar[1], tpar[2]))
            },
-           rgamma = {
+           gamma = {
              # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
              dt <- c(0, rgamma(N-1, tpar[1], tpar[2]))
            },
-           rexp = {
+           exp = {
              dt <- c(0, rexp(N-1, tpar[1]))
            })
     
@@ -65,8 +67,8 @@ simulate <- function(x = NULL,
           rw = {
       Sigma <-
         matrix(c(sigma[1] ^ 2, 
-                 sigma[1] * sigma[2] * rho[1], 
-                 sigma[1] * sigma[2] * rho[1], 
+                 sigma[1] * sigma[2] * rho_p[1], 
+                 sigma[1] * sigma[2] * rho_p[1], 
                  sigma[2] ^ 2),
                2, 
                2,
@@ -126,15 +128,21 @@ simulate <- function(x = NULL,
            })
     
     ## Merge ARGOS error multiplication factors
-    # d <- merge(d, emf, by = "lc", all.x = TRUE)
-    # d <- d[order(d$date),]
-    # 
-    # lo <- d$lon + sapply(1:N, function(i) {
-    #   rt(1, d$nu.lon[i]) * d$itau2.lon[i] ^ -0.5
-    # })
-    # la <- d$lat + sapply(1:N, function(i) {
-    #   rt(1, d$nu.lat[i]) * d$itau2.lat[i] ^ -0.5
-    # })
+     d <- merge(d, emf(), by = "lc", all.x = TRUE)
+     d <- d[order(d$date), ]
+    
+    ## Sample Argos measurement errors
+     Tau <- diag(2) %o% c(tau[1] * d$emf.x, tau[2] * d$emf.y)
+     err <- lapply(1:N, function(i) rmvnorm(1, c(0,0), Tau[,,i])) %>%
+       do.call(rbind, .)
+     
+     d <- d %>% 
+       mutate(err.x = err[, 1], 
+              err.y = err[, 2]) %>%
+       mutate(id = round(runif(1, 1, 10000))) %>%
+       select(id, date, lc, x, y, err.x, err.y)
+       
+    return(d)
     
   } else {
     

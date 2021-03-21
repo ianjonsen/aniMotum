@@ -15,7 +15,7 @@ simulate(
   tau = c(0.85, 0.55),
   rho_o = 0.08,
   error = c("ls", "kf", "dist"),
-  t_dist = "rgamma",
+  t_dist = "gamma",
   tpar = c(1.5, 0.5)
 )
 }
