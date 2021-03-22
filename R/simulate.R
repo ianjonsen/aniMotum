@@ -125,7 +125,7 @@ simulate <- function(x = NULL,
              for (i in 2:N) {
                ## use a truncated normal to simulate g in logit space:
                ##   suitable bounds keep RW wandering off at extremes
-               lg[i] <- rtnorm(1, lg[i - 1], sd[i], a = -8, b = 8)
+               lg[i] <- rtnorm(1, lg[i - 1], sd[i], l = -8, u = 8)
              }
              g <- plogis(lg)
              mu[2,] <- rmvnorm(1, mu[1,], Sigma * dt.g[2] ^ 2)

@@ -4,16 +4,16 @@
 ##' @param n number of random values to generate
 ##' @param mean vector of means
 ##' @param sd vector of standard deviations
-##' @param a lower limit of distribution
-##' @param b upper limit of distribution
+##' @param l lower limit of distribution
+##' @param u upper limit of distribution
 ##'
 ##' @examples
-##' x <- rtnorm(10, a = -5, b = 5)
+##' x <- rtnorm(10, l = -5, u = 5)
 ##' range(x)
 ##' @export
 ##' @keywords internal
 
-rtnorm <- function(n, mean = 0, sd = 1, a = -Inf, b = Inf) {
-  U <- runif(n, pnorm(a, mean, sd), pnorm(b, mean, sd))
-  qnorm(U, mean, sd) 
+rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
+  x <- runif(n, pnorm(l, mean, sd), pnorm(u, mean, sd))
+  qnorm(x, mean, sd) 
 }
