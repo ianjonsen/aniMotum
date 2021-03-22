@@ -7,16 +7,18 @@
 simulate(
   x = NULL,
   N = 100,
-  start = c(0, 0),
-  model = c("rw", "crw"),
+  start = list(c(0, 0), Sys.time()),
+  model = c("rw", "crw", "mp"),
   sigma = c(7, 6.5),
   rho_p = -0.45,
   D = 0.05,
   tau = c(0.85, 0.55),
   rho_o = 0.08,
+  sigma_g = 1,
   error = c("ls", "kf", "dist"),
   t_dist = "gamma",
-  tpar = c(1.5, 0.5)
+  tpar = c(1.5, 0.5),
+  states = NULL
 )
 }
 \arguments{

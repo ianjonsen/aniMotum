@@ -20,32 +20,35 @@
 
 simulate <- function(x = NULL, 
                      N = 100, 
-                     start = c(0,0),
-                     model = c("rw", "crw"), 
+                     start = list(c(0, 0), Sys.time()),
+                     model = c("rw", "crw", "mp"), 
                      sigma = c(7, 6.5), 
                      rho_p = -0.45,
                      D = 0.05,
                      tau = c(0.85, 0.55),
                      rho_o = 0.08,
+                     sigma_g = 1,
                      error = c("ls","kf","dist"),
                      t_dist = "gamma",
-                     tpar = c(1.5, 0.5)
+                     tpar = c(1.5, 0.5), 
+                     states = NULL
                      ) {
   
   model <- match.arg(model)
   error <- match.arg(error)
-  
-  assert_that(model %in% c("rw","crw"), 
-              msg = "model can only be 1 of `rw` or `crw`")
+
+  assert_that(model %in% c("rw","crw","mp"), 
+              msg = "model can only be 1 of `rw`, `crw`, or `mp`")
   assert_that(error %in% c("ls","kf","dist"), 
               msg = "error can only be 1 of `ls`, `kf`, or `dist`")
-  
+  assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
+              msg = "`start` must be a 2-element list, including a POSIX datetime as the 2nd element")
   
   if(is.null(x)) {
-    start.date <- Sys.time()
     
-    Y <- mu <- v <- matrix(NA, N, 2)
-    v[1,] <- mu[1,] <- start 
+    mu <- v <- matrix(NA, N, 2)
+    mu[1, ] <- start[[1]]
+    v[1, ] <- c(0,0)
     
     ## generate random time intervals (h)
     switch(t_dist, 
@@ -63,21 +66,34 @@ simulate <- function(x = NULL,
     
     
     ## Define var-covar matrix
+    Sigma <- diag(2) * sigma ^ 2
     switch(model,
-          rw = {
-      Sigma <-
-        matrix(c(sigma[1] ^ 2, 
-                 sigma[1] * sigma[2] * rho_p[1], 
-                 sigma[1] * sigma[2] * rho_p[1], 
-                 sigma[2] ^ 2),
-               2, 
-               2,
-               byrow = TRUE)
-    },
-    crw = {
-      Sigma <- diag(2) * 2 * D
-    })
+           rw = {
+             Sigma[!Sigma] <- prod(sigma) * rho_p
+           },
+           crw = {
+             Sigma <- diag(2) * 2 * D
+           })
     
+    ## Simulate behavioural states
+    if(!is.null(states)) {
+      
+      nCov <- 0 # no covariates for now
+      beta <- matrix(rnorm(states*(states - 1) * (nCov + 1)), nrow = nCov + 1)
+      delta <- rep(1, states) / states
+      b <- rep(NA, N)
+      b[1] <- sample(1:states, size = 1, prob = delta)
+      T <- diag(2)
+      #g <- beta[1,]
+      T[!T] <- exp(beta)
+      T <- t(T)
+      T <- T / sum(T)
+      for (k in 2:N) {
+        b[k] <- sample(1:states, size = 1, prob = T[b[k-1], ])
+      }
+    } 
+    
+    ## Simulate movement
     switch(model,
            crw = {
              for (i in 2:N) {
@@ -86,14 +102,31 @@ simulate <- function(x = NULL,
              }
            },
            rw = {
-             for(i in 2:N) {
+             for (i in 2:N) {
                mu[i, ] <- rmvnorm(1, mu[i-1, ], Sigma * dt[i]^2)
+             }
+           },
+           mp = {
+             ## Simulate move persistence values as a RW
+             dt.g <- dt / median(dt)
+             
+             lg <- rep(NA, N)
+             lg[1] <- runif(1, -5, 5)
+             sd <- sigma_g * dt.g
+             for(i in 2:N) {
+               ## use a truncated normal to simulate g in logit space: suitable bounds keep RW wandering off at extremes
+               lg[i] <- rtnorm(1, lg[i-1], sd[i], a = -8, b = 8)
+             }
+             g <- plogis(lg)
+             mu[2, ] <- rmvnorm(1, mu[1, ], Sigma * dt.g[2]^2)
+             for (i in 3:N) {
+               mu[i,] <- rmvnorm(1, mu[i-1, ] + g[i] * (dt.g[i]/dt.g[i-1]) * (mu[i-1, ] - mu[i-2, ]),  Sigma * dt[i]^2)
              }
            }
            )
 
     ## time interval is nominally 1 h
-    dts <- start.date + cumsum(dt) * 3600
+    dts <- start[[2]] + cumsum(dt) * 3600
     
     ## probability vector
     lc <- factor(
@@ -107,41 +140,44 @@ simulate <- function(x = NULL,
       ordered = TRUE
     )
     
-    switch(model,
-           crw = {
-             d <- data.frame(
-               date = dts,
-               lc = lc,
-               x = mu[, 1],
-               y = mu[, 2],
-               u = v[, 1],
-               v = v[, 2]
-             )
+    d <- data.frame(
+      date = dts,
+      lc = lc,
+      x = mu[, 1],
+      y = mu[, 2]
+      )
+    
+    switch(error,
+           ls = {
+             ## Merge ARGOS error multiplication factors
+             d <- merge(d, emf(), by = "lc", all.x = TRUE)
+             d <- d[order(d$date), ]
+             
+             ## Sample Argos measurement errors
+             Tau <-
+               diag(2) %o% c((tau[1] * d$emf.x)^2, (tau[2] * d$emf.y)^2)
+             err <-
+               lapply(1:N, function(i)
+                 rmvnorm(1, c(0, 0), Tau[, , i])) %>%
+               do.call(rbind, .)
+             
+             d <- d %>%
+               mutate(err.x = err[, 1],
+                      err.y = err[, 2]) %>%
+               select(date, lc, x, y, err.x, err.y)
            },
-           rw = {
-             d <- data.frame(
-               date = dts,
-               lc = lc,
-               x = mu[, 1],
-               y = mu[, 2]
-             )
+           kf = {
+             
            })
     
-    ## Merge ARGOS error multiplication factors
-     d <- merge(d, emf(), by = "lc", all.x = TRUE)
-     d <- d[order(d$date), ]
+    switch(model,
+           crw = {
+             d <- d %>% mutate(u = v[, 1], v = v[, 2])
+           },
+           mp = {
+             d <- d %>% mutate(g = g)
+           })
     
-    ## Sample Argos measurement errors
-     Tau <- diag(2) %o% c(tau[1] * d$emf.x, tau[2] * d$emf.y)
-     err <- lapply(1:N, function(i) rmvnorm(1, c(0,0), Tau[,,i])) %>%
-       do.call(rbind, .)
-     
-     d <- d %>% 
-       mutate(err.x = err[, 1], 
-              err.y = err[, 2]) %>%
-       mutate(id = round(runif(1, 1, 10000))) %>%
-       select(id, date, lc, x, y, err.x, err.y)
-       
     return(d)
     
   } else {
