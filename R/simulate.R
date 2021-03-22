@@ -34,6 +34,9 @@ simulate <- function(x = NULL,
                      states = NULL
                      ) {
   
+  ################
+  ## Check args ##
+  ################
   model <- match.arg(model)
   error <- match.arg(error)
 
@@ -43,7 +46,9 @@ simulate <- function(x = NULL,
               msg = "error can only be 1 of `ls`, `kf`, or `dist`")
   assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
               msg = "`start` must be a 2-element list, including a POSIX datetime as the 2nd element")
-  
+  ###########################
+  ## Simulate from scratch ##
+  ###########################
   if(is.null(x)) {
     
     mu <- v <- matrix(NA, N, 2)
@@ -74,8 +79,9 @@ simulate <- function(x = NULL,
            crw = {
              Sigma <- diag(2) * 2 * D
            })
-    
-    ## Simulate behavioural states
+    #################################
+    ## Simulate behavioural states ##
+    #################################
     if(!is.null(states)) {
       
       nCov <- 0 # no covariates for now
@@ -92,43 +98,51 @@ simulate <- function(x = NULL,
         b[k] <- sample(1:states, size = 1, prob = T[b[k-1], ])
       }
     } 
-    
-    ## Simulate movement
+    #######################
+    ## Simulate movement ##
+    #######################
     switch(model,
            crw = {
              for (i in 2:N) {
-               v[i, ] <- rmvnorm(1, v[i - 1, ], Sigma * dt[i])
-               mu[i, ] <- mu[i - 1, ] + v[i, ] * dt[i]
+               v[i,] <- rmvnorm(1, v[i - 1,], Sigma * dt[i])
+               mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
              }
            },
            rw = {
              for (i in 2:N) {
-               mu[i, ] <- rmvnorm(1, mu[i-1, ], Sigma * dt[i]^2)
+               mu[i,] <- rmvnorm(1, mu[i - 1,], Sigma * dt[i] ^ 2)
              }
            },
            mp = {
-             ## Simulate move persistence values as a RW
+             ######################################
+             ## Simulate move persistence values ##
+             ######################################
              dt.g <- dt / median(dt)
              
              lg <- rep(NA, N)
-             lg[1] <- runif(1, -5, 5)
+             lg[1] <- runif(1,-5, 5)
              sd <- sigma_g * dt.g
-             for(i in 2:N) {
-               ## use a truncated normal to simulate g in logit space: suitable bounds keep RW wandering off at extremes
-               lg[i] <- rtnorm(1, lg[i-1], sd[i], a = -8, b = 8)
+             for (i in 2:N) {
+               ## use a truncated normal to simulate g in logit space:
+               ##   suitable bounds keep RW wandering off at extremes
+               lg[i] <- rtnorm(1, lg[i - 1], sd[i], a = -8, b = 8)
              }
              g <- plogis(lg)
-             mu[2, ] <- rmvnorm(1, mu[1, ], Sigma * dt.g[2]^2)
+             mu[2,] <- rmvnorm(1, mu[1,], Sigma * dt.g[2] ^ 2)
              for (i in 3:N) {
-               mu[i,] <- rmvnorm(1, mu[i-1, ] + g[i] * (dt.g[i]/dt.g[i-1]) * (mu[i-1, ] - mu[i-2, ]),  Sigma * dt[i]^2)
+               mu[i, ] <- rmvnorm(1, mu[i - 1,] +
+                                    g[i] * (dt.g[i] / dt.g[i - 1]) *
+                                    (mu[i - 1,] - mu[i - 2,]),
+                                  Sigma * dt[i] ^ 2)
              }
-           }
-           )
+           })
 
     ## time interval is nominally 1 h
     dts <- start[[2]] + cumsum(dt) * 3600
     
-    ## probability vector
+    ##############################################
+    ## Simulate Argos error classes for LS data ##
+    ##############################################
     lc <- factor(
       sample(
         c(3, 2, 1, 0, "A", "B"),
@@ -153,14 +167,15 @@ simulate <- function(x = NULL,
              d <- merge(d, emf(), by = "lc", all.x = TRUE)
              d <- d[order(d$date), ]
              
-             ## Sample Argos measurement errors
-             Tau <-
-               diag(2) %o% c((tau[1] * d$emf.x)^2, (tau[2] * d$emf.y)^2)
+             Tau <- diag(2) %o% c((tau[1] * d$emf.x)^2, 
+                                  (tau[2] * d$emf.y)^2)
+             ## Sample errors
              err <-
                lapply(1:N, function(i)
                  rmvnorm(1, c(0, 0), Tau[, , i])) %>%
                do.call(rbind, .)
              
+             ## add errors to data.frame
              d <- d %>%
                mutate(err.x = err[, 1],
                       err.y = err[, 2]) %>%
@@ -181,6 +196,9 @@ simulate <- function(x = NULL,
     return(d)
     
   } else {
+    ########################################
+    ## Simulate from a foieGras model fit ##
+    ########################################
     
   }
   

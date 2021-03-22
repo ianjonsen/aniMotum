@@ -1,4 +1,4 @@
-citHeader("To cite foieGras in publications, please, include these references:")
+citHeader("To cite foieGras in publications, please, usee these references:")
 
 citEntry(entry = "article",
          title        = "A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags",
