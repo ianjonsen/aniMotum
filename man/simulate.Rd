@@ -18,7 +18,8 @@ simulate(
   error = c("ls", "kf", "dist"),
   t_dist = "gamma",
   tpar = c(1.5, 0.5),
-  states = NULL
+  states = NULL,
+  alpha = c(0.9, 0.8)
 )
 }
 \arguments{

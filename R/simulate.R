@@ -31,7 +31,8 @@ simulate <- function(x = NULL,
                      error = c("ls","kf","dist"),
                      t_dist = "gamma",
                      tpar = c(1.5, 0.5), 
-                     states = NULL
+                     states = NULL,
+                     alpha = c(0.9, 0.8)
                      ) {
   
   ################
@@ -83,21 +84,18 @@ simulate <- function(x = NULL,
     ## Simulate behavioural states ##
     #################################
     if(!is.null(states)) {
-      
-      nCov <- 0 # no covariates for now
-      beta <- matrix(rnorm(states*(states - 1) * (nCov + 1)), nrow = nCov + 1)
-      delta <- rep(1, states) / states
+      ## set up transition matrix
+      T <- diag(2) * alpha
+      T[!T] <- rev(diag(1 - T))
       b <- rep(NA, N)
-      b[1] <- sample(1:states, size = 1, prob = delta)
-      T <- diag(2)
-      #g <- beta[1,]
-      T[!T] <- exp(beta)
-      T <- t(T)
-      T <- T / sum(T)
+      ## initial state
+      b[1] <- sample(1:states, size = 1, prob = rep(1, states) / states)
+      ## sample subsequent states
       for (k in 2:N) {
         b[k] <- sample(1:states, size = 1, prob = T[b[k-1], ])
       }
     } 
+    
     #######################
     ## Simulate movement ##
     #######################
@@ -192,6 +190,8 @@ simulate <- function(x = NULL,
            mp = {
              d <- d %>% mutate(g = g)
            })
+    
+    row.names(d) <- 1:N
     
     return(d)
     

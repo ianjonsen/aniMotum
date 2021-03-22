@@ -4,7 +4,7 @@
 \alias{rtnorm}
 \title{rtnorm}
 \usage{
-rtnorm(n, mean = 0, sd = 1, a = -Inf, b = Inf)
+rtnorm(n, mean = 0, sd = 1, l = -Inf, u = Inf)
 }
 \arguments{
 \item{n}{number of random values to generate}
@@ -13,9 +13,9 @@ rtnorm(n, mean = 0, sd = 1, a = -Inf, b = Inf)
 
 \item{sd}{vector of standard deviations}
 
-\item{a}{lower limit of distribution}
+\item{l}{lower limit of distribution}
 
-\item{b}{upper limit of distribution}
+\item{u}{upper limit of distribution}
 }
 \description{
 rtnorm
@@ -24,7 +24,7 @@ rtnorm
 simulate values from a truncated normal distribution
 }
 \examples{
-x <- rtnorm(10, a = -5, b = 5)
+x <- rtnorm(10, l = -5, u = 5)
 range(x)
 }
 \keyword{internal}
