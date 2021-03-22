@@ -11,7 +11,7 @@ simulate(
   model = c("rw", "crw"),
   sigma = c(7, 6.5),
   rho_p = -0.45,
-  D = 0.6,
+  D = 0.05,
   tau = c(0.85, 0.55),
   rho_o = 0.08,
   error = c("ls", "kf", "dist"),
