@@ -3,14 +3,17 @@
 ##' @description visualize simulated tracks from a fG_sim data.frame
 ##'
 ##' @param x a \code{foieGras} simulation data.frame with class \code{fG_sim}
+##' @param error logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots
+##' @param pal hcl.colors palette to use (default: "Zissou1"); see hcl.pals() for options
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. Can be rendered all on a single page (pages = 1) or on separate pages (pages = 0).
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path geom_line theme_minimal 
-##' @importFrom ggplot2 element_blank xlab ylab unit scale_colour_gradientn 
-##' @importFrom ggplot2 theme ylim
+##' @importFrom ggplot2 element_blank xlab ylab unit scale_colour_gradientn guides guide_legend
+##' @importFrom ggplot2 theme ylim coord_fixed scale_colour_manual scale_size
 ##' @importFrom dplyr "%>%"
+##' @importFrom stringr str_split
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
 ##' @importFrom assertthat assert_that
@@ -21,78 +24,144 @@
 ##' @export
 
 plot.fG_sim <- function(x, 
-                        pal = rev(hcl.colors(n=100, "Zissou1")), 
+                        error = FALSE,
+                        pal = "Zissou1", 
                         ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
   
-  bts <- if (any(names(x) %in% c("g", "b", "u", "v")))
-    names(x)[names(x) %in% c("g", "b", "u", "v")]
-  browser()
-  if(!is.null(bts) & any(bts %in% c("g","b"))) {
-    p <- ggplot(x, aes(x, y, colour = eval(parse(text = bts)))) +
-      geom_path(size = 0.25) +
-      geom_point() +
-      scale_colour_gradientn(colours = pal,
-                             name = bts) +
-      xlab(element_blank()) +
-      ylab(element_blank()) +
-      theme_minimal() +
-      theme(legend.position = "bottom",
-            legend.key.height = unit(0.015, units = "npc"))
-    
-  } else if (!is.null(bts) & all(bts %in% c("u","v"))) {
-    x <- x %>% mutate(s = sqrt(u^2 + v^2))
-    p <- ggplot(x, aes(x, y, colour = s)) +
-      geom_path(size = 0.25) +
-      geom_point() +
-      scale_colour_gradientn(colours = pal,
-                             name = "s km/h") +
-      xlab(element_blank()) +
-      ylab(element_blank()) +
-      theme_minimal() +
-      theme(legend.position = "bottom",
-            legend.key.height = unit(0.015, units = "npc"))
-    
-  }
+  bts <- if (any(names(x) %in% c("g", "b")))
+    names(x)[names(x) %in% c("g", "b")]
+  model <- str_split(class(x)[2], "_", simplify = TRUE)[,2]
   
-  ## 1-D ts plot
-  if (!is.null(bts) & any(bts %in% c("g", "b"))) {
-    p1 <- ggplot(x, aes(
-      x = date,
-      y = eval(parse(text = bts)),
-      colour = eval(parse(text = bts))
-    )) +
-      geom_line(size = 0.25) +
-      geom_point(size = 0.75) +
-      scale_colour_gradientn(colours = pal,
-                             guide = "none") +
-      xlab(element_blank()) +
-      ylab(eval(bts)) +
-      theme_minimal()
+  switch(model,
+         crw = {
+           x <- x %>% mutate(s = sqrt(u^2 + v^2))
+           if(!error) {
+            p <- ggplot() +
+              geom_path(data = x, aes(x, y), size = 0.1, 
+                       colour = hcl.colors(n=2, pal)[1])
+           } else {
+             p <- ggplot() #+
+               #geom_path(data = x, aes(x+err.x, y+err.y), size = 0.1, 
+                        # colour = hcl.colors(n=2, pal)[1])
+           }
+
+          if(!is.null(bts)) {
+            if(!error) {
+              p <- p +
+                geom_point(data = x, aes(x, y, size = b, colour = factor(b)))
+            } else {
+              p <- p +
+                geom_point(data = x, aes(x+err.x, y+err.y, size = b, colour = factor(b))) +
+                geom_point(data = x, aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3)
+            }
+              p <- p + scale_colour_manual(values = hcl.colors(n=2, pal), name = bts) +
+                scale_size(range = c(0.75, 1.5), guide = "none") +
+                guides(color = guide_legend(override.aes = list(size = c(0.75, 1.5))))
+            
+          } else if(is.null(bts)) {
+            if(!error) {
+              p <- p +
+                geom_point(data = x, aes(x, y, colour = s))
+            } else{
+              p <- p +
+                geom_point(data = x, aes(x+err.x, y+err.y, colour = s)) +
+                geom_point(data = x, aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3)
+            }
+              p <- p + scale_colour_gradientn(colours = rev(hcl.colors(n=100, pal)),
+                                     name = "s")
+              
+          }
+         p <- p + xlab(element_blank()) + 
+           ylab(element_blank()) + 
+           theme_minimal() + 
+           theme(legend.position = "bottom", 
+                 legend.key.height = unit(0.015, units = "npc")) +
+           coord_fixed()
+         
+         if (!is.null(bts)) {
+           p1 <- ggplot(x) +
+             geom_point(aes(x = date, y = s, colour = factor(b)), size = 0.75) +
+             scale_colour_manual(values = hcl.colors(n = 2, pal),
+                                 guide = "none") +
+             geom_line(aes(x = date, y = s), colour = hcl.colors(n=2, pal)[1], 
+                       size = 0.1, inherit.aes = FALSE)
+         } else {
+           p1 <- ggplot(x, aes(x = date, y = s, colour = s)) +
+             geom_point(size = 0.75) +
+             scale_colour_gradientn(colours = hcl.colors(n = 100, pal),
+                                    guide = "none") +
+             geom_line(size = 0.1)
+         }
+         p1 <- p1 +
+           xlab(element_blank()) +
+           ylab("s km/h") +
+           theme_minimal() +
+           ylim(extendrange(x$s, f = 0.025))
+     
+         wrap_plots(p, p1, heights = c(3,1))
     
-    if (bts[1] == "g")
-      p1 <- p1 + ylim(0, 1)
-    
-    wrap_plots(p, p1, heights = c(4,1))
-    
-  } else if (!is.null(bts) & all(bts %in% c("u", "v"))) {
-    p1 <- ggplot(x, aes(x = date, y = s, colour = s)) +
-      geom_line(size = 0.25) +
-      geom_point(size = 0.75) +
-      scale_colour_gradientn(colours = pal,
-                             guide = "none") +
-      xlab(element_blank()) +
-      ylab("s km/h") +
-      theme_minimal()
-    er <- extendrange(x$s, f = 0.025)
-    p1 <- p1 + ylim(er[1], er[2])
-    
-    wrap_plots(p, p1, heights = c(4,1))
-    
-  } else {
-    return(p)
-  }
+         },
+         rw = {
+           p <- ggplot(x) +
+             geom_path(aes(x, y), size = 0.1, colour = hcl.colors(n = 2, pal)[1])
+           
+           if (!is.null(bts)) {
+             p <- p +
+               geom_point(aes(x, y, colour = factor(eval(
+                 parse(text = bts)
+               )))) +
+               scale_colour_manual(values = hcl.colors(n = 2, pal), name = bts)
+             
+           } else {
+             p <- p +
+               geom_point(aes(x, y), colour = hcl.colors(n = 2, pal)[1])
+           }
+           p <- p + 
+             xlab(element_blank()) +
+             ylab(element_blank()) +
+             theme_minimal() +
+             theme(legend.position = "bottom",
+                   legend.key.height = unit(0.015, units = "npc")) +
+             coord_fixed()
+           
+           return(p)
+           
+         }, 
+         mpm = {
+           p <- ggplot(x) 
+           
+           if(!error) {
+             p <- p + geom_path(aes(x, y, colour = g), size = 0.1) + 
+               geom_point(aes(x, y, colour = g, size = rev(g)))
+           } else {
+             p <- p + geom_point(aes(x+err.x, y+err.y, colour = g, size = rev(g))) +
+               geom_path(aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3) +
+               geom_point(aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.4)
+           }
+             p <- p + scale_colour_gradientn(colours = rev(hcl.colors(n=100, pal)), 
+                                    name = bts) +
+               scale_size(range = c(0.5, 2), guide = "none") +
+               xlab(element_blank()) +
+               ylab(element_blank()) +
+               theme_minimal() +
+               theme(legend.position = "bottom", 
+                   legend.key.height = unit(0.015, units = "npc")) +
+               coord_fixed()
+           
+           p1 <- ggplot(x, aes(x = date, y = g, colour = g)) +
+             geom_line(size = 0.1) +
+             geom_point(size = 0.75) +
+             scale_colour_gradientn(colours = rev(hcl.colors(n=100, pal)),
+                                    guide = "none") +
+             xlab(element_blank()) +
+             ylab("g") +
+             theme_minimal() +
+             ylim(0,1)
+           
+           wrap_plots(p, p1, heights = c(4,1))
+         })
 }

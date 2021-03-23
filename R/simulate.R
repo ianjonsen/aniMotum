@@ -205,6 +205,17 @@ simulate <- function(x = NULL,
     if(n.states > 1) d <- d %>% mutate(b = b)
     row.names(d) <- 1:N
     
+    switch(model,
+           rw = { 
+             class(d) <- append("fG_rw", class(d))
+           },
+           crw = {
+             class(d) <- append("fG_crw", class(d))
+           },
+           mpm = {
+             class(d) <- append("fG_mpm", class(d))
+           })
+    
     class(d) <- append("fG_sim", class(d))
     
     return(d)
