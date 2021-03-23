@@ -8,7 +8,7 @@ simulate(
   x = NULL,
   N = 100,
   start = list(c(0, 0), Sys.time()),
-  model = c("rw", "crw", "mp"),
+  model = c("rw", "crw", "mpm"),
   sigma = c(7, 6.5),
   rho_p = -0.45,
   D = 0.05,
@@ -16,10 +16,10 @@ simulate(
   rho_o = 0.08,
   sigma_g = 1,
   error = c("ls", "kf", "dist"),
-  t_dist = "gamma",
+  t_dist = c("gamma", "lnorm", "exp"),
   tpar = c(1.5, 0.5),
-  states = NULL,
-  alpha = c(0.9, 0.8)
+  alpha = c(0.9, 0.8),
+  beta = c(1, 0.5)
 )
 }
 \arguments{

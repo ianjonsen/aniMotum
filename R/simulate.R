@@ -21,7 +21,7 @@
 simulate <- function(x = NULL, 
                      N = 100, 
                      start = list(c(0, 0), Sys.time()),
-                     model = c("rw", "crw", "mp"), 
+                     model = c("rw", "crw", "mpm"), 
                      sigma = c(7, 6.5), 
                      rho_p = -0.45,
                      D = 0.05,
@@ -29,10 +29,10 @@ simulate <- function(x = NULL,
                      rho_o = 0.08,
                      sigma_g = 1,
                      error = c("ls","kf","dist"),
-                     t_dist = "gamma",
+                     t_dist = c("gamma","lnorm","exp"),
                      tpar = c(1.5, 0.5), 
-                     states = NULL,
-                     alpha = c(0.9, 0.8)
+                     alpha = c(0.9, 0.8),
+                     beta = c(1, 0.25)
                      ) {
   
   ################
@@ -40,13 +40,22 @@ simulate <- function(x = NULL,
   ################
   model <- match.arg(model)
   error <- match.arg(error)
+  t_dist <- match.arg(t_dist)
 
-  assert_that(model %in% c("rw","crw","mp"), 
-              msg = "model can only be 1 of `rw`, `crw`, or `mp`")
+  assert_that(model %in% c("rw","crw","mpm"), 
+              msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
   assert_that(error %in% c("ls","kf","dist"), 
               msg = "error can only be 1 of `ls`, `kf`, or `dist`")
+  assert_that(t_dist %in% c("gamma","lnorm","exp"),
+              msg = "t_dist can only be 1 of `gamma`, `lnorm`, or `exp`")
   assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
-              msg = "`start` must be a 2-element list, including a POSIX datetime as the 2nd element")
+              msg = "`start` must be a 2-element list, with coordinates as the 1st element and
+              a POSIX datetime as the 2nd element")
+  
+  n.states <- 1
+  if(length(sigma) > 2 & model == "rw") n.states <- length(sigma)/2
+  if(length(D) > 1 & model == "crw") n.states <- length(D)
+  
   ###########################
   ## Simulate from scratch ##
   ###########################
@@ -58,43 +67,48 @@ simulate <- function(x = NULL,
     
     ## generate random time intervals (h)
     switch(t_dist, 
-           lnorm = {
-             #3, 0.5
-             dt <- c(0, rlnorm(N-1, tpar[1], tpar[2]))
-           },
            gamma = {
              # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
              dt <- c(0, rgamma(N-1, tpar[1], tpar[2]))
+           },
+           lnorm = {
+             #3, 0.5
+             dt <- c(0, rlnorm(N-1, tpar[1], tpar[2]))
            },
            exp = {
              dt <- c(0, rexp(N-1, tpar[1]))
            })
     
-    
-    ## Define var-covar matrix
-    Sigma <- diag(2) * sigma ^ 2
-    switch(model,
-           rw = {
-             Sigma[!Sigma] <- prod(sigma) * rho_p
-           },
-           crw = {
-             Sigma <- diag(2) * 2 * D
-           })
+    ## Define var-cov matrix for movement process
+      Sigma <- lapply(1:n.states, function(i) {
+        Sigma <- diag(2) * sigma[i:(i+1) + (i-1)] ^ 2
+        switch(model,
+               rw = {
+                 Sigma[!Sigma] <- prod(sigma[i:(i+1) + (i-1)]) * rho_p[i]
+               },
+               crw = {
+                 Sigma <- diag(2) * 2 * D[i]
+               })
+        Sigma
+      })
+
     #################################
     ## Simulate behavioural states ##
     #################################
-    if(!is.null(states)) {
+    if(n.states > 1) {
       ## set up transition matrix
       T <- diag(2) * alpha
       T[!T] <- rev(diag(1 - T))
       b <- rep(NA, N)
       ## initial state
-      b[1] <- sample(1:states, size = 1, prob = rep(1, states) / states)
+      b[1] <- sample(1:n.states, size = 1, prob = rep(1, n.states) / n.states)
       ## sample subsequent states
       for (k in 2:N) {
-        b[k] <- sample(1:states, size = 1, prob = T[b[k-1], ])
+        b[k] <- sample(1:n.states, size = 1, prob = T[b[k-1], ])
       }
-    } 
+    } else {
+      b <- rep(1, N)
+    }
     
     #######################
     ## Simulate movement ##
@@ -102,19 +116,16 @@ simulate <- function(x = NULL,
     switch(model,
            crw = {
              for (i in 2:N) {
-               v[i,] <- rmvnorm(1, v[i - 1,], Sigma * dt[i])
+               v[i,] <- rmvnorm(1, beta[b[i]] * v[i - 1,], Sigma[[b[i]]] * dt[i])
                mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
              }
            },
            rw = {
              for (i in 2:N) {
-               mu[i,] <- rmvnorm(1, mu[i - 1,], Sigma * dt[i] ^ 2)
+               mu[i,] <- rmvnorm(1, mu[i - 1,], Sigma[[b[i]]] * dt[i] ^ 2)
              }
            },
-           mp = {
-             ######################################
-             ## Simulate move persistence values ##
-             ######################################
+           mpm = {
              dt.g <- dt / median(dt)
              
              lg <- rep(NA, N)
@@ -126,12 +137,12 @@ simulate <- function(x = NULL,
                lg[i] <- rtnorm(1, lg[i - 1], sd[i], l = -8, u = 8)
              }
              g <- plogis(lg)
-             mu[2,] <- rmvnorm(1, mu[1,], Sigma * dt.g[2] ^ 2)
+             mu[2,] <- rmvnorm(1, mu[1,], Sigma[[1]] * dt.g[2] ^ 2)
              for (i in 3:N) {
                mu[i, ] <- rmvnorm(1, mu[i - 1,] +
                                     g[i] * (dt.g[i] / dt.g[i - 1]) *
                                     (mu[i - 1,] - mu[i - 2,]),
-                                  Sigma * dt[i] ^ 2)
+                                  Sigma[[1]] * dt[i] ^ 2)
              }
            })
 
@@ -187,10 +198,11 @@ simulate <- function(x = NULL,
            crw = {
              d <- d %>% mutate(u = v[, 1], v = v[, 2])
            },
-           mp = {
+           mpm = {
              d <- d %>% mutate(g = g)
            })
     
+    if(n.states > 1) d <- d %>% mutate(b = b)
     row.names(d) <- 1:N
     
     return(d)
