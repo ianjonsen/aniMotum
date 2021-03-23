@@ -15,6 +15,7 @@
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom tibble tibble
 ##' @importFrom assertthat assert_that
+##' @importFrom sf st_coordinates
 ##' 
 ##' @export
 
@@ -224,7 +225,32 @@ simulate <- function(x = NULL,
     ########################################
     ## Simulate from a foieGras model fit ##
     ########################################
-    
+    d <- lapply(x$ssm, function(k) {
+      model <- k$pm
+      N <- nrow(k$fitted)
+      dts <- k$fitted$date
+      dt <- difftime(dts, lag(dts), units = "hours") %>% as.numeric()
+      dt[1] <- 0
+      
+      if(model == "crw") {
+        mu <- v <- matrix(NA, N, 2)
+        mu[1,] <- st_coordinates(k$fitted$geometry)[1,]
+        v[1, ] <- c(k$fitted$u[1], k$fitted$v[1])
+        Sigma <- diag(2) * 2 * k$par["D", 1]
+      }
+      
+      ###############################
+      ## Simulate movement process ##
+      ###############################
+      for (i in 2:N) {
+        v[i,] <- rmvnorm(1, v[i - 1,], Sigma * dt[i])
+        mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
+      }
+      
+    data.frame(date = dts, x = mu[,1], y = mu[,2], u = v[,1], v= v[,2]) %>%
+      mutate(s = sqrt(u^2+v^2))
+    })
+    browser()
   }
   
 }
