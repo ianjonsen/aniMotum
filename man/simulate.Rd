@@ -19,7 +19,7 @@ simulate(
   t_dist = c("gamma", "lnorm", "exp"),
   tpar = c(1.5, 0.5),
   alpha = c(0.9, 0.8),
-  beta = c(1, 0.5)
+  beta = c(1, 0.25)
 )
 }
 \arguments{

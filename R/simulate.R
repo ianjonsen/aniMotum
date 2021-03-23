@@ -205,6 +205,8 @@ simulate <- function(x = NULL,
     if(n.states > 1) d <- d %>% mutate(b = b)
     row.names(d) <- 1:N
     
+    class(d) <- append("fG_sim", class(d))
+    
     return(d)
     
   } else {
