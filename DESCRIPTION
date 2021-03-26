@@ -50,7 +50,8 @@ Suggests:
     future (>= 1.13.0),
     furrr (>= 0.1.0),
     parallel,
-    mvtnorm
+    mvtnorm,
+    tmvtnorm
 Depends: 
     R (>= 3.5.0)
 SystemRequirements: C++11, GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0)

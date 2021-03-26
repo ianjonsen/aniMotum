@@ -41,9 +41,9 @@
 ##'
 ##' @keywords internal
 
-sfilter <-
+sfilter_new <-
   function(x,
-           model = c("rw", "crw"),
+           model = c("rw", "crw", "crwp"),
            time.step = 6,
            scale = FALSE,
            parameters = NULL,
@@ -64,7 +64,7 @@ sfilter <-
 
     ## check args
     assert_that(inherits(x, c("sf","tbl_df")), msg = "x must be an sf-tibble produced by `prefilter()`")
-    assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
+    assert_that(model %in% c("rw","crw","crwp"), msg = "model can only be 1 of `rw` or `crw`")
     assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
                 msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
     assert_that(is.logical(scale), msg = "scale must be TRUE or FALSE to run on/off location scaling")
@@ -116,7 +116,7 @@ sfilter <-
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
-      ts <-
+      ptms <-
         data.frame(date = seq(
           trunc(d$date[1], "hour"),
           by = tsp,
@@ -124,7 +124,7 @@ sfilter <-
         ))
       
     } else if (inherits(time.step, "data.frame") & all(!is.na(time.step))) {
-      ts <- subset(time.step, id %in% unique(d$id)) %>% 
+      ptms <- subset(time.step, id %in% unique(d$id)) %>% 
         select(date)
       
     } else if (inherits(time.step, "data.frame") & any(is.na(time.step))) {
@@ -133,57 +133,79 @@ sfilter <-
     
     if (all(!is.na(time.step))) {
       ## add 1 s to observation time(s) that exactly match prediction time(s)
-      if (sum(d$date %in% ts$date) > 0) {
+      if (sum(d$date %in% ptms$date) > 0) {
         o.times <- which(d$date %in% ts$date)
         d[o.times, "date"] <- d[o.times, "date"] + 1
       }
 
     ## merge data and prediction times
     ## add is.data flag (distinguish obs from reg states)
-    d.all <- full_join(d, ts, by = "date") %>%
-      arrange(date) %>%
-      mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
-      mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
-    } else {
-      d.all <- d
+    # d.all <- full_join(d, ptms, by = "date") %>%
+    #   arrange(date) %>%
+    #   mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
+    #   mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
+    # } else {
+    #   d.all <- d
     }
 
-    ## calc delta times in hours for observations & interpolation points (states)
-    dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
-      as.numeric()
-    dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
+    ## calc observation delta times in hours
+    d <- d %>% 
+      mutate(dt = difftime(date, lag(date), units = "hours")) %>%
+      mutate(dt = as.numeric(dt))
+    d$dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
+    
+    if(all(!is.na(time.step))) {
+      ## calc prediction delta times in hours
+      pdt <- with(ptms, difftime(date, lag(date), units = "hours")) %>%
+        as.numeric()
+      pdt[1] <- 0.000001
+    }
+    
+    ## use approx & MA filter to obtain initial values
+    ## start with inits for fitted values (state estimates)
 
-    ## use approx & MA filter to obtain state initial values
-    x.init1 <-
-      approx(x = select(d, date, x),
-             xout = d.all$date,
-             rule = 2)$y
     x.init <-
-      stats::filter(x.init1, rep(1, 5) / 5) %>% as.numeric()
+      stats::filter(d$x, rep(1, 5) / 5) %>% as.numeric()
     x.na <- which(is.na(x.init))
-    x.init[x.na] <- x.init1[x.na]
+    x.init[x.na] <- d$x[x.na]
 
-    y.init1 <-
-      approx(x = select(d, date, y),
-             xout = d.all$date,
-             rule = 2)$y
     y.init <-
-      stats::filter(y.init1, rep(1, 5) / 5) %>% as.numeric()
+      stats::filter(d$y, rep(1, 5) / 5) %>% as.numeric()
     y.na <- which(is.na(y.init))
-    y.init[y.na] <- y.init1[y.na]
+    y.init[y.na] <- d$y[y.na]
+    
+    if (all(!is.na(time.step))) {
+      ## now calc inits for predictions
+      px.init <-
+        approx(x = data.frame(d$date, x.init),
+               xout = ptms$date,
+               rule = 2)$y
+      
+      py.init <-
+        approx(x = data.frame(d$date, y.init),
+               xout = ptms$date,
+               rule = 2)$y
+    }
     
     if(scale) {
       xs <- cbind(x.init = x.init - mean(x.init, na.rm = TRUE) / sd(x.init, na.rm = TRUE), 
                   y.init = y.init - mean(y.init, na.rm = TRUE) / sd(y.init, na.rm = TRUE)
                   )
+      if(all(!is.na(time.step))) {
+        pxs <- cbind(px.init = px.init - mean(px.init, na.rm = TRUE) / sd(px.init, na.rm = TRUE), 
+                     py.init = py.init - mean(py.init, na.rm = TRUE) / sd(py.init, na.rm = TRUE)
+                     )  
+      }
     } else {
       xs <- cbind(x.init, y.init)
+      if(all(!is.na(time.step))) pxs <- cbind(px.init, py.init)
     }
     
-
     state0 <- c(xs[1,1], xs[1,2], 0 , 0)
+#    pstate0 <- c(pxs[1,1], pxs[1,2], 0, 0)
     attributes(state0) <- NULL
-
+#    attributes(pstate0) <- NULL
+    
     if (is.null(parameters)) {
       ## Estimate stochastic innovations
       es <- xs[-1,] - xs[-nrow(xs),]
@@ -193,12 +215,12 @@ sfilter <-
       sigma <- sqrt(diag(V))
       rho <- V[1, 2] / prod(sigma)
 
-      v <- cbind(c(0,diff(x.init)), c(0,diff(y.init))) / dt
+      v <- cbind(c(0,diff(x.init)), c(0,diff(y.init))) / d$dt
+      if(all(!is.na(time.step))) pv <- cbind(c(0,diff(px.init)), c(0,diff(py.init))) / pdt
       
       parameters <- list(
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
-        X = t(xs),
         mu = t(xs),
         v = t(v),
         l_D = 0,
@@ -207,7 +229,7 @@ sfilter <-
         l_rho_o = 0
       )
     }
-
+    
     ## start to work out which obs_mod to use for each observation
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
     obst <- which(table(d$obs.type) > 0)
@@ -266,8 +288,8 @@ sfilter <-
 
     ## TMB - data list
     ## convert from string to integer for C++
-    obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
-                      ifelse(d.all$obs.type == "KF", 1, 2)
+    obs_mod <- ifelse(d$obs.type %in% c("LS","GPS"), 0, 
+                      ifelse(d$obs.type == "KF", 1, 2)
                       )
     ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0) so
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
@@ -275,8 +297,8 @@ sfilter <-
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
        
     if(scale) {
-      d.all.tmp <- d.all
-      d.all <- d.all %>%
+      d.tmp <- d
+      d <- d %>%
         mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
@@ -284,26 +306,29 @@ sfilter <-
     
     data <- list(
       model_name = model,
-      Y = rbind(d.all$x, d.all$y), 
-      dt = dt,
+      Y = rbind(d$x, d$y), 
+      dt = d$dt,
+#      pdt = pdt,
       state0 = state0,
-      isd = as.integer(d.all$isd),
+#      pstate0 = pstate0,
+#      isd = as.integer(d.all$isd),
       obs_mod = as.integer(obs_mod),
-      m = d.all$smin,
-      M = d.all$smaj,
-      c = d.all$eor,
-      K = cbind(d.all$emf.x, d.all$emf.y),
-      GLerr = cbind(d.all$lonerr, d.all$laterr)
+      m = d$smin,
+      M = d$smaj,
+      c = d$eor,
+      K = cbind(d$emf.x, d$emf.y),
+      GLerr = cbind(d$lonerr, d$laterr)
     )
     
-    if(scale) d.all <- d.all.tmp
+    if(scale) d <- d.tmp
     
     ## TMB - create objective function
-    if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
+    if (is.null(inner.control) |
+        !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
     verb <- ifelse(verbose == 2, TRUE, FALSE)
-    rnd <- switch(model, rw = "X", crw = c("mu", "v"))
+    rnd <- switch(model, rw = "X", crw = c("mu", "v"), crwp = c("mu", "v"))
 
     obj <-
       MakeADFun(
@@ -398,6 +423,8 @@ sfilter <-
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
       }
 
+      browser()
+      
       switch(model,
              rw = {
                tmp <- summary(rep, "random")

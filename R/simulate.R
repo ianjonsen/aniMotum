@@ -12,17 +12,19 @@
 ##' @examples 
 ##' 
 ##' @importFrom dplyr "%>%" 
+##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
-##' @importFrom tibble tibble
+##' @importFrom tibble as_tibble
 ##' @importFrom assertthat assert_that
-##' @importFrom sf st_coordinates
+##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
 ##' 
 ##' @export
 
 simulate <- function(x = NULL, 
                      N = 100, 
                      start = list(c(0, 0), Sys.time()),
-                     model = c("rw", "crw", "mpm"), 
+                     model = c("rw", "crw", "mpm"),
+                     vmax = 4,
                      sigma = c(4, 4), 
                      rho_p = 0,
                      D = 0.005,
@@ -30,7 +32,7 @@ simulate <- function(x = NULL,
                      rho_o = 0,
                      sigma_g = 1.25,
                      error = c("ls","kf","dist"),
-                     t_dist = c("gamma","lnorm","exp"),
+                     t_dist = c("reg", "gamma","lnorm","exp"),
                      tpar = c(1.5, 0.5), 
                      alpha = c(0.9, 0.8),
                      beta = c(1, 0.25)
@@ -47,8 +49,8 @@ simulate <- function(x = NULL,
               msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
   assert_that(error %in% c("ls","kf","dist"), 
               msg = "error can only be 1 of `ls`, `kf`, or `dist`")
-  assert_that(t_dist %in% c("gamma","lnorm","exp"),
-              msg = "t_dist can only be 1 of `gamma`, `lnorm`, or `exp`")
+  assert_that(t_dist %in% c("gamma","lnorm","exp","reg"),
+              msg = "t_dist can only be 1 of `gamma`, `lnorm`, `exp`, `reg`")
   assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
               msg = "`start` must be a 2-element list, with coordinates as the 1st element and
               a POSIX datetime as the 2nd element")
@@ -78,6 +80,9 @@ simulate <- function(x = NULL,
            },
            exp = {
              dt <- c(0, rexp(N-1, tpar[1]))
+           },
+           reg = {
+             dt <- c(0, rep(3, N-1))
            })
     
     ## Define var-cov matrix for movement process
@@ -117,13 +122,15 @@ simulate <- function(x = NULL,
     switch(model,
            crw = {
              for (i in 2:N) {
-               v[i,] <- rmvnorm(1, beta[b[i]] * v[i - 1,], Sigma[[b[i]]] * dt[i])
+               v[i,] <- rtmvnorm(1, beta[b[i]] * v[i - 1,], sigma = Sigma[[b[i]]] * dt[i], 
+                                 lower = rep(-sqrt(vmax*2)*3.6,2), upper = rep(sqrt(vmax*2)*3.6,2))
                mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
              }
            },
            rw = {
              for (i in 2:N) {
-               mu[i,] <- rmvnorm(1, mu[i - 1,], Sigma[[b[i]]] * dt[i] ^ 2)
+               mu[i,] <- rtmvnorm(1, mu[i - 1,], sigma = Sigma[[b[i]]] * dt[i] ^ 2, 
+                                  lower = rep(-sqrt(vmax*2)*3.6,2), upper = rep(sqrt(vmax*2)*3.6,2))
              }
            },
            mpm = {
@@ -184,12 +191,21 @@ simulate <- function(x = NULL,
                lapply(1:N, function(i)
                  rmvnorm(1, c(0, 0), Tau[, , i])) %>%
                do.call(rbind, .)
-             
+      
              ## add errors to data.frame
              d <- d %>%
-               mutate(err.x = err[, 1],
-                      err.y = err[, 2]) %>%
-               select(date, lc, x, y, err.x, err.y)
+               mutate(x.err = err[, 1],
+                      y.err = err[, 2]) %>%
+               select(date, lc, x, y, x.err, y.err) %>%
+               mutate(x1 = x+x.err, y1 = y+y.err) %>%
+               st_as_sf(., coords = c("x1","y1"), crs = "+proj=merc +units=km +datum=WGS84") %>% 
+               st_transform(xy, crs = 4326)
+             ll <- st_coordinates(d) %>% 
+               as.data.frame()
+             names(ll) <- c("lon","lat")
+             st_geometry(d) <- NULL
+             d <- data.frame(d, ll) %>%
+               select(date,lc,lon,lat,x,y,x.err,y.err)
            },
            kf = {
              
@@ -219,7 +235,7 @@ simulate <- function(x = NULL,
     
     class(d) <- append("fG_sim", class(d))
     
-    return(d)
+    return(as_tibble(d))
     
   } else {
     ########################################
@@ -243,14 +259,18 @@ simulate <- function(x = NULL,
       ## Simulate movement process ##
       ###############################
       for (i in 2:N) {
-        v[i,] <- rmvnorm(1, v[i - 1,], Sigma * dt[i])
+        v[i,] <- rtmvnorm(1, v[i - 1,], sigma = Sigma * dt[i], 
+                          lower = rep(-sqrt(vmax*2)*3.6,2), 
+                          upper = rep(sqrt(vmax*2)*3.6,2))
         mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
       }
       
     data.frame(date = dts, x = mu[,1], y = mu[,2], u = v[,1], v= v[,2]) %>%
       mutate(s = sqrt(u^2+v^2))
-    })
-    browser()
+    }) %>% 
+      do.call(rbind, .)
+    
+    return(as_tibble(d))
   }
   
 }

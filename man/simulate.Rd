@@ -9,6 +9,7 @@ simulate(
   N = 100,
   start = list(c(0, 0), Sys.time()),
   model = c("rw", "crw", "mpm"),
+  vmax = 4,
   sigma = c(4, 4),
   rho_p = 0,
   D = 0.005,
@@ -16,7 +17,7 @@ simulate(
   rho_o = 0,
   sigma_g = 1.25,
   error = c("ls", "kf", "dist"),
-  t_dist = c("gamma", "lnorm", "exp"),
+  t_dist = c("reg", "gamma", "lnorm", "exp"),
   tpar = c(1.5, 0.5),
   alpha = c(0.9, 0.8),
   beta = c(1, 0.25)
