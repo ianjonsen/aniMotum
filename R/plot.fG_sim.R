@@ -45,7 +45,7 @@ plot.fG_sim <- function(x,
                        colour = hcl.colors(n=2, pal)[1])
            } else {
              p <- ggplot() #+
-               #geom_path(data = x, aes(x+err.x, y+err.y), size = 0.1, 
+               #geom_path(data = x, aes(x+x.err, y+y.err), size = 0.1, 
                         # colour = hcl.colors(n=2, pal)[1])
            }
 
@@ -55,7 +55,7 @@ plot.fG_sim <- function(x,
                 geom_point(data = x, aes(x, y, size = b, colour = factor(b)))
             } else {
               p <- p +
-                geom_point(data = x, aes(x+err.x, y+err.y, size = b, colour = factor(b))) +
+                geom_point(data = x, aes(x+x.err, y+y.err, size = b, colour = factor(b))) +
                 geom_point(data = x, aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3)
             }
               p <- p + scale_colour_manual(values = hcl.colors(n=2, pal), name = bts) +
@@ -68,7 +68,7 @@ plot.fG_sim <- function(x,
                 geom_point(data = x, aes(x, y, colour = s))
             } else{
               p <- p +
-                geom_point(data = x, aes(x+err.x, y+err.y, colour = s)) +
+                geom_point(data = x, aes(x+x.err, y+y.err, colour = s)) +
                 geom_point(data = x, aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3)
             }
               p <- p + scale_colour_gradientn(colours = rev(hcl.colors(n=100, pal)),
@@ -138,7 +138,7 @@ plot.fG_sim <- function(x,
              p <- p + geom_path(aes(x, y, colour = g), size = 0.1) + 
                geom_point(aes(x, y, colour = g, size = rev(g)))
            } else {
-             p <- p + geom_point(aes(x+err.x, y+err.y, colour = g, size = rev(g))) +
+             p <- p + geom_point(aes(x+x.err, y+y.err, colour = g, size = rev(g))) +
                geom_path(aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.3) +
                geom_point(aes(x, y), colour = grey(0.5), alpha = 0.5, size = 0.4)
            }

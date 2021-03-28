@@ -51,7 +51,8 @@ Suggests:
     furrr (>= 0.1.0),
     parallel,
     mvtnorm,
-    tmvtnorm
+    tmvtnorm,
+    CircStats
 Depends: 
     R (>= 3.5.0)
 SystemRequirements: C++11, GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0)

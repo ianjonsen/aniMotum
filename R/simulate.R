@@ -1,3 +1,93 @@
+##' simulate Argos error classes for LS data 
+##' 
+##' @description uses data from: 1) all IMOS reprocessed KF data (2012 - 2015); 
+##' 2) LESE, SESE, HBTU KF data in Jonsen et al. 2020 Move Ecol to specify
+##' Argos location quality class proportions
+##' @param N number of location class values to be randomly sampled
+##' 
+##' @keywords internal
+
+argos_lc <- function(N) {
+  factor(
+    sample(
+      c(3, 2, 1, 0, "A", "B"),
+      N,
+      replace = TRUE,
+      prob = c(0.0444, 0.0320, 0.0514, 0.0746, 0.2858, 0.5119) 
+    ),
+    levels = c(3, 2, 1, 0, "A", "B"),
+    ordered = TRUE
+  )
+  
+}
+
+##' simulate Argos ellipse params & sample errors from multivariate normal
+##' 
+##' @description uses internal extdata/error_ellipse.RDS params ordered by lc 
+##' to sample smaj, smin from log-normals & eor froma von Mises, then convert
+##' ellipse params to covariance matrix and sample x,y errors from multivariate
+##' normal. Returns both ellipse params and x,y errors
+##' 
+##' @param lc Argos location classes
+##' 
+##' @importFrom CircStats rvm
+##' @importFrom stats rlnorm
+##' @importFrom mvtnorm rmvnorm
+##' 
+##' @export
+
+epar <- function(lc) {
+  
+  ellps.tab <-
+    readRDS(system.file("extdata", "error_ellipse.RDS",
+                        package = "foieGras"))
+  n <- length(lc)
+  
+  eor.m <- ellps.tab$eor.mn[lc]
+  eor.c <- ellps.tab$eor.conc[lc]
+  
+  ## sample error ellipse parameters
+  ellps <- with(ellps.tab,
+                data.frame(
+                  smaj = rlnorm(n, smaj.mn[lc], smaj.sd[lc]),
+                  smin = rlnorm(n, smin.mn[lc], smin.sd[lc]),
+                  eor = sapply(1:n, function(i) {
+                    rvm(1, eor.m[i], eor.c[i]) * 180 / pi
+                  })
+                ))
+  
+  ## convert ellipse params to covar matrix
+  psi <- 1 # keep this here for possible later use
+  s1 <- with(ellps, 
+             (smaj / sqrt(2))^2 * sin(eor)^2 + 
+               (smin * psi / sqrt(2))^2 * cos(eor)^2
+  )
+  s2 <- with(ellps,
+             (smaj / sqrt(2))^2 * cos(eor)^2 +
+               (smin * psi / sqrt(2))^2 * sin(eor)^2
+  )
+  s12 <- with(ellps,
+              (0.5 * ((smaj / sqrt(2))^2 - (smin * psi / sqrt(2))^2)) * 
+                cos(eor) * sin(eor)
+  )
+  
+  ## return x,y errors + ellipse params
+  errs <- lapply(1:n, function(i) {
+    Sigma <- diag(2) * c(s1[i], s2[i])
+    Sigma[!Sigma] <- s12[i]
+    rmvnorm(1, c(0, 0), sigma = Sigma)
+  }) %>%
+    do.call(rbind, .) / 1000 # convert errors in m to km
+  
+  data.frame(x.err = errs[,1],
+         y.err = errs[,2], 
+         smaj = ellps$smaj,
+         smin = ellps$smin,
+         eor = ellps$eor
+         ) 
+}
+
+
 ##' @title simulate animal tracks from a \code{fG_ssm} fit or from scratch
 ##'
 ##' @description simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters. 
@@ -14,9 +104,10 @@
 ##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
-##' @importFrom tibble as_tibble
+##' @importFrom tibble tibble
 ##' @importFrom assertthat assert_that
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
+##' @importFrom CircStats rvm
 ##' 
 ##' @export
 
@@ -27,12 +118,12 @@ simulate <- function(x = NULL,
                      vmax = 4,
                      sigma = c(4, 4), 
                      rho_p = 0,
-                     D = 0.005,
+                     D = 0.05,
                      tau = c(1.5, 0.75),
                      rho_o = 0,
                      sigma_g = 1.25,
-                     error = c("ls","kf","dist"),
-                     t_dist = c("reg", "gamma","lnorm","exp"),
+                     error = c("ls","kf"),
+                     t_dist = c("reg", "gamma"),
                      tpar = c(1.5, 0.5), 
                      alpha = c(0.9, 0.8),
                      beta = c(1, 0.25)
@@ -47,10 +138,10 @@ simulate <- function(x = NULL,
 
   assert_that(model %in% c("rw","crw","mpm"), 
               msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
-  assert_that(error %in% c("ls","kf","dist"), 
-              msg = "error can only be 1 of `ls`, `kf`, or `dist`")
-  assert_that(t_dist %in% c("gamma","lnorm","exp","reg"),
-              msg = "t_dist can only be 1 of `gamma`, `lnorm`, `exp`, `reg`")
+  assert_that(error %in% c("ls","kf"), 
+              msg = "error can only be 1 of `ls` or `kf`")
+  assert_that(t_dist %in% c("gamma","reg"),
+              msg = "t_dist can only be 1 of `gamma` or `reg`")
   assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
               msg = "`start` must be a 2-element list, with coordinates as the 1st element and
               a POSIX datetime as the 2nd element")
@@ -73,13 +164,6 @@ simulate <- function(x = NULL,
            gamma = {
              # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
              dt <- c(0, rgamma(N-1, tpar[1], tpar[2]))
-           },
-           lnorm = {
-             #3, 0.5
-             dt <- c(0, rlnorm(N-1, tpar[1], tpar[2]))
-           },
-           exp = {
-             dt <- c(0, rexp(N-1, tpar[1]))
            },
            reg = {
              dt <- c(0, rep(3, N-1))
@@ -122,15 +206,17 @@ simulate <- function(x = NULL,
     switch(model,
            crw = {
              for (i in 2:N) {
-               v[i,] <- rtmvnorm(1, beta[b[i]] * v[i - 1,], sigma = Sigma[[b[i]]] * dt[i], 
-                                 lower = rep(-sqrt(vmax*2)*3.6,2), upper = rep(sqrt(vmax*2)*3.6,2))
+               v[i,] <- rtmvnorm(1, beta[b[i]] * v[i - 1,], 
+                                 sigma = Sigma[[b[i]]] * dt[i], 
+                                 lower = rep(-sqrt(vmax*2)*3.6,2), 
+                                 upper = rep(sqrt(vmax*2)*3.6,2))
                mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
              }
            },
            rw = {
              for (i in 2:N) {
-               mu[i,] <- rtmvnorm(1, mu[i - 1,], sigma = Sigma[[b[i]]] * dt[i] ^ 2, 
-                                  lower = rep(-sqrt(vmax*2)*3.6,2), upper = rep(sqrt(vmax*2)*3.6,2))
+               mu[i,] <- rmvnorm(1, mu[i - 1,], 
+                                 sigma = Sigma[[b[i]]] * dt[i] ^ 2)
              }
            },
            mpm = {
@@ -157,38 +243,25 @@ simulate <- function(x = NULL,
     ## time interval is nominally 1 h
     dts <- start[[2]] + cumsum(dt) * 3600
     
-    ##############################################
-    ## Simulate Argos error classes for LS data ##
-    ##############################################
-    lc <- factor(
-      sample(
-        c(3, 2, 1, 0, "A", "B"),
-        N,
-        replace = TRUE,
-        prob = c(0.01, 0.04, 0.13, 0.2, 0.27, 0.35) # from ellies ex data
-      ),
-      levels = c(3, 2, 1, 0, "A", "B"),
-      ordered = TRUE
-    )
-    
-    d <- data.frame(
+    ## add Argos lc values
+    d <- tibble(
       date = dts,
-      lc = lc,
+      lc = argos_lc(N),
       x = mu[, 1],
       y = mu[, 2]
       )
+    
     
     switch(error,
            ls = {
              ## Merge ARGOS error multiplication factors
              d <- merge(d, emf(), by = "lc", all.x = TRUE)
-             d <- d[order(d$date), ]
+             d <- d[order(d$date), c("date", "lc", "x", "y", "emf.x", "emf.y")]
              
              Tau <- diag(2) %o% c((tau[1] * d$emf.x)^2, 
                                   (tau[2] * d$emf.y)^2)
              ## Sample errors
-             err <-
-               lapply(1:N, function(i)
+             err <- lapply(1:N, function(i)
                  rmvnorm(1, c(0, 0), Tau[, , i])) %>%
                do.call(rbind, .)
       
@@ -196,20 +269,24 @@ simulate <- function(x = NULL,
              d <- d %>%
                mutate(x.err = err[, 1],
                       y.err = err[, 2]) %>%
-               select(date, lc, x, y, x.err, y.err) %>%
-               mutate(x1 = x+x.err, y1 = y+y.err) %>%
-               st_as_sf(., coords = c("x1","y1"), crs = "+proj=merc +units=km +datum=WGS84") %>% 
-               st_transform(xy, crs = 4326)
-             ll <- st_coordinates(d) %>% 
-               as.data.frame()
-             names(ll) <- c("lon","lat")
-             st_geometry(d) <- NULL
-             d <- data.frame(d, ll) %>%
-               select(date,lc,lon,lat,x,y,x.err,y.err)
+               select(date, lc, x, y, x.err, y.err) 
            },
            kf = {
-             
+             errs <- epar(d$lc)
+             d <- data.frame(d, errs)
            })
+    
+    ## add errors and transform to lon,lat - keeping true x,y
+    d <- d %>% mutate(x1 = x + x.err, y1 = y + y.err) %>%
+      st_as_sf(., coords = c("x1", "y1"),
+               crs = "+proj=merc +units=km +datum=WGS84") %>%
+      st_transform(xy, crs = 4326)
+    ll <- st_coordinates(d) %>%
+      as.data.frame() 
+    names(ll) <- c("lon","lat")
+    st_geometry(d) <- NULL
+    d <- tibble(d, ll) %>%
+      select(date, lc, lon, lat, x, y, x.err, y.err, everything())
     
     switch(model,
            crw = {
@@ -220,7 +297,6 @@ simulate <- function(x = NULL,
            })
     
     if(n.states > 1) d <- d %>% mutate(b = b)
-    row.names(d) <- 1:N
     
     switch(model,
            rw = { 
@@ -235,7 +311,7 @@ simulate <- function(x = NULL,
     
     class(d) <- append("fG_sim", class(d))
     
-    return(as_tibble(d))
+    return(d)
     
   } else {
     ########################################
@@ -245,32 +321,71 @@ simulate <- function(x = NULL,
       model <- k$pm
       N <- nrow(k$fitted)
       dts <- k$fitted$date
-      dt <- difftime(dts, lag(dts), units = "hours") %>% as.numeric()
+      dt <-
+        difftime(dts, lag(dts), units = "hours") %>% as.numeric()
       dt[1] <- 0
       
-      if(model == "crw") {
-        mu <- v <- matrix(NA, N, 2)
-        mu[1,] <- st_coordinates(k$fitted$geometry)[1,]
-        v[1, ] <- c(k$fitted$u[1], k$fitted$v[1])
-        Sigma <- diag(2) * 2 * k$par["D", 1]
-      }
+      switch(model,
+             crw = {
+               mu <- v <- matrix(NA, N, 2)
+               mu[1,] <- st_coordinates(k$fitted$geometry)[1,]
+               v[1, ] <- c(k$fitted$u[1], k$fitted$v[1])
+               Sigma <- diag(2) * 2 * k$par["D", 1]
+             },
+             rw = {
+               mu <- matrix(NA, N, 2)
+               mu[1,] <- st_coordinates(k$fitted$geometry)[1, ]
+               Sigma <-
+                 diag(2) * c(k$par["sigma_x", 1], k$par["sigma_y", 1]) ^ 2
+               Sigma[!Sigma] <-
+                 prod(Sigma[1, 1], Sigma[2, 2]) * k$par["rho_p", 1]
+             })
       
       ###############################
       ## Simulate movement process ##
       ###############################
-      for (i in 2:N) {
-        v[i,] <- rtmvnorm(1, v[i - 1,], sigma = Sigma * dt[i], 
-                          lower = rep(-sqrt(vmax*2)*3.6,2), 
-                          upper = rep(sqrt(vmax*2)*3.6,2))
-        mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
-      }
-      
-    data.frame(date = dts, x = mu[,1], y = mu[,2], u = v[,1], v= v[,2]) %>%
-      mutate(s = sqrt(u^2+v^2))
-    }) %>% 
+      switch(model,
+             crw = {
+               for (i in 2:N) {
+                 v[i,] <- rtmvnorm(
+                   1,
+                   v[i - 1,],
+                   sigma = Sigma * dt[i],
+                   lower = rep(-sqrt(vmax * 2) * 3.6, 2),
+                   upper = rep(sqrt(vmax * 2) * 3.6, 2)
+                 )
+                 mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
+               }
+               data.frame(
+                 date = dts,
+                 x = mu[, 1],
+                 y = mu[, 2],
+                 u = v[, 1],
+                 v = v[, 2]
+               ) %>%
+                 mutate(s = sqrt(u ^ 2 + v ^ 2))
+             },
+             rw = {
+               for (i in 2:N) {
+                 mu[i, ] <- rmvnorm(1, mu[i - 1, ], sigma = Sigma * dt[i])
+               }
+               data.frame(date = dts, x = mu[, 1], y = mu[, 2])
+             })
+    }) %>%
       do.call(rbind, .)
     
-    return(as_tibble(d))
+    
+    d <- as_tibble(d)
+    switch(model,
+           rw = { 
+             class(d) <- append("fG_rw", class(d))
+           },
+           crw = {
+             class(d) <- append("fG_crw", class(d))
+           })
+    
+    class(d) <- append("fG_sim", class(d))
+    return(d)
   }
   
 }
