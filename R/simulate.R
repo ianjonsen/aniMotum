@@ -286,7 +286,8 @@ simulate <- function(x = NULL,
     names(ll) <- c("lon","lat")
     st_geometry(d) <- NULL
     d <- tibble(d, ll) %>%
-      select(date, lc, lon, lat, x, y, x.err, y.err, everything())
+      select(date, lc, lon, lat, x, y, x.err, y.err, everything()) %>%
+      mutate(lc = as.character(lc))
     
     switch(model,
            crw = {
