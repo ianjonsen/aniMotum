@@ -39,7 +39,9 @@ Imports:
     trip,
     assertthat,
     wesanderson,
-    patchwork
+    patchwork,
+    furrr,
+    future
 Suggests: 
     testthat,
     covr,
@@ -47,8 +49,6 @@ Suggests:
     rmarkdown,
     rgeos,
     rworldmap,
-    future (>= 1.13.0),
-    furrr (>= 0.1.0),
     parallel
 Depends: 
     R (>= 3.5.0)
