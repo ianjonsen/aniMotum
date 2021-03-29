@@ -9,14 +9,7 @@ sudo: true
 services: docker
 
 before_install:
-  - "docker pull ubuntu:18.04"
-  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
-  - sudo apt-get --yes --force-yes update -qq
-  - sudo apt-get install libgdal-dev libgeos-dev libproj-dev libudunits2-dev libv8-dev libprotobuf-dev protobuf-compiler libjq-dev
-  - echo "options(repos = c(CRAN = 'https://packagemanager.rstudio.com/all/__linux__/bionic/latest'))" >> ~/.Rprofile.site
-  - echo "options(HTTPUserAgent = paste0('R/', getRversion(), ' R (',
-       paste(getRversion(), R.version['platform'], R.version['arch'], R.version['os']),
-       ')'))" >> ~/.Rprofile.site
+  - sudo apt-get install libgdal-dev libgeos-dev libproj-dev libudunits2-dev
 
 language: r
 r:
@@ -58,3 +51,13 @@ after_success:
 #      - libgeos-dev
 #      - libudunits2-dev
 #      - gdal-bin
+#
+#
+#   - "docker pull ubuntu:18.04"
+#  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
+#  - sudo apt-get --yes --force-yes update -qq
+#  - sudo apt-get install libgdal-dev libgeos-dev libproj-dev libudunits2-dev libv8-dev libprotobuf-dev protobuf-compiler libjq-dev
+#  - echo "options(repos = c(CRAN = 'https://packagemanager.rstudio.com/all/__linux__/bionic/latest'))" >> ~/.Rprofile.site
+#  - echo "options(HTTPUserAgent = paste0('R/', getRversion(), ' R (',
+#       paste(getRversion(), R.version['platform'], R.version['arch'], R.version['os']),
+#       ')'))" >> ~/.Rprofile.site
