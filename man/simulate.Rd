@@ -6,7 +6,7 @@
 \usage{
 simulate(
   x = NULL,
-  A = 1,
+  reps = 1,
   what = c("fitted", "predicted"),
   sim_only = FALSE,
   N = 100,

@@ -112,7 +112,7 @@ epar <- function(lc) {
 ##' @export
 
 simulate <- function(x = NULL, 
-                     A = 1,
+                     reps = 1,
                      what = c("fitted", "predicted"),
                      sim_only = FALSE,
                      N = 100, 
@@ -308,13 +308,13 @@ simulate <- function(x = NULL,
     
     switch(model,
            rw = { 
-             class(d) <- append("fG_rw", class(d))
+             class(d) <- append("fG_rws", class(d))
            },
            crw = {
-             class(d) <- append("fG_crw", class(d))
+             class(d) <- append("fG_crws", class(d))
            },
            mpm = {
-             class(d) <- append("fG_mpm", class(d))
+             class(d) <- append("fG_mpms", class(d))
            })
     
     class(d) <- append("fG_sim", class(d))
@@ -352,18 +352,17 @@ simulate <- function(x = NULL,
                                 max(v, na.rm = TRUE)))
                },
                rw = {
-                 
                  Sigma <-
                    diag(2) * c(x$ssm[[k]]$par["sigma_x", 1], 
                                x$ssm[[k]]$par["sigma_y", 1]) ^ 2
                  Sigma[!Sigma] <-
-                   prod(Sigma[1, 1], Sigma[2, 2]) * x$ssm[[k]]$par["rho_p", 1]
+                   prod(Sigma[1, 1]^0.5, Sigma[2, 2]^0.5) * x$ssm[[k]]$par["rho_p", 1]
                })
         
         ###############################
         ## Simulate movement process ##
         ###############################
-        lapply(1:A, function(j) {
+        lapply(1:reps, function(j) {
           switch(model,
                  crw = {
                    mu <- v <- matrix(NA, N, 2)
@@ -405,16 +404,16 @@ simulate <- function(x = NULL,
           as_tibble()
       }) 
     
-    d <- tibble(id = x$id, sims = d)
+    d <- tibble(id = x$id, model = x$pmodel, sims = d)
     switch(model,
            rw = { 
-             class(d) <- append("fG_rw", class(d))
+             class(d) <- append("fG_rws", class(d))
            },
            crw = {
-             class(d) <- append("fG_crw", class(d))
+             class(d) <- append("fG_crws", class(d))
            })
     
-    class(d) <- append("fG_sim", class(d))
+    class(d) <- append("fG_simfit", class(d))
     return(d)
   }
   

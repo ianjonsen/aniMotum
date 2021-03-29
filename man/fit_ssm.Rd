@@ -13,7 +13,7 @@ fit_ssm(
   min.dt = 60,
   pf = FALSE,
   model = "crw",
-  time.step = 6,
+  time.step = NA,
   scale = FALSE,
   emf = NULL,
   map = NULL,

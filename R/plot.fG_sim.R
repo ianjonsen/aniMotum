@@ -37,7 +37,7 @@ plot.fG_sim <- function(x,
   model <- str_split(class(x)[2], "_", simplify = TRUE)[,2]
   
   switch(model,
-         crw = {
+         crws = {
            x <- x %>% mutate(s = sqrt(u^2 + v^2))
            if(!error) {
             p <- ggplot() +
@@ -105,7 +105,7 @@ plot.fG_sim <- function(x,
          wrap_plots(p, p1, heights = c(3,1))
     
          },
-         rw = {
+         rws = {
            p <- ggplot(x) +
              geom_path(aes(x, y), size = 0.1, colour = hcl.colors(n = 2, pal)[1])
            
@@ -131,7 +131,7 @@ plot.fG_sim <- function(x,
            return(p)
            
          }, 
-         mpm = {
+         mpms = {
            p <- ggplot(x) 
            
            if(!error) {
