@@ -6,6 +6,8 @@
 \usage{
 simulate(
   x = NULL,
+  A = 1,
+  what = c("fitted", "predicted"),
   N = 100,
   start = list(c(0, 0), Sys.time()),
   model = c("rw", "crw", "mpm"),

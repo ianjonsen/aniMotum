@@ -112,6 +112,8 @@ epar <- function(lc) {
 ##' @export
 
 simulate <- function(x = NULL, 
+                     A = 1,
+                     what = c("fitted", "predicted"),
                      N = 100, 
                      start = list(c(0, 0), Sys.time()),
                      model = c("rw", "crw", "mpm"),
@@ -132,10 +134,14 @@ simulate <- function(x = NULL,
   ################
   ## Check args ##
   ################
+  what <- match.arg(what)
   model <- match.arg(model)
   error <- match.arg(error)
   t_dist <- match.arg(t_dist)
 
+  assert_that(what %in% c("fitted","predicted"), 
+              msg = "only `fitted` or `predicted` locations can be simulated 
+              from a model fit")
   assert_that(model %in% c("rw","crw","mpm"), 
               msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
   assert_that(error %in% c("ls","kf"), 
@@ -208,8 +214,8 @@ simulate <- function(x = NULL,
              for (i in 2:N) {
                v[i,] <- rtmvnorm(1, beta[b[i]] * v[i - 1,], 
                                  sigma = Sigma[[b[i]]] * dt[i], 
-                                 lower = rep(-sqrt(vmax*2)*3.6,2), 
-                                 upper = rep(sqrt(vmax*2)*3.6,2))
+                                 lower = rep(-sqrt(vmax*vmax/2)*3.6,2), 
+                                 upper = rep(sqrt(vmax*vmax/2)*3.6,2))
                mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
              }
            },
@@ -318,65 +324,87 @@ simulate <- function(x = NULL,
     ########################################
     ## Simulate from a foieGras model fit ##
     ########################################
-    d <- lapply(x$ssm, function(k) {
-      model <- k$pm
-      N <- nrow(k$fitted)
-      dts <- k$fitted$date
-      dt <-
-        difftime(dts, lag(dts), units = "hours") %>% as.numeric()
-      dt[1] <- 0
-      
-      switch(model,
-             crw = {
-               mu <- v <- matrix(NA, N, 2)
-               mu[1,] <- st_coordinates(k$fitted$geometry)[1,]
-               v[1, ] <- c(k$fitted$u[1], k$fitted$v[1])
-               Sigma <- diag(2) * 2 * k$par["D", 1]
-             },
-             rw = {
-               mu <- matrix(NA, N, 2)
-               mu[1,] <- st_coordinates(k$fitted$geometry)[1, ]
-               Sigma <-
-                 diag(2) * c(k$par["sigma_x", 1], k$par["sigma_y", 1]) ^ 2
-               Sigma[!Sigma] <-
-                 prod(Sigma[1, 1], Sigma[2, 2]) * k$par["rho_p", 1]
-             })
-      
-      ###############################
-      ## Simulate movement process ##
-      ###############################
-      switch(model,
-             crw = {
-               for (i in 2:N) {
-                 v[i,] <- rtmvnorm(
-                   1,
-                   v[i - 1,],
-                   sigma = Sigma * dt[i],
-                   lower = rep(-sqrt(vmax * 2) * 3.6, 2),
-                   upper = rep(sqrt(vmax * 2) * 3.6, 2)
-                 )
-                 mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
-               }
-               data.frame(
-                 date = dts,
-                 x = mu[, 1],
-                 y = mu[, 2],
-                 u = v[, 1],
-                 v = v[, 2]
-               ) %>%
-                 mutate(s = sqrt(u ^ 2 + v ^ 2))
-             },
-             rw = {
-               for (i in 2:N) {
-                 mu[i, ] <- rmvnorm(1, mu[i - 1, ], sigma = Sigma * dt[i])
-               }
-               data.frame(date = dts, x = mu[, 1], y = mu[, 2])
-             })
-    }) %>%
-      do.call(rbind, .)
+    n <- nrow(x)
+    d <- lapply(1:n, function(k) {
+        model <- x$ssm[[k]]$pm
+        switch(what,
+               fitted = {
+                 loc <- x$ssm[[k]]$fitted
+                 },
+               predicted = {
+                 loc <- x$ssm[[k]]$predicted
+               })
+        N <- nrow(loc)
+        dts <- loc$date
+        dt <-
+          difftime(dts, lag(dts), units = "hours") %>% as.numeric()
+        dt[1] <- 0
+        
+        switch(model,
+               crw = {
+                 Sigma <- diag(2) * 2 * x$ssm[[k]]$par["D", 1]
+                 vmin <- with(loc,
+                              c(min(u, na.rm = TRUE),
+                                min(v, na.rm = TRUE))) # in km/h
+                 vmax <- with(loc,
+                              c(max(u, na.rm = TRUE),
+                                max(v, na.rm = TRUE)))
+               },
+               rw = {
+                 
+                 Sigma <-
+                   diag(2) * c(x$ssm[[k]]$par["sigma_x", 1], 
+                               x$ssm[[k]]$par["sigma_y", 1]) ^ 2
+                 Sigma[!Sigma] <-
+                   prod(Sigma[1, 1], Sigma[2, 2]) * x$ssm[[k]]$par["rho_p", 1]
+               })
+        
+        ###############################
+        ## Simulate movement process ##
+        ###############################
+        lapply(1:A, function(j) {
+          switch(model,
+                 crw = {
+                   mu <- v <- matrix(NA, N, 2)
+                   mu[1,] <- st_coordinates(loc$geometry)[1,]
+                   v[1, ] <- c(loc$u[1], loc$v[1])
+                   for (i in 2:N) {
+                     v[i,] <- rtmvnorm(1,
+                                       v[i - 1,],
+                                       sigma = Sigma * dt[i],
+                                       lower = vmin,
+                                       upper = vmax)
+                     mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
+                   }
+                   data.frame(
+                     rep = j,
+                     date = dts,
+                     x = mu[, 1],
+                     y = mu[, 2],
+                     u = v[, 1],
+                     v = v[, 2]
+                   ) %>%
+                     mutate(s = sqrt(u ^ 2 + v ^ 2))
+                 },
+                 rw = {
+                   mu <- matrix(NA, N, 2)
+                   mu[1, ] <- st_coordinates(loc$geometry)[1,]
+                   for (i in 2:N) {
+                     mu[i, ] <- rmvnorm(1, mu[i - 1, ], sigma = Sigma * dt[i])
+                   }
+                   data.frame(
+                     rep = j,
+                     date = dts,
+                     x = mu[, 1],
+                     y = mu[, 2]
+                   )
+                 })
+        }) %>% 
+          do.call(rbind, .) %>%
+          as_tibble()
+      }) 
     
-    
-    d <- as_tibble(d)
+    d <- tibble(id = x$id, sims = d)
     switch(model,
            rw = { 
              class(d) <- append("fG_rw", class(d))
