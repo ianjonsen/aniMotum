@@ -8,6 +8,7 @@ simulate(
   x = NULL,
   A = 1,
   what = c("fitted", "predicted"),
+  sim_only = FALSE,
   N = 100,
   start = list(c(0, 0), Sys.time()),
   model = c("rw", "crw", "mpm"),
