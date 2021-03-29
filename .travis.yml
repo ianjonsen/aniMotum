@@ -6,10 +6,11 @@ os:
   - linux
 
 sudo: true
-services: docker
 
 before_install:
-  - sudo apt-get install libgdal-dev libgeos-dev libproj-dev libudunits2-dev
+  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+  - sudo apt-get update
+  - sudo apt-get install libudunits2-dev libgdal-dev libgeos-dev libproj-dev
 
 language: r
 r:
