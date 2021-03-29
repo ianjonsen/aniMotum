@@ -4,7 +4,7 @@
 \alias{plot.fG_sim}
 \title{plot}
 \usage{
-\method{plot}{fG_sim}(x, error = FALSE, pal = "Zissou1", ...)
+\method{plot}{fG_sim}(x, error = FALSE, pal = "Zissou1", col = TRUE, rev = FALSE, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_sim}}
@@ -12,6 +12,10 @@
 \item{error}{logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots}
 
 \item{pal}{hcl.colors palette to use (default: "Zissou1"); see hcl.pals() for options}
+
+\item{col}{colour data points by speed; logical (default = TRUE)}
+
+\item{rev}{reverse direction of colour palette; logical (default = FALSE)}
 
 \item{...}{additional arguments to be ignored}
 }

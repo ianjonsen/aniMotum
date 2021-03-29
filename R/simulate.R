@@ -128,8 +128,8 @@ simulate <- function(x = NULL,
                      error = c("ls","kf"),
                      t_dist = c("reg", "gamma"),
                      tpar = c(1.5, 0.5), 
-                     alpha = c(0.9, 0.8),
-                     beta = c(1, 0.25)
+                     alpha = c(0.9, 0.8)#,
+                    # beta = c(1, 0.25)
                      ) {
   
   ################
@@ -154,8 +154,24 @@ simulate <- function(x = NULL,
               a POSIX datetime as the 2nd element")
   
   n.states <- 1
-  if(length(sigma) > 2 & model == "rw") n.states <- length(sigma)/2
-  if(length(D) > 1 & model == "crw") n.states <- length(D)
+  if(length(sigma) > 2 & model == "rw") {
+    n.states <- length(sigma)/2
+    bm <- matrix(sigma, n.states, 2, byrow = TRUE)
+    bm <- apply(bm,1,mean)
+    beta <- bm / max(bm)
+
+    ## ensure covar matrices are symmetric and non-NA
+    if(length(rho_p) == 1) rho_p <- rep(rho_p, n.states)
+  } else if(length(sigma == 2) & model == "rw") {
+    beta <- 1
+  }
+  
+  if(length(D) > 1 & model == "crw") {
+    n.states <- length(D)
+    beta <- D / max(D)
+  } else if (length(D) == 1 & model == "crw") {
+    beta <- 1
+  }
   
   ###########################
   ## Simulate from scratch ##
@@ -221,29 +237,38 @@ simulate <- function(x = NULL,
              }
            },
            rw = {
-             for (i in 2:N) {
-               mu[i,] <- rmvnorm(1, mu[i - 1,], 
-                                 sigma = Sigma[[b[i]]] * dt[i] ^ 2)
+             mu[2, ] <- rtmvnorm(1, beta[b[2]] * (mu[1, ] - mu[1, ]), 
+                                 sigma = Sigma[[b[2]]] * dt[2]^2,
+                                 lower = rep(-sqrt(vmax*vmax/2)*3.6,2),
+                                 upper = rep(sqrt(vmax*vmax/2)*3.6,2)) + mu[1, ]
+               
+             for (i in 3:N) {
+               dxy <- rtmvnorm(1, beta[b[i]] * (mu[i - 1,] - mu[i - 2, ]), 
+                                 sigma = Sigma[[b[i]]] * dt[i]^2,
+                               lower = rep(-sqrt(vmax*vmax/2)*3.6,2),
+                               upper = rep(sqrt(vmax*vmax/2)*3.6,2))
+               mu[i, ] <- mu[i - 1, ] + dxy
              }
            },
            mpm = {
-             dt.g <- dt / median(dt)
+             #dt.g <- dt / median(dt)
              
              lg <- rep(NA, N)
              lg[1] <- runif(1,-5, 5)
-             sd <- sigma_g * dt.g
+             sd <- sigma_g * dt
              for (i in 2:N) {
                ## use a truncated normal to simulate g in logit space:
                ##   suitable bounds keep RW wandering off at extremes
-               lg[i] <- rtnorm(1, lg[i - 1], sd[i], l = -8, u = 8)
+               lg[i] <- rtnorm(1, lg[i-1], sd[i], l = -8, u = 8)
              }
              g <- plogis(lg)
-             mu[2,] <- rmvnorm(1, mu[1,], Sigma[[1]] * dt.g[2] ^ 2)
+             mu[2,] <- rmvnorm(1, mu[1,], Sigma[[1]] * dt[2] ^ 2)
              for (i in 3:N) {
-               mu[i, ] <- rmvnorm(1, mu[i - 1,] +
-                                    g[i] * (dt.g[i] / dt.g[i - 1]) *
-                                    (mu[i - 1,] - mu[i - 2,]),
-                                  Sigma[[1]] * dt[i] ^ 2)
+               dxy <- rtmvnorm(1, c(0,0), Sigma[[1]] * dt[i] ^ 2,
+                               lower = rep(-sqrt(vmax*vmax/2)*3.6, 2),
+                               upper = rep(sqrt(vmax*vmax/2)*3.6, 2))
+               mu[i, ] <- mu[i-1, ] + g[i] * (dt[i] / dt[i-1]) * 
+                 (mu[i-1,] - mu[i-2,]) + dxy
              }
            })
 
@@ -330,10 +355,10 @@ simulate <- function(x = NULL,
         model <- x$ssm[[k]]$pm
         switch(what,
                fitted = {
-                 loc <- x$ssm[[k]]$fitted
+                 loc <- grab(x$ssm[[k]], "fitted", as_sf = FALSE)
                  },
                predicted = {
-                 loc <- x$ssm[[k]]$predicted
+                 loc <- grab(x$ssm[[k]], "predicted", as_sf = FALSE)
                })
         N <- nrow(loc)
         dts <- loc$date
@@ -357,6 +382,10 @@ simulate <- function(x = NULL,
                                x$ssm[[k]]$par["sigma_y", 1]) ^ 2
                  Sigma[!Sigma] <-
                    prod(Sigma[1, 1]^0.5, Sigma[2, 2]^0.5) * x$ssm[[k]]$par["rho_p", 1]
+                 vmin <- with(loc, c(min(diff(x), na.rm = TRUE), 
+                                     min(diff(y), na.rm = TRUE)))
+                 vmax <- with(loc, c(max(diff(x), na.rm = TRUE), 
+                                     max(diff(y), na.rm = TRUE)))
                })
         
         ###############################
@@ -389,8 +418,13 @@ simulate <- function(x = NULL,
                  rw = {
                    mu <- matrix(NA, N, 2)
                    mu[1, ] <- st_coordinates(loc$geometry)[1,]
-                   for (i in 2:N) {
-                     mu[i, ] <- rmvnorm(1, mu[i - 1, ], sigma = Sigma * dt[i])
+                   mu[2, ] <- rmvnorm(1, mu[1,], sigma = Sigma * dt[2]^2)
+                   for (i in 3:N) {
+                     dxy <- rtmvnorm(1, mu[i - 1, ] - mu[i - 2,], 
+                                     sigma = Sigma * dt[i]^2,
+                                     lower = vmin,
+                                     upper = vmax)
+                     mu[i, ] <- mu[i - 1, ] + dxy
                    }
                    data.frame(
                      rep = j,
