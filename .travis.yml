@@ -5,6 +5,9 @@ deploy.skip_cleanup: true
 os:
   - linux
 
+dist:
+  - bionic
+
 sudo: true
 
 before_install:
