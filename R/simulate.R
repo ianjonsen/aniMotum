@@ -104,7 +104,7 @@ epar <- function(lc) {
 ##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
-##' @importFrom tibble tibble
+##' @importFrom tibble tibble as_tibble
 ##' @importFrom assertthat assert_that
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
 ##' @importFrom CircStats rvm
@@ -390,7 +390,7 @@ simulate <- function(x = NULL,
         ###############################
         ## Simulate movement process ##
         ###############################
-        lapply(1:reps, function(j) {
+        tmp <- lapply(1:reps, function(j) {
           switch(model,
                  crw = {
                    mu <- v <- matrix(NA, N, 2)
@@ -411,8 +411,7 @@ simulate <- function(x = NULL,
                      y = mu[, 2],
                      u = v[, 1],
                      v = v[, 2]
-                   ) %>%
-                     mutate(s = sqrt(u ^ 2 + v ^ 2))
+                   )
                  },
                  rw = {
                    mu <- matrix(NA, N, 2)
@@ -435,6 +434,30 @@ simulate <- function(x = NULL,
         }) %>% 
           do.call(rbind, .) %>%
           as_tibble()
+        
+        loc <- grab(x[k,], what = what, as_sf = FALSE) %>%
+          mutate(rep = 0)
+        switch(model,
+               crw = { 
+                 loc <- loc %>% select(rep, date, x, y, u, v)
+                 },
+               rw = {
+                 loc <- loc %>% select(rep, date, x, y)
+               })
+        tmp <- rbind(loc, tmp)
+        ## lon,lat
+        tmp <- st_as_sf(tmp, coords = c("x","y"), crs = "+proj=merc +units=km +datum=WGS84")
+        xy <- st_coordinates(tmp) %>% as.data.frame()
+        names(xy) <- c("x","y")
+        ll <- tmp %>% 
+          st_transform(., crs = 4326) %>%
+          st_coordinates(.) %>%
+          as.data.frame(.)
+        names(ll) <- c("lon","lat")
+        st_geometry(tmp) <- NULL
+        cbind(tmp, xy, ll) %>% 
+          as_tibble() %>%
+          select(rep, date, lon, lat, x, y, everything())
       }) 
     
     d <- tibble(id = x$id, model = x$pmodel, sims = d)

@@ -3,6 +3,7 @@
 S3method(plot,fG_mpm)
 S3method(plot,fG_osar)
 S3method(plot,fG_sim)
+S3method(plot,fG_simfit)
 S3method(plot,fG_ssm)
 S3method(print,ssm)
 export(emf)
