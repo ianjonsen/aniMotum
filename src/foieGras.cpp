@@ -2,7 +2,6 @@
 #include <TMB.hpp>
 #include "TMB/sub/rw.hpp"
 #include "TMB/sub/crw.hpp"
-#include "TMB/sub/crwp.hpp"
 #include "TMB/sub/mpm.hpp"
 #include "TMB/sub/joint_mpm.hpp"
 
@@ -14,8 +13,6 @@ Type objective_function<Type>::operator() ()
     return rw(this);
   } else if (model_name == "crw") {
     return crw(this);
-  } else if (model_name == "crwp") {
-    return crwp(this);
   } else if (model_name == "mpm") {
     return mpm(this);
   } else if (model_name == "jmpm") {

@@ -354,10 +354,10 @@ simulate <- function(x = NULL,
         model <- x$ssm[[k]]$pm
         switch(what,
                fitted = {
-                 loc <- grab(x$ssm[[k]], "fitted", as_sf = FALSE)
+                 loc <- grab(x[k,], "fitted")
                  },
                predicted = {
-                 loc <- grab(x$ssm[[k]], "predicted", as_sf = FALSE)
+                 loc <- grab(x[k,], "predicted")
                })
         N <- nrow(loc)
         dts <- loc$date
