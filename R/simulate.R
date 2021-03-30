@@ -36,7 +36,7 @@ argos_lc <- function(N) {
 ##' 
 ##' @export
 
-epar <- function(lc) {
+ellp.par <- function(lc) {
   
   ellps.tab <-
     readRDS(system.file("extdata", "error_ellipse.RDS",
@@ -91,11 +91,25 @@ epar <- function(lc) {
 ##' @title simulate animal tracks from a \code{fG_ssm} fit or from scratch
 ##'
 ##' @description simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters. 
-##' @param x a compound \code{fG} tbl fit object (ignored if NULL)
-##' @param N number of time steps to simulate (ignored if x is suppled)
-##' @param model simulate from the \code{rw} or \code{crw} process model (ignored if x is suppled)
-##' @param Sigma covariance matrix for movement process (ignored if x is suppled)
-##' @param error simulate Argos errors based on Least-Squares location classes ("lc"), Argos Kalman Filter error ellipses ("kf"), or from an arbitrary distribution ("dist") (ignored if x is suppled)
+##' @param x a compound \code{fG_ssm} model fit object (ignored if NULL)
+##' @param reps number of replicate tracks to simulate from an \code{fG_ssm} model fit object (ignored if x is NULL)
+##' @param what simulate fitted (irregular in time) or predicted (typically regular in time) locations 
+##' @param sim_only do not include \code{fG_ssm} estimated location in output (default is FALSE)
+##' @param N number of time steps to simulate (ignored if x is supplied)
+##' @param start coordinates and datetime of start location for simulated track (ignored if x is supplied)
+##' @param model simulate from the \code{rw}, \code{crw} or \code{mpm} process models (ignored if x is supplied)
+##' @param vmax maximum travel rate (m/s) of simulated animal (ignored if x is supplied)
+##' @param sigma a vector of process error sd's for the \code{rw} model (ignored if x is supplied or if \code{model != "rw"})
+##' @param rho_p correlation parameter for \code{rw} model process covariance matrix (ignored if x is supplied or if \code{model != "rw"})
+##' @param D diffusion coefficient for \code{crw} model process covariance matrix (ignored if x is supplied or if \code{model != "crw"})
+##' @param sigma_g random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})
+##' @param error indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf) (ignored if x is supplied)
+##' @param tau vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf})
+##' @param rho_o correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf})
+##' @param t_dist distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)
+##' @param ts time interval in h (ignored if x is supplied)
+##' @param tpar shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{t_dist = "reg"})
+##' @param alpha transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)
 ##' 
 ##' @return a data.frame
 ##' 
@@ -122,12 +136,13 @@ simulate <- function(x = NULL,
                      sigma = c(4, 4), 
                      rho_p = 0,
                      D = 0.05,
-                     tau = c(1.5, 0.75),
-                     rho_o = 0,
                      sigma_g = 1.25,
                      error = c("ls","kf"),
+                     tau = c(1.5, 0.75),
+                     rho_o = 0,
                      t_dist = c("reg", "gamma"),
-                     tpar = c(1.5, 0.5), 
+                     ts = 3, 
+                     tpar = c(0.23, 1), 
                      alpha = c(0.9, 0.8)
                      ) {
   
@@ -185,10 +200,10 @@ simulate <- function(x = NULL,
     switch(t_dist, 
            gamma = {
              # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
-             dt <- c(0, rgamma(N-1, tpar[1], tpar[2]))
+             dt <- c(0, rgamma(N-1, shape = tpar[1], scale = tpar[2]))
            },
            reg = {
-             dt <- c(0, rep(3, N-1))
+             dt <- c(0, rep(ts, N-1))
            })
     
     ## Define var-cov matrix for movement process
@@ -271,7 +286,7 @@ simulate <- function(x = NULL,
              }
            })
 
-    ## time interval is nominally 1 h
+    ## time interval is nominally ts h, or determine by t_par
     dts <- start[[2]] + cumsum(dt) * 3600
     
     ## add Argos lc values
@@ -303,7 +318,7 @@ simulate <- function(x = NULL,
                select(date, lc, x, y, x.err, y.err) 
            },
            kf = {
-             errs <- epar(d$lc)
+             errs <- ellp.par(d$lc)
              d <- data.frame(d, errs)
            })
     

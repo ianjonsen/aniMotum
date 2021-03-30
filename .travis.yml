@@ -30,6 +30,7 @@ r_packages:
   - rgdal
   - rgeos
   - Matrix
+  - TMB
 
 r_github_packages:
   - r-lib/covr

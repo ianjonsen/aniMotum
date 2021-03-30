@@ -16,25 +16,54 @@ simulate(
   sigma = c(4, 4),
   rho_p = 0,
   D = 0.05,
-  tau = c(1.5, 0.75),
-  rho_o = 0,
   sigma_g = 1.25,
   error = c("ls", "kf"),
+  tau = c(1.5, 0.75),
+  rho_o = 0,
   t_dist = c("reg", "gamma"),
-  tpar = c(1.5, 0.5),
+  ts = 3,
+  tpar = c(0.23, 1),
   alpha = c(0.9, 0.8)
 )
 }
 \arguments{
-\item{x}{a compound \code{fG} tbl fit object (ignored if NULL)}
+\item{x}{a compound \code{fG_ssm} model fit object (ignored if NULL)}
 
-\item{N}{number of time steps to simulate (ignored if x is suppled)}
+\item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model fit object (ignored if x is NULL)}
 
-\item{model}{simulate from the \code{rw} or \code{crw} process model (ignored if x is suppled)}
+\item{what}{simulate fitted (irregular in time) or predicted (typically regular in time) locations}
 
-\item{error}{simulate Argos errors based on Least-Squares location classes ("lc"), Argos Kalman Filter error ellipses ("kf"), or from an arbitrary distribution ("dist") (ignored if x is suppled)}
+\item{sim_only}{do not include \code{fG_ssm} estimated location in output (default is FALSE)}
 
-\item{Sigma}{covariance matrix for movement process (ignored if x is suppled)}
+\item{N}{number of time steps to simulate (ignored if x is supplied)}
+
+\item{start}{coordinates and datetime of start location for simulated track (ignored if x is supplied)}
+
+\item{model}{simulate from the \code{rw}, \code{crw} or \code{mpm} process models (ignored if x is supplied)}
+
+\item{vmax}{maximum travel rate (m/s) of simulated animal (ignored if x is supplied)}
+
+\item{sigma}{a vector of process error sd's for the \code{rw} model (ignored if x is supplied or if \code{model != "rw"})}
+
+\item{rho_p}{correlation parameter for \code{rw} model process covariance matrix (ignored if x is supplied or if \code{model != "rw"})}
+
+\item{D}{diffusion coefficient for \code{crw} model process covariance matrix (ignored if x is supplied or if \code{model != "crw"})}
+
+\item{sigma_g}{random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})}
+
+\item{error}{indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf) (ignored if x is supplied)}
+
+\item{tau}{vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf})}
+
+\item{rho_o}{correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf})}
+
+\item{t_dist}{distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)}
+
+\item{ts}{time interval in h (ignored if x is supplied)}
+
+\item{tpar}{shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{t_dist = "reg"})}
+
+\item{alpha}{transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)}
 }
 \value{
 a data.frame
