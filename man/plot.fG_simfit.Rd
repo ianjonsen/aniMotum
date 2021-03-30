@@ -4,7 +4,7 @@
 \alias{plot.fG_simfit}
 \title{plot}
 \usage{
-\method{plot}{fG_simfit}(x, pal = "Zissou1", ncol = 2, ...)
+\method{plot}{fG_simfit}(x, ncol = 2, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}

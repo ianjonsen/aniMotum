@@ -8,7 +8,7 @@
 ##' @return Plots of simulated tracks. 
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
-##' @importFrom ggplot2 element_blank xlab ylab coord_fixed scale_colour_manual
+##' @importFrom ggplot2 element_blank xlab ylab coord_fixed
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors
@@ -19,7 +19,6 @@
 ##' @export
 
 plot.fG_simfit <- function(x, 
-                           pal = "Zissou1",
                            ncol = 2,
                         ...)
 {
@@ -33,29 +32,28 @@ plot.fG_simfit <- function(x,
     ggplot() + 
       geom_path(
           data = x %>% filter(rep != 0),
-          aes(lon, lat, col = factor(rep)),
-          size = 0.2,
-          alpha = 0.75
+          aes(lon, lat, group = rep),
+          colour = hcl.colors(n=5, palette = "Zissou1")[1],
+          size = 0.1
         ) + 
       geom_point(
         data = x %>% filter(rep != 0),
-        aes(lon, lat, col = factor(rep)),
-        size = 0.4,
-        alpha = 0.75
+        aes(lon, lat),
+        colour = hcl.colors(n=5, palette = "Zissou1")[1],
+        size = 0.2,
+        alpha = 0.25
       ) +
       geom_point(
         data = x %>% filter(rep == 0),
         aes(lon, lat),
-        size = 0.8,
-        alpha = 0.85
+        colour = hcl.colors(n=5, palette = "Zissou1")[3],
+        size = 0.8
       ) +
-      scale_colour_manual(values = hcl.colors(n = max(x$rep), palette = pal),
-                          name = "replicate") +
       xlab(element_blank()) +
       ylab(element_blank())
   })
 
-  wrap_plots(p, guides = "collect", ncol = ncol) &
+  wrap_plots(p, ncol = ncol) &
     coord_fixed() & 
     theme_minimal()
   
