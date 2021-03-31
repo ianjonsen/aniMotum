@@ -3,7 +3,7 @@
 ##' @description plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 ##'
 ##' @param x a \code{foieGras osar} object with class `fG_osar`
-##' @param type type of residual plot to generate; time-series (ts), qqnorm (default, qq) or acf
+##' @param type type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)
 ##' @param bw binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
@@ -12,7 +12,6 @@
 ##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars
 ##' @importFrom stats acf qnorm
 ##' @importFrom grDevices hcl.colors
-##' @importFrom testthat validate_that
 ##' @method plot fG_osar
 ##'
 ##' @examples
@@ -29,11 +28,10 @@ plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1
     warning("additional arguments ignored")
   }
 
-  validate_that(type != "hist", msg = "Plot type = 'hist' is deprecated, using type = 'qqnorm' instead")
   if(type == "hist") {
+    warning("type = 'hist' is deprecated, using type = 'qqnorm' instead", immediate. = TRUE)
     type <- "qqnorm"
   }
-  
   type <- match.arg(type)
   
   wpal <- hcl.colors(n = 5, palette = "Zissou1")

@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{a \code{foieGras osar} object with class `fG_osar`}
 
-\item{type}{type of residual plot to generate; time-series (ts), qqnorm (default, qq) or acf}
+\item{type}{type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)}
 
 \item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"}
 
