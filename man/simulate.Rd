@@ -66,11 +66,21 @@ simulate(
 \item{alpha}{transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)}
 }
 \value{
-a data.frame
+if \code{x} supplied then a nested tibble with rows corresponding to the supplied \code{fG_ssm} model fit object with lists of simulated tracks, else if \code{is.null(x)} then a tibble is returned.
 }
 \description{
 simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters.
 }
 \examples{
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 48)
+sim <- simulate(fit, reps = 2, what = "predicted")
+plot(sim)
+
+sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", t_dist = "reg", ts=12)
+plot(sim, error = TRUE)
+
+sim <- simluate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
+t_dist = "gamma", t_par = c(1, 4))
+plot(sim, error = TRUE, pal = "Cividis")
 
 }

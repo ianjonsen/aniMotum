@@ -111,9 +111,19 @@ ellp.par <- function(lc) {
 ##' @param tpar shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{t_dist = "reg"})
 ##' @param alpha transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)
 ##' 
-##' @return a data.frame
+##' @return if \code{x} supplied then a nested tibble with rows corresponding to the supplied \code{fG_ssm} model fit object with lists of simulated tracks, else if \code{is.null(x)} then a tibble is returned.
 ##' 
 ##' @examples 
+##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 48)
+##' sim <- simulate(fit, reps = 2, what = "predicted")
+##' plot(sim)
+##' 
+##' sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", t_dist = "reg", ts=12)
+##' plot(sim, error = TRUE)
+##' 
+##' sim <- simluate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
+##' t_dist = "gamma", t_par = c(1, 4))
+##' plot(sim, error = TRUE, pal = "Cividis")
 ##' 
 ##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm
