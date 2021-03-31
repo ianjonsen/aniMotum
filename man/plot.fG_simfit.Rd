@@ -9,6 +9,8 @@
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}
 
+\item{ncol}{number of columns to arrange multiple plots}
+
 \item{...}{additional arguments to be ignored}
 }
 \value{

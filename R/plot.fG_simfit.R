@@ -3,6 +3,7 @@
 ##' @description visualize tracks simulated from a foieGras model fit
 ##'
 ##' @param x a \code{foieGras} simulation data.frame with class \code{fG_simfit}
+##' @param ncol number of columns to arrange multiple plots
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 

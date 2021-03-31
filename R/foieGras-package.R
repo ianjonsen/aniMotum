@@ -13,7 +13,7 @@
 ##'
 ##' @keywords foieGras
 ##' @importFrom assertthat assert_that
-##' @importFrom utils data flush.console
+##' @importFrom utils data flush.console globalVariables
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
@@ -77,13 +77,11 @@ NULL
 ##' but fitting to data is not the focus of the example.
 NULL
 
-## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
-
 ## stop R CMD check generating NOTES about global variables
-id <- tid <- ssm <- converged <- keep <- id <- y <- x <- x.se <- y.se <- "shut.up"
-geometry <- u <- v <- u.se <- v.se <- lc <- smaj <- smin <- eor <- "shut.up"
-obs.type <- emf.x <- emf.y <- lon <- lat <- rename <- X <- Y <- "shut.up"
-y.z <- x.z <- z <- out <- r <- sub <- isd <- digits <- "shut.up"
-lonerr <- laterr <- coord <- value <- resid <- "shut.up"
-se <- g <- g.se <- id1 <- mpm <- residual <- "shut.up"
+globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se", "y.se",
+                  "geometry", "u", "v", "u.se", "v.se", "lc", "smaj", "smin", "eor",
+                  "obs.type", "emf.x", "emf.y", "lon", "lat", "rename", "X", "Y", 
+                  "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", 
+                  "lonerr", "laterr", "coord", "value", "resid", 
+                  "se", "g", "g.se", "id1", "mpm", "residual",
+                  "s", "s.se", "ci", "b", "x.err", "y.err", "xy"))

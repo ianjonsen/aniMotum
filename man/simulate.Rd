@@ -20,7 +20,7 @@ simulate(
   error = c("ls", "kf"),
   tau = c(1.5, 0.75),
   rho_o = 0,
-  t_dist = c("reg", "gamma"),
+  tdist = c("reg", "gamma"),
   ts = 3,
   tpar = c(0.23, 1),
   alpha = c(0.9, 0.8)
@@ -51,17 +51,17 @@ simulate(
 
 \item{sigma_g}{random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})}
 
-\item{error}{indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf) (ignored if x is supplied)}
+\item{error}{indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf") (ignored if x is supplied)}
 
-\item{tau}{vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf})}
+\item{tau}{vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf"})}
 
-\item{rho_o}{correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf})}
+\item{rho_o}{correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf"})}
 
-\item{t_dist}{distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)}
+\item{tdist}{distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)}
 
 \item{ts}{time interval in h (ignored if x is supplied)}
 
-\item{tpar}{shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{t_dist = "reg"})}
+\item{tpar}{shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{tdist = "reg"})}
 
 \item{alpha}{transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)}
 }
@@ -72,15 +72,15 @@ if \code{x} supplied then a nested tibble with rows corresponding to the supplie
 simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters.
 }
 \examples{
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 48)
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
 sim <- simulate(fit, reps = 2, what = "predicted")
 plot(sim)
 
-sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", t_dist = "reg", ts=12)
+sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 plot(sim, error = TRUE)
 
-sim <- simluate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
-t_dist = "gamma", t_par = c(1, 4))
+sim <- simulate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
+tdist = "gamma", tpar = c(1, 4))
 plot(sim, error = TRUE, pal = "Cividis")
 
 }

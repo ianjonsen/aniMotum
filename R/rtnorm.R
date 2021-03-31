@@ -7,6 +7,7 @@
 ##' @param l lower limit of distribution
 ##' @param u upper limit of distribution
 ##'
+##' @importFrom stats pnorm qnorm runif
 ##' @examples
 ##' x <- rtnorm(10, l = -5, u = 5)
 ##' range(x)

@@ -103,26 +103,26 @@ ellp.par <- function(lc) {
 ##' @param rho_p correlation parameter for \code{rw} model process covariance matrix (ignored if x is supplied or if \code{model != "rw"})
 ##' @param D diffusion coefficient for \code{crw} model process covariance matrix (ignored if x is supplied or if \code{model != "crw"})
 ##' @param sigma_g random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})
-##' @param error indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf) (ignored if x is supplied)
-##' @param tau vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf})
-##' @param rho_o correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf})
-##' @param t_dist distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)
+##' @param error indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf") (ignored if x is supplied)
+##' @param tau vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf"})
+##' @param rho_o correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf"})
+##' @param tdist distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)
 ##' @param ts time interval in h (ignored if x is supplied)
-##' @param tpar shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{t_dist = "reg"})
+##' @param tpar shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{tdist = "reg"})
 ##' @param alpha transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)
 ##' 
 ##' @return if \code{x} supplied then a nested tibble with rows corresponding to the supplied \code{fG_ssm} model fit object with lists of simulated tracks, else if \code{is.null(x)} then a tibble is returned.
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 48)
+##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
 ##' sim <- simulate(fit, reps = 2, what = "predicted")
 ##' plot(sim)
 ##' 
-##' sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", t_dist = "reg", ts=12)
+##' sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 ##' plot(sim, error = TRUE)
 ##' 
-##' sim <- simluate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
-##' t_dist = "gamma", t_par = c(1, 4))
+##' sim <- simulate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
+##' tdist = "gamma", tpar = c(1, 4))
 ##' plot(sim, error = TRUE, pal = "Cividis")
 ##' 
 ##' @importFrom dplyr "%>%" 
@@ -131,6 +131,7 @@ ellp.par <- function(lc) {
 ##' @importFrom tibble tibble as_tibble
 ##' @importFrom assertthat assert_that
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
+##' @importFrom stats rgamma runif
 ##' @importFrom CircStats rvm
 ##' 
 ##' @export
@@ -150,7 +151,7 @@ simulate <- function(x = NULL,
                      error = c("ls","kf"),
                      tau = c(1.5, 0.75),
                      rho_o = 0,
-                     t_dist = c("reg", "gamma"),
+                     tdist = c("reg", "gamma"),
                      ts = 3, 
                      tpar = c(0.23, 1), 
                      alpha = c(0.9, 0.8)
@@ -162,7 +163,7 @@ simulate <- function(x = NULL,
   what <- match.arg(what)
   model <- match.arg(model)
   error <- match.arg(error)
-  t_dist <- match.arg(t_dist)
+  tdist <- match.arg(tdist)
 
   assert_that(what %in% c("fitted","predicted"), 
               msg = "only `fitted` or `predicted` locations can be simulated 
@@ -171,8 +172,8 @@ simulate <- function(x = NULL,
               msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
   assert_that(error %in% c("ls","kf"), 
               msg = "error can only be 1 of `ls` or `kf`")
-  assert_that(t_dist %in% c("gamma","reg"),
-              msg = "t_dist can only be 1 of `gamma` or `reg`")
+  assert_that(tdist %in% c("gamma","reg"),
+              msg = "tdist can only be 1 of `gamma` or `reg`")
   assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
               msg = "`start` must be a 2-element list, with coordinates as the 1st element and
               a POSIX datetime as the 2nd element")
@@ -207,7 +208,7 @@ simulate <- function(x = NULL,
     v[1, ] <- c(0,0)
     
     ## generate random time intervals (h)
-    switch(t_dist, 
+    switch(tdist, 
            gamma = {
              # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
              dt <- c(0, rgamma(N-1, shape = tpar[1], scale = tpar[2]))
@@ -296,7 +297,7 @@ simulate <- function(x = NULL,
              }
            })
 
-    ## time interval is nominally ts h, or determine by t_par
+    ## time interval is nominally ts h, or determine by tpar
     dts <- start[[2]] + cumsum(dt) * 3600
     
     ## add Argos lc values
