@@ -29,7 +29,7 @@ plot.fG_simfit <- function(x,
   N <- nrow(x)
   
   p <- lapply(x$sims, function(x) {
-    x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
+
     ggplot() + 
       geom_path(
           data = x %>% filter(rep != 0),
