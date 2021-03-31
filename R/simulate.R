@@ -439,7 +439,7 @@ simulate <- function(x = NULL,
                    )
                  },
                  rw = {
-                   mu <- matrix(NA, N, 2)
+                   mu <- matrix(NA, N, 2) 
                    mu[1, ] <- st_coordinates(loc$geometry)[1,]
                    mu[2, ] <- rmvnorm(1, mu[1,], sigma = Sigma * dt[2]^2)
                    for (i in 3:N) {

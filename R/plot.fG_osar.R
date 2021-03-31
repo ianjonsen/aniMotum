@@ -11,7 +11,8 @@
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
 ##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars
 ##' @importFrom stats acf qnorm
-##' @importFrom wesanderson wes_palette
+##' @importFrom grDevices hcl.colors
+##' @importFrom testthat validate_that
 ##' @method plot fG_osar
 ##'
 ##' @examples
@@ -28,8 +29,14 @@ plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1
     warning("additional arguments ignored")
   }
 
+  validate_that(type != "hist", msg = "Plot type = 'hist' is deprecated, using type = 'qqnorm' instead")
+  if(type == "hist") {
+    type <- "qqnorm"
+  }
+  
   type <- match.arg(type)
-  wpal <- wes_palette("Zissou1", n = 5, "discrete")
+  
+  wpal <- hcl.colors(n = 5, palette = "Zissou1")
   
   if(inherits(x, "fG_osar")) {
   
