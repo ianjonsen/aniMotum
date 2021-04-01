@@ -17,7 +17,9 @@ fmap(
   size = 0.25,
   col = "black",
   lines = FALSE,
-  landfill = grey(0.6)
+  landfill = grey(0.6),
+  pal = "Zissou1",
+  rev = FALSE
 )
 }
 \arguments{

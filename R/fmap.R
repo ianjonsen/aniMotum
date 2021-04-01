@@ -30,19 +30,23 @@
 ##' @importFrom assertthat assert_that
 ##' @export
 
-fmap <- function(x, y = NULL,
-                     what = c("fitted", "predicted"),
-                     conf = TRUE,
-                     obs = FALSE,
-                     obs.shp = 17,
-                     by.date = TRUE,
-                     crs = NULL,
-                     ext.rng = c(0.05, 0.05),
-                     size = 0.25,
-                     col = "black",
-                     lines = FALSE,
-                 landfill = grey(0.6))
+fmap <- function(x,
+                 y = NULL,
+                 what = c("fitted", "predicted"),
+                 conf = TRUE,
+                 obs = FALSE,
+                 obs.shp = 17,
+                 by.date = TRUE,
+                 crs = NULL,
+                 ext.rng = c(0.05, 0.05),
+                 size = 0.25,
+                 col = "black",
+                 lines = FALSE,
+                 landfill = grey(0.6),
+                 pal = "Zissou1",
+                 rev = FALSE)
 {
+  
   what <- match.arg(what)
 
   assert_that(inherits(x, "fG_ssm"), msg = "x must be a foieGras ssm fit object with class `fG_ssm`")
