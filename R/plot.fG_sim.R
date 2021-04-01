@@ -4,7 +4,7 @@
 ##'
 ##' @param x a \code{foieGras} simulation data.frame with class \code{fG_sim}
 ##' @param error logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots
-##' @param pal hcl.colors palette to use (default: "Zissou1"); see hcl.pals() for options
+##' @param pal hcl.colors palette to use (default: "Zissou1"); type \code{hcl.pals()} for options
 ##' @param rev reverse direction of colour palette; logical (default = FALSE)
 ##' @param col colour data points by speed; logical (default = TRUE)
 ##' @param ... additional arguments to be ignored
@@ -28,8 +28,8 @@
 plot.fG_sim <- function(x, 
                         error = FALSE,
                         pal = "Zissou1",
-                        col = TRUE,
                         rev = FALSE,
+                        col = TRUE,
                         ...)
 {
   if (length(list(...)) > 0) {

@@ -429,6 +429,9 @@ simulate <- function(x = NULL,
                                        lower = vmin,
                                        upper = vmax)
                      mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
+                     ## keep within world Mercator y bounds (km)
+#                     if(mu[i, 2] < -15496300) mu[i, 2] <- -15496300
+#                     if(mu[i, 2] > 18764386) mu[i, 2] <- 18764386
                    }
                    data.frame(
                      rep = j,
@@ -449,6 +452,9 @@ simulate <- function(x = NULL,
                                      lower = vmin,
                                      upper = vmax)
                      mu[i, ] <- mu[i - 1, ] + dxy
+                     ## keep within world Mercator y bounds (km)
+#                     if(mu[i, 2] < -15496300) mu[i, 2] <- -15496300
+#                     if(mu[i, 2] > 18764386) mu[i, 2] <- 18764386
                    }
                    data.frame(
                      rep = j,

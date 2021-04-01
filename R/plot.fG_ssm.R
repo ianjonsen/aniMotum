@@ -29,6 +29,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: (type = 1) 1-d time series of fits to data, 
@@ -42,7 +43,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom tibble enframe
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
-##' @importFrom wesanderson wes_palette
+##' @importFrom grDevices hcl.colors
 ##' @method plot fG_ssm
 ##'
 ##' @examples
@@ -53,15 +54,23 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, pages = 1, ncol = 2, ...)
-{
-  if (length(list(...)) > 0) {
-    warning("additional arguments ignored")
-  }
-  
+plot.fG_ssm <-
+  function(x,
+           what = c("fitted", "predicted"),
+           type = 1,
+           outlier = TRUE,
+           pages = 1,
+           ncol = 2,
+           pal = "Zissou1",
+           ...)
+  {
+    if (length(list(...)) > 0) {
+      warning("additional arguments ignored")
+    }
+    
   what <- match.arg(what)
   
-  wpal <- wes_palette("Zissou1", n = 5, "discrete")
+  wpal <- hcl.colors(n = 5, palette = pal)
   
   if(inherits(x, "fG_ssm")) {
     switch(what,

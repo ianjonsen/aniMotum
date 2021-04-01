@@ -4,12 +4,14 @@
 \alias{plot.fG_simfit}
 \title{plot}
 \usage{
-\method{plot}{fG_simfit}(x, ncol = 2, ...)
+\method{plot}{fG_simfit}(x, ncol = 1, pal = "Zissou1", rev = FALSE, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}
 
 \item{ncol}{number of columns to arrange multiple plots}
+
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
 }

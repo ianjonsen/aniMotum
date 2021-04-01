@@ -7,7 +7,9 @@
 ##' @param bw binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
+##' @param pal \code{hcl.colors} colour palette to use (default = "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
+##' 
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
 ##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars
 ##' @importFrom stats acf qnorm
@@ -22,7 +24,7 @@
 ##'
 ##' @export
 
-plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1, ncol = 1, ...)
+plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1, ncol = 1, pal = "Zissou1", ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
@@ -34,7 +36,7 @@ plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1
   }
   type <- match.arg(type)
   
-  wpal <- hcl.colors(n = 5, palette = "Zissou1")
+  wpal <- hcl.colors(n = 5, palette = pal)
   
   if(inherits(x, "fG_osar")) {
   

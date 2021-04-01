@@ -4,6 +4,7 @@
 ##'
 ##' @param x a \code{foieGras} simulation data.frame with class \code{fG_simfit}
 ##' @param ncol number of columns to arrange multiple plots
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
@@ -13,6 +14,7 @@
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors
+##' @importFrom sf st_as_sf st_transform st_cast st_wrap_dateline
 ##' @method plot fG_simfit
 ##'
 ##' @examples
@@ -20,43 +22,53 @@
 ##' @export
 
 plot.fG_simfit <- function(x, 
-                           ncol = 2,
+                           ncol = 1,
+                           pal = "Zissou1",
+                           rev = FALSE,
                         ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
   N <- nrow(x)
-  
-  p <- lapply(x$sims, function(x) {
+  x$sims <- lapply(x$sims, function(x) {
+      st_as_sf(x, coords = c("x","y"), crs = "+proj=merc +units=km +datum=WGS84 +no_defs") %>%
+        st_transform(crs = "+proj=longlat +datum=WGS84")
+  })
 
+  p <- lapply(x$sims, function(x) {
+    
+    sf_lines <- x %>%
+      group_by(rep) %>%
+      summarise(do_union = FALSE) %>%
+      st_cast("MULTILINESTRING") %>%
+      st_wrap_dateline()
+    
     ggplot() + 
-      geom_path(
-          data = x %>% filter(rep != 0),
-          aes(lon, lat, group = rep),
-          colour = hcl.colors(n=5, palette = "Zissou1")[1],
+      geom_sf(
+          data = sf_lines %>% filter(rep != 0),
+          colour = hcl.colors(n=5, palette = pal)[1],
           size = 0.1
         ) + 
-      geom_point(
+      geom_sf(
         data = x %>% filter(rep != 0),
-        aes(lon, lat),
-        colour = hcl.colors(n=5, palette = "Zissou1")[1],
+        colour = hcl.colors(n=5, palette = pal)[1],
         size = 0.2,
         alpha = 0.25
       ) +
-      geom_point(
+      geom_sf(
         data = x %>% filter(rep == 0),
-        aes(lon, lat),
-        colour = hcl.colors(n=5, palette = "Zissou1")[3],
+        colour = hcl.colors(n=5, palette = pal)[3],
         size = 0.8
       ) +
       xlab(element_blank()) +
-      ylab(element_blank())
+      ylab(element_blank()) + 
+      theme_minimal()
   })
 
-  wrap_plots(p, ncol = ncol) &
-    coord_fixed() & 
-    theme_minimal()
+  wrap_plots(p, ncol = ncol)
+  
+  p
   
 }
   

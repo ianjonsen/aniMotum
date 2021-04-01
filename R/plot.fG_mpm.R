@@ -9,6 +9,8 @@
 ##' @param asp used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1; default), or allow aspect ratio to vary (asp = 0). 
 ##' Ignored if \code{y} is NULL and/or pages = 0
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param rev reverse colour palette (logical)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: 1-d time series of \code{gamma_t} estimates (if y not provided), with estimation uncertainty ribbons (95 % CI's); 
@@ -20,7 +22,7 @@
 ##' @importFrom stats qlogis
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
-##' @importFrom wesanderson wes_palette
+##' @importFrom grDevices hcl.colors
 ##' @method plot fG_mpm
 ##'
 ##' @examples
@@ -32,13 +34,13 @@
 ##'
 ##' @export
 
-plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, ...)
+plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, pal = "Zissou1", rev = FALSE, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
   
-  wpal <- wes_palette("Zissou1", n = 5, "discrete")
+  wpal <- hcl.colors(n = 5, "Zissou1")
   
   
   if(inherits(x, "fG_mpm") & (inherits(y, "fG_ssm") | is.null(y))) {
@@ -49,8 +51,7 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, ...)
         geom_ribbon(aes(date, ymin = plogis(qlogis(g) - 1.96 * g.se), ymax = plogis(qlogis(g) + 1.96 * g.se)), fill = grey(0.5), alpha = 0.25) +
         geom_point(aes(date, g, colour = g)) + 
         facet_wrap(~ id, scales = "free_x", ncol = ncol) +
-        scale_colour_gradientn(colours = rev(wes_palette(name = "Zissou1", 
-                                                     type = "continuous")),
+        scale_colour_gradientn(colours = hcl.colors(n=100, palette = pal, rev = rev),
                                limits = c(0,1),
                                name = expression(gamma[t])
                                ) +
@@ -78,8 +79,7 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, ...)
           geom_path(aes(lon, lat), size = 0.1, col = wpal[1], alpha = 0.5) +
           geom_point(aes(lon, lat, colour = g, size = g.se^-2), show.legend = c("colour" = TRUE, "size" = FALSE)) +
           scale_colour_gradientn(breaks = c(0, 0.25, 0.5, 0.75, 1), 
-                                 colours = rev(wes_palette(name = "Zissou1", 
-                                                           type = "continuous")),
+                                 colours = hcl.colors(n=100, palette = pal, rev = rev),
                                  limits = c(0,1), name = expression(gamma[t])) +
           labs(title = paste("id:", unique(x$id))) +
           xlab(element_blank()) +
