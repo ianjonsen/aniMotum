@@ -17,7 +17,7 @@
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' 
 ##' @examples
-##' ## fit jmpm to two southern elephant seals
+##' ## fit jmpm to two southern elephant seal tracks
 ##' data(xs)
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
