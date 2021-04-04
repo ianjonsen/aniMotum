@@ -47,10 +47,6 @@ a list with components
 fit a random walk with time-varying move persistence to temporally regular or irregular location data
 }
 \examples{
-## fit ssm & mpm to one southern elephant seal track
-data(ellies)
-fit <- fit_ssm(ellies \%>\% filter(id == unique(id)[1]), vmax=4, model = "rw", time.step=24) \%>\% fit_mpm(model = "mpm")
-
 ## fit jmpm to two southern elephant seal tracks
 data(xs)
 fmpm <- fit_mpm(xs, model = "jmpm")
