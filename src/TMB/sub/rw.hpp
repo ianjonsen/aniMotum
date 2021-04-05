@@ -113,7 +113,11 @@ Type rw(objective_function<Type>* obj) {
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
-        
+      
+      SIMULATE {
+        Y.col(i) = nll_obs.simulate() + X.col(i);
+        REPORT(Y);
+      }  
     } else if(isd(i) == 0) {
       continue;
     } else {  

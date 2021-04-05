@@ -17,7 +17,9 @@ fmap(
   size = 0.25,
   col = "black",
   lines = FALSE,
-  landfill = grey(0.6)
+  landfill = grey(0.6),
+  pal = "Zissou1",
+  rev = FALSE
 )
 }
 \arguments{
@@ -48,6 +50,10 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{lines}{logical indicating if lines are added to connect estimated locations (default = FALSE)}
 
 \item{landfill}{colour to use for land (default = grey(0.6))}
+
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+
+\item{rev}{reverse colour palette (logical)}
 }
 \description{
 map foieGras fitted or predicted locations, with or without

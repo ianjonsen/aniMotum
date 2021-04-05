@@ -18,29 +18,35 @@
 ##' @param col colour of observed locations (ignored if obs = FALSE)
 ##' @param lines logical indicating if lines are added to connect estimated locations (default = FALSE)
 ##' @param landfill colour to use for land (default = grey(0.6))
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param rev reverse colour palette (logical)
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_gradientn scale_fill_manual element_line
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr summarise "%>%" group_by mutate
-##' @importFrom wesanderson wes_palette
+##' @importFrom grDevices hcl.colors
 ##' @importFrom assertthat assert_that
 ##' @export
 
-fmap <- function(x, y = NULL,
-                     what = c("fitted", "predicted"),
-                     conf = TRUE,
-                     obs = FALSE,
-                     obs.shp = 17,
-                     by.date = TRUE,
-                     crs = NULL,
-                     ext.rng = c(0.05, 0.05),
-                     size = 0.25,
-                     col = "black",
-                     lines = FALSE,
-                 landfill = grey(0.6))
+fmap <- function(x,
+                 y = NULL,
+                 what = c("fitted", "predicted"),
+                 conf = TRUE,
+                 obs = FALSE,
+                 obs.shp = 17,
+                 by.date = TRUE,
+                 crs = NULL,
+                 ext.rng = c(0.05, 0.05),
+                 size = 0.25,
+                 col = "black",
+                 lines = FALSE,
+                 landfill = grey(0.6),
+                 pal = "Zissou1",
+                 rev = FALSE)
 {
+  
   what <- match.arg(what)
 
   assert_that(inherits(x, "fG_ssm"), msg = "x must be a foieGras ssm fit object with class `fG_ssm`")
@@ -169,9 +175,9 @@ fmap <- function(x, y = NULL,
                      ) 
        }
       p <- p + scale_colour_manual(values = 
-                            wes_palette(name = "Zissou1", 
-                                        n = nrow(x), 
-                                        type = "continuous")
+                                     hcl.colors(n = nrow(x), 
+                                                palette = pal, 
+                                                rev = rev)
                           ) 
     } else if(!is.null(y)) {
       if(lines) {
@@ -185,8 +191,9 @@ fmap <- function(x, y = NULL,
                        size = ifelse(length(size) == 2, size[1], size)
       ) +
         scale_colour_gradientn(colours = 
-                              rev(wes_palette(name = "Zissou1", 
-                                          type = "continuous")),
+                                 hcl.colors(n = 100, 
+                                            palette = pal, 
+                                            rev = rev),
                               name = expression(gamma[t]),
                               limits = c(0,1)
         ) 
@@ -199,9 +206,9 @@ fmap <- function(x, y = NULL,
       
       if(conf) {
         p <- p + scale_fill_manual(values = 
-                                     wes_palette(name = "Zissou1", 
-                                                 n = nrow(x), 
-                                                 type = "continuous")
+                                     hcl.colors(n = nrow(x), 
+                                                palette = pal, 
+                                                rev = rev)
         )
       }
       
@@ -244,8 +251,9 @@ fmap <- function(x, y = NULL,
                      size = size[1]
                      ) +
           scale_colour_gradientn(breaks = as.numeric(lab_dates), 
-                               colours = wes_palette(name = "Zissou1", 
-                                                     type = "continuous"), 
+                               colours = hcl.colors(n = 100, 
+                                                    palette = pal, 
+                                                    rev = rev), 
                                labels = lab_dates)
       }
       
@@ -261,14 +269,16 @@ fmap <- function(x, y = NULL,
     } else if(!by.date) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
-                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[4],
+                         colour = hcl.colors(n = 5, 
+                                             palette = pal)[4],
                          alpha = 0.75,
                          lwd = 0.25
         )
       }
       if(!is.na(size)[1]) {
         p <- p + geom_sf(data = sf_locs,
-                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[3],
+                         colour = hcl.colors(n = 5, 
+                                             palette = pal)[3],
                          size = size[1]
         ) 
       }
@@ -283,7 +293,8 @@ fmap <- function(x, y = NULL,
     } else if(!is.null(y)) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,
-                         colour = wes_palette(name = "Zissou1", n = 5, type = "discrete")[4],
+                         colour = hcl.colors(n = 5, 
+                                             palette = pal)[4],
                          alpha = 0.75,
                          lwd = 0.25
         )
@@ -293,8 +304,9 @@ fmap <- function(x, y = NULL,
                        size = ifelse(length(size) == 2, size[1], size)
       ) +
         scale_colour_gradientn(colours = 
-                                 rev(wes_palette(name = "Zissou1", 
-                                                 type = "continuous")),
+                                 hcl.colors(n = 100, 
+                                            palette = pal, 
+                                            rev = rev),
                                name = expression(gamma[t]),
                                limits = c(0,1)
         ) 

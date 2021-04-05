@@ -1,7 +1,9 @@
 ##' @title fit a a Move Persistence Model (mpm)
-##' @description fit a random walk with time-varying move persistence to location data (e.g., output from \code{fit_ssm})
-##' @param x a data frame of observations (see details)
+##' @description fit a random walk with time-varying move persistence to temporally regular or irregular location data
+##' @param x a `fG_ssm` fit object or a data frame of observations (see details)
+##' @param what if a `fG_ssm` fit object is supplied then \code{what} determines whether fitted or predicted (default) values are mapped; ignored if \code{x} is a data frame
 ##' @param model mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})
+##' @param coords column numbers of the location coordinates (default = 3:4)
 ##' @param optim numerical optimizer
 ##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)
 ##' @param verbose report progress during minimization
@@ -15,19 +17,18 @@
 ##' \item{\code{opt}}{the object returned by the optimizer}
 ##' 
 ##' @examples
-##' ## fit jmpm to two southern elephant seals
+##' ## fit jmpm to two southern elephant seal tracks
 ##' data(xs)
-##' dmp <- grab(xs, "predicted", as_sf=FALSE)
-##' dmp <- dmp[, c("id", "date", "lon", "lat")]
-##' fmpm <- fit_mpm(dmp, model = "jmpm")
-##' 
+##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr "%>%" mutate
+##' @importFrom dplyr "%>%" mutate select
 ##' @importFrom purrr map
 ##' @export
 fit_mpm <- function(x,
-                    model = c("mpm", "jmpm"),
+                    what = "predicted",
+                    model = c("jmpm", "mpm"),
+                    coords = 3:4,
                     optim = "optim",
                     optMeth = "L-BFGS-B",
                     verbose = 1,
@@ -38,6 +39,23 @@ fit_mpm <- function(x,
   
   if(verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
+
+  if(inherits(x, "fG_ssm")) {
+    x <- grab(x, what = what, as_sf = FALSE) %>%
+      select(id, date, coords[1], coords[2])
+  } else {
+    x <- x %>% select(id, date, coords[1], coords[2])
+  }
+  
+  if(all(c("x","y") %in% names(x))) {
+    # rescale x,y in km for better optimisation
+    xm <- max(x$x)
+    ym <- max(x$y)
+    x <- x %>% mutate(x = x/xm, y = y/ym)
+  } else {
+    # standardise coord names to x,y 
+    names(x)[3:4] <- c("x","y")
+  }
 
   switch(model,
          mpm = {

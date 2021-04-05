@@ -20,3 +20,8 @@ test_that("fit_mpm returns fG_mpm list w 8 elements", {
   expect_equal(length(fmp$mpm[[1]]), 8)
 })
 
+test_that("fit_mpm fits directly to an fG_ssm object", {
+  fmp <- fit_mpm(xs, model = "jmpm", verbose = 0)
+  expect_s3_class(fmp, "fG_mpm")
+  expect_equal(length(fmp$mpm[[1]]), 8)
+})

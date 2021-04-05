@@ -6,7 +6,9 @@
 \usage{
 fit_mpm(
   x,
-  model = c("mpm", "jmpm"),
+  what = "predicted",
+  model = c("jmpm", "mpm"),
+  coords = 3:4,
   optim = "optim",
   optMeth = "L-BFGS-B",
   verbose = 1,
@@ -15,9 +17,13 @@ fit_mpm(
 )
 }
 \arguments{
-\item{x}{a data frame of observations (see details)}
+\item{x}{a `fG_ssm` fit object or a data frame of observations (see details)}
+
+\item{what}{if a `fG_ssm` fit object is supplied then \code{what} determines whether fitted or predicted (default) values are mapped; ignored if \code{x} is a data frame}
 
 \item{model}{mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})}
+
+\item{coords}{column numbers of the location coordinates (default = 3:4)}
 
 \item{optim}{numerical optimizer}
 
@@ -38,14 +44,11 @@ a list with components
 \item{\code{opt}}{the object returned by the optimizer}
 }
 \description{
-fit a random walk with time-varying move persistence to location data (e.g., output from \code{fit_ssm})
+fit a random walk with time-varying move persistence to temporally regular or irregular location data
 }
 \examples{
-## fit jmpm to two southern elephant seals
+## fit jmpm to two southern elephant seal tracks
 data(xs)
-dmp <- grab(xs, "predicted", as_sf=FALSE)
-dmp <- dmp[, c("id", "date", "lon", "lat")]
-fmpm <- fit_mpm(dmp, model = "jmpm")
-
+fmpm <- fit_mpm(xs, model = "jmpm")
 
 }

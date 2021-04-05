@@ -6,7 +6,7 @@
 \usage{
 mpmf(
   x,
-  model = c("mpm", "jmpm"),
+  model = c("jmpm", "mpm"),
   optim = c("nlminb", "optim"),
   optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
   verbose = TRUE,

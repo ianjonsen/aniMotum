@@ -29,6 +29,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: (type = 1) 1-d time series of fits to data, 
@@ -42,7 +43,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom tibble enframe
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
-##' @importFrom wesanderson wes_palette
+##' @importFrom grDevices hcl.colors
 ##' @method plot fG_ssm
 ##'
 ##' @examples
@@ -53,15 +54,23 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @export
 
-plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = TRUE, pages = 1, ncol = 2, ...)
-{
-  if (length(list(...)) > 0) {
-    warning("additional arguments ignored")
-  }
-  
+plot.fG_ssm <-
+  function(x,
+           what = c("fitted", "predicted"),
+           type = 1,
+           outlier = TRUE,
+           pages = 1,
+           ncol = 2,
+           pal = "Zissou1",
+           ...)
+  {
+    if (length(list(...)) > 0) {
+      warning("additional arguments ignored")
+    }
+    
   what <- match.arg(what)
   
-  wpal <- wes_palette("Zissou1", n = 5, "discrete")
+  wpal <- hcl.colors(n = 5, palette = pal)
   
   if(inherits(x, "fG_ssm")) {
     switch(what,
@@ -102,7 +111,8 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
       if(pages == 1) {
         ## plot SE ribbon first
         p <- ggplot() + 
-          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
+          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), 
+                      fill=wpal[5], alpha = 0.4)
       
         if(outlier) {
           p <- p + 
@@ -131,7 +141,9 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
         
        p <- lapply(1:nrow(x), function(i) {
           px <- ggplot() + 
-            geom_ribbon(data = pd.lst[[i]], aes(date, ymin = value - 2 * se, ymax = value + 2 * se), fill=wpal[5], alpha = 0.4)
+            geom_ribbon(data = pd.lst[[i]], aes(date, ymin = value - 2 * se, 
+                                                ymax = value + 2 * se), 
+                        fill=wpal[5], alpha = 0.4)
           
           if(outlier) {
             px <- px + 
@@ -139,16 +151,20 @@ plot.fG_ssm <- function(x, what = c("fitted","predicted"), type = 1, outlier = T
                          colour = wpal[4], shape = 4) +
               geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
                          colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+              geom_rug(data = dd.lst[[i]] %>% filter(!keep), aes(date), 
+                       colour = wpal[4], sides = "b") + 
+              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
+                       colour = wpal[1], sides = "b")
           } else {
             px <- px + 
               geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
                          colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
+              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
+                       colour = wpal[1], sides = "b")
           }  
           px <- px + 
-            geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
+            geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], 
+                       shape = 20, size = 0.75) + 
             facet_wrap(facets = vars(coord), scales = "free",
                        labeller = labeller(coord = label_value),
                        ncol = 2) +

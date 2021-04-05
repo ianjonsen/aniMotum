@@ -4,7 +4,16 @@
 \alias{plot.fG_mpm}
 \title{plot}
 \usage{
-\method{plot}{fG_mpm}(x, y = NULL, pages = 1, asp = 0, ncol = 1, ...)
+\method{plot}{fG_mpm}(
+  x,
+  y = NULL,
+  pages = 1,
+  asp = 1,
+  ncol = 1,
+  pal = "Zissou1",
+  rev = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{foieGras} \code{mpm} fit object with class \code{fG_mpm}}
@@ -14,10 +23,14 @@ otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendere
 
 \item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
 
-\item{asp}{used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1), or allow aspect ratio to vary between plots (asp = 0; default). 
+\item{asp}{used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1; default), or allow aspect ratio to vary (asp = 0). 
 Ignored if \code{y} is NULL and/or pages = 0}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0}
+
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+
+\item{rev}{reverse colour palette (logical)}
 
 \item{...}{additional arguments to be ignored}
 }

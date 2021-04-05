@@ -4,14 +4,28 @@
 \alias{plot.fG_osar}
 \title{plot}
 \usage{
-\method{plot}{fG_osar}(x, type = c("qqnorm", "histogram"), bw = 0.5, ...)
+\method{plot}{fG_osar}(
+  x,
+  type = c("ts", "qqnorm", "acf"),
+  bw = 0.5,
+  pages = 1,
+  ncol = 1,
+  pal = "Zissou1",
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{foieGras osar} object with class `fG_osar`}
 
-\item{type}{type of residual plot to generate; either qqnorm (default) or histogram}
+\item{type}{type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)}
 
 \item{bw}{binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"}
+
+\item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
+
+\item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
+
+\item{pal}{\code{hcl.colors} colour palette to use (default = "Zissou1"; type \code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
 }

@@ -11,6 +11,7 @@
   outlier = TRUE,
   pages = 1,
   ncol = 2,
+  pal = "Zissou1",
   ...
 )
 }
@@ -26,6 +27,8 @@
 \item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
+
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
 }

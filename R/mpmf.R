@@ -25,7 +25,7 @@
 
 mpmf <-
   function(x,
-           model = c("mpm", "jmpm"),
+           model = c("jmpm", "mpm"),
            optim = c("nlminb", "optim"),
            optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
            verbose = TRUE,
@@ -67,41 +67,30 @@ mpmf <-
     # Scale to median
     x$dt <- x$dt / median(x$dt, na.rm=TRUE)
 
-        switch(model,
+    switch(model,
            jmpm = {
              # Number of tracks (or individual if only one track per individual)
              A <- nrow(count(x, id, tid))
+             
              data.tmb <- list(
                model_name = model,
-               x = cbind(x$lon, x$lat),
+               x = cbind(x$x, x$y),
                dt = x$dt,
                A = as.integer(A),
                idx = as.integer(idx)
              )
            },
            mpm = {
-             data.tmb <- list(
-               model_name = model,
-               x = cbind(x$lon, x$lat),
-               dt = x$dt
-             )
+             data.tmb <- list(model_name = model,
+                              x = cbind(x$x, x$y),
+                              dt = x$dt)
            })
-  
-    parameters <- switch(model, 
-                         jmpm = {
-                           list(
-                             lg = rep(0, dim(x)[1]),
-                             log_sigma = c(0, 0),
-                             log_sigma_g = 0
-                             )
-                           },
-                           mpm = {
-                             list(
-                               lg = rep(0, dim(x)[1]),
-                               log_sigma = c(0, 0),
-                               log_sigma_g = 0
-                             )
-                           })
+    
+    parameters <- list(
+      lg = rep(0, dim(x)[1]),
+      log_sigma = c(0, 0),
+      log_sigma_g = 0
+    )
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -190,7 +179,7 @@ mpmf <-
         id = x$id,
         date = x$date,
         g = plogis(lgs[, 1]),
-        g.se = lgs[, 2]      
+        g.se = lgs[, 2]
       )
     } else {
       fitted <- tibble(

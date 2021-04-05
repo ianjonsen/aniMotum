@@ -62,7 +62,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                as.data.frame(.)
              names(xy) <- c("x", "y")
              ll <- x %>%
-               st_transform("+proj=longlat +ellps=WGS84") %>%
+               st_transform("+proj=longlat +datum=WGS84") %>%
                st_coordinates(.) %>%
                as.data.frame(.)
              names(ll) <- c("lon", "lat")
@@ -81,7 +81,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                ))
              out <- lapply(1:length(out_lst), function(i) {
                st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
-                 st_set_crs("+proj=longlat +ellpsWGS84") %>%
+                 st_set_crs("+proj=longlat +datum=WGS84") %>%
                  st_transform(., prj[[i]])
              }) %>%
                bind_rows(.)
@@ -90,7 +90,8 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = out %>% select(id, date, x.se, y.se, geometry),
-                 crw = out %>% select(id, date, u, v, u.se, v.se, x.se, y.se, geometry)
+                 crw = out %>% select(id, date, u, v, u.se, v.se, x.se, 
+                                      y.se, s, s.se, geometry)
                )
                
              } else {
@@ -114,7 +115,8 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = out %>% select(id, date, lon, lat, x, y, x.se, y.se),
-                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, u, v, u.se, v.se)
+                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, 
+                                       u, v, u.se, v.se, s, s.se)
                ) %>% as_tibble()
              } else {
                out <- out %>%
