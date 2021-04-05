@@ -179,7 +179,7 @@ mpmf <-
         id = x$id,
         date = x$date,
         g = plogis(lgs[, 1]),
-        g.se = lgs[, 2]      
+        g.se = lgs[, 2]
       )
     } else {
       fitted <- tibble(

@@ -93,7 +93,7 @@ ellp.par <- function(lc) {
 ##' @description simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters. 
 ##' @param x a compound \code{fG_ssm} model fit object (ignored if NULL)
 ##' @param reps number of replicate tracks to simulate from an \code{fG_ssm} model fit object (ignored if x is NULL)
-##' @param what simulate fitted (irregular in time) or predicted (typically regular in time) locations 
+##' @param what simulate fitted (typically irregular in time) or predicted (typically regular in time) locations 
 ##' @param sim_only do not include \code{fG_ssm} estimated location in output (default is FALSE)
 ##' @param N number of time steps to simulate (ignored if x is supplied)
 ##' @param start coordinates and datetime of start location for simulated track (ignored if x is supplied)
@@ -115,13 +115,13 @@ ellp.par <- function(lc) {
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
-##' sim <- simulate(fit, reps = 2, what = "predicted")
+##' trs <- sim(fit, reps = 2, what = "predicted")
 ##' plot(sim)
 ##' 
-##' sim <- simulate(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
-##' plot(sim, error = TRUE)
+##' tr <- sim(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
+##' plot(tr, error = TRUE)
 ##' 
-##' sim <- simulate(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
+##' tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
 ##' tdist = "gamma", tpar = c(1, 4))
 ##' plot(sim, error = TRUE, pal = "Cividis")
 ##' 
@@ -136,7 +136,7 @@ ellp.par <- function(lc) {
 ##' 
 ##' @export
 
-simulate <- function(x = NULL, 
+sim <- function(x = NULL, 
                      reps = 1,
                      what = c("fitted", "predicted"),
                      sim_only = FALSE,
