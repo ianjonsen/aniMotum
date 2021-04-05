@@ -20,11 +20,11 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 
 master branch:  
 [![Build
-Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.org/ianjonsen/foieGras)
+Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.com/ianjonsen/foieGras)
 
 dev branch:  
 [![Build
-Status](https://travis-ci.org/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.org/ianjonsen/foieGras)
+Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.com/ianjonsen/foieGras)
 <!-- badges: end -->
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
@@ -42,8 +42,8 @@ SSM-estimated most-probable track.
 
 ## Installation
 
-First, ensure you have R version &gt;= 3.6.0 installed (preferably R
-4.0.0 or higher):
+First, ensure you have R version \>= 3.6.0 installed (preferably R 4.0.0
+or higher):
 
 ``` r
 R.Version()
@@ -54,7 +54,8 @@ R.Version()
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and
 can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
+`install.packages("foieGras", depedencies =
+c("Imports","LinkingTo","Suggests"))`
 
 ### From GitHub (source)
 
@@ -62,8 +63,10 @@ On PC’s running Windows, ensure you have installed
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
 
 On Mac’s, ensure you have installed the [Command Line Tools for
-Xcode](https://developer.apple.com/download/more/). A full Xcode install
-uses up a lot of disk space and is not required.
+Xcode](https://developer.apple.com/download/more/) by executing
+`xcode-select --install` in the terminal; or you can download the latest
+version from the URL (free developer registration may be required). A
+full Xcode install uses up a lot of disk space and is not required.
 
 To get the very latest `foieGras` stable version, you can install from
 GitHub:
@@ -110,6 +113,7 @@ plot(fit, what = "predicted")
 ![](man/figures/README-example-1.png)<!-- -->
 
 ``` r
+
 fmp <- fit %>% 
   grab(what = "predicted", as_sf = FALSE) %>%
   select(id, date, lon, lat) %>%
@@ -121,6 +125,7 @@ plot(fmp)
 ![](man/figures/README-example-2.png)<!-- -->
 
 ``` r
+
 fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84")
 ```
 
