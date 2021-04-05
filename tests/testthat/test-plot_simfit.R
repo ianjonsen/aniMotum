@@ -1,15 +1,15 @@
 context("test plot_simfit")
 
-tr <- sim(xs, reps = 2, what = "fitted")
+trs <- sim(xs, reps = 2, what = "fitted")
 
 ## expect plot is silent
-test_that("plot completes silently - fitted", {
-  tp <- plot(tr, ncol = 2, pal = "Cividis", rev = TRUE)
+test_that("plot completes silently", {
+  tp <- expect_warning(plot(trs, ncol = 2, pal = "Cividis", rev = TRUE))
   expect_s3_class(tp, c("patchwork", "gg", "ggplot", exact = TRUE))
 })
 
 ## expect plot is silent
-test_that("plot completes silently - fitted", {
-  tp <- plot(tr)
+test_that("plot completes silently", {
+  tp <- plot(trs)
   expect_s3_class(tp, c("patchwork", "gg", "ggplot", exact = TRUE))
 })

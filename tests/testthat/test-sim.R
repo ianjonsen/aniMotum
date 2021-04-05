@@ -4,7 +4,6 @@ data(xs)
 trs <- sim(xs, reps = 2, what = "fitted")
 
 test_that("sim returns fG_simfit nested tibble with 2 rows", {
-  
   expect_s3_class(trs, "fG_simfit")
   expect_s3_class(trs, "fG_crws")
   expect_equal(nrow(trs), 2)
@@ -12,6 +11,13 @@ test_that("sim returns fG_simfit nested tibble with 2 rows", {
 
 test_that("sim returns a tibble including estimated track, rep = 0", {
   expect_equal(trs$sims[[1]]$rep[1], 0)
+})
+
+test_that("sim returns fG_simfit nested tibble with 2 rows", {
+  trs <- sim(xs, reps = 2, what = "predicted")
+  expect_s3_class(trs, "fG_simfit")
+  expect_s3_class(trs, "fG_crws")
+  expect_equal(nrow(trs), 2)
 })
 
 test_that("sim returns a tibble excluding estimated track, rep = 0", {
