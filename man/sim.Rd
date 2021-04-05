@@ -74,13 +74,13 @@ simulate from the \code{rw} or \code{crw} process models to generate either a se
 \examples{
 fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
 trs <- sim(fit, reps = 2, what = "predicted")
-plot(sim)
+plot(trs)
 
 tr <- sim(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 plot(tr, error = TRUE)
 
 tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
 tdist = "gamma", tpar = c(1, 4))
-plot(sim, error = TRUE, pal = "Cividis")
+plot(tr, error = TRUE, pal = "Cividis")
 
 }
