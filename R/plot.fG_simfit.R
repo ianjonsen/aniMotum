@@ -67,8 +67,5 @@ plot.fG_simfit <- function(x,
   })
 
   wrap_plots(p, ncol = ncol)
-  
-  p
-  
 }
   

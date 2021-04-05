@@ -467,16 +467,19 @@ sim <- function(x = NULL,
           do.call(rbind, .) %>%
           as_tibble()
         
-        loc <- grab(x[k,], what = what, as_sf = FALSE) %>%
-          mutate(rep = 0)
-        switch(model,
-               crw = { 
-                 loc <- loc %>% select(rep, date, x, y, u, v)
+        if (!sim_only) {
+          loc <- grab(x[k, ], what = what, as_sf = FALSE) %>%
+            mutate(rep = 0)
+          switch(model,
+                 crw = {
+                   loc <- loc %>% select(rep, date, x, y, u, v)
                  },
-               rw = {
-                 loc <- loc %>% select(rep, date, x, y)
-               })
-        tmp <- rbind(loc, tmp)
+                 rw = {
+                   loc <- loc %>% select(rep, date, x, y)
+                 })
+          tmp <- rbind(loc, tmp)
+        }
+        
         ## lon,lat
         tmp <- st_as_sf(tmp, coords = c("x","y"), crs = "+proj=merc +units=km +datum=WGS84")
         xy <- st_coordinates(tmp) %>% as.data.frame()
@@ -491,9 +494,9 @@ sim <- function(x = NULL,
           as_tibble() %>%
           select(rep, date, lon, lat, x, y, everything())
       }) 
-    
+
     d <- tibble(id = x$id, model = x$pmodel, sims = d)
-    switch(model,
+    switch(unique(x$pmodel),
            rw = { 
              class(d) <- append("fG_rws", class(d))
            },
