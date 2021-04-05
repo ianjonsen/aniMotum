@@ -26,5 +26,7 @@ Plots of simulated tracks. Can be rendered all on a single page (pages = 1) or o
 visualize simulated tracks from a fG_sim data.frame
 }
 \examples{
+tr <- sim(N=100, model = "crw")
+plot(tr, error = TRUE)
 
 }

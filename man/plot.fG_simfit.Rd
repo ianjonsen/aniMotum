@@ -4,7 +4,7 @@
 \alias{plot.fG_simfit}
 \title{plot}
 \usage{
-\method{plot}{fG_simfit}(x, ncol = 1, pal = "Zissou1", rev = FALSE, ...)
+\method{plot}{fG_simfit}(x, ncol = 1, pal = "Zissou1", ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}
@@ -22,5 +22,7 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
+trs <- sim(xs, reps = 1)
+plot(trs)
 
 }

@@ -18,13 +18,14 @@
 ##' @method plot fG_simfit
 ##'
 ##' @examples
+##' trs <- sim(xs, reps = 1)
+##' plot(trs)
 ##'
 ##' @export
 
 plot.fG_simfit <- function(x, 
                            ncol = 1,
                            pal = "Zissou1",
-                           rev = FALSE,
                         ...)
 {
   if (length(list(...)) > 0) {

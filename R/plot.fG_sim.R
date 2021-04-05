@@ -22,7 +22,9 @@
 ##' @method plot fG_sim
 ##'
 ##' @examples
-##'
+##' tr <- sim(N=100, model = "crw")
+##' plot(tr, error = TRUE)
+##' 
 ##' @export
 
 plot.fG_sim <- function(x, 
