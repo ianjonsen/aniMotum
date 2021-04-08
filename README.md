@@ -19,12 +19,10 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
-[![Build
-Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.com/ianjonsen/foieGras)
+![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 
 dev branch:  
-[![Build
-Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.com/ianjonsen/foieGras)
+![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
@@ -42,8 +40,8 @@ SSM-estimated most-probable track.
 
 ## Installation
 
-First, ensure you have R version \>= 3.6.0 installed (preferably R 4.0.0
-or higher):
+First, ensure you have R version &gt;= 3.6.0 installed (preferably R
+4.0.0 or higher):
 
 ``` r
 R.Version()
@@ -54,8 +52,7 @@ R.Version()
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and
 can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies =
-c("Imports","LinkingTo","Suggests"))`
+`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
 
 ### From GitHub (source)
 
@@ -113,20 +110,18 @@ plot(fit, what = "predicted")
 ![](man/figures/README-example-1.png)<!-- -->
 
 ``` r
-
 fmp <- fit %>% 
   grab(what = "predicted", as_sf = FALSE) %>%
   select(id, date, lon, lat) %>%
   fit_mpm(model = "jmpm", verbose = 0) ## turn off parameter trace for tidy output
 
-plot(fmp)
+plot(fmp, pal = "Zissou1", rev = TRUE)
 ```
 
 ![](man/figures/README-example-2.png)<!-- -->
 
 ``` r
-
-fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84")
+fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84", pal = "Cividis")
 ```
 
 ![](man/figures/README-example-3.png)<!-- -->

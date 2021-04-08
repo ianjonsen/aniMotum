@@ -25,10 +25,10 @@ knitr::opts_chunk$set(
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
-![example branch parameter](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yml/badge.svg?branch=master)
+![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 
 dev branch:  
-![example branch parameter](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
+![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
 
@@ -74,7 +74,7 @@ fmp <- fit %>%
   select(id, date, lon, lat) %>%
   fit_mpm(model = "jmpm", verbose = 0) ## turn off parameter trace for tidy output
 
-plot(fmp)
+plot(fmp, pal = "Zissou1", rev = TRUE)
 
 fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84", pal = "Cividis")
 ```
