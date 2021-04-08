@@ -1,6 +1,4 @@
-# NOTE: This workflow is overkill for most R packages
-# check-standard.yaml is likely a better choice
-# usethis::use_github_action("check-standard") will install it.
+# Hybrid of r-lib/actions "check-standard" and "check-full"
 #
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
@@ -9,7 +7,6 @@ on:
     branches:
       - main
       - master
-      
   pull_request:
     branches:
       - main
@@ -30,9 +27,8 @@ jobs:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: '3.6'}
-          - {os: ubuntu-18.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest", http-user-agent: "R/4.0.0 (ubuntu-18.04) R (4.0.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
-          - {os: ubuntu-18.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
-          - {os: ubuntu-18.04,   r: 'oldrel',  rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
+          - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -70,14 +66,14 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "16.04"))')
-      
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+          
       - name: Install geospatial libraries
         if: runner.os == 'Linux'
         run: |
-          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && sudo apt-get update -y
-          sudo apt-get install -y libudunits2-dev libgdal-dev libgeos-dev libproj-dev
-          pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`  
+          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis
+          sudo apt-get update -y
+          sudo apt-get install -y gdal-bin libudunits2-dev libgdal-dev libgeos-dev libproj-dev
 
       - name: Install dependencies
         run: |
@@ -97,7 +93,7 @@ jobs:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
           options(crayon.enabled = TRUE)
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "error", check_dir = "check")
         shell: Rscript {0}
 
       - name: Show testthat output
