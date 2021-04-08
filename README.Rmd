@@ -25,10 +25,10 @@ knitr::opts_chunk$set(
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
-[![Build Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=master)](https://travis-ci.com/ianjonsen/foieGras)  
+![example branch parameter](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yml/badge.svg?branch=master)
 
 dev branch:  
-[![Build Status](https://travis-ci.com/ianjonsen/foieGras.svg?branch=dev)](https://travis-ci.com/ianjonsen/foieGras)
+![example branch parameter](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
 
@@ -76,7 +76,7 @@ fmp <- fit %>%
 
 plot(fmp)
 
-fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84")
+fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84", pal = "Cividis")
 ```
 
 ## Learn more
