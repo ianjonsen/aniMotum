@@ -9,12 +9,11 @@ on:
     branches:
       - main
       - master
-      - dev
+      
   pull_request:
     branches:
       - main
       - master
-      - dev
 
 name: R-CMD-check
 
