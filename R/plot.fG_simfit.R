@@ -54,8 +54,8 @@ plot.fG_simfit <- function(x,
       geom_sf(
         data = x %>% filter(rep != 0),
         colour = hcl.colors(n=5, palette = pal)[1],
-        size = 0.2,
-        alpha = 0.25
+        size = 0.5,
+        alpha = 0.4
       ) +
       geom_sf(
         data = x %>% filter(rep == 0),

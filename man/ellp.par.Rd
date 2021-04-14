@@ -15,3 +15,4 @@ to sample smaj, smin from log-normals & eor froma von Mises, then convert
 ellipse params to covariance matrix and sample x,y errors from multivariate
 normal. Returns both ellipse params and x,y errors
 }
+\keyword{internal}

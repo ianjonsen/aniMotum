@@ -27,7 +27,7 @@
 ##' @importFrom trip sda speedfilter trip
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median qlogis qnorm pnorm runif
-##' @importFrom utils flush.console
+##' @importFrom utils flush.console globalVariables
 ##' @importFrom ggplot2 ggplot geom_point geom_path geom_ribbon geom_qq geom_qq_line geom_histogram aes ggtitle theme_bw
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit aes_string
 ##' @importFrom ggplot2 element_text scale_colour_manual scale_colour_gradientn

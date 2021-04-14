@@ -34,7 +34,7 @@ argos_lc <- function(N) {
 ##' @importFrom stats rlnorm
 ##' @importFrom mvtnorm rmvnorm
 ##' 
-##' @export
+##' @keywords internal
 
 ellp.par <- function(lc) {
   
@@ -87,37 +87,41 @@ ellp.par <- function(lc) {
          ) 
 }
 
-
-##' @title simulate animal tracks from a \code{fG_ssm} fit or from scratch
+##' @title simulate animal tracks
 ##'
-##' @description simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters. 
-##' @param x a compound \code{fG_ssm} model fit object (ignored if NULL)
-##' @param reps number of replicate tracks to simulate from an \code{fG_ssm} model fit object (ignored if x is NULL)
-##' @param what simulate fitted (typically irregular in time) or predicted (typically regular in time) locations 
-##' @param sim_only do not include \code{fG_ssm} estimated location in output (default is FALSE)
-##' @param N number of time steps to simulate (ignored if x is supplied)
-##' @param start coordinates and datetime of start location for simulated track (ignored if x is supplied)
-##' @param model simulate from the \code{rw}, \code{crw} or \code{mpm} process models (ignored if x is supplied)
-##' @param vmax maximum travel rate (m/s) of simulated animal (ignored if x is supplied)
-##' @param sigma a vector of process error sd's for the \code{rw} model (ignored if x is supplied or if \code{model != "rw"})
-##' @param rho_p correlation parameter for \code{rw} model process covariance matrix (ignored if x is supplied or if \code{model != "rw"})
-##' @param D diffusion coefficient for \code{crw} model process covariance matrix (ignored if x is supplied or if \code{model != "crw"})
-##' @param sigma_g random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})
-##' @param error indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf") (ignored if x is supplied)
-##' @param tau vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf"})
-##' @param rho_o correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf"})
-##' @param tdist distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)
-##' @param ts time interval in h (ignored if x is supplied)
-##' @param tpar shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{tdist = "reg"})
-##' @param alpha transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)
+##' @description simulate from the \code{rw}, \code{crw} of \code{mpm} process models 
+##' to generate a set of x,y (or lon,lat) coordinates with or without error from 
+##' supplied input parameters. 
+##' @param N number of time steps to simulate
+##' @param start coordinates and datetime of start location for simulated track
+##' @param model simulate from the \code{rw}, \code{crw} or \code{mpm} process models
+##' @param vmax maximum travel rate (m/s) of simulated animal
+##' @param sigma a vector of process error sd's for the \code{rw} model 
+##' (ignored if \code{model != "rw"})
+##' @param rho_p correlation parameter for \code{rw} model process covariance matrix 
+##' (ignored if \code{model != "rw"})
+##' @param D diffusion coefficient for \code{crw} model process covariance matrix 
+##' (ignored if \code{model != "crw"})
+##' @param sigma_g random walk sd for time-varying move persistence parameter 
+##' (ignored if \code{model != "mpm"})
+##' @param error indicates whether measurement error should mimic Argos 
+##' Least-Squares ("ls") or Argos Kalman Filter ("kf")
+##' @param tau vector of LS measurement error sd's (ignored if \code{error = "kf"})
+##' @param rho_o correlation parameter for LS covariance matrix 
+##' (ignored if \code{error = "kf"})
+##' @param tdist distribution for simulating location times ("reg" generates locations 
+##' at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
+##' time intervals)
+##' @param ts time interval in h
+##' @param tpar shape and scale parameters for the gamma distributed times 
+##' (ignored if \code{tdist = "reg"})
+##' @param alpha transition probabilities switching model versions of 
+##' \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
+##' (ignored if sigma has length 2 or D has length 1)
 ##' 
-##' @return if \code{x} supplied then a nested tibble with rows corresponding to the supplied \code{fG_ssm} model fit object with lists of simulated tracks, else if \code{is.null(x)} then a tibble is returned.
+##' @return a tibble is returned
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
-##' trs <- sim(fit, reps = 2, what = "predicted")
-##' plot(trs)
-##' 
 ##' tr <- sim(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 ##' plot(tr, error = TRUE)
 ##' 
@@ -136,38 +140,31 @@ ellp.par <- function(lc) {
 ##' 
 ##' @export
 
-sim <- function(x = NULL, 
-                     reps = 1,
-                     what = c("fitted", "predicted"),
-                     sim_only = FALSE,
-                     N = 100, 
-                     start = list(c(0, 0), Sys.time()),
-                     model = c("rw", "crw", "mpm"),
-                     vmax = 4,
-                     sigma = c(4, 4), 
-                     rho_p = 0,
-                     D = 0.05,
-                     sigma_g = 1.25,
-                     error = c("ls","kf"),
-                     tau = c(1.5, 0.75),
-                     rho_o = 0,
-                     tdist = c("reg", "gamma"),
-                     ts = 3, 
-                     tpar = c(0.23, 1), 
-                     alpha = c(0.9, 0.8)
-                     ) {
+sim <- function(N = 100,
+                start = list(c(0, 0), Sys.time()),
+                model = c("rw", "crw", "mpm"),
+                vmax = 4,
+                sigma = c(4, 4),
+                rho_p = 0,
+                D = 0.05,
+                sigma_g = 1.25,
+                error = c("ls", "kf"),
+                tau = c(1.5, 0.75),
+                rho_o = 0,
+                tdist = c("reg", "gamma"),
+                ts = 3,
+                tpar = c(0.23, 1),
+                alpha = c(0.9, 0.8)) {
+  
   
   ################
   ## Check args ##
   ################
-  what <- match.arg(what)
+  
   model <- match.arg(model)
   error <- match.arg(error)
   tdist <- match.arg(tdist)
 
-  assert_that(what %in% c("fitted","predicted"), 
-              msg = "only `fitted` or `predicted` locations can be simulated 
-              from a model fit")
   assert_that(model %in% c("rw","crw","mpm"), 
               msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
   assert_that(error %in% c("ls","kf"), 
@@ -201,7 +198,6 @@ sim <- function(x = NULL,
   ###########################
   ## Simulate from scratch ##
   ###########################
-  if(is.null(x)) {
     
     mu <- v <- matrix(NA, N, 2)
     mu[1, ] <- start[[1]]
@@ -370,142 +366,5 @@ sim <- function(x = NULL,
     class(d) <- append("fG_sim", class(d))
     
     return(d)
-    
-  } else {
-    ########################################
-    ## Simulate from a foieGras model fit ##
-    ########################################
-    n <- nrow(x)
-    d <- lapply(1:n, function(k) {
-        model <- x$ssm[[k]]$pm
-        switch(what,
-               fitted = {
-                 loc <- grab(x[k,], "fitted")
-                 },
-               predicted = {
-                 loc <- grab(x[k,], "predicted")
-               })
-        N <- nrow(loc)
-        dts <- loc$date
-        dt <-
-          difftime(dts, lag(dts), units = "hours") %>% as.numeric()
-        dt[1] <- 0
-        
-        switch(model,
-               crw = {
-                 Sigma <- diag(2) * 2 * x$ssm[[k]]$par["D", 1]
-                 vmin <- with(loc,
-                              c(min(u, na.rm = TRUE),
-                                min(v, na.rm = TRUE))) # in km/h
-                 vmax <- with(loc,
-                              c(max(u, na.rm = TRUE),
-                                max(v, na.rm = TRUE)))
-               },
-               rw = {
-                 Sigma <-
-                   diag(2) * c(x$ssm[[k]]$par["sigma_x", 1], 
-                               x$ssm[[k]]$par["sigma_y", 1]) ^ 2
-                 Sigma[!Sigma] <-
-                   prod(Sigma[1, 1]^0.5, Sigma[2, 2]^0.5) * x$ssm[[k]]$par["rho_p", 1]
-                 vmin <- with(loc, c(min(diff(x), na.rm = TRUE), 
-                                     min(diff(y), na.rm = TRUE)))
-                 vmax <- with(loc, c(max(diff(x), na.rm = TRUE), 
-                                     max(diff(y), na.rm = TRUE)))
-               })
-        
-        ###############################
-        ## Simulate movement process ##
-        ###############################
-        tmp <- lapply(1:reps, function(j) {
-          switch(model,
-                 crw = {
-                   mu <- v <- matrix(NA, N, 2)
-                   mu[1,] <- st_coordinates(loc$geometry)[1,]
-                   v[1, ] <- c(loc$u[1], loc$v[1])
-                   for (i in 2:N) {
-                     v[i,] <- rtmvnorm(1,
-                                       v[i - 1,],
-                                       sigma = Sigma * dt[i],
-                                       lower = vmin,
-                                       upper = vmax)
-                     mu[i,] <- mu[i - 1,] + v[i,] * dt[i]
-                     ## keep within world Mercator y bounds (km)
-#                     if(mu[i, 2] < -15496300) mu[i, 2] <- -15496300
-#                     if(mu[i, 2] > 18764386) mu[i, 2] <- 18764386
-                   }
-                   data.frame(
-                     rep = j,
-                     date = dts,
-                     x = mu[, 1],
-                     y = mu[, 2],
-                     u = v[, 1],
-                     v = v[, 2]
-                   )
-                 },
-                 rw = {
-                   mu <- matrix(NA, N, 2) 
-                   mu[1, ] <- st_coordinates(loc$geometry)[1,]
-                   mu[2, ] <- rmvnorm(1, mu[1,], sigma = Sigma * dt[2]^2)
-                   for (i in 3:N) {
-                     dxy <- rtmvnorm(1, mu[i - 1, ] - mu[i - 2,], 
-                                     sigma = Sigma * dt[i]^2,
-                                     lower = vmin,
-                                     upper = vmax)
-                     mu[i, ] <- mu[i - 1, ] + dxy
-                     ## keep within world Mercator y bounds (km)
-#                     if(mu[i, 2] < -15496300) mu[i, 2] <- -15496300
-#                     if(mu[i, 2] > 18764386) mu[i, 2] <- 18764386
-                   }
-                   data.frame(
-                     rep = j,
-                     date = dts,
-                     x = mu[, 1],
-                     y = mu[, 2]
-                   )
-                 })
-        }) %>% 
-          do.call(rbind, .) %>%
-          as_tibble()
-        
-        if (!sim_only) {
-          loc <- grab(x[k, ], what = what, as_sf = FALSE) %>%
-            mutate(rep = 0)
-          switch(model,
-                 crw = {
-                   loc <- loc %>% select(rep, date, x, y, u, v)
-                 },
-                 rw = {
-                   loc <- loc %>% select(rep, date, x, y)
-                 })
-          tmp <- rbind(loc, tmp)
-        }
-        
-        ## lon,lat
-        tmp <- st_as_sf(tmp, coords = c("x","y"), crs = "+proj=merc +units=km +datum=WGS84")
-        xy <- st_coordinates(tmp) %>% as.data.frame()
-        names(xy) <- c("x","y")
-        ll <- tmp %>% 
-          st_transform(., crs = 4326) %>%
-          st_coordinates(.) %>%
-          as.data.frame(.)
-        names(ll) <- c("lon","lat")
-        st_geometry(tmp) <- NULL
-        cbind(tmp, xy, ll) %>% 
-          as_tibble() %>%
-          select(rep, date, lon, lat, x, y, everything())
-      }) 
-
-    d <- tibble(id = x$id, model = x$pmodel, sims = d)
-    switch(unique(x$pmodel),
-           rw = { 
-             class(d) <- append("fG_rws", class(d))
-           },
-           crw = {
-             class(d) <- append("fG_crws", class(d))
-           })
-    
-    class(d) <- append("fG_simfit", class(d))
-    return(d)
-  }
   
 }

@@ -2,13 +2,9 @@
 % Please edit documentation in R/sim.R
 \name{sim}
 \alias{sim}
-\title{simulate animal tracks from a \code{fG_ssm} fit or from scratch}
+\title{simulate animal tracks}
 \usage{
 sim(
-  x = NULL,
-  reps = 1,
-  what = c("fitted", "predicted"),
-  sim_only = FALSE,
   N = 100,
   start = list(c(0, 0), Sys.time()),
   model = c("rw", "crw", "mpm"),
@@ -27,55 +23,56 @@ sim(
 )
 }
 \arguments{
-\item{x}{a compound \code{fG_ssm} model fit object (ignored if NULL)}
+\item{N}{number of time steps to simulate}
 
-\item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model fit object (ignored if x is NULL)}
+\item{start}{coordinates and datetime of start location for simulated track}
 
-\item{what}{simulate fitted (typically irregular in time) or predicted (typically regular in time) locations}
+\item{model}{simulate from the \code{rw}, \code{crw} or \code{mpm} process models}
 
-\item{sim_only}{do not include \code{fG_ssm} estimated location in output (default is FALSE)}
+\item{vmax}{maximum travel rate (m/s) of simulated animal}
 
-\item{N}{number of time steps to simulate (ignored if x is supplied)}
+\item{sigma}{a vector of process error sd's for the \code{rw} model 
+(ignored if \code{model != "rw"})}
 
-\item{start}{coordinates and datetime of start location for simulated track (ignored if x is supplied)}
+\item{rho_p}{correlation parameter for \code{rw} model process covariance matrix 
+(ignored if \code{model != "rw"})}
 
-\item{model}{simulate from the \code{rw}, \code{crw} or \code{mpm} process models (ignored if x is supplied)}
+\item{D}{diffusion coefficient for \code{crw} model process covariance matrix 
+(ignored if \code{model != "crw"})}
 
-\item{vmax}{maximum travel rate (m/s) of simulated animal (ignored if x is supplied)}
+\item{sigma_g}{random walk sd for time-varying move persistence parameter 
+(ignored if \code{model != "mpm"})}
 
-\item{sigma}{a vector of process error sd's for the \code{rw} model (ignored if x is supplied or if \code{model != "rw"})}
+\item{error}{indicates whether measurement error should mimic Argos 
+Least-Squares ("ls") or Argos Kalman Filter ("kf")}
 
-\item{rho_p}{correlation parameter for \code{rw} model process covariance matrix (ignored if x is supplied or if \code{model != "rw"})}
+\item{tau}{vector of LS measurement error sd's (ignored if \code{error = "kf"})}
 
-\item{D}{diffusion coefficient for \code{crw} model process covariance matrix (ignored if x is supplied or if \code{model != "crw"})}
+\item{rho_o}{correlation parameter for LS covariance matrix 
+(ignored if \code{error = "kf"})}
 
-\item{sigma_g}{random walk sd for time-varying move persistence parameter (ignored if x is supplied or if \code{model != "mpm"})}
+\item{tdist}{distribution for simulating location times ("reg" generates locations 
+at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
+time intervals)}
 
-\item{error}{indicates whether measurement error should mimic Argos Least-Squares ("ls") or Argos Kalman Filter ("kf") (ignored if x is supplied)}
+\item{ts}{time interval in h}
 
-\item{tau}{vector of LS measurement error sd's (ignored if x is supplied or if \code{error = "kf"})}
+\item{tpar}{shape and scale parameters for the gamma distributed times 
+(ignored if \code{tdist = "reg"})}
 
-\item{rho_o}{correlation parameter for LS covariance matrix (ignored if x is supplied or if \code{error = "kf"})}
-
-\item{tdist}{distribution for simulating location times ("reg" generates locations at regular ts intervals, in h; "gamma" uses a gamma distribution to generates random time intervals) (ignored if x is supplied)}
-
-\item{ts}{time interval in h (ignored if x is supplied)}
-
-\item{tpar}{shape and scale parameters for the gamma distributed times (ignored if x is supplied or if \code{tdist = "reg"})}
-
-\item{alpha}{transition probabilities switching model versions of \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals (ignored if x supplied or if sigma has length 2 or D has length 1)}
+\item{alpha}{transition probabilities switching model versions of 
+\code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
+(ignored if sigma has length 2 or D has length 1)}
 }
 \value{
-if \code{x} supplied then a nested tibble with rows corresponding to the supplied \code{fG_ssm} model fit object with lists of simulated tracks, else if \code{is.null(x)} then a tibble is returned.
+a tibble is returned
 }
 \description{
-simulate from the \code{rw} or \code{crw} process models to generate either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length equal to the number of observations used in the SSM fit, or a set of x,y (or lon,lat) coordinates with or without error from supplied input parameters.
+simulate from the \code{rw}, \code{crw} of \code{mpm} process models 
+to generate a set of x,y (or lon,lat) coordinates with or without error from 
+supplied input parameters.
 }
 \examples{
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
-trs <- sim(fit, reps = 2, what = "predicted")
-plot(trs)
-
 tr <- sim(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 plot(tr, error = TRUE)
 
