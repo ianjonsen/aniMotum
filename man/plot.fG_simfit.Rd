@@ -22,7 +22,7 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
-trs <- sim(xs, reps = 1)
-plot(trs)
+trs <- simfit(xs, what = "p", reps = 1)
+plot(trs, ncol = 2)
 
 }

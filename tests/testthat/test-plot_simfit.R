@@ -1,6 +1,6 @@
 context("test plot_simfit")
 
-trs <- sim(xs, reps = 2, what = "fitted")
+trs <- simfit(xs, reps = 2, what = "fitted")
 
 ## expect plot is silent
 test_that("plot completes silently", {

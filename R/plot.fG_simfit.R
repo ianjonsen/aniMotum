@@ -18,8 +18,8 @@
 ##' @method plot fG_simfit
 ##'
 ##' @examples
-##' trs <- sim(xs, reps = 1)
-##' plot(trs)
+##' trs <- simfit(xs, what = "p", reps = 1)
+##' plot(trs, ncol = 2)
 ##'
 ##' @export
 

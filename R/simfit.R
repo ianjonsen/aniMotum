@@ -112,10 +112,9 @@ simfit <- function(x,
                  v = v[, 2]
                )
                if(cpf) {
-                 n <- nrow(df)
-                 time <- as.numeric((dts - dts[1]) / max(as.numeric(dts - dts[1])))
-                 bb.x <- with(df, ((x - x[1]) - time * (x - x[1])[n]) + x[1])
-                 bb.y <- with(df, ((y - y[1]) - time * (y - y[1])[n]) + y[1])
+                 time <- seq(0, 1, length = N)
+                 bb.x <- with(df, ((x - x[1]) - time * (x - x[1])[N]) + x[1])
+                 bb.y <- with(df, ((y - y[1]) - time * (y - y[1])[N]) + y[1])
                  df <- df %>%
                    mutate(x = bb.x,
                           y = bb.y)
@@ -149,12 +148,11 @@ simfit <- function(x,
                ## convert to Brownian-Bridge to simulate a central-place forager
                if(cpf) {
                  n <- nrow(df)
-                 time <- (dts - dts[1]) / max(as.numeric(dts - dts[1]))
-                 bb.x <- with(df, ((x - x[1]) - time * (x - x[1])[n]) + x[1])
-                 bb.y <- with(df, ((y - y[1]) - time * (y - y[1])[n]) + y[1])
-                 df <- df %>%
-                   mutate(x = bb.x,
-                          y = bb.y)
+                 time <- seq(0, 1, length = N)
+                 df <- df %>% 
+                   mutate(x = ((x - x[1]) - time * (x - x[1])[N]) + x[1],
+                          y = ((y - y[1]) - time * (y - y[1])[N]) + y[1]
+                          )
                }
                df
              })
