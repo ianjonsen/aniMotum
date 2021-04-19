@@ -6,7 +6,7 @@
 \usage{
 ssm_control(
   optim = c("nlminb", "optim"),
-  method = c("BFGS", "L-BFGS-B"),
+  method = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
   lower = NULL,
   upper = NULL,
   verbose = 1,

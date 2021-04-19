@@ -307,7 +307,6 @@ sfilter <-
     }
     if(control$optim == "nlminb" | 
        (control$optim == "optim" & 
-        control$method == "L-BFGS-B" & 
         any(is.null(control$lower), is.null(control$upper)))) {
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
@@ -324,13 +323,12 @@ sfilter <-
           l_rho_o=7)
     } else if(control$optim == "nlminb" | 
               (control$optim == "optim" & 
-               control$method == "L-BFGS-B" & 
                all(!is.null(control$lower),
                    !is.null(control$upper)))) {
       L <- control$lower
       U <- control$upper
     }
-      
+ 
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 

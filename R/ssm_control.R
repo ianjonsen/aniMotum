@@ -43,7 +43,7 @@
 
 ssm_control <-
   function(optim = c("nlminb", "optim"),
-           method = c("BFGS", "L-BFGS-B"),
+           method = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
            lower = NULL,
            upper = NULL,
            verbose = 1,
@@ -77,7 +77,11 @@ ssm_control <-
             x.tol = 1.5e-2
           )
       },
-      optim = list(maxit = 2000, reltol = 1.0e-3)
+      optim = list(
+        method = "L-BFGS-B", 
+        maxit = 2000, 
+        reltol = 1.0e-3
+        )
     )
     ## Override control parameters
     pars[names(dots)] <- dots

@@ -1,10 +1,24 @@
+# foieGras 0.7-5
+
+* adds `sim()` to simulate animal tracks using the `rw`, `crw` or `mpm` process models. The `rw` and `crw` models can also be specified with state-switching between multiple behavioural states. Tracks can be simulated with or without Argos (LS or KF) errors, as time-regular or time-irregular
+* adds `simfit()` to simulate animal tracks from `fit_ssm` fit objects
+* adds generic `plot()` methods for `sim` and `simfit` objects
+* adds `ssm_control()` for centralized control over optimizer and optimization method choices, optimizer parameters, and `foieGras` model parameter bounds
+* adds faster and more stable optimization
+* adds time-series and `acf()` plots as option when visualising prediction residuals calculated from `osar()`
+* removes `hist` plots as option when visualising prediction residuals calculated from `osar()`
+* removes (with deprecation errors) `verbose`, `optim`, `optMeth`, and `lpsi` arguments to `fit_ssm`
+* replaces wesanderson::wes_palette("Zissou1") with hcl.colors("Zissou1") and provides arguments to change this default palette
+
+
 # foieGras 0.6-9
 
-* adds wesanderson::wes_palette("Zissou1") as default palette for plots/maps
-* generic plot method for fG_ssm objects can now plot individuals all on 1 page (pages = 1) or on separate pages (pages = 0)
+* adds `wesanderson::wes_palette("Zissou1")` as default palette for plots/maps
+* generic plot method for `fG_ssm` objects can now plot individuals all on 1 page (`pages = 1`) or on separate pages (`pages = 0`)
 * 2-d (track) plots now include confidence ellipses on estimated locations
-* generic plot method for fg_mpm objects now available
-* mapping function (fmap) can optionally take an fg_mpm object to colour locations by behavioural index (gamma_t)
+* generic plot method for `fG_mpm` objects now available
+* mapping function (`fmap`) can optionally take an `fG_mpm` object to colour locations by behavioural index (`gamma_t`)
+
 
 # foieGras 0.6-7
 
