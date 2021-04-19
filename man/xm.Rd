@@ -8,7 +8,7 @@
 .RData
 }
 \description{
-Example foieGras mpm fit object. This example fit 
+Example foieGras mpm fit object. This example fit
 is included purely to speed up examples where a fit object is required
 but fitting to data is not the focus of the example.
 }

@@ -15,15 +15,15 @@ simfit(
 \arguments{
 \item{x}{a compound \code{fG_ssm} model fit object (ignored if NULL)}
 
-\item{what}{simulate fitted (typically irregular in time) or predicted 
+\item{what}{simulate fitted (typically irregular in time) or predicted
 (typically regular in time) locations}
 
-\item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model 
+\item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model
 fit object (ignored if x is NULL)}
 
 \item{cpf}{logical; should simulated tracks return to their start piont (ie. a central-place forager)}
 
-\item{sim_only}{logical, do not include \code{fG_ssm} estimated location in output 
+\item{sim_only}{logical, do not include \code{fG_ssm} estimated location in output
 (default is FALSE)}
 }
 \description{

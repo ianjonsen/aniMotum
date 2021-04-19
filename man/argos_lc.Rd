@@ -10,7 +10,7 @@ argos_lc(N)
 \item{N}{number of location class values to be randomly sampled}
 }
 \description{
-uses data from: 1) all IMOS reprocessed KF data (2012 - 2015); 
+uses data from: 1) all IMOS reprocessed KF data (2012 - 2015);
 2) LESE, SESE, HBTU KF data in Jonsen et al. 2020 Move Ecol to specify
 Argos location quality class proportions
 }

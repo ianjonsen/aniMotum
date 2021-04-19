@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras osar} object with class `fG_osar`}
+\item{x}{a \code{foieGras osar} object with class \code{fG_osar}}
 
 \item{type}{type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)}
 

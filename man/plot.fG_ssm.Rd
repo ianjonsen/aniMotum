@@ -16,7 +16,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
+\item{x}{a \code{foieGras} ssm fit object with class \code{fG_ssm}}
 
 \item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
 
@@ -33,8 +33,8 @@
 \item{...}{additional arguments to be ignored}
 }
 \value{
-a ggplot object with either: (type = 1) 1-d time series of fits to data, 
-separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
+a ggplot object with either: (type = 1) 1-d time series of fits to data,
+separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE);
 or (type = 2) 2-d fits to data (units = km)
 }
 \description{

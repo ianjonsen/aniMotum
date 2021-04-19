@@ -12,12 +12,8 @@ sfilter(
   parameters = NULL,
   map = NULL,
   fit.to.subset = TRUE,
-  optim = c("nlminb", "optim"),
-  optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-  verbose = 1,
-  control = NULL,
-  inner.control = NULL,
-  lpsi = -10
+  control = ssm_control(),
+  inner.control = NULL
 )
 }
 \arguments{
@@ -40,18 +36,18 @@ this if you know what you are doing...}
 \item{fit.to.subset}{fit the SSM to the data subset determined by prefilter
 (default is TRUE)}
 
-\item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
-
-\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"}
-
-\item{verbose}{report progress during minimization (0 = silent; 1 = show parameter trace [default]; 2 = show optimizer trace)}
-
-\item{control}{list of control parameters for the outer optimization (type ?nlminb or ?optim for details)}
+\item{control}{list of control parameters for the outer optimization (see \code{ssm_control} for details)}
 
 \item{inner.control}{list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
 
-\item{lpsi}{lower bound for the psi parameter}
+\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+
+\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+
+\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+
+\item{lpsi}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
 }
 \description{
 generates initial values for model parameters and unobserved states;

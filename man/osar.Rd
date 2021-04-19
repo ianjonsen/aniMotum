@@ -9,7 +9,7 @@ osar(x, method = "fullGaussian", ...)
 \arguments{
 \item{x}{a compound \code{fG} tbl fit object}
 
-\item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)}
+\item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see \code{?TMB::oneStepPrediction} for details)}
 
 \item{...}{other arguments to TMB::oneStepPrediction}
 }

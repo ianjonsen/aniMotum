@@ -9,8 +9,8 @@ grab(x, what = "fitted", as_sf = TRUE)
 \arguments{
 \item{x}{a \code{foieGras} ssm or mpm model object}
 
-\item{what}{the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
-`data` (single letters can be used)}
+\item{what}{the tibble to be grabbed; either \code{fitted}, \code{predicted} (ssm only), or
+\code{data} (single letters can be used)}
 
 \item{as_sf}{logical; if FALSE then return a tibble with un-projected lonlat
 coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.}
@@ -19,7 +19,7 @@ coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
 a tibble with all individual tibble's appended
 }
 \description{
-`grab()` lets you obtain `fitted`, `predicted`, or `data` tibble's
+\code{grab()} lets you obtain \code{fitted}, \code{predicted}, or \code{data} tibble's
 from a compound tibble created when fitting to multiple individual data sets.
 The specified tibble's are appended to a single output tibble.
 }

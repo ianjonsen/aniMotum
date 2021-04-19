@@ -23,7 +23,7 @@ emf
 \details{
 Error Multiplication Factors for Argos (and GPS) locations. Default assumption is that GPS locations are
 10x more accurate than Argos lc 3 in both x and y directions.
- 
+
 User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
 
 \code{emf.x} {emf values for the \code{x} direction}

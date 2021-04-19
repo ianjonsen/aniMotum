@@ -10,7 +10,7 @@ ellp.par(lc)
 \item{lc}{Argos location classes}
 }
 \description{
-uses internal extdata/error_ellipse.RDS params ordered by lc 
+uses internal extdata/error_ellipse.RDS params ordered by lc
 to sample smaj, smin from log-normals & eor froma von Mises, then convert
 ellipse params to covariance matrix and sample x,y errors from multivariate
 normal. Returns both ellipse params and x,y errors

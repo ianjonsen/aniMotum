@@ -21,13 +21,13 @@
 ##' this if you know what you are doing...
 ##' @param fit.to.subset fit the SSM to the data subset determined by prefilter
 ##' (default is TRUE)
-##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"
-##' @param verbose report progress during minimization (0 = silent; 1 = show parameter trace [default]; 2 = show optimizer trace)
-##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
+##' @param control list of control parameters for the outer optimization (see \code{ssm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
-##' @param lpsi lower bound for the psi parameter
+##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
+##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
+##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
+##' @param lpsi `r lifecycle::badge("deprecated")` use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
@@ -49,17 +49,11 @@ sfilter <-
            parameters = NULL,
            map = NULL,
            fit.to.subset = TRUE,
-           optim = c("nlminb", "optim"),
-           optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-           verbose = 1,
-           control = NULL,
-           inner.control = NULL,
-           lpsi=-10) {
+           control = ssm_control(),
+           inner.control = NULL) {
 
     st <- proc.time()
     call <- match.call()
-    optim <- match.arg(optim)
-    optMeth <- match.arg(optMeth)
     model <- match.arg(model)
 
     ## check args
@@ -74,22 +68,8 @@ sfilter <-
                 msg = "map must be a named list of parameters to fix (turn off) in estimation or NULL")
     assert_that(is.logical(fit.to.subset), 
                 msg = "fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
-    assert_that(optim %in% c("nlminb", "optim"),
-                msg = "optimiser can only be either `nlminb` or `optim`")
-    assert_that(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-                msg = "optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
-    assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
-                msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
-    assert_that(any(is.list(control) || is.null(control)), msg = "control must be a named list of valid optimiser control arguments or NULL")
     assert_that(any(is.list(inner.control) || is.null(inner.control)), msg = "inner.control must be a named list of valid newtonOptimiser control arguments or NULL")
-    assert_that(is.numeric(lpsi), msg = "lpsi must be a numeric value defining the lower estimation bound (on log scale) for psi")
     
-    ## populate control list if any parameters specified...
-    if (length(control)) {
-      nms <- names(control)
-      if (!is.list(control) || is.null(nms))
-        stop("'control' argument must be a named list")
-    }
 
     if(length(time.step) > 1 & !is.data.frame(time.step)) {
         stop("\ntime.step must be a data.frame with id's when specifying multiple prediction times")
@@ -302,7 +282,6 @@ sfilter <-
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-    verb <- ifelse(verbose == 2, TRUE, FALSE)
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
 
     obj <-
@@ -312,37 +291,46 @@ sfilter <-
         map = map,
         random = rnd,
         hessian = FALSE,
-        method = optMeth,
+        method = control$method,
         DLL = "foieGras",
-        silent = !verb,
+        silent = !ifelse(control$verbose == 2, TRUE, FALSE),
         inner.control = inner.control
       )
-    #    newtonOption(obj, trace = verbose, smartsearch = TRUE)
-    #    obj$env$inner.control$trace <- verbose
-    #    obj$env$inner.control$smartsearch <- FALSE
-    #    obj$env$inner.control$maxit <- 1
-    obj$env$tracemgc <- verb
 
-    ## add par values to trace if verbose = TRUE
+    obj$env$tracemgc <- ifelse(control$verbose == 2, TRUE, FALSE)
+
+    ## add par values to trace if control$verbose = TRUE
     myfn <- function(x) {
       cat("\r", "pars:  ", round(x, 5), "     ")
       flush.console()
       obj$fn(x)
     }
-
+    if(control$optim == "nlminb" | 
+       (control$optim == "optim" & 
+        control$method == "L-BFGS-B" & 
+        any(is.null(control$lower), is.null(control$upper)))) {
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
-          l_rho_p=-12,
+          l_rho_p=-7,
           l_D=-Inf,
-          l_psi=lpsi,
+          l_psi=-Inf,
           l_tau=c(-Inf,-Inf),
-          l_rho_o=-12) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.99999, 0.99999
+          l_rho_o=-7) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
     U = c(l_sigma=c(Inf,Inf),
-          l_rho_p=12,
+          l_rho_p=7,
           l_D=Inf,
           l_psi=Inf,
           l_tau=c(Inf,Inf),
-          l_rho_o=12)
+          l_rho_o=7)
+    } else if(control$optim == "nlminb" | 
+              (control$optim == "optim" & 
+               control$method == "L-BFGS-B" & 
+               all(!is.null(control$lower),
+                   !is.null(control$upper)))) {
+      L <- control$lower
+      U <- control$upper
+    }
+      
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
@@ -358,23 +346,22 @@ sfilter <-
     oldw <- getOption("warn")
     options(warn = -1)  ## turn warnings off but check if optimizer crashed & return warning at end
     opt <-
-      switch(optim,
+      switch(control$optim,
                               nlminb = try(nlminb(obj$par,
-                                                  ifelse(verbose == 1, myfn, obj$fn),
+                                                  ifelse(control$verbose == 1, myfn, obj$fn),
                                                   obj$gr,
-                                                  control = control,
+                                                  control = control$control,
                                                   lower = L,
                                                   upper = U
-                              ))
-                              , #myfn #obj$fn
+                              )),
                               optim = try(do.call(
                                 optim,
                                 args = list(
                                   par = obj$par,
-                                  fn = ifelse(verbose == 1, myfn, obj$fn),
+                                  fn = ifelse(control$verbose == 1, myfn, obj$fn),
                                   gr = obj$gr,
-                                  method = optMeth,
-                                  control = control,
+                                  method = control$method,
+                                  control = control$control,
                                   lower = L,
                                   upper = U
                                 )
@@ -383,7 +370,7 @@ sfilter <-
     ## if error then exit with limited output to aid debugging
     ## check if pdHess is FALSE at end and return warning
     rep <- try(sdreport(obj))
-    
+   
     options(warn = oldw) ## turn warnings back on
     
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
@@ -488,9 +475,9 @@ sfilter <-
         pv <- NULL
       }
       
-      if (optim == "nlminb") {
+      if (control$optim == "nlminb") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
-      } else if (optim == "optim") {
+      } else if (control$optim == "optim") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
       }
       ## drop sv's from fxd
@@ -512,7 +499,7 @@ sfilter <-
         tmb = obj,
         rep = rep,
         aic = aic,
-        optimiser = optim,
+        optimiser = control$optim,
         time = proc.time() - st
       )
       if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:

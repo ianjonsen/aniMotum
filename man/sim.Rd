@@ -31,45 +31,45 @@ sim(
 
 \item{vmax}{maximum travel rate (m/s) of simulated animal}
 
-\item{sigma}{a vector of process error sd's for the \code{rw} model 
+\item{sigma}{a vector of process error sd's for the \code{rw} model
 (ignored if \code{model != "rw"})}
 
-\item{rho_p}{correlation parameter for \code{rw} model process covariance matrix 
+\item{rho_p}{correlation parameter for \code{rw} model process covariance matrix
 (ignored if \code{model != "rw"})}
 
-\item{D}{diffusion coefficient for \code{crw} model process covariance matrix 
+\item{D}{diffusion coefficient for \code{crw} model process covariance matrix
 (ignored if \code{model != "crw"})}
 
-\item{sigma_g}{random walk sd for time-varying move persistence parameter 
+\item{sigma_g}{random walk sd for time-varying move persistence parameter
 (ignored if \code{model != "mpm"})}
 
-\item{error}{indicates whether measurement error should mimic Argos 
+\item{error}{indicates whether measurement error should mimic Argos
 Least-Squares ("ls") or Argos Kalman Filter ("kf")}
 
 \item{tau}{vector of LS measurement error sd's (ignored if \code{error = "kf"})}
 
-\item{rho_o}{correlation parameter for LS covariance matrix 
+\item{rho_o}{correlation parameter for LS covariance matrix
 (ignored if \code{error = "kf"})}
 
-\item{tdist}{distribution for simulating location times ("reg" generates locations 
-at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
+\item{tdist}{distribution for simulating location times ("reg" generates locations
+at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random
 time intervals)}
 
 \item{ts}{time interval in h}
 
-\item{tpar}{shape and scale parameters for the gamma distributed times 
+\item{tpar}{shape and scale parameters for the gamma distributed times
 (ignored if \code{tdist = "reg"})}
 
-\item{alpha}{transition probabilities switching model versions of 
-\code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
+\item{alpha}{transition probabilities switching model versions of
+\code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals
 (ignored if sigma has length 2 or D has length 1)}
 }
 \value{
 a tibble is returned
 }
 \description{
-simulate from the \code{rw}, \code{crw} of \code{mpm} process models 
-to generate a set of x,y (or lon,lat) coordinates with or without error from 
+simulate from the \code{rw}, \code{crw} of \code{mpm} process models
+to generate a set of x,y (or lon,lat) coordinates with or without error from
 supplied input parameters.
 }
 \examples{

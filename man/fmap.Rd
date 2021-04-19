@@ -23,9 +23,9 @@ fmap(
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class `fG_ssm`}
+\item{x}{a \code{foieGras} ssm fit object with class \code{fG_ssm}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; default is NULL}
+\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm}; default is NULL}
 
 \item{what}{specify which location estimates to map: fitted or predicted}
 
@@ -37,7 +37,7 @@ fmap(
 
 \item{by.date}{when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)}
 
-\item{crs}{`proj4string` for re-projecting locations, if NULL the
+\item{crs}{\code{proj4string} for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used}
 
 \item{ext.rng}{factors to extend the plot range in x and y dimensions

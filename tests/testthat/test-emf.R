@@ -4,7 +4,10 @@ context("test emf")
 data(ellie)
 
 test_that("p has s3 classes `fG_ssmp`, `sf`, `data.frame`", {
-  f <- fit_ssm(ellie, vmax=5, model = "rw", time.step = 48, optim = "nlminb", verbose = 0, emf = 
+  f <- fit_ssm(ellie, vmax=5, model = "rw", time.step = 48, 
+               control = ssm_control(optim = "nlminb", 
+                                     verbose = 0), 
+               emf = 
                  emf(emf.x = c(1, 1, 1, 1, 1, 10), 
                      emf.y  = c(1, 1, 1, 1, 1, 10)
                      )

@@ -19,12 +19,12 @@ fit_ssm(
   map = NULL,
   parameters = NULL,
   fit.to.subset = TRUE,
-  optim = "optim",
-  optMeth = "L-BFGS-B",
-  verbose = 1,
-  control = NULL,
+  control = ssm_control(),
   inner.control = NULL,
-  lpsi = -Inf
+  verbose = NULL,
+  optim = NULL,
+  optMeth = NULL,
+  lpsi = NULL
 )
 }
 \arguments{
@@ -47,7 +47,7 @@ outlier locations}
 \item{model}{fit either a simple random walk ("rw") or correlated random walk
 ("crw") as a continuous-time process model}
 
-\item{time.step}{options: 1) the regular time interval, in hours, to predict to; 
+\item{time.step}{options: 1) the regular time interval, in hours, to predict to;
 2) a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates; 3) NA - turns off prediction and locations are only estimated at observation times.}
 
@@ -64,17 +64,17 @@ this if you know what you are doing}
 \item{fit.to.subset}{fit the SSM to the data subset determined by \code{prefilter}
 (default is TRUE)}
 
-\item{optim}{numerical optimizer to be used ("nlminb" or "optim")}
-
-\item{optMeth}{optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb" (see ?optim for details)}
-
-\item{verbose}{report progress during minimization; 0 for complete silence; 1 for parameter trace; 2 for optimizer trace}
-
-\item{control}{list of control settings for the outer optimizer (see \code{\link{nlminb}} or \code{\link{optim}} for details)}
+\item{control}{list of control settings for the outer optimizer (see \code{ssm_control} for details)}
 
 \item{inner.control}{list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)}
 
-\item{lpsi}{lower bound for the psi parameter}
+\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+
+\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+
+\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+
+\item{lpsi}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
 }
 \value{
 a list with components
@@ -94,31 +94,31 @@ a list with components
 }
 \description{
 fits either a simple random walk or a correlated random walk
-(a random walk on velocity) in continuous time to filter Argos LS, and/or KF/KS location data, 
+(a random walk on velocity) in continuous time to filter Argos LS, and/or KF/KS location data,
 processed light-level geolocation data (GLS), and/or GPS data. Location data of different types can
-combined in a single data frame (see details). Predicts locations at user-specified 
+combined in a single data frame (see details). Predicts locations at user-specified
 time intervals (regular or irregular).
 }
 \details{
-\code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
+\code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type.
 Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
 object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
-can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are 
+can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are
 assumed to have the same error variances as class B. By default, class G (GPS) locations are assumed to have error variances 10x smaller than
-Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude. 
+Argos class 3 variances, but unlike Argos error variances the GPS variances are the same for longitude and latitude.
 
-See \code{\link{emf}} for details on how to modify these assumptions. 
+See \code{\link{emf}} for details on how to modify these assumptions.
 
-Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the 
-above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor"). 
+Argos Kalman Filter (or Kalman Smoother) data should have 8 columns, including the
+above 5 plus "smaj", "smin", "eor" that contain Argos error ellipse variables (in m for "smaj", "smin" and deg for "eor").
 
-Light-level geolocation (GLS) locations can be modelled provided each longitude and latitude has a corresponding standard error. These data 
-should have 7 columns, including the above 5 plus "lonerr", "laterr" (in degrees). In this case, all lc values should be set to "GL". 
+Light-level geolocation (GLS) locations can be modelled provided each longitude and latitude has a corresponding standard error. These data
+should have 7 columns, including the above 5 plus "lonerr", "laterr" (in degrees). In this case, all lc values should be set to "GL".
 
-Multiple location data types can be combined in a single data frame (see the vignette for examples). 
+Multiple location data types can be combined in a single data frame (see the vignette for examples).
 
-When data are provided as an \code{sf-tibble}, the user-specified projection is respected. Otherwise, longlat data are re-projected internally 
-to a global Mercator grid and provided as the default output. An un-projected \code{tibble} of lon,lat and x,y location estimates can be 
+When data are provided as an \code{sf-tibble}, the user-specified projection is respected. Otherwise, longlat data are re-projected internally
+to a global Mercator grid and provided as the default output. An un-projected \code{tibble} of lon,lat and x,y location estimates can be
 obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 }
 \examples{

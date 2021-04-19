@@ -11,7 +11,7 @@ join(ssm, mpm, what.ssm = "predicted", as_sf = TRUE)
 
 \item{mpm}{a \code{foieGras} mpm fitted model object}
 
-\item{what.ssm}{specifies whether ssm `predicted` or `fitted` values are to be extracted}
+\item{what.ssm}{specifies whether ssm \code{predicted} or \code{fitted} values are to be extracted}
 
 \item{as_sf}{logical; if FALSE then return a tibble with un-projected lonlat
 coordinates, otherwise return an sf tibble}
@@ -20,7 +20,7 @@ coordinates, otherwise return an sf tibble}
 a single tbl with all individuals
 }
 \description{
-`join()` joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using `as_sf = FALSE`.
+\code{join()} joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using \code{as_sf = FALSE}.
 }
 \examples{
 ## load example foieGras fit objects (to save time)

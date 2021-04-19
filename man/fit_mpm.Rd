@@ -17,9 +17,9 @@ fit_mpm(
 )
 }
 \arguments{
-\item{x}{a `fG_ssm` fit object or a data frame of observations (see details)}
+\item{x}{a \code{fG_ssm} fit object or a data frame of observations (see details)}
 
-\item{what}{if a `fG_ssm` fit object is supplied then \code{what} determines whether fitted or predicted (default) values are mapped; ignored if \code{x} is a data frame}
+\item{what}{if a \code{fG_ssm} fit object is supplied then \code{what} determines whether fitted or predicted (default) values are mapped; ignored if \code{x} is a data frame}
 
 \item{model}{mpm model to fit; either \code{mpm} with unpooled random walk variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, pooled random variance parameter (\code{sigma_g})}
 
