@@ -111,7 +111,7 @@ model fitting for quality control of locations is comprised of 2 steps: a prefil
 ## load foieGras example data - 2 southern elephant seals
 data("ellies")
 ## prefilter and fit Random Walk SSM using a 24 h time step
-fit <- fit_ssm(ellies, model = "crw", time.step = 24, verbose = 0)
+fit <- fit_ssm(ellies, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
 ```
 these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `verbose = 0` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
 

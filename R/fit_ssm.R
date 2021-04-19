@@ -125,13 +125,13 @@ fit_ssm <- function(d,
               msg = "pf must be either FALSE (fit model) or TRUE (only run prefilter)")
 
 ## warnings for deprecated arguments
-  if(!is.null(verbose)) deprecate_stop("0.7-2", "fit_ssm(verbose)", 
+  if(!is.null(verbose)) deprecate_stop("0.7-5", "fit_ssm(verbose)", 
                                        details = "use `control = ssm_control(verbose)` instead")
-  if(!is.null(optim)) deprecate_stop("0.7-2", "fit_ssm(optim)", 
+  if(!is.null(optim)) deprecate_stop("0.7-5", "fit_ssm(optim)", 
                                      details = "use `control = ssm_control(optim)` instead")
-  if(!is.null(optMeth)) deprecate_stop("0.7-2", "fit_ssm(optMeth)", 
+  if(!is.null(optMeth)) deprecate_stop("0.7-5", "fit_ssm(optMeth)", 
                                        details = "use `control = ssm_control(method)` instead")
-  if(!is.null(lpsi)) deprecate_stop("0.7-2", "fit_ssm(lpsi)", 
+  if(!is.null(lpsi)) deprecate_stop("0.7-5", "fit_ssm(lpsi)", 
                                     details = "use `control = ssm_control(lower)` instead")
   
   fit <- d %>%
