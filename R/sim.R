@@ -38,8 +38,7 @@ argos_lc <- function(N) {
 
 ellp.par <- function(lc) {
   
-  ellps.tab <-
-    readRDS(system.file("extdata", "error_ellipse.RDS",
+  load(system.file("extdata", "ellps_tab.rda",
                         package = "foieGras"))
   n <- length(lc)
   
@@ -119,11 +118,34 @@ ellp.par <- function(lc) {
 ##' \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
 ##' (ignored if sigma has length 2 or D has length 1)
 ##' 
-##' @return a tibble is returned
+##' @return a tibble is returned with columns that can include some or all of the following, 
+##' depending on the arguments used
+##' \item{date}{time as POSIXct tz = UTC (default)}
+##' \item{lc}{Argos location class}
+##' \item{lon}{longitude with error}
+##' \item{lat}{latitude with error}
+##' \item{x}{x in km from arbitrary origin without error}
+##' \item{y}{y in km from arbitrary origin without error}
+##' \item{x.err}{a random deviate drawn from Argos LS or KF error distribution}
+##' \item{y.err}{a random deviate drawn from Argos LS or KF error distribution}
+##' \item{smaj}{Argos error ellipse semi-major axis in m (if error = "kf")}
+##' \item{smin}{Argos error ellipse semi-minor axis in m (if error = "kf")}
+##' \item{eor}{Argos error ellipse orientation in degrees (if error = "kf")}
+##' \item{u}{velocity in x direction (if model = "crw")}
+##' \item{v}{velocity in y direction (if model = "crw")}
+##' \item{b}{behavioural state (if model = "rw" or "crw" and multiple process variances given, see examples)}
+##' \item{g}{movement persistence - the autocorrelation between successive movements on the interval 0,1 (if model = "mpm")}
+##' 
 ##' 
 ##' @examples 
-##' tr <- sim(N=200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
+##' tr <- sim(N = 200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 ##' plot(tr, error = TRUE)
+##' 
+##' tr <- sim(N = 200, model = "rw", sigma = c(4,4,0.5,0.5), error = "ls", tdist = "reg")
+##' plot(tr)
+##' 
+##' tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
+##' plot(tr)
 ##' 
 ##' tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
 ##' tdist = "gamma", tpar = c(1, 4))
@@ -141,7 +163,9 @@ ellp.par <- function(lc) {
 ##' @export
 
 sim <- function(N = 100,
-                start = list(c(0, 0), Sys.time()),
+                start = list(c(0, 0), 
+                             as.POSIXct(format(Sys.time(), tz = "UTC", usetz = TRUE))
+                             ),
                 model = c("rw", "crw", "mpm"),
                 vmax = 4,
                 sigma = c(4, 4),
