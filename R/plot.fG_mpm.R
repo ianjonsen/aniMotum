@@ -6,9 +6,8 @@
 ##' @param y optional \code{ssm} fit object with class \code{fG_ssm} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered 
 ##' otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
-##' @param asp used a fixed 1:1 aspect ratio for 2-d track plots (asp = 1; default), or allow aspect ratio to vary (asp = 0). 
-##' Ignored if \code{y} is NULL and/or pages = 0
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0
+##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
 ##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param rev reverse colour palette (logical)
 ##' @param ... additional arguments to be ignored
@@ -22,7 +21,7 @@
 ##' @importFrom stats qlogis
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
-##' @importFrom grDevices hcl.colors
+##' @importFrom grDevices hcl.colors devAskNewPage
 ##' @method plot fG_mpm
 ##'
 ##' @examples
@@ -34,7 +33,7 @@
 ##'
 ##' @export
 
-plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, pal = "Zissou1", rev = FALSE, ...)
+plot.fG_mpm <- function(x, y = NULL, pages = 1, ncol = 1, ask = TRUE, pal = "Zissou1", rev = FALSE, ...)
 {
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
@@ -44,23 +43,42 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, pal = "Zissou
   
   
   if(inherits(x, "fG_mpm") & (inherits(y, "fG_ssm") | is.null(y))) {
-    d <- grab(x, as_sf = FALSE)
+    d <- grab(x, as_sf = FALSE) %>%
+      split(. ,.$id)
     
     if(is.null(y)) {
-   p <- ggplot(d) +
-        geom_ribbon(aes(date, ymin = plogis(qlogis(g) - 1.96 * g.se), ymax = plogis(qlogis(g) + 1.96 * g.se)), fill = grey(0.5), alpha = 0.25) +
-        geom_point(aes(date, g, colour = g)) + 
-        facet_wrap(~ id, scales = "free_x", ncol = ncol) +
-        scale_colour_gradientn(colours = hcl.colors(n=100, palette = pal, rev = rev),
-                               limits = c(0,1),
-                               name = expression(gamma[t])
-                               ) +
-     ylab(expression(gamma[t])) +
-     xlab(element_blank()) +
-     ylim(0,1) +
-     theme_minimal()
-   return(p)
-   
+      p <- lapply(1:length(d), function(i) {
+        ggplot(d[[i]]) +
+          geom_ribbon(aes(
+            date,
+            ymin = plogis(qlogis(g) - 1.96 * g.se),
+            ymax = plogis(qlogis(g) + 1.96 * g.se)
+          ),
+          fill = grey(0.5),
+          alpha = 0.25) +
+          geom_point(aes(date, g, colour = g)) + 
+          scale_colour_gradientn(colours = hcl.colors(n=100, palette = pal, rev = rev),
+                                 limits = c(0,1),
+                                 name = expression(gamma[t])
+          ) +
+          ylab(expression(gamma[t])) +
+          xlab(element_blank()) +
+          ylim(0,1) +
+          labs(title = paste("id:", d[[i]]$id[1])) +
+          theme_minimal()
+      })
+      names(p) <- sapply(d, function(x) x$id[1])
+      if (!pages) {
+        if(ask) {
+          devAskNewPage(ask = TRUE)
+          print(p)
+          devAskNewPage(ask = FALSE)
+        } else {
+          return(p)
+        }
+      } else if (pages) {
+        wrap_plots(p, ncol = ncol, byrow = TRUE)
+      }  
     } else if(!is.null(y)) {
       if(nrow(grab(y, "predicted")) != nrow(grab(x, "fitted"))) {
         if(nrow(grab(y, "fitted")) != nrow(grab(x, "fitted"))) {
@@ -75,27 +93,39 @@ plot.fG_mpm <- function(x, y = NULL, pages = 1, asp = 1, ncol = 1, pal = "Zissou
       }
       
       p <- lapply(xy, function(x) {
-        m <- ggplot(x) +
-          geom_path(aes(lon, lat), size = 0.1, col = wpal[1], alpha = 0.5) +
-          geom_point(aes(lon, lat, colour = g, size = g.se^-2), show.legend = c("colour" = TRUE, "size" = FALSE)) +
-          scale_colour_gradientn(breaks = c(0, 0.25, 0.5, 0.75, 1), 
-                                 colours = hcl.colors(n=100, palette = pal, rev = rev),
-                                 limits = c(0,1), name = expression(gamma[t])) +
+        ggplot(x) +
+          geom_path(aes(lon, lat),
+                    size = 0.25,
+                    col = wpal[1],
+                    alpha = 0.75) +
+          geom_point(aes(lon, lat, colour = g, size = g.se ^ -2),
+                     show.legend = c("colour" = TRUE, "size" = FALSE)) +
+          scale_colour_gradientn(
+            breaks = c(0, 0.25, 0.5, 0.75, 1),
+            colours = hcl.colors(n = 100, palette = pal, rev = rev),
+            limits = c(0, 1),
+            name = expression(gamma[t])
+          ) +
           labs(title = paste("id:", unique(x$id))) +
           xlab(element_blank()) +
           ylab(element_blank()) +
           theme_minimal() +
-          scale_size(range = c(0.01, 2))
-        m
+          scale_size(range = c(0.1, 3))
       })
-     
-      if(pages == 1 & asp == 1) {
+      names(p) <- y$id
+      
+      if (!pages) {
+        if(ask) {
+          devAskNewPage(ask = TRUE)
+          print(p)
+          devAskNewPage(ask = FALSE)
+        } else {
+          return(p)
+        }
+      } else if (pages) {
         wrap_plots(p, ncol = ncol, heights = rep(2, ceiling(length(p)/ncol)), guides = "collect") &
-        coord_fixed()
-      } else if(pages == 1 & asp == 0) {
-        wrap_plots(p, ncol = ncol, guides = "collect")
+          coord_fixed()
       }
-      else if(pages == 0) return(p)
     }
     
   } else {

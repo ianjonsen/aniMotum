@@ -23,3 +23,9 @@ test_that("plot completes silently",{
 test_that("plot completes silently",{
   expect_silent(plot(res, "acf"))
 })
+
+test_that("plot returns a list w class gg, ggplot elements", {
+  tp <- plot(res, "qq", pages = 0, ask = FALSE)
+  expect_type(tp, "list")
+  expect_s3_class(tp[[1]], c("gg","ggplot"))
+})

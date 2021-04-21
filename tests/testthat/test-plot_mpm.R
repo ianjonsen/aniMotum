@@ -5,15 +5,16 @@ data(xm)
 data(xs)
 
 ## plot gamma time-series on a single page
-tp <- plot(xm, pages = 1, asp = 0, ncol = 1)
+tp <- plot(xm, pages = 1, ncol = 1)
 test_that("plot completes silently - fitted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
 
 ## plot gamma time-series on separate pages for each individual
-tp <- plot(xm, pages = 0)
+tp <- plot(xm, pages = 0, ask = FALSE)
 test_that("plot completes silently - predicted", {
-  expect_s3_class(tp, c("gg","ggplot"))
+  expect_type(tp, "list")
+  expect_s3_class(tp[[1]], c("gg","ggplot"))
 })
 
 ## plot gamma-coloured locations along track
@@ -24,6 +25,16 @@ test_that("plot completes silently - predicted", {
 
 ## plot gamma-coloured locations along track in 2 columns
 tp <- plot(xm, xs, ncol = 2)
+test_that("plot completes silently - predicted", {
+  expect_s3_class(tp, c("gg","ggplot"))
+})
+
+tp <- plot(xm, xs, pages = 0, ask = TRUE)
+test_that("plot completes silently - predicted", {
+  expect_type(tp, "logical")
+})
+
+tp <- plot(xm, xs, pal = "Cividis", rev = TRUE)
 test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })

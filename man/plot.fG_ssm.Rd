@@ -9,8 +9,9 @@
   what = c("fitted", "predicted"),
   type = 1,
   outlier = TRUE,
-  pages = 1,
-  ncol = 2,
+  pages = 0,
+  ncol = 1,
+  ask = TRUE,
   pal = "Zissou1",
   ...
 )
@@ -24,9 +25,12 @@
 
 \item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
 
-\item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
+\item{pages}{each individual is plotted on a separate page by default (pages = 0),
+multiple individuals can be combined on a single page; pages = 1}
 
-\item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
+\item{ncol}{number of columns to arrange plots when combining individuals on a single page (ignored if pages = 0)}
+
+\item{ask}{logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects}
 
 \item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
 

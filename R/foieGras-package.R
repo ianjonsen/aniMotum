@@ -83,4 +83,4 @@ globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se"
                   "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", 
                   "lonerr", "laterr", "coord", "value", "resid", 
                   "se", "g", "g.se", "id1", "mpm", "residual",
-                  "s", "s.se", "ci", "b", "x.err", "y.err", "xy"))
+                  "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab"))

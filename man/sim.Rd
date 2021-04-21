@@ -55,7 +55,7 @@ Least-Squares ("ls") or Argos Kalman Filter ("kf")}
 at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random
 time intervals)}
 
-\item{ts}{time interval in h}
+\item{ts}{time interval in h (ignored if \code{tdist = "gamma"})}
 
 \item{tpar}{shape and scale parameters for the gamma distributed times
 (ignored if \code{tdist = "reg"})}
@@ -67,7 +67,7 @@ time intervals)}
 \value{
 a tibble is returned with columns that can include some or all of the following,
 depending on the arguments used
-\item{date}{time as POSIXct tz = UTC}
+\item{date}{time as POSIXct tz = UTC (default)}
 \item{lc}{Argos location class}
 \item{lon}{longitude with error}
 \item{lat}{latitude with error}

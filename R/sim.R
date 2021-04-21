@@ -111,7 +111,7 @@ ellp.par <- function(lc) {
 ##' @param tdist distribution for simulating location times ("reg" generates locations 
 ##' at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
 ##' time intervals)
-##' @param ts time interval in h
+##' @param ts time interval in h (ignored if \code{tdist = "gamma"})
 ##' @param tpar shape and scale parameters for the gamma distributed times 
 ##' (ignored if \code{tdist = "reg"})
 ##' @param alpha transition probabilities switching model versions of 

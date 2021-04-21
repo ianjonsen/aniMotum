@@ -4,14 +4,14 @@
 ##'
 ##' @param x a \code{foieGras osar} object with class `fG_osar`
 ##' @param type type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)
-##' @param bw binwidth for histogram plots (see ggplot2::geom_histogram for details), ignored if type = "qqnorm"
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
+##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
 ##' @param pal \code{hcl.colors} colour palette to use (default = "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
-##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars
+##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars theme_bw
 ##' @importFrom stats acf qnorm
 ##' @importFrom grDevices hcl.colors
 ##' @method plot fG_osar
@@ -24,16 +24,24 @@
 ##'
 ##' @export
 
-plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1, ncol = 1, pal = "Zissou1", ...)
-{
-  if (length(list(...)) > 0) {
-    warning("additional arguments ignored")
-  }
-
-  if(type == "hist") {
-    warning("type = 'hist' is deprecated, using type = 'qqnorm' instead", immediate. = TRUE)
-    type <- "qqnorm"
-  }
+plot.fG_osar <-
+  function(x,
+           type = c("ts", "qqnorm", "acf"),
+           pages = 1,
+           ncol = 1,
+           ask = TRUE,
+           pal = "Zissou1",
+           ...)
+  {
+    if (length(list(...)) > 0) {
+      warning("additional arguments ignored")
+    }
+    
+    if (type[1] == "hist") {
+      warning("type = 'hist' is deprecated, using type = 'qqnorm' instead",
+              immediate. = TRUE)
+      type <- "qqnorm"
+    }
   type <- match.arg(type)
   
   wpal <- hcl.colors(n = 5, palette = pal)
@@ -87,8 +95,17 @@ plot.fG_osar <- function(x, type = c("ts", "qqnorm", "acf"), bw = 0.5, pages = 1
            })
          })
 
-    if(pages == 1) wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))
-    else return(p)
+    if (pages == 1)
+      wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+    else {
+      if (ask) {
+        devAskNewPage(ask = TRUE)
+        print(p)
+        devAskNewPage(ask = FALSE)
+      } else {
+        return(p)
+      }
+    }
     
   } else {
     stop("an fG_osar class object is required")

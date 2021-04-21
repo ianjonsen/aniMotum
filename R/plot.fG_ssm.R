@@ -27,8 +27,10 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
-##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
-##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
+##' @param pages each individual is plotted on a separate page by default (pages = 0), 
+##' multiple individuals can be combined on a single page; pages = 1
+##' @param ncol number of columns to arrange plots when combining individuals on a single page (ignored if pages = 0)
+##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
 ##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
@@ -43,7 +45,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom tibble enframe
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
-##' @importFrom grDevices hcl.colors
+##' @importFrom grDevices hcl.colors devAskNewPage
 ##' @method plot fG_ssm
 ##'
 ##' @examples
@@ -59,8 +61,9 @@ plot.fG_ssm <-
            what = c("fitted", "predicted"),
            type = 1,
            outlier = TRUE,
-           pages = 1,
-           ncol = 2,
+           pages = 0,
+           ncol = 1,
+           ask = TRUE,
            pal = "Zissou1",
            ...)
   {
@@ -68,191 +71,243 @@ plot.fG_ssm <-
       warning("additional arguments ignored")
     }
     
-  what <- match.arg(what)
-  
-  wpal <- hcl.colors(n = 5, palette = pal)
-  
-  if(inherits(x, "fG_ssm")) {
-    switch(what,
-           fitted = {
-             ssm <- grab(x, "fitted", as_sf = FALSE)
-           },
-           predicted = {
-             if(any(sapply(x$ssm, function(.) is.na(.$ts)))) {
+    what <- match.arg(what)
+    
+    wpal <- hcl.colors(n = 5, palette = pal)
+    
+    if (inherits(x, "fG_ssm")) {
+      switch(what,
+             fitted = {
                ssm <- grab(x, "fitted", as_sf = FALSE)
-               warning("there are no predicted locations because you used time.step = NA when calling `fit_ssm`, 
-                       plotting fitted locations instead", call. = FALSE)
-             } else {
-             ssm <- grab(x, "predicted", as_sf = FALSE)
-             }
-           })
-    
-    if(outlier) {
-      d <- grab(x, "data", as_sf = FALSE) %>%
-        mutate(lc = factor(lc, levels=c("3","2","1","0","A","B","Z"), ordered=TRUE))
-    } else {
-      d <- grab(x, "data", as_sf = FALSE) %>%
-        mutate(lc = factor(lc, levels=c("3","2","1","0","A","B","Z"), ordered=TRUE)) %>%
-        filter(keep)
-    }
-    
-    if(type == 1) {
+             },
+             predicted = {
+               if (any(sapply(x$ssm, function(.)
+                 is.na(.$ts)))) {
+                 ssm <- grab(x, "fitted", as_sf = FALSE)
+                 warning(
+                   "there are no predicted locations because you used time.step = NA when calling `fit_ssm`,
+                       plotting fitted locations instead",
+                   call. = FALSE
+                 )
+               } else {
+                 ssm <- grab(x, "predicted", as_sf = FALSE)
+               }
+             })
       
-      foo <- ssm %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
-      foo.se <- ssm %>% select(x.se, y.se) %>% gather(., key = "coord.se", value = "se", x.se, y.se)
-      bar <- rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
+      if (outlier) {
+        d <- grab(x, "data", as_sf = FALSE) %>%
+          mutate(lc = factor(
+            lc,
+            levels = c("3", "2", "1", "0", "A", "B", "Z"),
+            ordered = TRUE
+          ))
+      } else {
+        d <- grab(x, "data", as_sf = FALSE) %>%
+          mutate(lc = factor(
+            lc,
+            levels = c("3", "2", "1", "0", "A", "B", "Z"),
+            ordered = TRUE
+          )) %>%
+          filter(keep)
+      }
       
-      foo.d <- d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
-      bar.d <- d %>% select(date, lc, keep) %>% bind_rows(., .)
-      
-      pd <- bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
-      dd <- bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
-    
-      if(pages == 1) {
-        ## plot SE ribbon first
-        p <- ggplot() + 
-          geom_ribbon(data = pd, aes(date, ymin = value - 2 * se, ymax = value + 2 * se), 
-                      fill=wpal[5], alpha = 0.4)
-      
-        if(outlier) {
-          p <- p + 
-            geom_point(data = dd %>% filter(!keep), aes(date, value), 
-                       colour = wpal[4], shape = 4) +
-            geom_point(data = dd %>% filter(keep), aes(date, value), 
-                       colour = wpal[1], shape = 19, size = 2) +
-            geom_rug(data = dd %>% filter(!keep), aes(date), colour = wpal[4], sides = "b") + 
-            geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
-        } else {
-          p <- p + 
-            geom_point(data = dd %>% filter(keep), aes(date, value), 
-                       colour = wpal[1], shape = 19, size = 2) +
-            geom_rug(data = dd %>% filter(keep), aes(date), colour = wpal[1], sides = "b")
-        }  
-          p <- p + 
-           geom_point(data = pd, aes(date, value), col=wpal[5], shape = 20, size = 0.75) + 
-            facet_wrap(facets = vars(id, coord), scales = "free",
-                     labeller = labeller(id = label_both, coord = label_value),
-                     ncol = ncol)
-          
-      } else if(pages == 0){
+      if (type == 1) {
+        foo <-
+          ssm %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
+        foo.se <-
+          ssm %>% select(x.se, y.se) %>% gather(., key = "coord.se", value = "se", x.se, y.se)
+        bar <-
+          rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
+        
+        foo.d <-
+          d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
+        bar.d <- d %>% select(date, lc, keep) %>% bind_rows(., .)
+        
+        pd <-
+          bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
+        dd <-
+          bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
+        
         ## coerce to lists
         pd.lst <- split(pd, pd$id)
         dd.lst <- split(dd, dd$id)
         
-       p <- lapply(1:nrow(x), function(i) {
-          px <- ggplot() + 
-            geom_ribbon(data = pd.lst[[i]], aes(date, ymin = value - 2 * se, 
-                                                ymax = value + 2 * se), 
-                        fill=wpal[5], alpha = 0.4)
+        p <- lapply(1:nrow(x), function(i) {
+          px <- ggplot() +
+            geom_ribbon(
+              data = pd.lst[[i]],
+              aes(date, ymin = value - 2 * se,
+                  ymax = value + 2 * se),
+              fill = wpal[5],
+              alpha = 0.4
+            )
           
-          if(outlier) {
-            px <- px + 
-              geom_point(data = dd.lst[[i]] %>% filter(!keep), aes(date, value), 
-                         colour = wpal[4], shape = 4) +
-              geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
-                         colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(!keep), aes(date), 
-                       colour = wpal[4], sides = "b") + 
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
-                       colour = wpal[1], sides = "b")
+          if (outlier) {
+            px <- px +
+              geom_point(
+                data = dd.lst[[i]] %>% filter(!keep),
+                aes(date, value),
+                colour = wpal[4],
+                shape = 4
+              ) +
+              geom_point(
+                data = dd.lst[[i]] %>% filter(keep),
+                aes(date, value),
+                colour = wpal[1],
+                shape = 19,
+                size = 2
+              ) +
+              geom_rug(
+                data = dd.lst[[i]] %>% filter(!keep),
+                aes(date),
+                colour = wpal[4],
+                sides = "b"
+              ) +
+              geom_rug(
+                data = dd.lst[[i]] %>% filter(keep),
+                aes(date),
+                colour = wpal[1],
+                sides = "b"
+              )
           } else {
-            px <- px + 
-              geom_point(data = dd.lst[[i]] %>% filter(keep), aes(date, value), 
-                         colour = wpal[1], shape = 19, size = 2) +
-              geom_rug(data = dd.lst[[i]] %>% filter(keep), aes(date), 
-                       colour = wpal[1], sides = "b")
-          }  
-          px <- px + 
-            geom_point(data = pd.lst[[i]], aes(date, value), col=wpal[5], 
-                       shape = 20, size = 0.75) + 
-            facet_wrap(facets = vars(coord), scales = "free",
-                       labeller = labeller(coord = label_value),
-                       ncol = 2) +
-            labs(title = paste("id:", x$id[i]))
+            px <- px +
+              geom_point(
+                data = dd.lst[[i]] %>% filter(keep),
+                aes(date, value),
+                colour = wpal[1],
+                shape = 19,
+                size = 2
+              ) +
+              geom_rug(
+                data = dd.lst[[i]] %>% filter(keep),
+                aes(date),
+                colour = wpal[1],
+                sides = "b"
+              )
+          }
+          px <- px +
+            geom_point(
+              data = pd.lst[[i]],
+              aes(date, value),
+              col = wpal[5],
+              shape = 20,
+              size = 0.75
+            ) +
+            facet_wrap(
+              facets = vars(coord),
+              scales = "free",
+              labeller = labeller(coord = label_value),
+              ncol = 2
+            ) +
+            labs(title = paste("id:", x$id[i])) +
+            xlab(element_blank()) +
+            ylab(element_blank()) +
+            theme_minimal()
           px
         })
+        names(p) <- x$id
         
-      } 
-      
-      return(p)
-      
-    } else if (type == 2) {
-      ssm.lst <- split(ssm, ssm$id)
-      conf_poly <- lapply(ssm.lst, function(x) {
-        conf <- lapply(1:nrow(x), function(i)
-          with(x, elps(x[i], y[i], x.se[i], y.se[i], 90))
-        )
-        lapply(conf, function(x) st_polygon(list(x))) %>%
-          st_multipolygon()
-      })
-      conf_sf <- st_as_sfc(conf_poly) %>%
-        st_as_sf() %>%
-        mutate(id = unique(ssm$id))
-      
-      if(nrow(x) == 1) {
-      ## for a single track plot
-      p <- ggplot() + 
-        geom_sf(data = conf_sf, col = NA, fill = wpal[5], alpha = 0.25)
-      
-      if(outlier) {
-      p <- p + 
-        geom_point(data = d %>% filter(!keep), aes(x, y),
-                   size = 1, colour = wpal[4], shape = 4) +
-        geom_point(data = d %>% filter(keep), aes(x, y),
-                              size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
-      } else {
-        p <- p + 
-          geom_point(data = d %>% filter(keep), aes(x, y),
-                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
+        if (!pages) {
+          if(ask) {
+            devAskNewPage(ask = TRUE)
+            print(p)
+            devAskNewPage(ask = FALSE)
+          } else {
+            return(p)
+          }
+        } else if (pages) {
+          wrap_plots(p, ncol = ncol, byrow = TRUE)
+        }
+        
+      } else if (type == 2) {
+        ssm.lst <- split(ssm, ssm$id)
+        conf_poly <- lapply(ssm.lst, function(x) {
+          conf <- lapply(1:nrow(x), function(i)
+            with(x, elps(x[i], y[i], x.se[i], y.se[i], 90)))
+          lapply(conf, function(x)
+            st_polygon(list(x))) %>%
+            st_multipolygon()
+        })
+        conf_sf <- st_as_sfc(conf_poly) %>%
+          st_as_sf() %>%
+          mutate(id = unique(ssm$id))
+        
+        d.lst <- split(d, d$id)
+        ssm.lst <- split(ssm, ssm$id)
+        
+        p <- lapply(1:nrow(x), function(i) {
+          m <- ggplot() +
+            geom_sf(
+              data = conf_sf %>% filter(id == unique(id)[i]),
+              col = NA,
+              fill = wpal[5],
+              alpha = 0.25
+            )
+          
+          if (outlier) {
+            m <- m +
+              geom_point(
+                data = d %>% filter(!keep & id == unique(id)[i]),
+                aes(x, y),
+                size = 1,
+                colour = wpal[4],
+                shape = 4
+              ) +
+              geom_point(
+                data = d %>% filter(keep & id == unique(id)[i]),
+                aes(x, y),
+                size = 2,
+                colour = wpal[1],
+                shape = 19,
+                alpha = 0.6
+              )
+          } else {
+            m <- m +
+              geom_point(
+                data = d %>% filter(keep & id == unique(id)[i]),
+                aes(x, y),
+                size = 2,
+                colour = wpal[1],
+                shape = 19,
+                alpha = 0.6
+              )
+          }
+          m <- m +
+            geom_path(
+              data = ssm %>% filter(id == unique(id)[i]),
+              aes(x, y),
+              col = wpal[5],
+              lwd = 0.2
+            ) +
+            geom_point(
+              data = ssm %>% filter(id == unique(id)[i]),
+              aes(x, y),
+              col = wpal[5],
+              shape = 20,
+              size = 0.75
+            ) +
+            labs(title = paste("id:", x[i, "id"]))
+          
+          m <- m +
+            xlab(element_blank()) +
+            ylab(element_blank()) +
+            theme_minimal()
+          m
+        })
+        names(p) <- x$id
+        if (!pages) {
+          if(ask) {
+            devAskNewPage(ask = TRUE)
+            print(p)
+            devAskNewPage(ask = FALSE)
+          } else {
+            return(p)
+          }
+        } else if (pages) {
+          wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+        }
       }
-        p <- p + 
-          geom_path(data = ssm, aes(x, y), col = wpal[5], lwd = 0.2) +
-          geom_point(data = ssm, aes(x, y), col = wpal[5], shape = 20, size = 0.75) + 
-          labs(title = paste("id:", x$id))
-      
-    p <- p + 
-      xlab(element_blank()) + 
-      ylab(element_blank()) +
-      theme_minimal()
-    
-    return(p)
-    
     } else {
-      ## for multiple tracks on 1 page, use patchwork::wrap_plots instead of facet_wrap so we can have the equivalent of scales = "free"
-    d.lst <- split(d, d$id)
-    ssm.lst <- split(ssm, ssm$id)
-
-    p <- lapply(1:nrow(x), function(i) {
-      m <- ggplot() + 
-        geom_sf(data = conf_sf %>% filter(id == unique(id)[i]), col = NA, fill = wpal[5], alpha = 0.25)
-      
-      if(outlier) {
-        m <- m + 
-          geom_point(data = d %>% filter(!keep & id == unique(id)[i]), aes(x, y),
-                     size = 1, colour = wpal[4], shape = 4) +
-          geom_point(data = d %>% filter(keep & id == unique(id)[i]), aes(x, y),
-                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
-      } else {
-        m <- m + 
-          geom_point(data = d %>% filter(keep & id == unique(id)[i]), aes(x, y),
-                     size = 2, colour = wpal[1], shape = 19, alpha = 0.6)
-      }
-      m <- m + 
-        geom_path(data = ssm %>% filter(id == unique(id)[i]), aes(x, y), col = wpal[5], lwd = 0.2) +
-        geom_point(data = ssm %>% filter(id == unique(id)[i]), aes(x, y), col = wpal[5], shape = 20, size = 0.75) + 
-        labs(title = paste("id:", x[i, "id"]))
-      
-    m <- m + 
-      xlab(element_blank()) + 
-      ylab(element_blank()) +
-      theme_minimal()
-    m  
-    })
-    if(pages == 1) wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))
-    else return(p)
+      stop("x must be a fG_ssm tibble")
     }
-  } else {
-    stop("x must be a fG_ssm tibble")
-  }
-  }
 }
