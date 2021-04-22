@@ -13,10 +13,13 @@
 ##' @param method if optim = "optim" then the optimization method to be used 
 ##' can be one of "BFGS", "L-BFGS-B", "Nelder-Mead", "CG", "SANN", or "Brent"
 ##' see \code{\link{optim}} for details
-##' @param lower a list of named parameter lower bounds, if NULL then built in
-##' defaults are used when \code{method = "L-BFGS-B"}
+##' @param lower a list named parameter lower bounds, if NULL then built in
+##' defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are:
+##' \code{l_sigma} a vector of length 2, log scale; \code{l_rho_p} a scalar, logit scale;
+##' \code{l_D} a scalar, log scale; \code{l_psi} a scalar, log scale;
+##' \code{l_tau} a vector of length 2, log scale; \code{l_rho_o} a scalar, logit scale
 ##' @param upper a list of named parameter upper bounds, if NULL then built in
-##' defaults are used when \code{method = "L-BFGS-B"}
+##' defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}
 ##' @param verbose integer; report progress during minimization: 0 = silent;
 ##' 1 = optimizer trace; 2 = parameter trace (default))
 ##' @param ... control parameters for the chosen optimizer
@@ -56,6 +59,8 @@ ssm_control <-
       stop("\nlower parameter bounds must be specified as a named list")
     if (!is.null(upper) & !inherits(upper, "list"))
       stop("\nupper parameter bounds must be specified as a named list")
+    if ((!is.null(lower) | !is.null(upper)) & (length(lower) > 7 | length(upper) > 7))
+      stop("\nthe number of parameters must be <= 7")
     
     assert_that(optim %in% c("nlminb", "optim"),
                 msg = "optimiser can only be either `nlminb` or `optim`")

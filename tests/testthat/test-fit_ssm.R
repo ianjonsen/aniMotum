@@ -156,3 +156,17 @@ test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
   expect_s3_class(f, "fG_ssm")
 })
 
+## specify lower, upper parameter bounds
+test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
+  skip_on_cran()
+  data(ellies)
+  f <- fit_ssm(ellie, vmax=4, model="crw", time.step=72, control = 
+                 ssm_control(verbose = 0, 
+                             lower = list(l_psi = -1),
+                             upper = list(l_psi = 1))
+               )
+  expect_equal(nrow(f), 1)
+  expect_s3_class(f$ssm[[1]], "ssm")
+  expect_equal(length(f$ssm[[1]]), 15)
+  expect_s3_class(f, "fG_ssm")
+})

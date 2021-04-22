@@ -7,6 +7,7 @@
 \method{plot}{fG_mpm}(
   x,
   y = NULL,
+  se = FALSE,
   pages = 1,
   ncol = 1,
   ask = TRUE,
@@ -20,6 +21,8 @@
 
 \item{y}{optional \code{ssm} fit object with class \code{fG_ssm} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered
 otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.}
+
+\item{se}{logical (default = FALSE); should points be scaled by \code{gamma_t} uncertainty (ignored if y is not supplied)}
 
 \item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
 
@@ -35,7 +38,7 @@ otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendere
 }
 \value{
 a ggplot object with either: 1-d time series of \code{gamma_t} estimates (if y not provided), with estimation uncertainty ribbons (95 \% CI's);
-or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points having greater uncertainty (size is proportional to \code{SE^-2}).
+or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points having greater uncertainty (size is proportional to \code{SE^-2}, if se = TRUE).
 Plots can be rendered all on a single page (pages = 1) or on separate pages.
 }
 \description{

@@ -305,9 +305,7 @@ sfilter <-
       flush.console()
       obj$fn(x)
     }
-    if(control$optim == "nlminb" | 
-       (control$optim == "optim" & 
-        any(is.null(control$lower), is.null(control$upper)))) {
+    
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
           l_rho_p=-7,
@@ -321,13 +319,13 @@ sfilter <-
           l_psi=Inf,
           l_tau=c(Inf,Inf),
           l_rho_o=7)
-    } else if(control$optim == "nlminb" | 
-              (control$optim == "optim" & 
-               all(!is.null(control$lower),
-                   !is.null(control$upper)))) {
-      L <- control$lower
-      U <- control$upper
+    
+    if(any(!is.null(control$lower))) {
+      L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
     }
+    if(any(!is.null(control$upper))) {
+      U[which(names(U) %in% names(control$upper))] <- unlist(control$upper)
+    } 
  
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
@@ -338,6 +336,9 @@ sfilter <-
     if(model == "rw") {
       L <- L[names(L) != "l_D"] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
       U <- U[names(U) != "l_D"]
+    } else if(model == "crw") {
+      L <- L[!names(L) %in% c("l_sigma","l_sigma","l_rho_p")] 
+      U <- U[!names(U) %in% c("l_sigma","l_sigma","l_rho_p")]
     }
 
     ## Minimize objective function

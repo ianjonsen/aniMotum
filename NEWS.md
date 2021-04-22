@@ -3,6 +3,9 @@
 * adds `sim()` to simulate animal tracks using the `rw`, `crw` or `mpm` process models. The `rw` and `crw` models can also be specified with state-switching between multiple behavioural states. Tracks can be simulated with or without Argos (LS or KF) errors, as time-regular or time-irregular
 * adds `simfit()` to simulate animal tracks from `fit_ssm` fit objects
 * adds generic `plot()` methods for `sim` and `simfit` objects
+* adds `fit_mpm` can take a `fit_ssm` object directly as input, removing need for user to manipulate data prior to calling `fit_mpm`
+* adds `fit_mpm` can fit to SSM-`predicted` (time regular) or SSM-`fitted` (time irregular) locations, via `what` argument
+* adds `fit_mpm` can fit to lon,lat or x,y coordinates, via `coords` argument
 * adds `ssm_control()` for centralized control over optimizer and optimization method choices, optimizer parameters, and `foieGras` model parameter bounds
 * adds faster and more stable optimization
 * adds time-series and `acf()` plots as option when visualising prediction residuals calculated from `osar()`

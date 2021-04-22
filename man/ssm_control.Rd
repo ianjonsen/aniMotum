@@ -20,11 +20,14 @@ ssm_control(
 can be one of "BFGS", "L-BFGS-B", "Nelder-Mead", "CG", "SANN", or "Brent"
 see \code{\link{optim}} for details}
 
-\item{lower}{a list of named parameter lower bounds, if NULL then built in
-defaults are used when \code{method = "L-BFGS-B"}}
+\item{lower}{a list named parameter lower bounds, if NULL then built in
+defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are:
+\code{l_sigma} a vector of length 2, log scale; \code{l_rho_p} a scalar, logit scale;
+\code{l_D} a scalar, log scale; \code{l_psi} a scalar, log scale;
+\code{l_tau} a vector of length 2, log scale; \code{l_rho_o} a scalar, logit scale}
 
 \item{upper}{a list of named parameter upper bounds, if NULL then built in
-defaults are used when \code{method = "L-BFGS-B"}}
+defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}}
 
 \item{verbose}{integer; report progress during minimization: 0 = silent;
 1 = optimizer trace; 2 = parameter trace (default))}

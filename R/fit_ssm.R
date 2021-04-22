@@ -92,7 +92,7 @@
 ##' @importFrom dplyr tibble mutate "%>%"
 ##' @importFrom purrr map
 ##' @importFrom assertthat assert_that
-##' @importFrom lifecycle deprecate_stop
+##' @importFrom lifecycle deprecate_stop deprecate_warn
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -125,14 +125,29 @@ fit_ssm <- function(d,
               msg = "pf must be either FALSE (fit model) or TRUE (only run prefilter)")
 
 ## warnings for deprecated arguments
-  if(!is.null(verbose)) deprecate_stop("0.7-5", "fit_ssm(verbose)", 
+  if(!is.null(verbose)) {
+    deprecate_warn("0.7-5", "fit_ssm(verbose)", 
                                        details = "use `control = ssm_control(verbose)` instead")
-  if(!is.null(optim)) deprecate_stop("0.7-5", "fit_ssm(optim)", 
+    control$verbose <- verbose
+  }
+  if(!is.null(optim)) {
+    deprecate_warn("0.7-5", "fit_ssm(optim)", 
                                      details = "use `control = ssm_control(optim)` instead")
-  if(!is.null(optMeth)) deprecate_stop("0.7-5", "fit_ssm(optMeth)", 
+    if(optim %in% c("nlminb", "optim")) control$optim <- optim
+    else stop("invalid optimiser specified, see ?ssm_control for options")
+  }
+  if(!is.null(optMeth)) {
+    deprecate_warn("0.7-5", "fit_ssm(optMeth)", 
                                        details = "use `control = ssm_control(method)` instead")
-  if(!is.null(lpsi)) deprecate_stop("0.7-5", "fit_ssm(lpsi)", 
+    if(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
+      control$method <- optMeth
+    else stop("invalid optimisation method specified, see ?ssm_control for options")
+  }
+  if(!is.null(lpsi)) {
+    deprecate_warn("0.7-5", "fit_ssm(lpsi)", 
                                     details = "use `control = ssm_control(lower)` instead")
+    control$lower <- list(l_psi = lpsi)
+  }
   
   fit <- d %>%
     split(., .$id) %>%

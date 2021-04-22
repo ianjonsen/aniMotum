@@ -12,7 +12,7 @@
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
-##' @importFrom dplyr select bind_rows "%>%"
+##' @importFrom dplyr select bind_rows "%>%" everything
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'
@@ -89,9 +89,14 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
              if (what != "data") {
                out <- switch(
                  x$ssm[[1]]$pm,
-                 rw = out %>% select(id, date, x.se, y.se, geometry),
-                 crw = out %>% select(id, date, u, v, u.se, v.se, x.se, 
-                                      y.se, s, s.se, geometry)
+                 rw = {
+                   out %>% select(id, date, x.se, y.se, geometry)
+                   },
+                 crw = {
+                   ## use everything() to deal w fit objects from <= 0.6-9, which don't contain s, s.se
+                   out %>% select(id, date, u, v, u.se, v.se, x.se, 
+                                      y.se, everything())
+                 }
                )
                
              } else {
@@ -116,7 +121,7 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  x$ssm[[1]]$pm,
                  rw = out %>% select(id, date, lon, lat, x, y, x.se, y.se),
                  crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, 
-                                       u, v, u.se, v.se, s, s.se)
+                                       u, v, u.se, v.se, everything())
                ) %>% as_tibble()
              } else {
                out <- out %>%

@@ -11,7 +11,7 @@
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
-##' @importFrom ggplot2 aes facet_grid facet_wrap coord_flip vars theme_bw
+##' @importFrom ggplot2 aes facet_grid theme_minimal
 ##' @importFrom stats acf qnorm
 ##' @importFrom grDevices hcl.colors
 ##' @method plot fG_osar
@@ -56,7 +56,7 @@ plot.fG_osar <-
              geom_point(aes(x = date, y = residual), shape = 19, colour = wpal[1]) +
              geom_hline(aes(yintercept = 0), lty = 2, colour = wpal[4]) +
              facet_grid(id ~ coord) +
-             theme_bw()
+             theme_minimal()
            })
          }, 
          qqnorm = {
@@ -67,7 +67,7 @@ plot.fG_osar <-
                geom_qq(colour = wpal[1]) +
                geom_qq_line(colour = wpal[4]) +
                facet_grid(id ~ coord) +
-               theme_bw()
+               theme_minimal()
            })
          },
          acf = {
@@ -91,7 +91,7 @@ plot.fG_osar <-
               geom_hline(data = cil, aes(yintercept = ci), linetype = 2, color = wpal[2]) +
               geom_hline(data = cil, aes(yintercept = -ci), linetype = 2, color = wpal[2]) +
               facet_grid(id ~ coord) +
-              theme_bw()
+              theme_minimal()
            })
          })
 

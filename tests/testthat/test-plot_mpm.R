@@ -23,6 +23,12 @@ test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
 
+## plot gamma-coloured locations along track & scale size according to se
+tp <- plot(xm, xs, se = TRUE)
+test_that("plot completes silently - predicted", {
+  expect_s3_class(tp, c("gg","ggplot"))
+})
+
 ## plot gamma-coloured locations along track in 2 columns
 tp <- plot(xm, xs, ncol = 2)
 test_that("plot completes silently - predicted", {
