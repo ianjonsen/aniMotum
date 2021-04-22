@@ -69,14 +69,17 @@ fit_mpm <- function(x,
                         inner.control = inner.control
              ), silent = TRUE)
              )
+           
           fit <- tibble(id = names(fit), mpm = fit) %>%
             mutate(converged = sapply(.$mpm, function(x) 
               if(length(x) == 8) {
                 x$opt$convergence == 0
               } else if(length(x) < 8) {
                 FALSE
-              })) %>%
-            mutate(model = sapply(.$mpm, function(x) x$model))
+              }))
+          browser()
+          fit <- tibble(fit, model)
+          fit$model[which(fit$converged)] <- sapply(fit[which(fit$converged), ]$mpm, function(x) x$model)
          },
          jmpm = {
            fit <- try(mpmf( 

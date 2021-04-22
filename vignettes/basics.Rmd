@@ -139,7 +139,7 @@ plot(fit, what = "fitted", type = 2, pages = 1, ncol = 2)
 
 the predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the `prefilter` stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
 
-Assessing goodness-of-fit is an important component of any model fitting exercise. Residual plots are useful tools for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction residual, or one-step-ahead residual, provides a useful alternative - albeit more computationally demanding to calculate. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualised as time-series plot, Q-Q plots, or autocorrelation functions:
+Assessing goodness-of-fit is an important component of any model fitting exercise. Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction residual, or one-step-ahead residual, provides a useful alternative - albeit more computationally demanding to calculate. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualised as time-series plot, Q-Q plots, or autocorrelation functions:
 ```{r osar plots, fig.width=8, fig.height=6}
 # just calculate & plot residuals for first fitted track
 res <- osar(fit[1,])
@@ -147,3 +147,4 @@ res <- osar(fit[1,])
 (plot(res, type = "ts") | plot(res, type = "qq")) / (plot(res, type = "acf") | plot_spacer())
 ```
 
+As calculation of these residuals is computationally demanding, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 
