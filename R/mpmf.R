@@ -10,12 +10,12 @@
 ##'
 ##' @param x temporally regularized location data, eg. output from \code{fit_ssm}
 ##' @param model specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s). 
-##' @param optim numerical optimizer to be used ("nlminb" or "optim")
-##' @param optMeth optimization method to use (default is "L-BFGS-B"), ignored if optim = "nlminb"
-##' @param verbose report progress during minimization
-##' @param control list of control parameters for the outer optimization (type ?nlminb or ?optim for details)
+##' @param control list of control settings for the outer optimizer (see \code{mpm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
+##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
+##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
+##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom dplyr mutate arrange "%>%" count
@@ -26,23 +26,11 @@
 mpmf <-
   function(x,
            model = c("jmpm", "mpm"),
-           optim = c("nlminb", "optim"),
-           optMeth = c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-           verbose = TRUE,
-           control = NULL,
+           control = mpm_control(),
            inner.control = NULL) {
     
     call <- match.call()
-    optim <- match.arg(optim)
-    optMeth <- match.arg(optMeth)
     model <- match.arg(model)
-    
-    ## populate control list if any parameters specified...
-    if (length(control)) {
-      nms <- names(control)
-      if (!is.list(control) || is.null(nms))
-        stop("'control' argument must be a named list")
-    }
    
     # Create a tid column if there is none specified
     if(all(colnames(x) != "tid")){
@@ -97,7 +85,6 @@ mpmf <-
       inner.control <- list(smartsearch = TRUE)
     }
     
-    verb <- ifelse(verbose == 2, TRUE, FALSE)
     rnd <- switch(model, jmpm = "lg", mpm = "lg")
 
     obj <-
@@ -105,12 +92,13 @@ mpmf <-
         data = data.tmb,
         parameters = parameters,
         random = rnd,
+        method = control$method,
         DLL = "foieGras",
-        silent = !verb,
+        silent = !ifelse(control$verbose == 2, TRUE, FALSE),
         inner.control = inner.control
       )
     
-    obj$env$tracemgc <- verb
+    obj$env$tracemgc <- ifelse(control$verbose == 2, TRUE, FALSE)
     
     ## add par values to trace if verbose = TRUE
     myfn <- function(x) {
@@ -126,6 +114,13 @@ mpmf <-
     U = c(log_sigma=c(50,50),
           log_sigma_g=50
           )
+    if(any(!is.null(control$lower))) {
+      L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
+    }
+    if(any(!is.null(control$upper))) {
+      U[which(names(U) %in% names(control$upper))] <- unlist(control$upper)
+    } 
+    
     names(L) <- c("log_sigma", "log_sigma", "log_sigma_g")
     names(U) <- c("log_sigma", "log_sigma", "log_sigma_g")
     
@@ -139,11 +134,11 @@ mpmf <-
     oldw <- getOption("warn")
     options(warn = -1)  ## turn warnings off but check if optimizer crashed & return warning at end
     opt <-
-      switch(optim,
+      switch(control$optim,
              nlminb = try(nlminb(obj$par,
-                                 ifelse(verbose == 1, myfn, obj$fn),
+                                 ifelse(control$verbose == 1, myfn, obj$fn),
                                  obj$gr,
-                                 control = control,
+                                 control = control$control,
                                  lower = L,
                                  upper = U
              )), 
@@ -151,10 +146,10 @@ mpmf <-
                optim,
                args = list(
                  par = obj$par,
-                 fn = ifelse(verbose == 1, myfn, obj$fn),
+                 fn = ifelse(control$verbose == 1, myfn, obj$fn),
                  gr = obj$gr,
-                 method = optMeth,
-                 control = control,
+                 method = control$method,
+                 control = control$control,
                  lower = L,
                  upper = U
                )
@@ -191,9 +186,9 @@ mpmf <-
       )
     }
     
-    if (optim == "nlminb") {
+    if (control$optim == "nlminb") {
       aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
-    } else if (optim == "optim") {
+    } else if (control$optim == "optim") {
       aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
     }
     
