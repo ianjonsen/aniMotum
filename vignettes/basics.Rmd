@@ -172,3 +172,5 @@ plot(fmp, pages = 1, pal = "Zissou1", rev = TRUE)
 plot(fmp, fit, pages = 1, pal = "Cividis")
 ```
 
+### simulating tracks
+tracks can be simulated in foieGras 
