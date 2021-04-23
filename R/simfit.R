@@ -13,7 +13,7 @@
 ##' (default is FALSE)
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48, control = ssm_control(se = FALSE))
 ##' trs <- simfit(fit, reps = 2, what = "predicted")
 ##' plot(trs)
 ##' 

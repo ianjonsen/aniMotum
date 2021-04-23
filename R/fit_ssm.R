@@ -79,15 +79,14 @@
 ##' @seealso \code{\link{sfilter}}
 ##' 
 ##' @examples
-##' ## fit crw model to two seals with Argos LS data
-##' data(ellies)
-##' fit <- fit_ssm(ellies, vmax = 5, model = "crw", time.step = 48)
+##' ## fit crw model to Argos LS data
+##' fit <- fit_ssm(sese1, vmax = 5, model = "crw", time.step = 48, control = ssm_control(se = FALSE)) ## se = FALSE to speed up ex
 ##' 
-##' ## time series plots of fitted value fits to both seals
-##' plot(fit, what = "fitted", type = 1)
+##' ## time series plots of fitted value fit to data
+##' plot(fit, what = "fitted", type = 1, ask = FALSE)
 ##'
-##' ## track plots of predicted value fits for both seals
-##' plot(fit, what = "predicted", type = 2)
+##' ## track plots of predicted value fit to data
+##' plot(fit, what = "predicted", type = 2, ask = FALSE)
 ##'
 ##' @importFrom dplyr tibble mutate "%>%"
 ##' @importFrom purrr map

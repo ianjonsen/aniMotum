@@ -18,19 +18,19 @@ test_that("plot completes silently - predicted", {
 })
 
 ## plot gamma-coloured locations along track
-tp <- plot(xm, xs)
+tp <- plot(xm, xs, pages = 1)
 test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
 
 ## plot gamma-coloured locations along track & scale size according to se
-tp <- plot(xm, xs, se = TRUE)
+tp <- plot(xm, xs, se = TRUE, pages = 1)
 test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
 
 ## plot gamma-coloured locations along track in 2 columns
-tp <- plot(xm, xs, ncol = 2)
+tp <- plot(xm, xs, pages = 1, ncol = 2)
 test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })
@@ -40,7 +40,7 @@ test_that("plot completes silently - predicted", {
   expect_type(tp, "logical")
 })
 
-tp <- plot(xm, xs, pal = "Cividis", rev = TRUE)
+tp <- plot(xm, xs, pal = "Cividis", rev = TRUE, pages = 1)
 test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("gg","ggplot"))
 })

@@ -32,7 +32,7 @@ either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with lengt
 equal to the number of observations used in the SSM fit.
 }
 \examples{
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48, control = ssm_control(se = FALSE))
 trs <- simfit(fit, reps = 2, what = "predicted")
 plot(trs)
 
