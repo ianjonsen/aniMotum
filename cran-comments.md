@@ -1,11 +1,11 @@
 ## Submission
-This update fixes 1 NOTE from incoming automated checks
+This update adds functionality to the package
 
 ## Test environments
-* local OS X install (10.15.4), R 4.0.2
-* ubuntu 16.04.6 (via travis-ci), r-release, r-devel, r-oldrelease
-* Debian clang (via R-hub), r-devel
-* windows (via win-builder), r-release, r-devel
+* local macOS (11.2.3), R 4.0.4
+* macOS 11.2.3 (via GitHub Actions), r-release
+* ubuntu 20.04 (via GitHub Actions), r-release, r-devel, r-oldrel
+* windows latest (via GitHub Actions), r-release, r-oldrel
 
 ## R CMD check results
 
@@ -13,4 +13,5 @@ This update fixes 1 NOTE from incoming automated checks
 
 NOTES:  
 
-1. installed C++ files total 13.9 Mb (OS X), 21.5 Mb (windows), 34.9 Mb (linux). I have been unable to reduce this further.  
+1. data and C++ files total 14.4 Mb (OS X), 21.8 Mb (windows), 51.5 Mb (linux). 
+I have been unable to reduce this further.  

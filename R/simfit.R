@@ -8,7 +8,7 @@
 ##' fit object (ignored if x is NULL)
 ##' @param what simulate fitted (typically irregular in time) or predicted 
 ##' (typically regular in time) locations 
-##' @param cpf logical; should simulated tracks return to their start piont (ie. a central-place forager)
+##' @param cpf logical; should simulated tracks return to their start point (ie. a central-place forager)
 ##' @param sim_only logical, do not include \code{fG_ssm} estimated location in output 
 ##' (default is FALSE)
 ##' 

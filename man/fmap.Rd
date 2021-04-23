@@ -29,7 +29,7 @@ fmap(
 
 \item{what}{specify which location estimates to map: fitted or predicted}
 
-\item{conf}{include confidence regions around estimated location (logigal; default = TRUE, unless y is an mpm fit object then conf is FALSE)}
+\item{conf}{include confidence regions around estimated location (logical; default = TRUE, unless y is an mpm fit object then conf is FALSE)}
 
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
 
