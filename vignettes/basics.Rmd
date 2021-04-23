@@ -110,7 +110,7 @@ head(data.frame(foo))
 model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::fit_ssm` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object,the prefilter guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
 ## prefilter and fit Random Walk SSM using a 24 h time step
-fit <- fit_ssm(sese, model = "crw", time.step = 24, control = ssm_control(verbose = 0, se = FALSE))
+fit <- fit_ssm(sese1, model = "crw", time.step = 24, control = ssm_control(verbose = 0, se = FALSE))
 ```
 these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `control = ssm_control(verbose = 0, se = FALSE)` is included for speed and vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted via the `control = ssm_control()` argument, see `?ssm_control` for details.
 
@@ -137,20 +137,22 @@ plot(fit, what = "fitted", type = 2, pages = 1, ncol = 2)
 
 the predicted values (red) are the state estimates predicted at regular time intervals, specified by `time.step` (here every 24 h). These estimates are plotted on top of the observations that passed the `prefilter` stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`.
 
-Assessing goodness-of-fit is an important component of any model fitting exercise. Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction residual, or one-step-ahead residual, provides a useful alternative - albeit more computationally demanding to calculate. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualised as time-series plot, Q-Q plots, or autocorrelation functions:
-```{r osar plots, fig.width=8, fig.height=6}
+Assessing goodness-of-fit is an important component of any model fitting exercise. Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction residual, or one-step-ahead residual, provides a useful alternative - albeit more computationally demanding to calculate. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualised as Q-Q plots, or autocorrelation functions:
+```{r osar plots, eval=FALSE}
 # just calculate & plot residuals for first fitted track
-res <- osar(fit[1,])
+res <- osar(fit)
 
-(plot(res, type = "ts") | plot(res, type = "qq")) / (plot(res, type = "acf") | plot_spacer())
+plot(res, type = "qq") | plot(res, type = "acf")
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=3}
+## load osar res data to speed vignette build
+data(res)
+plot(res, type = "qq") | plot(res, type = "acf")
 ```
 
 As calculation of these residuals is computationally demanding, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 
 
 ### inferring behaviour
-a behavioural index, movement persistence, can be estimated along SSM-fitted tracks by using the `fit_mpm` function. This index ranges continuously from 0, associated with frequent changes in direction and/or speed, to 1, associated with infrequent changes (persistence) in direction and/or speed.
-```{r movement persistence, fig.width=8, fig.height=6}
-
-
-```
+A behavioural index, movement persistence, can be estimated along SSM-fitted tracks by using the `fit_mpm` function. This index ranges continuously from 0, associated with frequent changes in direction and/or speed, to 1, associated with infrequent changes (persistence) in direction and/or speed.
 

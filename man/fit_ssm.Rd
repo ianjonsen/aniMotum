@@ -123,7 +123,8 @@ obtained by using \code{\link{grab}} with the argument \code{as_sf = FALSE}.
 }
 \examples{
 ## fit crw model to Argos LS data
-fit <- fit_ssm(sese1, vmax = 5, model = "crw", time.step = 48, control = ssm_control(se = FALSE)) ## se = FALSE to speed up ex
+## se = FALSE to speed up ex
+fit <- fit_ssm(sese, vmax = 4, model = "crw", time.step = 48, control = ssm_control(se = FALSE)) 
 
 ## time series plots of fitted value fit to data
 plot(fit, what = "fitted", type = 1, ask = FALSE)

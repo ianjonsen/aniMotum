@@ -36,7 +36,7 @@ NULL
 
 ##' @name ellie
 ##' @docType data
-##' @title Southern elephant seal Argos satellite data (1 individual)
+##' @title Southern elephant seal Argos satellite data (1 individual, sub-sampled for testing speed)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
@@ -48,6 +48,17 @@ NULL
 ##' @name sese
 ##' @docType data
 ##' @title Southern elephant seal Argos satellite data (5 individuals)
+##' @format .RData
+##' @keywords data
+##' @description Example elephant seal Argos tracking data. Data were sourced from
+##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
+##' Australian Government through the National Collaborative Research Infrastructure
+##' Strategy and the Super Science Initiative.
+NULL
+
+##' @name sese1
+##' @docType data
+##' @title Southern elephant seal Argos satellite data (1 individual)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
@@ -74,6 +85,15 @@ NULL
 ##' @description Example foieGras mpm fit object. This example fit 
 ##' is included purely to speed up examples where a fit object is required
 ##' but fitting to data is not the focus of the example.
+NULL
+
+##' @name res
+##' @docType data
+##' @title foieGras example osar residuals object
+##' @format .RData
+##' @keywords data
+##' @description Example foieGras osar residuals object. This example osar 
+##' residuals object is included purely to speed up vignette build.
 NULL
 
 ## stop R CMD check generating NOTES about global variables
