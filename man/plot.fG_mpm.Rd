@@ -8,7 +8,7 @@
   x,
   y = NULL,
   se = FALSE,
-  pages = 1,
+  pages = 0,
   ncol = 1,
   ask = TRUE,
   pal = "Zissou1",

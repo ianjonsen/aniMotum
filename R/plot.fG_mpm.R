@@ -38,7 +38,7 @@ plot.fG_mpm <-
   function(x,
            y = NULL,
            se = FALSE,
-           pages = 1,
+           pages = 0,
            ncol = 1,
            ask = TRUE,
            pal = "Zissou1",
@@ -114,6 +114,9 @@ plot.fG_mpm <-
             geom_point(aes(lon, lat, colour = g, size = g.se ^ -2),
                      show.legend = c("colour" = TRUE, "size" = FALSE)) +
             scale_size(range = c(0.1, 2.5))
+        } else if(!se) {
+          px <- px +
+            geom_point(aes(lon, lat, colour = g), size = 1)
         }
         px <- px + scale_colour_gradientn(
             breaks = c(0, 0.25, 0.5, 0.75, 1),
@@ -124,6 +127,7 @@ plot.fG_mpm <-
           labs(title = paste("id:", unique(x$id))) +
           xlab(element_blank()) +
           ylab(element_blank()) +
+          coord_fixed() +
           theme_minimal()
         px
       })
@@ -138,8 +142,8 @@ plot.fG_mpm <-
           return(p)
         }
       } else if (pages) {
-        wrap_plots(p, ncol = ncol, heights = rep(2, ceiling(length(p)/ncol)), guides = "collect") &
-          coord_fixed()
+        wrap_plots(p, ncol = ncol, heights = rep(2, ceiling(length(p)/ncol)), 
+                   guides = "collect")
       }
     }
     

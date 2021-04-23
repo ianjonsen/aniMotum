@@ -148,3 +148,11 @@ res <- osar(fit[1,])
 ```
 
 As calculation of these residuals is computationally demanding, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 
+
+### inferring behaviour
+a behavioural index, movement persistence, can be estimated along SSM-fitted tracks by using the `fit_mpm` function. This index ranges continuously from 0, associated with frequent changes in direction and/or speed, to 1, associated with infrequent changes (persistence) in direction and/or speed.
+```{r movement persistence, fig.width=8, fig.height=6}
+
+
+```
+
