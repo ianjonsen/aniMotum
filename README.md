@@ -80,30 +80,14 @@ compile issues, I recommend you consult the excellent information on the
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here’s an
-example showing how to quality-control Argos tracking data using
-parallel processing (via the `future` and `furrr` packages), and infer a
+example showing how to quality-control Argos tracking data, and infer a
 behavioural index along the estimated animal tracks:
 
 ``` r
 library(tidyverse)
 library(foieGras)
 
-data(sese)
-future::plan("multisession")
-fit <- sese$data %>%
-  furrr::future_map(~ try(
-    fit_ssm(
-      d = .x,
-      vmax = 4,
-      model = "crw",
-      time.step = 24,
-      control = ssm_control(verbose = 0, 
-                            se = FALSE) 
-    ), silent = TRUE),
-    .progress = FALSE,
-    .options = furrr::furrr_options(seed = TRUE)
-  ) %>% do.call(rbind, .)
-future::plan("sequential")
+fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0, se = FALSE))
 
 fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
 
