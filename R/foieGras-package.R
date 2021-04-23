@@ -45,9 +45,9 @@ NULL
 ##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name ellies
+##' @name sese
 ##' @docType data
-##' @title Southern elephant seal Argos satellite data (2 individuals)
+##' @title Southern elephant seal Argos satellite data (5 individuals)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from

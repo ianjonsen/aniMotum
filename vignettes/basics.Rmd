@@ -44,8 +44,8 @@ where the Argos data are provided via CLS Argos' Kalman filter model (KF) and in
 
 2) a `data.frame` or `tibble` that looks like this
 ```{r data 2, echo = FALSE}
-data(ellies, package = "foieGras")
-head(data.frame(ellies))
+data(sese, package = "foieGras")
+head(data.frame(do.call(rbind, sese$data[1:2])))
 ```
 where the Argos data are provided via CLS Argos' Least-Squares model (LS) and do not include error ellipse information.
 
@@ -109,19 +109,20 @@ head(data.frame(foo))
 ### fitting a foieGras model
 model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::fit_ssm` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object,the prefilter guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the `fit_ssm` function:
 ```{r fit_ssm, message=FALSE}
-## load foieGras example data - 2 southern elephant seals
-data("ellies")
+## structure data appropriately for fit_ssm
+x <- do.call(rbind, sese$data[1:2])
+
 ## prefilter and fit Random Walk SSM using a 24 h time step
-fit <- fit_ssm(ellies, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
+fit <- fit_ssm(x, model = "crw", time.step = 24, control = ssm_control(verbose = 0, se = FALSE))
 ```
-these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `verbose = 0` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?foieGras::fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted but these should rarely need to be accessed by users and will not be dealt with here.
+these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `control = ssm_control(verbose = 0, se = FALSE)` is included for speed and vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted via the `control = ssm_control()` argument, see `?ssm_control` for details.
 
 `fit_ssm` can be applied to single tracks or to multiple tracks, as shown above. The SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
 ```{r multi-fits, message=FALSE}
 ## list fit outcomes for both seals
 fit
 ```
-individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw` or `crw`) in the 4th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette]( https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via `ssm_control()` (see `?fit_ssm` and `?ssm_control` on usage) may overcome mild issues (see `?nlminb` or `?optim` for details on optimization control parameters).
+individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw` or `crw`) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette]( https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via `ssm_control()` (see `?fit_ssm` and `?ssm_control` on usage) may overcome mild issues (see `?nlminb` or `?optim` for details on optimization control parameters).
 
 ### accessing and visualizing model fit objects
 simple summary information about the `foieGras` fit can be obtained by calling the fit object:
