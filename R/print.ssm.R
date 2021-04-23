@@ -18,8 +18,10 @@ print.ssm <- function(x, ...)
 {
   pm <- x$pm
   timeStep <- ifelse(length(x$ts) == 1, x$ts, "multiple time.steps")
-  nbrStates <- nrow(x$predicted)
-  nbStates <- nrow(x$fitted)
+  nobs.tot <- nrow(x$data)
+  nobs.pf <- sum(x$data$keep)
+  n.fit <- nrow(x$fitted)
+  n.pred <- nrow(x$predicted)
   parm <- x$par
   if("objective" %in% names(x$opt)) {
     nll <- x$opt$objective
@@ -28,8 +30,10 @@ print.ssm <- function(x, ...)
   }
   cat("Process model:", pm, "\n")
   cat("Time interval:", timeStep, if(is.numeric(timeStep)) {"hours"}, "\n")
-  cat("number of observations:", nbStates, "\n")
-  cat("number of regularised state estimates:", nbrStates, "\n\n")
+  cat("number of original observations:", nobs.tot, "\n")
+  cat("number of observations:", nobs.pf, "\n")
+  cat("number of fitted states:", n.fit, "\n")
+  cat("number of predicted states:", n.pred, "\n\n")
   cat("parameter estimates\n")
   cat("-------------------\n")
   print(round(parm, 5), justify = "right")
