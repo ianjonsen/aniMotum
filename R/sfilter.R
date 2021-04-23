@@ -29,7 +29,7 @@
 ##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
 ##' @param lpsi `r lifecycle::badge("deprecated")` use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
-##' @importFrom TMB MakeADFun sdreport newtonOption
+##' @importFrom TMB MakeADFun sdreport newtonOption FreeADFun
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
 ##' @importFrom utils flush.console
 ##' @importFrom dplyr mutate select full_join arrange lag bind_cols "%>%"
@@ -290,7 +290,7 @@ sfilter <-
         parameters,
         map = map,
         random = rnd,
-        hessian = FALSE,
+        hessian = TRUE,
         method = control$method,
         DLL = "foieGras",
         silent = !ifelse(control$verbose == 2, TRUE, FALSE),
@@ -366,9 +366,12 @@ sfilter <-
                                 )
                               ), silent = TRUE))
     cat("\n")
+    
+    FreeADFun(obj)
+    
     ## if error then exit with limited output to aid debugging
     ## check if pdHess is FALSE at end and return warning
-    rep <- try(sdreport(obj))
+    rep <- try(sdreport(obj, skip.delta.method = !control$se)) #
    
     options(warn = oldw) ## turn warnings back on
     

@@ -1,4 +1,4 @@
-# foieGras 0.7-5
+# foieGras 0.7-5 (23/04/2021)
 
 * adds `sim()` to simulate animal tracks using the `rw`, `crw` or `mpm` process models. The `rw` and `crw` models can also be specified with state-switching between multiple behavioural states. Tracks can be simulated with or without Argos (LS or KF) errors, as time-regular or time-irregular
 * adds `simfit()` to simulate animal tracks from `fit_ssm` fit objects

@@ -22,6 +22,9 @@
 ##' defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}
 ##' @param verbose integer; report progress during minimization: 0 = silent;
 ##' 1 = optimizer trace; 2 = parameter trace (default))
+##' @param se logical; should standard errors for fixed effects be calculated (default = TRUE). 
+##' Turning this off will speed up computation time at the expense of reporting uncertainty for 
+##' fixed effects
 ##' @param ... control parameters for the chosen optimizer
 ##' @return Returns a list with components
 ##'   \item{\code{optim}}{the name of the numerical optimizer as a
@@ -50,6 +53,7 @@ ssm_control <-
            lower = NULL,
            upper = NULL,
            verbose = 1,
+           se = TRUE,
            ...) {
     optim <- match.arg(optim)
     method <- match.arg(method)
@@ -95,5 +99,6 @@ ssm_control <-
          lower = lower,
          upper = upper,
          verbose = verbose,
+         se = se,
          control = pars)
   }

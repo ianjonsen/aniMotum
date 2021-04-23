@@ -60,27 +60,33 @@ Note: there can be issues getting compilers to work properly, especially on a Ma
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here's an example showing how to quality-control Argos tracking data and infer a behavioural index along the estimated animal tracks:
-```{r example}
+```{r example, message=FALSE, fig.width=8, fig.height=5}
 library(tidyverse)
 library(foieGras)
 
-ellies
+data(sese)
+future::plan("multisession")
+fit <- sese$data %>%
+  furrr::future_map(~ try(
+    fit_ssm(
+      d = .x,
+      vmax = 4,
+      model = "crw",
+      time.step = 24,
+      control = ssm_control(verbose = 0, 
+                            se = FALSE) 
+    ), silent = TRUE),
+    .progress = FALSE,
+    .options = furrr::furrr_options(seed = TRUE)
+  ) %>% do.call(rbind, .)
+future::plan("sequential")
 
-fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 24, verbose = 0) ## turn off parameter trace for tidy output
-plot(fit, what = "predicted")
+fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
 
-fmp <- fit %>% 
-  grab(what = "predicted", as_sf = FALSE) %>%
-  select(id, date, lon, lat) %>%
-  fit_mpm(model = "jmpm", verbose = 0) ## turn off parameter trace for tidy output
+plot(fmp, pages = 1, ncol = 3, pal = "Zissou1", rev = TRUE)
 
-plot(fmp, pal = "Zissou1", rev = TRUE)
-
-fmap(fit, fmp, what = "predicted", crs = "+proj=stere +lon_0=99 +units=km +ellps=WGS84", pal = "Cividis")
+fmap(fit, fmp, what = "predicted", pal = "Cividis")
 ```
-
-## Learn more
-foieGras can do a lot more. New vignettes, highlighting features are coming...
 
 ## What to do if you encounter a problem
 If you are convinced you have encountered a bug or unexpected/inconsistent behaviour when using foieGras, you can post an issue [here](https://github.com/ianjonsen/foieGras/issues). First, have a read through the posted issues to see if others have encountered the same problem and whether a solution has been offered. You can reply to an existing issue if you have the same problem and have more details to share or you can submit a new issue. To submit an issue, you will need to _clearly_ describe the unexpected behaviour, include a reproducible example with a small dataset, clearly describe what you expected to happen (but didn't), and (ideally) post a few screenshots/images that nicely illustrate the problem.
