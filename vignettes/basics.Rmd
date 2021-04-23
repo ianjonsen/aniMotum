@@ -112,14 +112,14 @@ model fitting for quality control of locations is comprised of 2 steps: a prefil
 fit <-
   fit_ssm(
     sese1,
-    model = "crw",
+    model = "rw",
     time.step = 24,
     control = ssm_control(verbose = 0)
   )
 ```
 these are the minimum arguments required: the input data, the model (`rw` or `crw`) and the time.step (in h) to which locations are predicted (the argument `control = ssm_control(verbose = 0)` is included for vignette tidyness). Additional control can be exerted over the prefiltering step, via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` arguments. see `?fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the SSM fitting step can also be exerted via the `control = ssm_control()` argument, see `?ssm_control` for details.
 
-`fit_ssm` can be applied to single tracks or to multiple tracks, as shown above. The SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `foieGras` fit object. The `converged` column indicates whether each model fit converged successfully. 
+`fit_ssm` can be applied to single tracks or to multiple tracks, as shown above. The SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `fG_ssm` fit object. The `converged` column indicates whether each model fit converged successfully. 
 ```{r multi-fits, message=FALSE}
 ## list fit outcomes for both seals
 fit
@@ -127,11 +127,11 @@ fit
 individual `id` is displayed in the 1st column, all fit output (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw` or `crw`) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette]( https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via `ssm_control()` (see `?fit_ssm` and `?ssm_control` on usage) may overcome mild issues (see `?nlminb` or `?optim` for details on optimization control parameters).
 
 ### accessing and visualizing model fit objects
-simple summary information about the `foieGras` fit can be obtained by calling the fit object:
+simple summary information about the fit can be obtained by calling the individual fit objects:
 ```{r fit summary, message = FALSE}
 fit$ssm[[1]]
 ```
-the table lists all estimated parameters, the specific ones listed depend on the process model selected and the data type. Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation between `sigma_x` and `sigma_y`, `tau_x` and `tau_y` are the observation error standard deviations, and `rho_o` is the correlation between them. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
+here, the `[[1]]` denotes the first individual and so on. The summary table lists all estimated parameters, the specific ones listed depend on the process model selected and the data type. Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation parameter in the covariance term, `tau_x` and `tau_y` are the observation error standard deviations, and `rho_o` is the correlation parameter. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
 
 a summary `plot` method allows a quick visual of the SSM fit to the data:
 ```{r fit plot, fig.width=6, fig.height=4}
@@ -171,6 +171,3 @@ plot(fmp, pages = 1, pal = "Zissou1", rev = TRUE)
 
 plot(fmp, fit, pages = 1, pal = "Cividis")
 ```
-
-### simulating tracks
-tracks can be simulated in foieGras 
