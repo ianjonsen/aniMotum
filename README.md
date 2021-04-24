@@ -7,15 +7,15 @@ data for location quality control and behavioural inference
 <!-- badges: start -->
 
 [![Lifecycle:
-maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Coverage
 status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras)
-[![CRAN\_Downloads](http://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](http://www.r-pkg.org/pkg/foieGras)
-[![CRAN\_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
+[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
+[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
@@ -40,8 +40,8 @@ SSM-estimated most-probable track.
 
 ## Installation
 
-First, ensure you have R version &gt;= 3.6.0 installed (preferably R
-4.0.0 or higher):
+First, ensure you have R version \>= 3.6.0 installed (preferably R 4.0.0
+or higher):
 
 ``` r
 R.Version()
@@ -49,10 +49,11 @@ R.Version()
 
 ### From CRAN
 
-`foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras) and
-can be downloaded within `R`, in the usual way
+`foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras/)
+and can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
+`install.packages("foieGras", depedencies =
+c("Imports","LinkingTo","Suggests"))`
 
 ### From GitHub (source)
 
@@ -97,6 +98,7 @@ plot(fmp, pages = 1, ncol = 3, pal = "Zissou1", rev = TRUE)
 ![](man/figures/README-example-1.png)<!-- -->
 
 ``` r
+
 fmap(fit, fmp, what = "predicted", pal = "Cividis")
 ```
 
