@@ -77,7 +77,7 @@ jobs:
       - name: Install TMB from source (to build against existing Matrix pkg ver)
         if: runner.os == 'Linux'
         run: |
-          install.packages('TMB', type = 'source')
+          install.packages('TMB')
           
       - name: Install dependencies
         run: |
