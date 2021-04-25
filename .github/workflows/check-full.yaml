@@ -74,6 +74,11 @@ jobs:
         run: |
           sudo apt-get install gdal-bin libudunits2-dev libgdal-dev libgeos-dev libproj-dev
 
+      - name: Install TMB from source (to build against existing Matrix pkg ver)
+        if: runner.os == 'Linux'
+        run: |
+          install.packages("TMB", type = "source")
+          
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
