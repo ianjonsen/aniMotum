@@ -32,10 +32,6 @@
 ##'   \item{\code{verbose}}{level of tracing information to be reported}
 ##'   \item{\code{control}}{list of control parameters for the optimizer}
 ##' @seealso \code{\link{nlminb}}, \code{\link{optim}}.
-##' @examples
-##' fit <- fit_mpm(xs,
-##' what = "p",
-##' model = "jmpm")
 ##' @importFrom assertthat assert_that
 ##' @export
 

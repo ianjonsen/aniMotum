@@ -17,8 +17,10 @@ print \code{foieGras} fit object summary information
 }
 \examples{
 ## see summary fit output
-## load example foieGras ssm fit object (to save time)
-data(xs)
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
 xs$ssm[[1]]
 
 }

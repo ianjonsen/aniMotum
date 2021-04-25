@@ -67,14 +67,15 @@ NULL
 ##' Strategy and the Super Science Initiative.
 NULL
 
-##' @name xs
+##' @name sese2
 ##' @docType data
-##' @title foieGras example fit object
+##' @title Southern elephant seal Argos satellite data (2 highly sub-sampled individuals)
 ##' @format .RData
 ##' @keywords data
-##' @description Example foieGras fit object. This example
-##' fit is included purely to speed up examples where a fit object is required
-##' but fitting to data is not the focus of the example.
+##' @description Example elephant seal Argos tracking data, highly sub-sampled. 
+##' These example data are included purely to speed up examples where a fit 
+##' object is required. Generating a fit object is preferred as storing an 
+##' example fit risks GDAL errors on platforms with older GDAL libraries
 NULL
 
 ##' @name xm

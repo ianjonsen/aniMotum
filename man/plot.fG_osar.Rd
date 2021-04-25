@@ -33,9 +33,11 @@
 plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 }
 \examples{
-## load example osar output (to save time)
-data(xs)
-dres <- osar(xs[1, ]) # only use first seal to save time
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
+dres <- osar(xs[2, ]) # only use one seal to save time
 plot(dres, type = "qq")
 
 }

@@ -17,8 +17,10 @@
 ##' @importFrom tibble as_tibble
 ##'
 ##' @examples
-##' ## load example foieGras fit object (to save time)
-##' data(xs)
+##' ## generate a fG_ssm fit object
+##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+##' control = ssm_control(se = FALSE, verbose = 0))
+##' 
 ##' ## grab predicted values as an un-projected tibble
 ##' preds <- grab(xs, what = "predicted", as_sf = FALSE)
 ##' 

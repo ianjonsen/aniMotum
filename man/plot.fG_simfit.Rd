@@ -22,6 +22,10 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
 trs <- simfit(xs, what = "p", reps = 1)
 plot(trs, ncol = 2)
 

@@ -48,6 +48,11 @@ visualize fits from an fG_mpm object
 # plot mpm fit object
 # 1-d time-series plots
 plot(xm) 
+
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
 # 2-d track plots by adding ssm fit object
 plot(xm, xs) 
 

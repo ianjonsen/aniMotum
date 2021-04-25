@@ -1,7 +1,9 @@
 context("test plot_ssm")
 
-## expect plot is silent
-data(xs)
+## generate fG_ssm obj a quickly as possible
+## have to do this to avoid error when calling st_transform on platforms running older GDAL versions (sese2 is highly sub-sampled for this purpose)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+              control = ssm_control(se = FALSE, verbose = 0))
 
 ## plot fitted value ts
 tp <- plot(xs, what = "fitted", pages = 0, outlier = FALSE)

@@ -20,11 +20,12 @@ calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
 One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version). \code{osar} tries the "fullGaussian" (fastest) method first and falls back to the "oneStepGaussianOffMode" (slower) method for any failures. Subsequent failures are dropped from the output and a warning message is given. Note, OSA residuals can take a considerable time to calculate if there are many individual fits and/or deployments are long. The method is automatically parallelized across 2 x the number of individual fits, up to the number of processor cores available.
 }
 \examples{
-## see summary fit output
-## load example foieGras fit object (to save time)
-data(xs)
-d <- xs[1, ] ## just use the first seal to save time
-dres <- osar(d)
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
+## just use one seal to save time
+dres <- osar(xs[2,])
 
 }
 \references{

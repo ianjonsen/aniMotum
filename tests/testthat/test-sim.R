@@ -1,6 +1,9 @@
 context("test sim")
 
-data(xs)
+## generate fG_ssm obj a quickly as possible
+## have to do this to avoid error when calling st_transform on platforms running older GDAL versions (sese2 is highly sub-sampled for this purpose)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "crw", time.step=72, 
+              control = ssm_control(se = FALSE, verbose = 0))
 trs <- simfit(xs, what = "fitted", reps = 2, )
 
 test_that("sim returns fG_simfit nested tibble with 2 rows", {

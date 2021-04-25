@@ -56,11 +56,6 @@ dots argument.  See \code{\link{nlminb}} and \code{\link{optim}}
 for available options. Adapted from S. Wotherspoon
 \url{https://github.com/SWotherspoon/RWalc/blob/master/R/RWalc.R}
 }
-\examples{
-fit <- fit_mpm(xs,
-what = "p",
-model = "jmpm")
-}
 \seealso{
 \code{\link{nlminb}}, \code{\link{optim}}.
 }

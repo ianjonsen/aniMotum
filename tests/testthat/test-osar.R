@@ -1,7 +1,10 @@
 context("test osar")
 skip_on_cran()
-data(xs)
-res <- osar(xs[1,])
+## generate fG_ssm obj a quickly as possible
+## have to do this to avoid error when calling st_transform on platforms running older GDAL versions (sese2 is highly sub-sampled for this purpose)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+              control = ssm_control(se = FALSE, verbose = 0))
+res <- osar(xs[2,])
 
 test_that("r has s3 classes `fG_osar`, `tbl_df`, `tbl`, `data.frame`", {
   expect_s3_class(res, c("fG_osar","tbl_df","tbl","data.frame"))

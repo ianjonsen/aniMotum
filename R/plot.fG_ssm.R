@@ -49,8 +49,10 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @method plot fG_ssm
 ##'
 ##' @examples
-##' ## load example foieGras fit object (to save time)
-##' data(xs)
+##' ## generate a fG_ssm fit object (call is for speed only)
+##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+##' control = ssm_control(se = FALSE, verbose = 0))
+##' 
 ##' plot(xs, what = "f", type = 1)
 ##' plot(xs, what = "p", type = 2)
 ##'

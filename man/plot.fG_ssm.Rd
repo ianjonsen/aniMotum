@@ -45,8 +45,10 @@ or (type = 2) 2-d fits to data (units = km)
 visualize fits from an fG_ssm object
 }
 \examples{
-## load example foieGras fit object (to save time)
-data(xs)
+## generate a fG_ssm fit object (call is for speed only)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+control = ssm_control(se = FALSE, verbose = 0))
+
 plot(xs, what = "f", type = 1)
 plot(xs, what = "p", type = 2)
 
