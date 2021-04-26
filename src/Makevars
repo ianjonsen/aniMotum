@@ -9,4 +9,4 @@ tmblib:
 	(cd TMB; $(R_HOME)/bin$(R_ARCH_BIN)/Rscript --no-save --no-restore compile.R)
 
 clean:
-	rm -rf *.so *.o
+	rm -rf *.so *.o TMB/*.so TMB/*.o
