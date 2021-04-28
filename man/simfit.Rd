@@ -8,6 +8,8 @@ simfit(
   x,
   what = c("fitted", "predicted"),
   reps = 1,
+  grad = NULL,
+  beta = c(-250, -250),
   cpf = FALSE,
   sim_only = FALSE
 )
@@ -19,9 +21,15 @@ simfit(
 (typically regular in time) locations}
 
 \item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model
-fit object (ignored if x is NULL)}
+fit object}
 
-\item{cpf}{logical; should simulated tracks return to their start point (ie. a central-place forager)}
+\item{grad}{a rasterStack of x- and y-gradients as separate layers}
+
+\item{beta}{a 2-element vector of parameters defining the potential function
+magnitude in x- and y-directions (ignored if \code{is.null(grad)},
+ie. no potential function)}
+
+\item{cpf}{logical; should simulated tracks return to their start piont (ie. a central-place forager)}
 
 \item{sim_only}{logical, do not include \code{fG_ssm} estimated location in output
 (default is FALSE)}
@@ -32,8 +40,8 @@ either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with lengt
 equal to the number of observations used in the SSM fit.
 }
 \examples{
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48, control = ssm_control(se = FALSE))
-trs <- simfit(fit, reps = 2, what = "predicted")
+fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
+trs <- simfit(fit, what = "predicted", reps = 2)
 plot(trs)
 
 }
