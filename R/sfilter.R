@@ -268,14 +268,17 @@ sfilter <-
       dt = dt,
       state0 = state0,
       isd = as.integer(d.all$isd),
+      fidx = which(d.all$isd),
+      pidx = which(!d.all$isd),
       obs_mod = as.integer(obs_mod),
+      se = as.integer(control$se),
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$lonerr, d.all$laterr)
     )
-    
+
     if(scale) d.all <- d.all.tmp
     
     ## TMB - create objective function
@@ -283,7 +286,7 @@ sfilter <-
       inner.control <- list(smartsearch = TRUE)
     }
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
-
+browser()
     obj <-
       MakeADFun(
         data,
@@ -296,7 +299,7 @@ sfilter <-
         silent = !ifelse(control$verbose == 2, TRUE, FALSE),
         inner.control = inner.control
       )
-
+browser()
     obj$env$tracemgc <- ifelse(control$verbose == 2, TRUE, FALSE)
 
     ## add par values to trace if control$verbose = TRUE
@@ -371,8 +374,8 @@ sfilter <-
     
     ## if error then exit with limited output to aid debugging
     ## check if pdHess is FALSE at end and return warning
-    rep <- try(sdreport(obj, skip.delta.method = !control$se)) #
-   
+    rep <- try(sdreport(obj)) #, skip.delta.method = !control$se
+
     options(warn = oldw) ## turn warnings back on
     
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
@@ -419,7 +422,6 @@ sfilter <-
                tmp <- summary(rep, "random")
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
-               ss <- fxd[which(row.names(fxd) == "sv"), ] ## speeds
                
                loc <-
                  cbind(loc[seq(1, dim(loc)[1], by = 2),],
@@ -432,8 +434,6 @@ sfilter <-
                        vel[seq(2, dim(vel)[1], by = 2),]) %>%
                  as.data.frame(., row.names = 1:nrow(.))
                names(vel) <- c("u", "u.se", "v", "v.se")
-               vel <- vel %>%
-                 mutate(s = ss[, 1], s.se = ss[, 2])
                
                rdm <- bind_cols(loc, vel) %>%
                  mutate(
@@ -447,7 +447,7 @@ sfilter <-
                           y = y  * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
                }
                rdm <- rdm %>%
-                 select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, s, s.se, isd)
+                 select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
              })
       
       ## coerce x,y back to sf object
@@ -458,24 +458,40 @@ sfilter <-
       switch(model,
              rw = {
                rdm <- rdm %>% select(id, date, x.se, y.se, isd)
-
+               ## fitted
+               fv <- filter(rdm, isd) %>%
+                 select(-isd)
+               ##predicted
+               if(all(!is.na(time.step))) {
+                 pv <- filter(rdm, !isd) %>%
+                   select(-isd)
+               } else {
+                 pv <- NULL
+               }
              },
              crw = {
+               if(control$se) {
+                 browser()
+               } else {
+                 sf <- as.vector(obj$report()$sf)
+                 sp <- as.vector(obj$report()$sp)
+                 sf[1] <- sp[1] <- NA # replace tiny w NA
+               }
                rdm <- rdm %>%
-                 select(id, date, x.se, y.se, u, v, u.se, v.se, s, s.se, isd)
+                 select(id, date, x.se, y.se, u, v, u.se, v.se, isd) 
+               ## fitted
+               fv <- filter(rdm, isd) %>%
+                 mutate(s = sf) %>%
+                 select(-isd)
+               ##predicted
+               if(all(!is.na(time.step))) {
+                 pv <- filter(rdm, !isd) %>%
+                   mutate(s = sp) %>%
+                   select(-isd)
+               } else {
+                 pv <- NULL
+               }
              })
-
-      ## Fitted values (estimated locations at observation times)
-      fv <- subset(rdm, isd) %>%
-        select(-isd)
-
-      ## Predicted values (estimated locations at regular time intervals, defined by `ts`)
-      if(all(!is.na(time.step))) {
-      pv <- subset(rdm, !isd) %>%
-        select(-isd)
-      } else {
-        pv <- NULL
-      }
       
       if (control$optim == "nlminb") {
         aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]

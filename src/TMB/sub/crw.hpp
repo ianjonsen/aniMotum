@@ -16,8 +16,11 @@ Type crw(objective_function<Type>* obj) {
   DATA_VECTOR(dt);         	        //  time diff in some appropriate unit. this should contain dt for both interp and obs positions.
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
+  DATA_IVECTOR(fidx);
+  DATA_IVECTOR(pidx);
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
+  DATA_SCALAR(se);                  // turn delta method on/off for sv (speeds up model fitting if SE's not req'd & this allows param SE's to be calculated regardless)
   
   // for KF observation model
   DATA_VECTOR(m);                 //  m is the semi-minor axis length
@@ -51,7 +54,8 @@ Type crw(objective_function<Type>* obj) {
   Type jnll = 0.0;
   Type tiny = 1e-5;
   
-  vector<Type> sv = dt.size();
+  vector<Type> sf = fidx.size();
+  vector<Type> sp = pidx.size();
   
   // Setup object for evaluating multivariate normal likelihood
   matrix<Type> cov(4,4);
@@ -85,8 +89,6 @@ Type crw(objective_function<Type>* obj) {
     x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
     x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
     
-    // 2-D velocity
-    sv(i) = sqrt(pow(v(0,i), 2) + pow(v(1,i), 2)); 
     jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
   }
   
@@ -145,6 +147,23 @@ Type crw(objective_function<Type>* obj) {
     }
   }
   
+// calculate 2-D vel along track separately for fitted (isd==1) vs predicted (isd==0) states
+  vector<Type> sf_t(2);
+  vector<Type> sp_t(2);
+  sf(0) = tiny;
+  sp(0) = tiny;
+  for(int i = 1; i < fidx.size(); ++i) {
+    sf_t(0) = mu(0, fidx(i)) - mu(0, fidx(i-1));
+    sf_t(1) = mu(1, fidx(i)) - mu(1, fidx(i-1));
+    
+    sf(i) = sqrt(pow(sf_t(0), 2) + pow(sf_t(1), 2)); 
+  }
+  for(int i = 1; i < pidx.size(); ++i) {
+    sp_t(0) = mu(0, pidx(i)) - mu(0, pidx(i-1));
+    sp_t(1) = mu(1, pidx(i)) - mu(1, pidx(i-1));
+    sp(i) = sqrt(pow(sp_t(0), 2) + pow(sp_t(1), 2)); 
+  }
+  
   SIMULATE {
     REPORT(Y);
   }
@@ -153,7 +172,13 @@ Type crw(objective_function<Type>* obj) {
   ADREPORT(rho_o);
   ADREPORT(tau);
   ADREPORT(psi);
-  ADREPORT(sv);
+  if(se == 1) {
+    ADREPORT(sf);
+    ADREPORT(sp);
+  } else if(se == 0) {
+    REPORT(sf);
+    REPORT(sp);
+  }
   
   return jnll;
 }
