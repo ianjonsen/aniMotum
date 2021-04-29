@@ -261,6 +261,14 @@ sfilter <-
                y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
     }
     
+    ## calculate fitted & predicted indices + delta t for proper speed estimates
+    fidx <- which(d.all$isd)
+    
+    fdt <- as.numeric(difftime(d.all$date[fidx], lag(d.all$date[fidx]), 
+                               units = "hours"))
+    pidx <- which(!d.all$isd)
+    pdt <- as.numeric(difftime(d.all$date[pidx], lag(d.all$date[pidx]), 
+                               units = "hours"))
     
     data <- list(
       model_name = model,
@@ -268,8 +276,10 @@ sfilter <-
       dt = dt,
       state0 = state0,
       isd = as.integer(d.all$isd),
-      fidx = which(d.all$isd),
-      pidx = which(!d.all$isd),
+      fidx = fidx-1, ## for C++ indexing
+      fdt = fdt,
+      pidx = pidx-1,
+      pdt = pdt,
       obs_mod = as.integer(obs_mod),
       se = as.integer(control$se),
       m = d.all$smin,
@@ -286,7 +296,7 @@ sfilter <-
       inner.control <- list(smartsearch = TRUE)
     }
     rnd <- switch(model, rw = "X", crw = c("mu", "v"))
-browser()
+
     obj <-
       MakeADFun(
         data,
@@ -299,7 +309,7 @@ browser()
         silent = !ifelse(control$verbose == 2, TRUE, FALSE),
         inner.control = inner.control
       )
-browser()
+
     obj$env$tracemgc <- ifelse(control$verbose == 2, TRUE, FALSE)
 
     ## add par values to trace if control$verbose = TRUE

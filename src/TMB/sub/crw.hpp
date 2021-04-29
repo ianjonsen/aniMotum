@@ -17,7 +17,9 @@ Type crw(objective_function<Type>* obj) {
   DATA_VECTOR(state0);              //  initial state
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(fidx);
+  DATA_VECTOR(fdt);
   DATA_IVECTOR(pidx);
+  DATA_VECTOR(pdt);
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   DATA_SCALAR(se);                  // turn delta method on/off for sv (speeds up model fitting if SE's not req'd & this allows param SE's to be calculated regardless)
@@ -148,20 +150,12 @@ Type crw(objective_function<Type>* obj) {
   }
   
 // calculate 2-D vel along track separately for fitted (isd==1) vs predicted (isd==0) states
-  vector<Type> sf_t(2);
-  vector<Type> sp_t(2);
-  sf(0) = tiny;
-  sp(0) = tiny;
+
   for(int i = 1; i < fidx.size(); ++i) {
-    sf_t(0) = mu(0, fidx(i)) - mu(0, fidx(i-1));
-    sf_t(1) = mu(1, fidx(i)) - mu(1, fidx(i-1));
-    
-    sf(i) = sqrt(pow(sf_t(0), 2) + pow(sf_t(1), 2)); 
+    sf(i) = sqrt(pow(mu(0, fidx(i)) - mu(0, fidx(i-1)), 2) + pow(mu(1, fidx(i)) - mu(1, fidx(i-1)), 2)) / fdt(i);
   }
   for(int i = 1; i < pidx.size(); ++i) {
-    sp_t(0) = mu(0, pidx(i)) - mu(0, pidx(i-1));
-    sp_t(1) = mu(1, pidx(i)) - mu(1, pidx(i-1));
-    sp(i) = sqrt(pow(sp_t(0), 2) + pow(sp_t(1), 2)); 
+    sp(i) = sqrt(pow(mu(0, pidx(i)) - mu(0, pidx(i-1)), 2) + pow(mu(1, pidx(i)) - mu(1, pidx(i-1)), 2)) / pdt(i);
   }
   
   SIMULATE {
