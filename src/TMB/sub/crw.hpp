@@ -86,7 +86,7 @@ Type crw(objective_function<Type>* obj) {
     x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
     
     // 2-D velocity
-    sv(i) = sqrt(pow(v(0,i) - v(0,i-1), 2) + pow(v(1,i) - v(1,i-1), 2)); 
+    sv(i) = sqrt(pow(v(0,i), 2) + pow(v(1,i), 2)); 
     jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
   }
   
