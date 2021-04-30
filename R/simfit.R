@@ -17,9 +17,9 @@
 ##' (default is FALSE)
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(ellies, vmax = 4, model = "crw", time.step = 72)
+##' fit <- fit_ssm(sese2, vmax = 4, model = "crw", time.step = 72)
 ##' trs <- simfit(fit, what = "predicted", reps = 2)
-##' plot(trs)
+##' plot(trs, ncol = 2)
 ##' 
 ##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm

@@ -103,6 +103,6 @@ globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se"
                   "geometry", "u", "v", "u.se", "v.se", "lc", "smaj", "smin", "eor",
                   "obs.type", "emf.x", "emf.y", "lon", "lat", "rename", "X", "Y", 
                   "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", 
-                  "lonerr", "laterr", "coord", "value", "resid", 
-                  "se", "g", "g.se", "id1", "mpm", "residual",
+                  "lonerr", "laterr", "coord", "value", "resid", "long", 
+                  "se", "g", "g.se", "id1", "mpm", "residual", "group",
                   "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab"))

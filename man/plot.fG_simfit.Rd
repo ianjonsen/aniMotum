@@ -37,7 +37,8 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
-trs <- simfit(xs, what = "p", reps = 1)
-plot(trs, type = "b", ext = "h")
+fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
+trs <- simfit(fit, what = "p", reps = 2)
+plot(trs, type = "b")
 
 }

@@ -45,7 +45,10 @@ Imports:
     mvtnorm,
     tmvtnorm,
     parallel,
-    lifecycle
+    lifecycle,
+    raster,
+    broom,
+    rnaturalearth
 Suggests: 
     testthat,
     covr,
