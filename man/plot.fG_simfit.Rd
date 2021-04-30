@@ -4,10 +4,25 @@
 \alias{plot.fG_simfit}
 \title{plot}
 \usage{
-\method{plot}{fG_simfit}(x, ncol = 1, pal = "Zissou1", ...)
+\method{plot}{fG_simfit}(
+  x,
+  type = c("lines", "points", "both"),
+  ext = c("hemi", "tracks"),
+  or = NULL,
+  ncol = 1,
+  pal = "Zissou1",
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}
+
+\item{type}{plots tracks as "line", "points" or "both" (default).}
+
+\item{ext}{map extent for plotting, either "hemi" (default) for hemisphere, or
+"tracks" to zoom in on track extents. In the latter case, the projection is Mercator.}
+
+\item{or}{orientation of orthographic projection, default is to centre on start of fitted track}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
@@ -22,11 +37,7 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
-## generate a fG_ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "crw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
-
 trs <- simfit(xs, what = "p", reps = 1)
-plot(trs, ncol = 2)
+plot(trs, type = "b", ext = "h")
 
 }
