@@ -10,7 +10,7 @@ ssm_control(
   lower = NULL,
   upper = NULL,
   verbose = 1,
-  se = TRUE,
+  se = FALSE,
   ...
 )
 }
@@ -33,9 +33,8 @@ defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are 
 \item{verbose}{integer; report progress during minimization: 0 = silent;
 1 = optimizer trace; 2 = parameter trace (default))}
 
-\item{se}{logical; should standard errors for fixed effects be calculated (default = TRUE).
-Turning this off will speed up computation time at the expense of reporting uncertainty for
-fixed effects}
+\item{se}{logical; should standard errors for speed estimates be calculated (default = FALSE).
+Turning this on will slow down computation time but provide SE's for speed-along-track calculations}
 
 \item{...}{control parameters for the chosen optimizer}
 }

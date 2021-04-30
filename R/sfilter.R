@@ -399,6 +399,16 @@ sfilter <-
       if("tau" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
       }
+      ## separate speed+se if present
+      if("sf" %in% row.names(fxd)) {
+        sf <- fxd[which(row.names(fxd) == "sf"), ]
+        sf[1,] <- c(NA,NA)
+        if("sp" %in% row.names(fxd)) {
+          sp <- fxd[which(row.names(fxd) == "sp"), ]
+          sp[1,] <- c(NA,NA)
+        }
+        fxd <- fxd[!row.names(fxd) %in% c("sf","sp"),]
+      }
 
       switch(model,
              rw = {
@@ -481,22 +491,28 @@ sfilter <-
              },
              crw = {
                if(control$se) {
-                 browser()
+                 sf.se <- sf[,2]
+                 sf <- sf[,1]
+                 if(all(!is.na(time.step))) {
+                   sp.se <- sp[,2]
+                   sp <- sp[,1]
+                 }
                } else {
                  sf <- as.vector(obj$report()$sf)
                  sp <- as.vector(obj$report()$sp)
-                 sf[1] <- sp[1] <- NA # replace tiny w NA
+                 sf.se <- NA
+                 sp.se <- NA
                }
                rdm <- rdm %>%
                  select(id, date, x.se, y.se, u, v, u.se, v.se, isd) 
                ## fitted
                fv <- filter(rdm, isd) %>%
-                 mutate(s = sf) %>%
+                 mutate(s = sf, s.se = sf.se) %>%
                  select(-isd)
                ##predicted
                if(all(!is.na(time.step))) {
                  pv <- filter(rdm, !isd) %>%
-                   mutate(s = sp) %>%
+                   mutate(s = sp, s.se = sp.se) %>%
                    select(-isd)
                } else {
                  pv <- NULL
