@@ -122,10 +122,10 @@ fmap <- function(x,
 
   ## get worldmap
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sp") %>%
+    wm <- ne_countries(scale = 50, returnclass = "sf") %>%
       st_transform(crs = prj)
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sp") %>%
+    wm <- ne_countries(scale = 110, returnclass = "sf") %>%
       st_transform(crs = prj)
   }
   
