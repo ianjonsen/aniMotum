@@ -33,6 +33,8 @@
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit aes_string
 ##' @importFrom ggplot2 element_text scale_colour_manual scale_colour_gradientn
 ##' @importFrom grDevices extendrange grey hcl.colors
+##' @importFrom rnaturalearth ne_countries
+##' @importFrom broom tidy
 NULL
 
 ##' @name ellie
