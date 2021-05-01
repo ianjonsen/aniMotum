@@ -12,11 +12,9 @@
 ##' 
 ##' @return Plots of simulated tracks. 
 ##' 
-##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
-##' @importFrom ggplot2 element_blank xlab ylab coord_fixed geom_sf 
-##' @importFrom ggplot2 xlim ylim theme_void
-##' @importFrom sf st_as_sf st_transform
-##' @importFrom dplyr "%>%"
+##' @importFrom ggplot2 ggplot element_blank xlab ylab geom_sf xlim ylim 
+##' @importFrom ggplot2 theme_void
+##' @importFrom sf st_as_sf st_transform st_bbox st_is_empty
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
 ##' @importFrom rnaturalearth ne_countries
@@ -32,7 +30,6 @@
 plot.fG_simfit <- function(x, 
                            type = c("lines","points","both"),
                            ext = c("hemi", "tracks"),
-                           or = NULL,
                            ncol = 1,
                            pal = "Zissou1",
                         ...)
@@ -51,22 +48,24 @@ plot.fG_simfit <- function(x,
     wm <- ne_countries(scale = 110, returnclass = "sf") 
   }
   
-   p <- lapply(x$sims, function(x) {
-    prj <- paste0("+proj=ortho +lon_0=", x$lon[1], 
-                  " +lat_0=", x$lat[1], 
+   p <- lapply(x$sims, function(xx) {
+    prj <- paste0("+proj=ortho +lon_0=", trunc(xx$lon[1]), 
+                  " +lat_0=", trunc(xx$lat[1]), 
                   " +units=km +datum=WGS84 +no_defs")
-    wm <- st_transform(wm, crs = prj)
-    x <- st_as_sf(x, coords = c("lon","lat"), crs = 4326)
-    x <- st_transform(x, crs = prj)
+    wmx <- st_transform(wm, crs = prj)
+    xx <- st_as_sf(xx, coords = c("lon","lat"), crs = 4326)
+    xx <- st_transform(xx, crs = prj)
+    
     if(ext == "tracks") {
-      bounds <- st_bbox(x)
-      bounds[c(1,3)] <- extendrange(bounds[c(1,3)], f= 0.15)
-      bounds[c(2,4)] <- extendrange(bounds[c(2,4)], f= 0.15)
+      bounds <- st_bbox(xx)
+      bounds[c(1,3)] <- extendrange(bounds[c(1,3)], f= 0.05)
+      bounds[c(2,4)] <- extendrange(bounds[c(2,4)], f= 0.05)
+    } else {
+      bounds <- st_bbox(wmx)
     }
-    else bounds <- st_bbox(wm)
 
       m <- ggplot() + 
-        geom_sf(data = wm,
+        geom_sf(data = wmx,
                 fill = grey(0.5),
                 colour = NA) +
         xlim(bounds[c(1,3)]) +
@@ -74,7 +73,7 @@ plot.fG_simfit <- function(x,
 
     switch(type, 
            lines = {
-             xl <- subset(x, rep != 0)
+             xl <- subset(xx, rep != 0)
              xl <- group_by(xl, rep)
              xl <- summarise(xl, do_union = FALSE)
              xl <- st_cast(xl, "MULTILINESTRING")
@@ -87,7 +86,7 @@ plot.fG_simfit <- function(x,
                          )
            },
            points = {
-             xp <- subset(x, rep != 0)
+             xp <- subset(xx, rep != 0)
              xp <- group_by(xp, rep)
              xp <- summarise(xp, do_union = FALSE)
              xp <- st_cast(xp, "MULTIPOINT")
@@ -98,11 +97,11 @@ plot.fG_simfit <- function(x,
                           alpha = 0.6)
            },
            both = {
-             xl <- subset(x, rep != 0)
+             xl <- subset(xx, rep != 0)
              xl <- group_by(xl, rep)
              xl <- summarise(xl, do_union = FALSE)
              xl <- st_cast(xl, "MULTILINESTRING")
-             xp <- subset(x, rep != 0)
+             xp <- subset(xx, rep != 0)
              xp <- group_by(xp, rep)
              xp <- summarise(xp, doUnion = FALSE)
              xp <- st_cast(xp, "MULTIPOINT")
@@ -117,7 +116,7 @@ plot.fG_simfit <- function(x,
                           size = 0.75,
                           alpha = 0.6)
            })
-    xp0 <- subset(x, rep == 0)
+    xp0 <- subset(xx, rep == 0)
     xp0 <- summarise(xp0, do_union = FALSE)
     xp0 <- st_cast(xp0, "MULTIPOINT")
     
@@ -130,7 +129,8 @@ plot.fG_simfit <- function(x,
       xlab(element_blank()) +
       ylab(element_blank()) + 
       theme_void()
-      
+    
+    m
   })
 
   wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))

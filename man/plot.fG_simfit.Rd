@@ -8,7 +8,6 @@
   x,
   type = c("lines", "points", "both"),
   ext = c("hemi", "tracks"),
-  or = NULL,
   ncol = 1,
   pal = "Zissou1",
   ...
