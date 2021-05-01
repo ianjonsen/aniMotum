@@ -28,6 +28,7 @@
 ##' @importFrom dplyr summarise "%>%" group_by mutate
 ##' @importFrom grDevices hcl.colors
 ##' @importFrom assertthat assert_that
+##' @importFrom rnaturalearth ne_countries
 ##' @export
 
 fmap <- function(x,
@@ -119,12 +120,17 @@ fmap <- function(x,
      st_cast("MULTILINESTRING")
   } 
 
-  ## get coastline
-  coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
-    st_transform(crs = prj)
+  ## get worldmap
+  if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
+    wm <- ne_countries(scale = 50, returnclass = "sp") %>%
+      st_transform(crs = prj)
+  } else {
+    wm <- ne_countries(scale = 110, returnclass = "sp") %>%
+      st_transform(crs = prj)
+  }
   
   p <- ggplot() +
-    geom_sf(data = coast,
+    geom_sf(data = wm,
             fill = landfill,
             lwd=0) +
     xlim(bounds[c("xmin","xmax")]) +

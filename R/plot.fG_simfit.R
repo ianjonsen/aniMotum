@@ -34,6 +34,7 @@ plot.fG_simfit <- function(x,
                            type = c("lines","points","both"),
                            ext = c("hemi", "tracks"),
                            or = NULL,
+                           scale = 110,
                            ncol = 1,
                            pal = "Zissou1",
                         ...)
@@ -45,7 +46,13 @@ plot.fG_simfit <- function(x,
   type <- match.arg(type)
   ext <- match.arg(ext)
   
-  wm <- ne_countries(scale = 50, returnclass = "sp")
+  ## get coastline
+  if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
+    wm <- ne_countries(scale = 50, returnclass = "sp")
+  } else {
+    wm <- ne_countries(scale = 110, returnclass = "sp")
+  }
+  
   wm <- suppressMessages(tidy(wm))
   wm$region <- wm$id
   wm.df <- wm[,c("long","lat","group","region")]

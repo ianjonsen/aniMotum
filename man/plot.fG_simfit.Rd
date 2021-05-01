@@ -9,6 +9,7 @@
   type = c("lines", "points", "both"),
   ext = c("hemi", "tracks"),
   or = NULL,
+  scale = 110,
   ncol = 1,
   pal = "Zissou1",
   ...
