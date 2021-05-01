@@ -48,9 +48,9 @@ plot.fG_simfit <- function(x,
   
   ## get coastline
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sp")
+    wm <- ne_countries(scale = 50, returnclass = "sp") 
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sp")
+    wm <- ne_countries(scale = 110, returnclass = "sp") 
   }
   
   wm <- suppressMessages(tidy(wm))
