@@ -6,7 +6,6 @@
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param ext map extent for plotting, either "hemi" (default) for hemisphere, or
 ##' "tracks" to zoom in on track extents. In the latter case, the projection is Mercator.
-##' @param or orientation of orthographic projection, default is to centre on start of fitted track
 ##' @param ncol number of columns to arrange multiple plots
 ##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
@@ -14,9 +13,9 @@
 ##' @return Plots of simulated tracks. 
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
-##' @importFrom ggplot2 element_blank xlab ylab coord_fixed geom_polygon 
-##' @importFrom ggplot2 coord_map theme_void
-##' @importFrom broom tidy
+##' @importFrom ggplot2 element_blank xlab ylab coord_fixed geom_sf 
+##' @importFrom ggplot2 xlim ylim theme_void
+##' @importFrom sf st_as_sf st_transform
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
@@ -47,72 +46,84 @@ plot.fG_simfit <- function(x,
   
   ## get coastline
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sp") 
+    wm <- ne_countries(scale = 50, returnclass = "sf") 
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sp") 
+    wm <- ne_countries(scale = 110, returnclass = "sf") 
   }
   
-  wm <- suppressMessages(tidy(wm))
-  wm$region <- wm$id
-  wm.df <- wm[,c("long","lat","group","region")]
-  
-  p <- lapply(x$sims, function(x) {
-    if(min(x$lon) < -175 & max(x$lon > 175)) x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
-    switch(ext, 
-           hemi = {
-             bounds <- c(-180,180,-84.99,89.99)
-           },
-           tracks = {
-             bounds <- c(range(x$lon), range(x$lat))
-           })
-    
-    if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
-    
+   p <- lapply(x$sims, function(x) {
+    prj <- paste0("+proj=ortho +lon_0=", x$lon[1], 
+                  " +lat_0=", x$lat[1], 
+                  " +units=km +datum=WGS84 +no_defs")
+    wm <- st_transform(wm, crs = prj)
+    x <- st_as_sf(x, coords = c("lon","lat"), crs = 4326)
+    x <- st_transform(x, crs = prj)
+    if(ext == "tracks") {
+      bounds <- st_bbox(x)
+      bounds[c(1,3)] <- extendrange(bounds[c(1,3)], f= 0.15)
+      bounds[c(2,4)] <- extendrange(bounds[c(2,4)], f= 0.15)
+    }
+    else bounds <- st_bbox(wm)
+
       m <- ggplot() + 
-        geom_polygon(data = wm.df, 
-                     aes(long, lat, group = group), 
-                     fill = grey(0.4)) +
-        coord_map("ortho",
-                  orientation = or,
-                  xlim = bounds[1:2],
-                  ylim = bounds[3:4])
-    
+        geom_sf(data = wm,
+                fill = grey(0.5),
+                colour = NA) +
+        xlim(bounds[c(1,3)]) +
+        ylim(bounds[c(2,4)])
+
     switch(type, 
            lines = {
+             xl <- subset(x, rep != 0)
+             xl <- group_by(xl, rep)
+             xl <- summarise(xl, do_union = FALSE)
+             xl <- st_cast(xl, "MULTILINESTRING")
+             
              m <- m + 
-               geom_path(data = x%>% filter(rep != 0),
-                         aes(lon, lat, group = rep),
+               geom_sf(data = xl,
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
                          alpha = 0.6
                          )
            },
            points = {
+             xp <- subset(x, rep != 0)
+             xp <- group_by(xp, rep)
+             xp <- summarise(xp, do_union = FALSE)
+             xp <- st_cast(xp, "MULTIPOINT")
              m <- m + 
-               geom_point(data = x%>% filter(rep != 0),
-                          aes(lon, lat),
+               geom_sf(data = xp,
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
                           alpha = 0.6)
            },
            both = {
+             xl <- subset(x, rep != 0)
+             xl <- group_by(xl, rep)
+             xl <- summarise(xl, do_union = FALSE)
+             xl <- st_cast(xl, "MULTILINESTRING")
+             xp <- subset(x, rep != 0)
+             xp <- group_by(xp, rep)
+             xp <- summarise(xp, doUnion = FALSE)
+             xp <- st_cast(xp, "MULTIPOINT")
              m <- m + 
-               geom_path(data = x%>% filter(rep != 0),
-                         aes(lon, lat, group = rep),
+               geom_sf(data = xl,
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
                          alpha = 0.6
                ) +
-               geom_point(data = x%>% filter(rep != 0),
-                          aes(lon, lat),
+               geom_sf(data = xp,
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
                           alpha = 0.6)
            })
+    xp0 <- subset(x, rep == 0)
+    xp0 <- summarise(xp0, do_union = FALSE)
+    xp0 <- st_cast(xp0, "MULTIPOINT")
+    
     m <- m + 
-      geom_point(
-        data = x %>% filter(rep == 0),
-        aes(lon, lat),
+      geom_sf(
+        data = xp0,
         colour = hcl.colors(n=5, palette = pal)[3],
         size = 1
       ) +

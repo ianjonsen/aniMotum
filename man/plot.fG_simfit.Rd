@@ -22,8 +22,6 @@
 \item{ext}{map extent for plotting, either "hemi" (default) for hemisphere, or
 "tracks" to zoom in on track extents. In the latter case, the projection is Mercator.}
 
-\item{or}{orientation of orthographic projection, default is to centre on start of fitted track}
-
 \item{ncol}{number of columns to arrange multiple plots}
 
 \item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
