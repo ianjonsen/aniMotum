@@ -6,15 +6,18 @@
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param ext map extent for plotting, either "hemi" (default) for hemisphere, or
 ##' "tracks" to zoom in on track extents. In the latter case, the projection is Mercator.
+##' @param or orientation of orthographic projection, default is to centre on start of fitted track
 ##' @param ncol number of columns to arrange multiple plots
 ##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
 ##' 
-##' @importFrom ggplot2 ggplot element_blank xlab ylab geom_sf xlim ylim 
-##' @importFrom ggplot2 theme_void
-##' @importFrom sf st_as_sf st_transform st_bbox st_is_empty
+##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
+##' @importFrom ggplot2 element_blank xlab ylab coord_fixed geom_polygon 
+##' @importFrom ggplot2 coord_map theme_void
+##' @importFrom broom tidy
+##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
 ##' @importFrom rnaturalearth ne_countries
@@ -30,6 +33,7 @@
 plot.fG_simfit <- function(x, 
                            type = c("lines","points","both"),
                            ext = c("hemi", "tracks"),
+                           or = NULL,
                            ncol = 1,
                            pal = "Zissou1",
                         ...)
@@ -41,96 +45,80 @@ plot.fG_simfit <- function(x,
   type <- match.arg(type)
   ext <- match.arg(ext)
   
-  ## get coastline
+  ## get worldmap
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sf") 
+    wm <- ne_countries(scale = 50, returnclass = "sp")
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sf") 
+    wm <- ne_countries(scale = 110, returnclass = "sp")
   }
+  wm <- suppressMessages(tidy(wm))
+  wm$region <- wm$id
+  wm.df <- wm[,c("long","lat","group","region")]
   
-   p <- lapply(x$sims, function(xx) {
-    prj <- paste0("+proj=ortho +lon_0=", trunc(xx$lon[1]), 
-                  " +lat_0=", trunc(xx$lat[1]), 
-                  " +units=km +datum=WGS84 +no_defs")
-    wmx <- st_transform(wm, crs = prj)
-    xx <- st_as_sf(xx, coords = c("lon","lat"), crs = 4326)
-    xx <- st_transform(xx, crs = prj)
+  p <- lapply(x$sims, function(x) {
+    if(min(x$lon) < -175 & max(x$lon > 175)) x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
+    switch(ext, 
+           hemi = {
+             bounds <- c(-180,180,-84.99,89.99)
+           },
+           tracks = {
+             bounds <- c(range(x$lon), range(x$lat))
+           })
     
-    if(ext == "tracks") {
-      bounds <- st_bbox(xx)
-      bounds[c(1,3)] <- extendrange(bounds[c(1,3)], f= 0.05)
-      bounds[c(2,4)] <- extendrange(bounds[c(2,4)], f= 0.05)
-    } else {
-      bounds <- st_bbox(wmx)
-    }
-
+    if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
+    
       m <- ggplot() + 
-        geom_sf(data = wmx,
-                fill = grey(0.5),
-                colour = NA) +
-        xlim(bounds[c(1,3)]) +
-        ylim(bounds[c(2,4)])
-
+        geom_polygon(data = wm.df, 
+                     aes(long, lat, group = group), 
+                     fill = grey(0.4)) +
+        coord_map("ortho",
+                  orientation = or,
+                  xlim = bounds[1:2],
+                  ylim = bounds[3:4])
+    
     switch(type, 
            lines = {
-             xl <- subset(xx, rep != 0)
-             xl <- group_by(xl, rep)
-             xl <- summarise(xl, do_union = FALSE)
-             xl <- st_cast(xl, "MULTILINESTRING")
-             
              m <- m + 
-               geom_sf(data = xl,
+               geom_path(data = x%>% filter(rep != 0),
+                         aes(lon, lat, group = rep),
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
                          alpha = 0.6
                          )
            },
            points = {
-             xp <- subset(xx, rep != 0)
-             xp <- group_by(xp, rep)
-             xp <- summarise(xp, do_union = FALSE)
-             xp <- st_cast(xp, "MULTIPOINT")
              m <- m + 
-               geom_sf(data = xp,
+               geom_point(data = x%>% filter(rep != 0),
+                          aes(lon, lat),
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
                           alpha = 0.6)
            },
            both = {
-             xl <- subset(xx, rep != 0)
-             xl <- group_by(xl, rep)
-             xl <- summarise(xl, do_union = FALSE)
-             xl <- st_cast(xl, "MULTILINESTRING")
-             xp <- subset(xx, rep != 0)
-             xp <- group_by(xp, rep)
-             xp <- summarise(xp, doUnion = FALSE)
-             xp <- st_cast(xp, "MULTIPOINT")
              m <- m + 
-               geom_sf(data = xl,
+               geom_path(data = x%>% filter(rep != 0),
+                         aes(lon, lat, group = rep),
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
                          alpha = 0.6
                ) +
-               geom_sf(data = xp,
+               geom_point(data = x%>% filter(rep != 0),
+                          aes(lon, lat),
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
                           alpha = 0.6)
            })
-    xp0 <- subset(xx, rep == 0)
-    xp0 <- summarise(xp0, do_union = FALSE)
-    xp0 <- st_cast(xp0, "MULTIPOINT")
-    
     m <- m + 
-      geom_sf(
-        data = xp0,
+      geom_point(
+        data = x %>% filter(rep == 0),
+        aes(lon, lat),
         colour = hcl.colors(n=5, palette = pal)[3],
         size = 1
       ) +
       xlab(element_blank()) +
       ylab(element_blank()) + 
       theme_void()
-    
-    m
+      
   })
 
   wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))

@@ -8,6 +8,7 @@
   x,
   type = c("lines", "points", "both"),
   ext = c("hemi", "tracks"),
+  or = NULL,
   ncol = 1,
   pal = "Zissou1",
   ...
@@ -20,6 +21,8 @@
 
 \item{ext}{map extent for plotting, either "hemi" (default) for hemisphere, or
 "tracks" to zoom in on track extents. In the latter case, the projection is Mercator.}
+
+\item{or}{orientation of orthographic projection, default is to centre on start of fitted track}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
