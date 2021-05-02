@@ -40,17 +40,22 @@ osar <- function(x, method = "fullGaussian", ...)
   }
 
   if(inherits(x, "fG_ssm")) {
-    if(nrow(x) > 3) {
+    if(nrow(x) > 3 & 
+       requireNamespace("future", quietly = TRUE) &
+       requireNamespace("furrr", quietly = TRUE)
+       ) {
     cat("running in parallel, this could take a while...\n")
-    cl <- makeClusterPSOCK(availableCores())
-    plan(cluster, workers = cl)
+    cl <- future::makeClusterPSOCK(availableCores())
+    future::plan(cluster, workers = cl)
     
     r <- x$ssm %>%
-      future_map(~ try(map_fn(.x, method), silent = TRUE), 
-                 .options = furrr_options(seed = TRUE))
+      furrr::future_map(~ try(map_fn(.x, method), silent = TRUE), 
+                 .options = furrr::furrr_options(seed = TRUE))
     
-    stopCluster(cl)
+    parallel::stopCluster(cl)
     } else {
+      if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
+                           running sequentially. This could take a while...\n")
       r <- lapply(1:nrow(x), function(i) {
         try(map_fn(x$ssm[[i]], method), silent = TRUE)
     })
@@ -65,17 +70,22 @@ osar <- function(x, method = "fullGaussian", ...)
   if (any(cr)) {
     ## re-try on failures
     redo <- x[which(cr), ]
-    if(nrow(redo) > 3) {
+    if(nrow(x) > 3 & 
+       requireNamespace("future", quietly = TRUE) &
+       requireNamespace("furrr", quietly = TRUE)
+    ) {
       cat("running in parallel, this could take a while...\n")
-      cl <- makeClusterPSOCK(availableCores())
-      plan(cluster, workers = cl)
+      cl <- future::makeClusterPSOCK(availableCores())
+      future::plan(cluster, workers = cl)
       
       r.redo <- redo$ssm %>%
-        future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
-                   .options = furrr_options(seed = TRUE))
+        furrr::future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
+                   .options = furrr::furrr_options(seed = TRUE))
       
-      stopCluster(cl)
+      parallel::stopCluster(cl)
     } else {
+      if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
+                           running sequentially. This could take a while...\n")
       r.redo <- lapply(1:nrow(redo), function(i) {
         try(map_fn(redo$ssm[[i]], method = "oneStepGaussianOffMode"), silent = TRUE)
       })

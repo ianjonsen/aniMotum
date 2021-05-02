@@ -29,13 +29,10 @@ emf <- function(gps = 0.1,
   
   if(length(gps) == 1) gps <- c(gps, gps)
   
-  df <- data.frame(
+  data.frame(
     emf.x = c(gps[1], emf.x, emf.x[6]),
     emf.y = c(gps[2], emf.y, emf.y[6]),
-    lc = c("G", "3", "2", "1", "0", "A", "B", "Z")
-  ) 
-  
-  data.frame(lc = as.character(lc))
-
+    lc = as.character(c("G", "3", "2", "1", "0", "A", "B", "Z"))
+  )
 
 }
