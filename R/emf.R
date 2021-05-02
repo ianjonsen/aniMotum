@@ -15,9 +15,6 @@
 ##' \code{lc} {location class designations}
 ##'
 ##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. The number of classes specified is flexible though may not be amenable to a large number of classes. Whatever class designations are chosen must also appear in the input data \code{lc} column. A GPS location class ("G") is provided by default and assumes that GPS locations are 10 x more precise than Argos lc 3 locations.
-
-##' @importFrom tibble as_tibble
-##' @importFrom dplyr mutate "%>%"
 ##'
 ##' @export
 
@@ -36,10 +33,9 @@ emf <- function(gps = 0.1,
     emf.x = c(gps[1], emf.x, emf.x[6]),
     emf.y = c(gps[2], emf.y, emf.y[6]),
     lc = c("G", "3", "2", "1", "0", "A", "B", "Z")
-  ) %>%
-    mutate(lc = as.character(lc))
+  ) 
+  
+  data.frame(lc = as.character(lc))
 
-  df %>%
-    as_tibble()
 
 }
