@@ -30,10 +30,10 @@
 ##' (default is TRUE)
 ##' @param control list of control settings for the outer optimizer (see \code{ssm_control} for details)
 ##' @param inner.control list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)
-##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
-##' @param lpsi `r lifecycle::badge("deprecated")` use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
+##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
+##' @param optim is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
+##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
+##' @param lpsi is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
 ##' @details \code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
 ##' Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
@@ -90,10 +90,6 @@
 ##' ## track plots of predicted value fit to data
 ##' plot(fit, what = "predicted", type = 2, ask = FALSE)
 ##'
-##' @importFrom dplyr tibble mutate "%>%"
-##' @importFrom purrr map
-##' @importFrom assertthat assert_that
-##' @importFrom lifecycle deprecate_stop deprecate_warn
 ##'
 ##' @export
 fit_ssm <- function(d,
@@ -120,49 +116,49 @@ fit_ssm <- function(d,
 {
 
 ## check args - most args handled by prefilter() & sfilter()
-  assert_that(is.data.frame(d), 
-              msg = "x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
-  assert_that(is.logical(pf), 
-              msg = "pf must be either FALSE (fit model) or TRUE (only run prefilter)")
+  if(!is.data.frame(d))  
+    stop("x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
+  if(!is.logical(pf)) 
+    stop("pf must be either FALSE (fit model) or TRUE (only run prefilter)")
 
 ## warnings for deprecated arguments
   if(!is.null(verbose)) {
-    deprecate_warn("0.7-5", "fit_ssm(verbose)", 
-                                       details = "use `control = ssm_control(verbose)` instead")
+    warning("the `verbose` arg is deprecated as of 0.7-5, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$verbose <- verbose
   }
   if(!is.null(optim)) {
-    deprecate_warn("0.7-5", "fit_ssm(optim)", 
-                                     details = "use `control = ssm_control(optim)` instead")
+    warning("the `optim` arg is deprecated as of 0.7-5, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     if(optim %in% c("nlminb", "optim")) control$optim <- optim
     else stop("invalid optimiser specified, see ?ssm_control for options")
   }
   if(!is.null(optMeth)) {
-    deprecate_warn("0.7-5", "fit_ssm(optMeth)", 
-                                       details = "use `control = ssm_control(method)` instead")
+    warning("the `optMeth` arg is deprecated as of 0.7-5, use `control = ssm_control(method)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     if(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
       control$method <- optMeth
     else stop("invalid optimisation method specified, see ?ssm_control for options")
   }
   if(!is.null(lpsi)) {
-    deprecate_warn("0.7-5", "fit_ssm(lpsi)", 
-                                    details = "use `control = ssm_control(lower)` instead")
+    warning("the `lpsi` arg is deprecated as of 0.7-5, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = lpsi)
   }
   
-  fit <- d %>%
-    split(., .$id) %>%
-    map(~ prefilter( 
-        data = .x,
-        vmax = vmax,
-        ang = ang,
-        distlim = distlim,
-        spdf = spdf,
-        min.dt = min.dt,
-        emf = emf))
-
+  fit <- lapply(split(d, d$id),
+                function(x) {
+                  prefilter(data = x,
+                            vmax = vmax,
+                            ang = ang,
+                            distlim = distlim,
+                            spdf = spdf,
+                            min.dt = min.dt,
+                            emf = emf)
+                })
+  
   if(pf){
-    fit <- try(fit %>% do.call(rbind, .))
+    fit <- try(do.call(rbind, fit))
     
     if(inherits(fit, "try-error")) 
     stop("\n Cannot bind tibbles with multiple guessed projections in pre-filtered output. \n
@@ -172,30 +168,32 @@ fit_ssm <- function(d,
     if(control$verbose == 1)
       cat(paste0("fitting ", model, "...\n"))
     
-    fit <- fit %>%
-      map(~ sfilter(
-        x = .x,
-        model = model,
-        time.step = time.step,
-        parameters = parameters,
-        map = map,
-        fit.to.subset = fit.to.subset,
-        control = control,
-        inner.control = inner.control
-      )
-      )
+    fit <- lapply(fit,
+                  function(x) {
+                    sfilter(x = x,
+                            model = model,
+                            time.step = time.step,
+                            parameters = parameters,
+                            map = map,
+                            fit.to.subset = fit.to.subset,
+                            control = control,
+                            inner.control = inner.control
+                            )
+                  })
 
-    fit <- tibble(id = names(fit), ssm = fit) %>%
-      mutate(converged = sapply(.$ssm, function(x) 
-        if(length(x) == 15) {
-          x$opt$convergence == 0
-        } else if(length(x) < 15) {
-          FALSE
-        })) %>%
-      mutate(pdHess = sapply(.$ssm, function(x) 
-        length(x) == 15
-      )) %>%
-      mutate(pmodel = sapply(.$ssm, function(x) x$pm))
+    fit <- tibble(id = names(fit), ssm = fit)
+    fit <- tibble(fit,
+                  converged = sapply(fit$ssm, function(x) 
+                    if(length(x) == 15) {
+                      x$opt$convergence == 0
+                    } else if(length(x) < 15) {
+                      FALSE
+                    }),
+                  pdHess = sapply(fit$ssm, function(x) 
+                    length(x) == 15
+                  ),
+                  pmodel = sapply(fit$ssm, function(x) x$pm)
+    )
   }
 
   class(fit) <- append("fG_ssm", class(fit))

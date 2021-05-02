@@ -12,7 +12,6 @@
 ##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 https://doi.org/10.1002/ecy.2566
 ##'
 ##' @keywords foieGras
-##' @importFrom assertthat assert_that
 ##' @importFrom utils data flush.console globalVariables
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
@@ -21,7 +20,6 @@
 ##' @importFrom future availableCores cluster makeClusterPSOCK plan
 ##' @importFrom tibble as_tibble tibble
 ##' @importFrom lubridate ymd_hms
-##' @importFrom purrr map
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
 ##' @importFrom raster extent extract nlayers

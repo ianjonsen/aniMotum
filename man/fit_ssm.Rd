@@ -68,13 +68,13 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)}
 
-\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
 
-\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+\item{optim}{is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
 
-\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+\item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
 
-\item{lpsi}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
+\item{lpsi}{is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
 }
 \value{
 a list with components
@@ -132,6 +132,7 @@ plot(fit, what = "fitted", type = 1, ask = FALSE)
 
 ## track plots of predicted value fit to data
 plot(fit, what = "predicted", type = 2, ask = FALSE)
+
 
 }
 \references{
