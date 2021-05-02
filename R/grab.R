@@ -7,7 +7,7 @@
 ##' @param x a \code{foieGras} ssm or mpm model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
 ##' `data` (single letters can be used)
-##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
+##' @param as_sf logical; if FALSE (default) then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
 ##'
 ##' @return a tibble with all individual tibble's appended
@@ -26,7 +26,7 @@
 ##' 
 ##' @export
 ##'
-grab <- function(x, what = "fitted", as_sf = TRUE) {
+grab <- function(x, what = "fitted", as_sf = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
@@ -60,13 +60,10 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  data = .$data
                )
              prj <- st_crs(x)
-             xy <- st_coordinates(x) %>%
-               as.data.frame(.)
+             xy <- as.data.frame(st_coordinates(x))
              names(xy) <- c("x", "y")
-             ll <- x %>%
-               st_transform("+proj=longlat +datum=WGS84 +no_defs") %>%
-               st_coordinates(.) %>%
-               as.data.frame(.)
+             ll <- st_transform(x, "+proj=longlat +datum=WGS84 +no_defs")
+             ll <- as.data.frame(st_coordinates(ll))
              names(ll) <- c("lon", "lat")
              st_geometry(x) <- NULL
              cbind(x, xy, ll)
@@ -82,11 +79,12 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  data = st_crs(.$data)
                ))
              out <- lapply(1:length(out_lst), function(i) {
-               st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
-                 st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
-                 st_transform(., prj[[i]])
-             }) %>%
-               bind_rows(.)
+              tmp <- st_as_sf(out_lst[[i]], coords = c("lon", "lat"))
+              tmp <- st_set_crs(tmp, "+proj=longlat +datum=WGS84 +no_defs")
+              tmp <- st_transform(tmp, prj[[i]])
+              tmp
+             })
+             out <- do.call(rbind, out)
              
              if (what != "data") {
                out <- switch(
