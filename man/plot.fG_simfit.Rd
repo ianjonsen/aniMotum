@@ -7,7 +7,7 @@
 \method{plot}{fG_simfit}(
   x,
   type = c("lines", "points", "both"),
-  ext = c("hemi", "tracks"),
+  zoom = FALSE,
   or = NULL,
   ncol = 1,
   pal = "Zissou1",
@@ -19,14 +19,16 @@
 
 \item{type}{plots tracks as "line", "points" or "both" (default).}
 
-\item{ext}{map extent for plotting, either "hemi" (default) for hemisphere, or
-"tracks" to zoom in on track extents. In the latter case, the projection is Mercator.}
+\item{zoom}{logical; should map extent be defined by track extent (TRUE) or
+should global map be drawn (FALSE; default).}
 
-\item{or}{orientation of orthographic projection, default is to centre on start of fitted track}
+\item{or}{orientation of projected map, default is to centre on
+start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type
+\code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
 }

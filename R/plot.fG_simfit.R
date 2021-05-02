@@ -4,18 +4,20 @@
 ##'
 ##' @param x a \code{foieGras} simulation data.frame with class \code{fG_simfit}
 ##' @param type plots tracks as "line", "points" or "both" (default). 
-##' @param ext map extent for plotting, either "hemi" (default) for hemisphere, or
-##' "tracks" to zoom in on track extents. In the latter case, the projection is Mercator.
-##' @param or orientation of orthographic projection, default is to centre on start of fitted track
+##' @param zoom logical; should map extent be defined by track extent (TRUE) or 
+##' should global map be drawn (FALSE; default).  
+##' @param or orientation of projected map, default is to centre on 
+##' start of fitted track (ignored if \code{mapproj} package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
-##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type 
+##' \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
-##' @importFrom ggplot2 element_blank xlab ylab coord_fixed geom_polygon 
-##' @importFrom ggplot2 coord_map theme_void
+##' @importFrom ggplot2 element_blank xlab ylab geom_polygon 
+##' @importFrom ggplot2 coord_map coord_quickmap theme_void
 ##' @importFrom broom tidy
 ##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
@@ -32,7 +34,7 @@
 
 plot.fG_simfit <- function(x, 
                            type = c("lines","points","both"),
-                           ext = c("hemi", "tracks"),
+                           zoom = FALSE,
                            or = NULL,
                            ncol = 1,
                            pal = "Zissou1",
@@ -43,7 +45,6 @@ plot.fG_simfit <- function(x,
   }
   
   type <- match.arg(type)
-  ext <- match.arg(ext)
   
   ## get worldmap
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
@@ -55,26 +56,36 @@ plot.fG_simfit <- function(x,
   wm$region <- wm$id
   wm.df <- wm[,c("long","lat","group","region")]
   
+  ## do plots
   p <- lapply(x$sims, function(x) {
-    if(min(x$lon) < -175 & max(x$lon > 175)) x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
-    switch(ext, 
-           hemi = {
-             bounds <- c(-180,180,-84.99,89.99)
-           },
-           tracks = {
-             bounds <- c(range(x$lon), range(x$lat))
-           })
-    
+    if(min(x$lon) < -175 & max(x$lon > 175)) {
+      x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
+    }
+
+    if(!zoom) { 
+      bounds <- c(-180,180,-89.99,89.99)
+    } else {
+      bounds <- c(range(x$lon), range(x$lat))
+    }
+ 
     if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
     
       m <- ggplot() + 
         geom_polygon(data = wm.df, 
                      aes(long, lat, group = group), 
-                     fill = grey(0.4)) +
-        coord_map("ortho",
+                     fill = grey(0.4))
+      
+      if(requireNamespace("mapproj", quietly = TRUE)) {
+        m <- m + coord_map("ortho",
                   orientation = or,
                   xlim = bounds[1:2],
                   ylim = bounds[3:4])
+      } else {
+        m <- m + coord_quickmap(
+          xlim = bounds[1:2],
+          ylim = bounds[3:4]
+        )
+      }
     
     switch(type, 
            lines = {
@@ -120,7 +131,7 @@ plot.fG_simfit <- function(x,
       theme_void()
       
   })
-
+  ## arrange plots
   wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p)/ncol)))
 }
   
