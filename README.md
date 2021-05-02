@@ -88,7 +88,7 @@ behavioural index along the estimated animal tracks:
 library(tidyverse)
 library(foieGras)
 
-fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0, se = FALSE))
+fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
 
 fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
 

@@ -33,11 +33,14 @@ pooled random variance parameter (\code{sigma_g})}
 
 \item{inner.control}{list of control parameters for the inner optimization}
 
-\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+\item{optim}{is deprecated, use ssm_control(optim = "optim") instead,
+see \code{ssm_control} for details}
 
-\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+\item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead,
+see \code{ssm_control} for details}
 
-\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
+see \code{ssm_control} for details}
 }
 \value{
 a list with components
