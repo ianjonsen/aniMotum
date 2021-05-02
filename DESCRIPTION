@@ -34,7 +34,6 @@ Imports:
     sf (>= 0.9-4),
     stringr,
     tidyr,
-    purrr,
     dplyr (>= 1.0.0),
     trip,
     assertthat,
