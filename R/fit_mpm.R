@@ -69,7 +69,7 @@ fit_mpm <- function(x,
   
   if(control$verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
-
+  
   if(inherits(x, "fG_ssm")) {
     x <- grab(x, what = what, as_sf = FALSE)[, c(1:2, coords[1], coords[2])]
   } else {
