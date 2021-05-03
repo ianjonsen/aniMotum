@@ -4,7 +4,7 @@ context("test fmap")
 ## have to do this to avoid error when calling st_transform on platforms running older GDAL versions (sese2 is highly sub-sampled for this purpose)
 xs <- fit_ssm(sese2, model = "crw", time.step=72, 
               control = ssm_control(verbose = 0))
-xm <- fit_mpm(xs, what = "p", model = "mpm")
+xm <- fit_mpm(xs, what = "p", model = "jmpm")
 
 mp <- fmap(xs, what = "fitted")
 test_that("mp with fitted locs has s3 classes `gg`, `ggplot`", {
