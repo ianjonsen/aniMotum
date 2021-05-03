@@ -12,7 +12,6 @@
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
-##' @importFrom dplyr select bind_rows "%>%" everything
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'
@@ -90,56 +89,47 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
-                   out %>% select(id, date, x.se, y.se, geometry)
+                   out[, c("id", "date", "x.se", "y.se", "geometry")]
                    },
                  crw = {
-                   ## use everything() to deal w fit objects from <= 0.6-9, which don't contain s, s.se
-                   out %>% select(id, date, u, v, u.se, v.se, x.se, 
-                                      y.se, everything())
-                 }
-               )
+                   ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
+                   if(all(c("s","s.se") %in% names(out))) {
+                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
+                             "y.se", "s", "s.se", "geometry")]
+                   } else {
+                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
+                             "y.se", "geometry")]
+                   }
+                 })
                
              } else {
-               out <-
-                 out %>% select(id,
-                                   date,
-                                   lc,
-                                   smaj,
-                                   smin,
-                                   eor,
-                                   keep,
-                                   obs.type,
-                                   emf.x,
-                                   emf.y,
-                                   geometry)
+               out <- out[, c("id", "date", "lc", "smaj", "smin", "eor", "keep", 
+                         "obs.type", "emf.x", "emf.y", "geometry")]
              }
              
            } else {
-             out <- do.call(bind_rows, out_lst)
+             out <- do.call(rbind, out_lst)
              if (what != "data") {
                out <- switch(
                  x$ssm[[1]]$pm,
-                 rw = out %>% select(id, date, lon, lat, x, y, x.se, y.se),
-                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, 
-                                       u, v, u.se, v.se, everything())
-               ) %>% as_tibble()
+                 rw = {
+                   out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                   },
+                 crw = {
+                   if(all(c("s","s.se") %in% names(out))) {
+                     out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
+                             "y.se", "u", "v", "u.se", "v.se", "s", "s.se")]
+                   } else {
+                     out[, c("id", "date", "lon", "lat", "x", "y", 
+                             "x.se", "y.se", "u", "v", "u.se", "v.se")]
+                   }
+                 })
+               out <- as_tibble(out)
              } else {
-               out <- out %>%
-                 select(id,
-                        date,
-                        lc,
-                        lon,
-                        lat,
-                        smaj,
-                        smin,
-                        eor,
-                        obs.type,
-                        keep,
-                        x,
-                        y,
-                        emf.x,
-                        emf.y) %>%
-                 as_tibble()
+               out <- out[, c("id", "date", "lc", "lon", "lat", 
+                              "smaj", "smin", "eor", "obs.type", "keep", 
+                              "x", "y", "emf.x", "emf.y")]
+               out <- as_tibble(out)
              }
            }
          },
@@ -153,16 +143,13 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
            }
 
            out <- lapply(x$mpm, function(.) {
-             x <-
-               switch(
-                 what,
-                 fitted = .$fitted,
-                 data = .$data
-               )
-             }) %>% do.call(rbind, .)
+             x <- switch(what, fitted = .$fitted, data = .$data)
+             }) 
+           out <- do.call(rbind, out)
+           out <- as_tibble(out)
          }
          )
       
-  return(out)       
+  return(out)
 
 }

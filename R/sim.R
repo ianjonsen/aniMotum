@@ -151,11 +151,9 @@ ellp.par <- function(lc) {
 ##' tdist = "gamma", tpar = c(1, 4))
 ##' plot(tr, error = TRUE, pal = "Cividis")
 ##' 
-##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
-##' @importFrom tibble tibble as_tibble
-##' @importFrom assertthat assert_that
+##' @importFrom tibble as_tibble
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
 ##' @importFrom stats rgamma runif
 ##' @importFrom CircStats rvm
@@ -189,15 +187,11 @@ sim <- function(N = 100,
   error <- match.arg(error)
   tdist <- match.arg(tdist)
 
-  assert_that(model %in% c("rw","crw","mpm"), 
-              msg = "model can only be 1 of `rw`, `crw`, or `mpm`")
-  assert_that(error %in% c("ls","kf"), 
-              msg = "error can only be 1 of `ls` or `kf`")
-  assert_that(tdist %in% c("gamma","reg"),
-              msg = "tdist can only be 1 of `gamma` or `reg`")
-  assert_that(inherits(start, "list") & length(start) == 2 & inherits(start[[2]], "POSIXct"),
-              msg = "`start` must be a 2-element list, with coordinates as the 1st element and
-              a POSIX datetime as the 2nd element")
+  if(!model %in% c("rw","crw","mpm")) stop("model can only be 1 of `rw`, `crw`, or `mpm`")
+  if(!error %in% c("ls","kf")) stop("error can only be 1 of `ls` or `kf`")
+  if(!tdist %in% c("gamma","reg")) stop("tdist can only be 1 of `gamma` or `reg`")
+  if(!all(inherits(start, "list"), length(start) == 2, inherits(start[[2]], "POSIXct")))
+    stop("`start` must be a 2-element list, with coordinates as the 1st element and a POSIX datetime as the 2nd element")
   
   n.states <- 1
   if(length(sigma) > 2 & model == "rw") {
@@ -267,7 +261,7 @@ sim <- function(N = 100,
     } else {
       b <- rep(1, N)
     }
-    
+      
     #######################
     ## Simulate movement ##
     #######################
@@ -321,13 +315,12 @@ sim <- function(N = 100,
     dts <- start[[2]] + cumsum(dt) * 3600
     
     ## add Argos lc values
-    d <- tibble(
+    d <- data.frame(
       date = dts,
       lc = argos_lc(N),
       x = mu[, 1],
       y = mu[, 2]
       )
-    
     
     switch(error,
            ls = {
@@ -339,14 +332,13 @@ sim <- function(N = 100,
                                   (tau[2] * d$emf.y)^2)
              ## Sample errors
              err <- lapply(1:N, function(i)
-                 rmvnorm(1, c(0, 0), Tau[, , i])) %>%
-               do.call(rbind, .)
+                 rmvnorm(1, c(0, 0), Tau[, , i]))
+             err <- do.call(rbind, err)
       
              ## add errors to data.frame
-             d <- d %>%
-               mutate(x.err = err[, 1],
-                      y.err = err[, 2]) %>%
-               select(date, lc, x, y, x.err, y.err) 
+             d$x.err <- err[, 1]
+             d$y.err <- err[, 2]
+             d <- d[, c("date","lc","x","y","x.err","y.err")]
            },
            kf = {
              errs <- ellp.par(d$lc)
@@ -354,27 +346,35 @@ sim <- function(N = 100,
            })
     
     ## add errors and transform to lon,lat - keeping true x,y
-    d <- d %>% mutate(x1 = x + x.err, y1 = y + y.err) %>%
-      st_as_sf(., coords = c("x1", "y1"),
-               crs = "+proj=merc +units=km +datum=WGS84") %>%
-      st_transform(xy, crs = 4326)
-    ll <- st_coordinates(d) %>%
-      as.data.frame() 
+    d$x1 <- with(d, x + x.err)
+    d$y1 <- with(d, y + y.err)
+    d <- st_as_sf(d, coords = c("x1", "y1"),
+               crs = "+proj=merc +units=km +datum=WGS84")
+    d <- st_transform(d, crs = 4326)
+    ll <- as.data.frame(st_coordinates(d))
     names(ll) <- c("lon","lat")
     st_geometry(d) <- NULL
-    d <- tibble(d, ll) %>%
-      select(date, lc, lon, lat, x, y, x.err, y.err, everything()) %>%
-      mutate(lc = as.character(lc))
+    d <- data.frame(d, ll)
+    
+    if(error == "ls") {
+      d <- d[, c("date", "lc", "lon", "lat", "x", "y", "x.err", "y.err")]
+    } else if(error == "kf") {
+      d <- d[, c("date", "lc", "lon", "lat", "x", "y", "x.err", "y.err","smaj","smin","eor")]
+    }
+    d$lc <- as.character(d$lc)
     
     switch(model,
            crw = {
-             d <- d %>% mutate(u = v[, 1], v = v[, 2])
+             d$u <- v[, 1]
+             d$v <- v[, 2]
            },
            mpm = {
-             d <- d %>% mutate(g = g)
+             d$g <- g
            })
     
-    if(n.states > 1) d <- d %>% mutate(b = b)
+    if(n.states > 1) d$b <- b
+    
+    d <- as_tibble(d)
     
     switch(model,
            rw = { 

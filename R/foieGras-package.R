@@ -16,10 +16,7 @@
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
-##' @importFrom furrr future_map
-##' @importFrom future availableCores cluster makeClusterPSOCK plan
 ##' @importFrom tibble as_tibble tibble
-##' @importFrom lubridate ymd_hms
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
 ##' @importFrom raster extent extract nlayers
@@ -102,7 +99,7 @@ NULL
 globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se", "y.se",
                   "geometry", "u", "v", "u.se", "v.se", "lc", "smaj", "smin", "eor",
                   "obs.type", "emf.x", "emf.y", "lon", "lat", "rename", "X", "Y", 
-                  "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", 
-                  "lonerr", "laterr", "coord", "value", "resid", "long", 
-                  "se", "g", "g.se", "id1", "mpm", "residual", "group",
+                  "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", "map",
+                  "lonerr", "laterr", "coord", "value", "resid", "long", "cluster",
+                  "se", "g", "g.se", "id1", "mpm", "residual", "group", "availableCores",
                   "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab"))

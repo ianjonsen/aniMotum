@@ -21,13 +21,10 @@
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference in s between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
-##' @importFrom lubridate ymd_hms
 ##' @importFrom dplyr mutate arrange select left_join lag rename "%>%" everything
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom trip sda speedfilter trip
 ##' @importFrom tibble as_tibble
-##' @importFrom stringr str_detect str_replace
-##' @importFrom assertthat assert_that
 ##'
 ##' @return an sf object with all observations passed from \code{data} and the following appended columns
 ##' \item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
@@ -49,18 +46,16 @@ prefilter <-
            ) {
 
     ## check args
-    assert_that(is.numeric(vmax) & vmax > 0, 
-                msg = "vmax must be a positive, non-zero value representing an upper speed threshold in m/s")
-    assert_that(any((is.numeric(ang) & length(ang) == 2) || is.na(ang)), 
-                msg = "ang must be either a vector of c(min, max) angles in degrees defining extreme steps to be removed from trajectory, or NA")
-    assert_that(any((is.numeric(distlim) & length(distlim) == 2) || is.na(distlim)),
-                msg = "distlim must be either a vector of c(min, max) in m defining distances of extreme steps to be removed from trajectory, or NA")
-    assert_that(is.logical(spdf), 
-                msg = "spdf must either TRUE to turn on, or FALSE to turn off speed filtering")
-    assert_that(is.numeric(min.dt) & min.dt >= 0,
-                msg = "min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
-    assert_that(any(is.null(emf) || (is.data.frame(emf) & nrow(emf) > 0)),
-                msg = "emf must be either NULL to use default emf (type emf() to see values), or a data.frame (see ?emf for details")  
+    if(!(is.numeric(vmax) & vmax > 0)) 
+      stop("vmax must be a positive, non-zero value representing an upper speed threshold in m/s")
+    if(!any((is.numeric(ang) & length(ang) == 2) || is.na(ang))) 
+      stop("ang must be either a vector of c(min, max) angles in degrees defining extreme steps to be removed from trajectory, or NA")
+    if(!any((is.numeric(distlim) & length(distlim) == 2) || is.na(distlim))) 
+      stop("distlim must be either a vector of c(min, max) in m defining distances of extreme steps to be removed from trajectory, or NA")
+    if(!is.logical(spdf)) stop("spdf must either TRUE to turn on, or FALSE to turn off speed filtering")
+    if(!(is.numeric(min.dt) & min.dt >= 0)) stop("min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
+    if(!any(is.null(emf) || (is.data.frame(emf) & nrow(emf) > 0))) 
+      stop("emf must be either NULL to use default emf (type emf() to see values), or a data.frame (see ?emf for details")  
 
   d <- data
   
@@ -104,31 +99,34 @@ prefilter <-
 
   ## add KF error columns, if missing
   if((ncol(d) %in% c(4,5,7) & !inherits(d, "sf")) | (ncol(d) == 6 & inherits(d, "sf"))) {
-    d <- d %>%
-      mutate(smaj = NA, smin = NA, eor = NA)
+    d$smaj <- NA
+    d$smin <- NA
+    d$eor <- NA
   } 
   ## add GL error columns, if missing
   if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf"))) {
-    d <- d %>%
-      mutate(lonerr = NA, laterr = NA)
+    d$lonerr <- NA
+    d$laterr <- NA
   }
 
   ##  convert dates to POSIXt
   ##  order records by time,
   ##  flag any duplicate date records,
   ##  flag records as either KF or LS,
-  d <- d %>%
-    mutate(date = ymd_hms(date, tz = "UTC")) %>%
-    arrange(date) %>%
-    mutate(keep = difftime(date, lag(date), units = "secs") > min.dt) %>%
-    mutate(keep = ifelse(is.na(keep), TRUE, keep)) %>%
-    mutate(obs.type = NA) %>%
-    mutate(obs.type = ifelse(!is.na(smaj) & !is.na(smin) & !is.na(eor), "KF", obs.type)) %>%
-    mutate(obs.type = ifelse(lc %in% c(3,2,1,0,"A","B","Z") & (is.na(smaj) | is.na(smin) |is.na(eor)), "LS", obs.type)) %>%
-    mutate(obs.type = ifelse(lc == "G" & (is.na(smaj) | is.na(smin) |is.na(eor)), "GPS", obs.type)) %>%
-    mutate(obs.type = ifelse(lc == "GL" & (is.na(smaj) | is.na(smin) |is.na(eor)) & (!is.na(lonerr) & !is.na(laterr)), "GLS", obs.type))
+  d$date <- as.POSIXct(d$date, "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  d <- d[order(d$date), ]
+  d$keep <- with(d, difftime(date, c(as.POSIXct(NA), date[-nrow(d)]), units = "secs") > min.dt)
+  d$keep <- with(d, ifelse(is.na(keep), TRUE, keep))
+  d$obs.type <- NA
+  d$obs.type <- with(d, ifelse(!is.na(smaj) & !is.na(smin) & !is.na(eor), "KF", obs.type))
+  d$obs.type <- with(d, ifelse(lc %in% c(3,2,1,0,"A","B","Z") & 
+                                 (is.na(smaj) | is.na(smin) | is.na(eor)), "LS", obs.type))
+  d$obs.type <- with(d, ifelse(lc == "G" & 
+                                 (is.na(smaj) | is.na(smin) |is.na(eor)), "GPS", obs.type))
+  d$obs.type <- with(d, ifelse(lc == "GL" & (is.na(smaj) | is.na(smin) |is.na(eor)) & 
+                                 (!is.na(lonerr) & !is.na(laterr)), "GLS", obs.type))
  
-  
+  ##*****************##
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
   d <- d %>%
@@ -239,9 +237,9 @@ prefilter <-
   } else {
     prj <- st_crs(d)
     # if data CRS units are m then change to km, otherwise optimiser may choke
-    if (str_detect(prj$input, "units=m")) {
+    if (grepl("units=m", prj$input, fixed = TRUE)) {
       prj$input <-
-        str_replace(prj$input, "units=m", "units=km")
+        sub("units=m", "units=km", prj$input, fixed = TRUE)
     }
     sf_locs <- d %>%
       select(-lon,-lat) %>%

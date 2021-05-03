@@ -41,8 +41,6 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars labs
 ##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both label_value geom_ribbon facet_wrap
 ##' @importFrom tidyr gather
-##' @importFrom dplyr "%>%" select bind_cols rename filter bind_rows mutate
-##' @importFrom tibble enframe
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors devAskNewPage
@@ -87,8 +85,7 @@ plot.fG_ssm <-
                  is.na(.$ts)))) {
                  ssm <- grab(x, "fitted", as_sf = FALSE)
                  warning(
-                   "there are no predicted locations because you used time.step = NA when calling `fit_ssm`,
-                       plotting fitted locations instead",
+                   "there are no predicted locations because you used time.step = NA when calling `fit_ssm`, plotting fitted locations instead",
                    call. = FALSE
                  )
                } else {
@@ -97,38 +94,35 @@ plot.fG_ssm <-
              })
       
       if (outlier) {
-        d <- grab(x, "data", as_sf = FALSE) %>%
-          mutate(lc = factor(
+        d <- grab(x, "data", as_sf = FALSE)
+        d$lc <- with(d, factor(
+          lc,
+          levels = c("3", "2", "1", "0", "A", "B", "Z"),
+          ordered = TRUE
+        ))
+      } else {
+        d <- grab(x, "data", as_sf = FALSE)
+        d$lc <- with(d, factor(
             lc,
             levels = c("3", "2", "1", "0", "A", "B", "Z"),
             ordered = TRUE
           ))
-      } else {
-        d <- grab(x, "data", as_sf = FALSE) %>%
-          mutate(lc = factor(
-            lc,
-            levels = c("3", "2", "1", "0", "A", "B", "Z"),
-            ordered = TRUE
-          )) %>%
-          filter(keep)
+        d <- subset(d, keep)
       }
       
       if (type == 1) {
-        foo <-
-          ssm %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
-        foo.se <-
-          ssm %>% select(x.se, y.se) %>% gather(., key = "coord.se", value = "se", x.se, y.se)
-        bar <-
-          rep(ssm$date, 2) %>% enframe(name = NULL) %>% rename(date = "value")
+        foo <- ssm[, c("id","x","y")]
+        foo <- gather(foo, key = "coord", value = "value", x, y)
+        foo.se <- ssm[, c("x.se", "y.se")] 
+        foo.se <- gather(foo.se, key = "coord.se", value = "se", x.se, y.se)
+        bar <- data.frame(date = rep(ssm$date, 2))
+
+        foo.d <- d[, c("id","x","y")]
+        foo.d <- gather(foo.d, key = "coord", value = "value", x, y)
+        bar.d <- rbind(d[, c("date", "lc", "keep")], d[, c("date", "lc", "keep")])
         
-        foo.d <-
-          d %>% select(id, x, y) %>% gather(., key = "coord", value = "value", x, y)
-        bar.d <- d %>% select(date, lc, keep) %>% bind_rows(., .)
-        
-        pd <-
-          bind_cols(foo, foo.se, bar) %>% select(id, date, coord, value, se)
-        dd <-
-          bind_cols(foo.d, bar.d) %>% select(id, date, lc, coord, value, keep)
+        pd <- cbind(foo, foo.se, bar)[, c("id", "date", "coord", "value", "se")]
+        dd <- cbind(foo.d, bar.d)[, c("id", "date", "lc", "coord", "value", "keep")]
         
         ## coerce to lists
         pd.lst <- split(pd, pd$id)
@@ -147,26 +141,26 @@ plot.fG_ssm <-
           if (outlier) {
             px <- px +
               geom_point(
-                data = dd.lst[[i]] %>% filter(!keep),
+                data = subset(dd.lst[[i]], !keep),
                 aes(date, value),
                 colour = wpal[4],
                 shape = 4
               ) +
               geom_point(
-                data = dd.lst[[i]] %>% filter(keep),
+                data = subset(dd.lst[[i]], keep),
                 aes(date, value),
                 colour = wpal[1],
                 shape = 19,
                 size = 2
               ) +
               geom_rug(
-                data = dd.lst[[i]] %>% filter(!keep),
+                data = subset(dd.lst[[i]], !keep),
                 aes(date),
                 colour = wpal[4],
                 sides = "b"
               ) +
               geom_rug(
-                data = dd.lst[[i]] %>% filter(keep),
+                data = subset(dd.lst[[i]], keep),
                 aes(date),
                 colour = wpal[1],
                 sides = "b"
@@ -174,14 +168,14 @@ plot.fG_ssm <-
           } else {
             px <- px +
               geom_point(
-                data = dd.lst[[i]] %>% filter(keep),
+                data = subset(dd.lst[[i]], keep),
                 aes(date, value),
                 colour = wpal[1],
                 shape = 19,
                 size = 2
               ) +
               geom_rug(
-                data = dd.lst[[i]] %>% filter(keep),
+                data = subset(dd.lst[[i]], keep),
                 aes(date),
                 colour = wpal[1],
                 sides = "b"
@@ -226,13 +220,13 @@ plot.fG_ssm <-
         conf_poly <- lapply(ssm.lst, function(x) {
           conf <- lapply(1:nrow(x), function(i)
             with(x, elps(x[i], y[i], x.se[i], y.se[i], 90)))
-          lapply(conf, function(x)
-            st_polygon(list(x))) %>%
-            st_multipolygon()
+          tmp <- lapply(conf, function(x)
+            st_polygon(list(x)))
+          st_multipolygon(tmp)
         })
-        conf_sf <- st_as_sfc(conf_poly) %>%
-          st_as_sf() %>%
-          mutate(id = unique(ssm$id))
+
+        conf_sf <- st_as_sf(st_as_sfc(conf_poly)) 
+        conf_sf$id <- unique(ssm$id)
         
         d.lst <- split(d, d$id)
         ssm.lst <- split(ssm, ssm$id)
@@ -240,7 +234,7 @@ plot.fG_ssm <-
         p <- lapply(1:nrow(x), function(i) {
           m <- ggplot() +
             geom_sf(
-              data = conf_sf %>% filter(id == unique(id)[i]),
+              data = subset(conf_sf, id == unique(id)[i]),
               col = NA,
               fill = wpal[5],
               alpha = 0.25
@@ -249,14 +243,14 @@ plot.fG_ssm <-
           if (outlier) {
             m <- m +
               geom_point(
-                data = d %>% filter(!keep & id == unique(id)[i]),
+                data = subset(d, !keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 1,
                 colour = wpal[4],
                 shape = 4
               ) +
               geom_point(
-                data = d %>% filter(keep & id == unique(id)[i]),
+                data = subset(d, keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 2,
                 colour = wpal[1],
@@ -266,7 +260,7 @@ plot.fG_ssm <-
           } else {
             m <- m +
               geom_point(
-                data = d %>% filter(keep & id == unique(id)[i]),
+                data = subset(d, keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 2,
                 colour = wpal[1],
@@ -276,13 +270,13 @@ plot.fG_ssm <-
           }
           m <- m +
             geom_path(
-              data = ssm %>% filter(id == unique(id)[i]),
+              data = subset(ssm, id == unique(id)[i]),
               aes(x, y),
               col = wpal[5],
               lwd = 0.2
             ) +
             geom_point(
-              data = ssm %>% filter(id == unique(id)[i]),
+              data = subset(ssm, id == unique(id)[i]),
               aes(x, y),
               col = wpal[5],
               shape = 20,

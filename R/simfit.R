@@ -21,11 +21,9 @@
 ##' trs <- simfit(fit, what = "predicted", reps = 2)
 ##' plot(trs, ncol = 2)
 ##' 
-##' @importFrom dplyr "%>%" 
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom tibble tibble as_tibble
-##' @importFrom assertthat assert_that
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
 ##' @importFrom stats rgamma runif
 ##' @importFrom raster extent extract nlayers
@@ -37,7 +35,7 @@ simfit <-
            what = c("fitted", "predicted"),
            reps = 1,
            grad = NULL,
-           beta = c(-250, -250),
+           beta = c(-300, -300),
            cpf = FALSE,
            sim_only = FALSE) {
     
@@ -52,11 +50,11 @@ simfit <-
     if(inherits(grad, "RasterStack") & nlayers(grad) != 2)
       stop("grad RasterStack must have 2 layers")
   }
-  if(length(beta) != 2) stop("beta must be specified as a 2-element vector")
+  if(length(beta) != 2) 
+    stop("beta must be specified as a 2-element vector")
   
-  assert_that(what %in% c("fitted", "predicted"),
-              msg = "only `fitted` or `predicted` locations can be simulated
-              from a model fit")
+  if(!what %in% c("fitted", "predicted")) 
+    stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
   ########################################
   ## Simulate from a foieGras model fit ##
@@ -73,8 +71,7 @@ simfit <-
            })
     N <- nrow(loc)
     dts <- loc$date
-    dt <-
-      difftime(dts, lag(dts), units = "hours") %>% as.numeric()
+    dt <- as.numeric(difftime(dts, c(as.POSIXct(NA), dts[-length(dts)]), units = "hours"))
     dt[1] <- 0
     
     switch(model,
@@ -188,42 +185,37 @@ simfit <-
                  y = mu[, 2]
                )
                if(cpf) {
-                 df <- df %>%
-                   mutate(x = ((x - x[1]) - time * 
-                                 (x - x[1])[N]) + x[1]) %>%
-                   mutate(y = ((y - y[1]) - time * 
-                                 (y - y[1])[N]) + y[1])
+                 df$x <- ((x - x[1]) - time * (x - x[1])[N]) + x[1]
+                 df$y <- ((y - y[1]) - time * (y - y[1])[N]) + y[1]
                }
                df
              })
-    }) %>% 
-      do.call(rbind, .) %>%
-      as_tibble()
+    }) 
+    tmp <- do.call(rbind, tmp)
+    tmp <- as_tibble(tmp)
 
     if (!sim_only) {
-      loc <- grab(x[k, ], what = what, as_sf = FALSE) %>%
-        mutate(rep = 0)
-      loc <- loc %>% select(rep, date, x, y)
+      loc <- grab(x[k, ], what = what, as_sf = FALSE)
+      loc$rep <- 0
+      loc <- loc[, c("rep", "date", "x", "y")]
       tmp <- rbind(loc, tmp)
     }
     
     ## lon,lat
-    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), crs = "+proj=merc +units=km +datum=WGS84"), silent = TRUE)
+    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), 
+                         crs = "+proj=merc +units=km +datum=WGS84"), silent = TRUE)
     if(inherits(tmp1, "try-error")) {
       stop("oops something went wrong, try again", call. = FALSE)
     }
     
-    xy <- st_coordinates(tmp1) %>% as.data.frame()
+    xy <- as.data.frame(st_coordinates(tmp1))
     names(xy) <- c("x","y")
-    ll <- tmp1 %>% 
-      st_transform(., crs = 4326) %>%
-      st_coordinates(.) %>%
-      as.data.frame(.)
+    ll <- st_transform(tmp1, crs = 4326)
+    ll <- st_coordinates(ll)
+    ll <- as.data.frame(ll)
     names(ll) <- c("lon","lat")
     st_geometry(tmp1) <- NULL
-    cbind(tmp1, xy, ll) %>% 
-      as_tibble() %>%
-      select(rep, date, lon, lat, x, y, everything())
+    cbind(tmp1, xy, ll)[, c("rep","date","lon","lat","x","y")]
   }) 
   
   d <- tibble(id = x$id, model = x$pmodel, sims = d)

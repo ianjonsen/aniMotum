@@ -9,7 +9,7 @@ simfit(
   what = c("fitted", "predicted"),
   reps = 1,
   grad = NULL,
-  beta = c(-250, -250),
+  beta = c(-300, -300),
   cpf = FALSE,
   sim_only = FALSE
 )

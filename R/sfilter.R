@@ -14,7 +14,6 @@
 ##' @param time.step the regular time interval, in hours, to predict to.
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates.
-##' @param scale scale location data for more efficient optimization.
 ##' @param map a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))
 ##' @param parameters a list of initial values for all model parameters and
 ##' unobserved states, default is to let sfilter specify these. Only play with
@@ -24,19 +23,16 @@
 ##' @param control list of control parameters for the outer optimization (see \code{ssm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
-##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
-##' @param lpsi `r lifecycle::badge("deprecated")` use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
+##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
+##' @param optim is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
+##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
+##' @param lpsi is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption FreeADFun
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
 ##' @importFrom utils flush.console
-##' @importFrom dplyr mutate select full_join arrange lag bind_cols "%>%"
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
-##' @importFrom assertthat assert_that
-##' @importFrom stringr str_split
 ##'
 ##'
 ##' @keywords internal
@@ -45,7 +41,6 @@ sfilter <-
   function(x,
            model = c("rw", "crw"),
            time.step = 6,
-           scale = FALSE,
            parameters = NULL,
            map = NULL,
            fit.to.subset = TRUE,
@@ -57,18 +52,13 @@ sfilter <-
     model <- match.arg(model)
 
     ## check args
-    assert_that(inherits(x, c("sf","tbl_df")), msg = "x must be an sf-tibble produced by `prefilter()`")
-    assert_that(model %in% c("rw","crw"), msg = "model can only be 1 of `rw` or `crw`")
-    assert_that(any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step)),
-                msg = "time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
-    assert_that(is.logical(scale), msg = "scale must be TRUE or FALSE to run on/off location scaling")
-    assert_that(any(is.list(parameters) || is.null(parameters)),
-                msg = "parameters must be a named list of parameter initial values or NULL")
-    assert_that(any(is.list(map) || is.null(map)),
-                msg = "map must be a named list of parameters to fix (turn off) in estimation or NULL")
-    assert_that(is.logical(fit.to.subset), 
-                msg = "fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
-    assert_that(any(is.list(inner.control) || is.null(inner.control)), msg = "inner.control must be a named list of valid newtonOptimiser control arguments or NULL")
+    if(!inherits(x, c("sf","tbl_df"))) stop("x must be an sf-tibble produced by `prefilter()`")
+    if(!model %in% c("rw","crw")) stop("model can only be 1 of `rw` or `crw`")
+    if(!any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step))) stop("time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
+    if(!any(is.list(parameters) || is.null(parameters))) stop("parameters must be a named list of parameter initial values or NULL")
+    if(!any(is.list(map) || is.null(map))) stop("map must be a named list of parameters to fix (turn off) in estimation or NULL")
+    if(!is.logical(fit.to.subset)) stop("fit.to.subset must be TRUE (fit to prefiltered observations) or FALSE (fit to all observations)")
+    if(!any(is.list(inner.control) || is.null(inner.control))) stop("inner.control must be a named list of valid newtonOptimiser control arguments or NULL")
     
 
     if(length(time.step) > 1 & !is.data.frame(time.step)) {
@@ -88,8 +78,9 @@ sfilter <-
     loc <- as.data.frame(st_coordinates(xx))
     names(loc) <- c("x","y")
     st_geometry(xx) <- NULL
-    d <- cbind(xx, loc) %>%
-      mutate(isd = TRUE)
+    d <- cbind(xx, loc)
+    d$isd <- TRUE
+      
 
     if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ## prediction times - assume on time.step-multiple of the hour
@@ -104,8 +95,7 @@ sfilter <-
         ))
       
     } else if (inherits(time.step, "data.frame") & all(!is.na(time.step))) {
-      ts <- subset(time.step, id %in% unique(d$id)) %>% 
-        select(date)
+      ts <- subset(time.step, id %in% unique(d$id))$date
       
     } else if (inherits(time.step, "data.frame") & any(is.na(time.step))) {
       stop("NA's detected in user-supplied prediction times data.frame")
@@ -120,17 +110,17 @@ sfilter <-
 
     ## merge data and prediction times
     ## add is.data flag (distinguish obs from reg states)
-    d.all <- full_join(d, ts, by = "date") %>%
-      arrange(date) %>%
-      mutate(isd = ifelse(is.na(isd), FALSE, isd)) %>%
-      mutate(id = ifelse(is.na(id), na.omit(unique(id))[1], id))
+    d.all <- full_join(d, ts, by = "date")
+    d.all <- d.all[order(d.all$date), ]
+    d.all$isd <- with(d.all, ifelse(is.na(isd), FALSE, isd))
+    d.all$id <- with(d.all, ifelse(is.na(id), na.omit(unique(id))[1], id))
     } else {
       d.all <- d
     }
 
     ## calc delta times in hours for observations & interpolation points (states)
-    dt <- difftime(d.all$date, lag(d.all$date), units = "hours") %>%
-      as.numeric()
+    dt <- as.numeric(difftime(d.all$date, c(as.POSIXct(NA),d.all$date[-nrow(d.all)]), 
+                              units = "hours"))
     dt[1] <- 0.000001 # - 0 causes numerical issues in CRW model
 
     ## use approx & MA filter to obtain state initial values
@@ -139,7 +129,7 @@ sfilter <-
              xout = d.all$date,
              rule = 2)$y
     x.init <-
-      stats::filter(x.init1, rep(1, 5) / 5) %>% as.numeric()
+      as.numeric(stats::filter(x.init1, rep(1, 5) / 5))
     x.na <- which(is.na(x.init))
     x.init[x.na] <- x.init1[x.na]
 
@@ -148,17 +138,12 @@ sfilter <-
              xout = d.all$date,
              rule = 2)$y
     y.init <-
-      stats::filter(y.init1, rep(1, 5) / 5) %>% as.numeric()
+      as.numeric(stats::filter(y.init1, rep(1, 5) / 5))
     y.na <- which(is.na(y.init))
     y.init[y.na] <- y.init1[y.na]
     
-    if(scale) {
-      xs <- cbind(x.init = x.init - mean(x.init, na.rm = TRUE) / sd(x.init, na.rm = TRUE), 
-                  y.init = y.init - mean(y.init, na.rm = TRUE) / sd(y.init, na.rm = TRUE)
-                  )
-    } else {
-      xs <- cbind(x.init, y.init)
-    }
+    xs <- cbind(x.init, y.init)
+
     
 
     state0 <- c(xs[1,1], xs[1,2], 0 , 0)
@@ -195,21 +180,19 @@ sfilter <-
     automap <- switch(model, 
                      rw = {
                        list(
-                         list(#l_dif = factor(NA),
+                         list(
                               l_psi = factor(NA)
                             ),
                          list(
-                            #l_dif = factor(NA),
                             l_psi = factor(NA),
                             l_tau = factor(c(NA, NA)),
                             l_rho_o = factor(NA)
                             ),
                          list(
-                            #l_dif = factor(NA),
                             l_psi = factor(NA),
                             l_tau = factor(c(NA, NA))
                             ),
-                         list(#l_dif = factor(NA),
+                         list(
                               l_psi = factor(NA)
                             )
                          )
@@ -253,21 +236,15 @@ sfilter <-
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
     ##  as isd makes likelihood contribution goes to 0 in C++ code
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
-       
-    if(scale) {
-      d.all.tmp <- d.all
-      d.all <- d.all %>%
-        mutate(x = x - mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE),
-               y = y - mean(y, na.rm = TRUE) / sd(y, na.rm = TRUE))
-    }
     
     ## calculate fitted & predicted indices + delta t for proper speed estimates
     fidx <- which(d.all$isd)
-    
-    fdt <- as.numeric(difftime(d.all$date[fidx], lag(d.all$date[fidx]), 
+    fdt <- as.numeric(difftime(d.all$date[fidx], 
+                               c(as.POSIXct(NA),d.all$date[fidx][-length(fidx)]), 
                                units = "hours"))
     pidx <- which(!d.all$isd)
-    pdt <- as.numeric(difftime(d.all$date[pidx], lag(d.all$date[pidx]), 
+    pdt <- as.numeric(difftime(d.all$date[pidx], 
+                               c(as.POSIXct(NA),d.all$date[pidx][-length(pidx)]), 
                                units = "hours"))
     
     data <- list(
@@ -288,8 +265,6 @@ sfilter <-
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$lonerr, d.all$laterr)
     )
-
-    if(scale) d.all <- d.all.tmp
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -392,7 +367,8 @@ sfilter <-
 
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
-      fxd <- fxd[which(!rownames(fxd) %in% str_split(names(map), "_", simplify=TRUE)[,2]), ]
+      fxd <- fxd[which(!rownames(fxd) %in% 
+                         sapply(strsplit(names(map), "_"), function(.) .[2])), ]
       if("sigma" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "sigma")] <- c("sigma_x","sigma_y")
       } 
@@ -413,78 +389,53 @@ sfilter <-
       switch(model,
              rw = {
                tmp <- summary(rep, "random")
-               rdm <- cbind(tmp[seq(1, nrow(tmp), by = 2), ],
+               rdm <- data.frame(cbind(tmp[seq(1, nrow(tmp), by = 2), ],
                             tmp[seq(2, nrow(tmp), by = 2), ]
-               ) %>%
-                 data.frame() %>%
-                 select(1,3,2,4) %>%
-                 rename(x = "Estimate",
-                        y = "Estimate.1",
-                        x.se = "Std..Error",
-                        y.se = "Std..Error.1")
+               ))[, c(1,3,2,4)] 
+               names(rdm) <- c("x","y","x.se","y.se")
 
-               rdm <- rdm %>%
-                 mutate(
-                   id = unique(d.all$id),
-                   date = d.all$date,
-                   isd = d.all$isd
-                 )
-               if(scale) {
-                 rdm <- rdm %>%
-                   mutate(x = x * sd(d.all$x, na.rm = TRUE) + mean(d.all$x, na.rm = TRUE),
-                          y = y * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
-                 }
-                rdm <- rdm %>%
-                  select(id, date, x, y, x.se, y.se, isd)
-
+               rdm$id <- unique(d.all$id)
+               rdm$date <- d.all$date
+               rdm$isd <- d.all$isd
+               
+               rdm <- rdm[, c("id","date","x","y","x.se","y.se","isd")]
              },
              crw = {
                tmp <- summary(rep, "random")
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
                
-               loc <-
-                 cbind(loc[seq(1, dim(loc)[1], by = 2),],
-                       loc[seq(2, dim(loc)[1], by = 2),]) %>%
-                 as.data.frame(., row.names = 1:nrow(.))
+               loc <- cbind(loc[seq(1, dim(loc)[1], by = 2),],
+                       loc[seq(2, dim(loc)[1], by = 2),]) 
+               loc <- as.data.frame(loc, row.names = 1:nrow(loc))
                names(loc) <- c("x", "x.se", "y", "y.se")
                          
-               vel <-
-                 cbind(vel[seq(1, dim(vel)[1], by = 2),],
-                       vel[seq(2, dim(vel)[1], by = 2),]) %>%
-                 as.data.frame(., row.names = 1:nrow(.))
+               vel <- cbind(vel[seq(1, dim(vel)[1], by = 2),],
+                       vel[seq(2, dim(vel)[1], by = 2),])
+               vel <- as.data.frame(vel, row.names = 1:nrow(vel))
                names(vel) <- c("u", "u.se", "v", "v.se")
                
-               rdm <- bind_cols(loc, vel) %>%
-                 mutate(
-                   id = unique(d.all$id),
-                   date = d.all$date,
-                   isd = d.all$isd
-                 ) 
-               if(scale) {
-                 rdm <- rdm %>%
-                   mutate(x = x  * sd(d.all$x, na.rm = TRUE) + mean(d.all$x, na.rm = TRUE),
-                          y = y  * sd(d.all$y, na.rm = TRUE) + mean(d.all$y, na.rm = TRUE))
-               }
-               rdm <- rdm %>%
-                 select(id, date, x, y, x.se, y.se, u, v, u.se, v.se, isd)
+               rdm <- cbind(loc, vel)
+               rdm$id <- unique(d.all$id)
+               rdm$date <- d.all$date
+               rdm$isd <- d.all$isd
+               
+               rdm <- rdm[, c("id", "date", "x", "y", 
+                              "x.se", "y.se", "u", "v", "u.se", "v.se", "isd")]
              })
       
       ## coerce x,y back to sf object
-      rdm <- rdm %>%
-        st_as_sf(coords = c("x","y"), remove = FALSE) %>%
-        st_set_crs(prj)
+      rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)
+      rdm <- st_set_crs(rdm, prj)
 
       switch(model,
              rw = {
-               rdm <- rdm %>% select(id, date, x.se, y.se, isd)
+               rdm <- rdm[, c("id", "date", "x.se", "y.se", "isd")]
                ## fitted
-               fv <- filter(rdm, isd) %>%
-                 select(-isd)
+               fv <- subset(rdm, isd)[, 1:4]
                ##predicted
                if(all(!is.na(time.step))) {
-                 pv <- filter(rdm, !isd) %>%
-                   select(-isd)
+                 pv <- subset(rdm, !isd)[, 1:4]
                } else {
                  pv <- NULL
                }
@@ -503,17 +454,19 @@ sfilter <-
                  sf.se <- NA
                  sp.se <- NA
                }
-               rdm <- rdm %>%
-                 select(id, date, x.se, y.se, u, v, u.se, v.se, isd) 
+               rdm <- rdm[, c("id", "date", "x.se", "y.se", 
+                              "u", "v", "u.se", "v.se", "isd")]
+               
                ## fitted
-               fv <- filter(rdm, isd) %>%
-                 mutate(s = sf, s.se = sf.se) %>%
-                 select(-isd)
+               fv <- subset(rdm, isd)[, -9]
+               fv$s <- sf
+               fv$s.se <- sf.se
+               
                ##predicted
                if(all(!is.na(time.step))) {
-                 pv <- filter(rdm, !isd) %>%
-                   mutate(s = sp, s.se = sp.se) %>%
-                   select(-isd)
+                 pv <- subset(rdm, !isd)[, -9]
+                 pv$s <- sp
+                 pv$s.se <- sp.se
                } else {
                  pv <- NULL
                }

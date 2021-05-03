@@ -19,7 +19,6 @@
 ##' @importFrom ggplot2 element_blank xlab ylab geom_polygon 
 ##' @importFrom ggplot2 coord_map coord_quickmap theme_void
 ##' @importFrom broom tidy
-##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
 ##' @importFrom rnaturalearth ne_countries
@@ -90,7 +89,7 @@ plot.fG_simfit <- function(x,
     switch(type, 
            lines = {
              m <- m + 
-               geom_path(data = x%>% filter(rep != 0),
+               geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
@@ -99,7 +98,7 @@ plot.fG_simfit <- function(x,
            },
            points = {
              m <- m + 
-               geom_point(data = x%>% filter(rep != 0),
+               geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
@@ -107,13 +106,13 @@ plot.fG_simfit <- function(x,
            },
            both = {
              m <- m + 
-               geom_path(data = x%>% filter(rep != 0),
+               geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
                          colour = hcl.colors(n=5, palette = pal)[1],
                          size = 0.5,
                          alpha = 0.6
                ) +
-               geom_point(data = x%>% filter(rep != 0),
+               geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
                           colour = hcl.colors(n=5, palette = pal)[1],
                           size = 0.75,
@@ -121,7 +120,7 @@ plot.fG_simfit <- function(x,
            })
     m <- m + 
       geom_point(
-        data = x %>% filter(rep == 0),
+        data = subset(x, rep == 0),
         aes(lon, lat),
         colour = hcl.colors(n=5, palette = pal)[3],
         size = 1

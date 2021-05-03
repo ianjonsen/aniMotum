@@ -18,9 +18,8 @@
 ##' Plots can be rendered all on a single page (pages = 1) or on separate pages.
 ##' 
 ##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs coord_fixed scale_size
-##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon facet_wrap
+##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon ylim
 ##' @importFrom stats qlogis
-##' @importFrom dplyr "%>%"
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors devAskNewPage
 ##' @method plot fG_mpm
@@ -59,8 +58,8 @@ plot.fG_mpm <-
   
   
   if(inherits(x, "fG_mpm") & (inherits(y, "fG_ssm") | is.null(y))) {
-    d <- grab(x, as_sf = FALSE) %>%
-      split(. ,.$id)
+    d <- grab(x, as_sf = FALSE)
+    d <- split(d, d$id)
     
     if(is.null(y)) {
       p <- lapply(1:length(d), function(i) {
@@ -100,12 +99,12 @@ plot.fG_mpm <-
         if(nrow(grab(y, "fitted")) != nrow(grab(x, "fitted"))) {
           stop("x and y have unequal numbers of estimated values")
         } else {
-          xy <- join(y, x, what.ssm = "fitted", as_sf = FALSE) %>%
-            split(., .$id)
+          xy <- join(y, x, what.ssm = "fitted", as_sf = FALSE)
+          xy <- split(xy, xy$id)
         }
       } else {
-        xy <- join(y, x, as_sf = FALSE) %>%
-          split(., .$id)
+        xy <- join(y, x, as_sf = FALSE)
+        xy <- split(xy, xy$id)
       }
       
       p <- lapply(xy, function(x) {

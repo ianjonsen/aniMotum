@@ -19,9 +19,7 @@
 ##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
-##' @importFrom future makeClusterPSOCK availableCores plan cluster
 ##' @importFrom parallel stopCluster
-##' @importFrom furrr future_map furrr_options
 ##' @export
 
 osar <- function(x, method = "fullGaussian", ...)
@@ -52,7 +50,7 @@ osar <- function(x, method = "fullGaussian", ...)
       furrr::future_map(~ try(map_fn(.x, method), silent = TRUE), 
                  .options = furrr::furrr_options(seed = TRUE))
     
-    parallel::stopCluster(cl)
+    stopCluster(cl)
     } else {
       if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
                            running sequentially. This could take a while...\n")
@@ -82,7 +80,7 @@ osar <- function(x, method = "fullGaussian", ...)
         furrr::future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
                    .options = furrr::furrr_options(seed = TRUE))
       
-      parallel::stopCluster(cl)
+      stopCluster(cl)
     } else {
       if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
                            running sequentially. This could take a while...\n")

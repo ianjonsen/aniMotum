@@ -43,7 +43,6 @@
 ##'     optim = "nlminb",
 ##'     eval.max = 2000)
 ##'     )
-##' @importFrom assertthat assert_that
 ##' @export
 
 ssm_control <-
@@ -65,12 +64,12 @@ ssm_control <-
     if ((!is.null(lower) | !is.null(upper)) & (length(lower) > 7 | length(upper) > 7))
       stop("\nthe number of parameters must be <= 7")
     
-    assert_that(optim %in% c("nlminb", "optim"),
-                msg = "optimiser can only be either `nlminb` or `optim`")
-    assert_that(method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-                msg = "optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
-    assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
-                msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
+    if(!optim %in% c("nlminb", "optim")) 
+      stop("optimiser can only be either `nlminb` or `optim`")
+    if(!method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent")) 
+      stop("optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
+    if(!(is.numeric(verbose) & verbose %in% c(0,1,2))) 
+      stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
     
     dots <- list(...)
     
