@@ -29,7 +29,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
-  if(!inherits(x, "fG_ssm") & !inherits(x, "fG_mpm")) 
+  if(!any(inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
     stop("a foieGras ssm or mpm model object with class `fG_ssm` of `fG_mpm`, respectively, must be supplied")
   if(!what %in% c("fitted","predicted","data"))
     stop("only `fitted`, `predicted` or `data` objects can be grabbed from an fG_ssm fit object")
@@ -37,7 +37,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
     stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
   if(inherits(x, "fG_ssm")) {
     if(any(sapply(x$ssm, function(.) is.na(.$ts))) && what == "predicted")
-      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. \n Either grab `fitted` values or re-fit with a positive-valued `time.step`")
+      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. 
+           \n Either grab `fitted` values or re-fit with a positive integer value for `time.step`")
   }
   
   switch(class(x)[1],
