@@ -17,8 +17,8 @@ sim(
   tau = c(1.5, 0.75),
   rho_o = 0,
   tdist = c("reg", "gamma"),
-  ts = 3,
-  tpar = c(0.23, 1),
+  ts = 6,
+  tpar = 1.2,
   alpha = c(0.9, 0.8)
 )
 }
@@ -55,9 +55,10 @@ Least-Squares ("ls") or Argos Kalman Filter ("kf")}
 at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random
 time intervals)}
 
-\item{ts}{time interval in h (ignored if \code{tdist = "gamma"})}
+\item{ts}{time interval in h}
 
-\item{tpar}{shape and scale parameters for the gamma distributed times
+\item{tpar}{rate parameter for the gamma distributed times, shape is take to be
+\code{ts * tpar} for a mean interval of approximately \code{ts} h
 (ignored if \code{tdist = "reg"})}
 
 \item{alpha}{transition probabilities switching model versions of
@@ -98,8 +99,8 @@ plot(tr)
 tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
 plot(tr)
 
-tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
-tdist = "gamma", tpar = c(1, 4))
+tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
+tdist = "gamma", tpar = 1.5)
 plot(tr, error = TRUE, pal = "Cividis")
 
 }

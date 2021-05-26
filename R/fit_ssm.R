@@ -145,6 +145,11 @@ fit_ssm <- function(d,
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = lpsi)
   }
+  ## add id if missing
+  if(! "id" %in% names(d)) {
+    d$id <- 1 
+    d <- d[, c("id", names(d)[names(d) != "id"])]
+  }
   
   fit <- lapply(split(d, d$id),
                 function(x) {
