@@ -94,6 +94,9 @@ simfit <-
                                  min(diff(y), na.rm = TRUE)))
              vmax <- with(loc, c(max(diff(x), na.rm = TRUE), 
                                  max(diff(y), na.rm = TRUE)))
+             if(any(abs(vmin / mean(dt[-1]) / 3.6) > 5) | any(vmax / mean(dt[-1]) / 3.6 > 5))
+               stop("Implausible travel rates detected, check SSM fit for implausible locations")
+             ## implausible for pinnipeds but not for eg. birds** need to re-think this...***
            })
     
     ###############################
@@ -166,7 +169,9 @@ simfit <-
                                  lower = vmin,
                                  upper = vmax,
                                  algorithm = "gibbs", burn.in.samples = 100)
+                 
                  dxy <- dxy[which(!is.na(dxy))[1],]
+            
                  ## wrap x values, reflect y values
                  mu1 <- wrap_x(mu[i-1,] + dxy, ex[1:2])
                  mu1 <- reflect_y(mu1, ex[3:4])
