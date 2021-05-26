@@ -96,6 +96,7 @@ simfit <-
                                  max(diff(y), na.rm = TRUE)))
              if(any(abs(vmin / mean(dt[-1]) / 3.6) > 5) | any(vmax / mean(dt[-1]) / 3.6 > 5))
                stop("Implausible travel rates detected, check SSM fit for implausible locations")
+             ## implausible for pinnipeds but not for eg. birds** need to re-think this...***
            })
     
     ###############################
