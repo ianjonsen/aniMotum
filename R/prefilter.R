@@ -153,7 +153,7 @@ prefilter <-
     d.tr <- subset(d, keep)[, c("lon","lat","date","id","lc","smaj","smin",
                                 "eor","lonerr","laterr","keep","obs.type")]
     names(d.tr)[1:2] <- c("x","y")
-    d.tr <- suppressWarnings(trip(d.tr, TORnames = c("date", "id"), 
+    d.tr <- suppressWarnings(trip(as.data.frame(d.tr), TORnames = c("date", "id"), 
                                   correct_all = FALSE))
     
     if(any(is.na(ang))) ang <- c(0,0)

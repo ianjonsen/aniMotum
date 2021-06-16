@@ -145,6 +145,13 @@ fit_ssm <- function(x,
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = lpsi)
   }
+
+  ## add id if missing
+  if(! "id" %in% names(x)) {
+    x$id <- 1 
+    x <- x[, c("id", names(x)[names(x) != "id"])]
+  }
+  
   ## in cases where user supplies id as a factor, make sure to drop any unused factor levels
   if(is.factor(x$id)) x$id <- droplevels(x$id)
   

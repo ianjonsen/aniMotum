@@ -111,8 +111,9 @@ ellp.par <- function(lc) {
 ##' @param tdist distribution for simulating location times ("reg" generates locations 
 ##' at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
 ##' time intervals)
-##' @param ts time interval in h (ignored if \code{tdist = "gamma"})
-##' @param tpar shape and scale parameters for the gamma distributed times 
+##' @param ts time interval in h
+##' @param tpar rate parameter for the gamma distributed times, shape is take to be
+##' \code{ts * tpar} for a mean interval of approximately \code{ts} h 
 ##' (ignored if \code{tdist = "reg"})
 ##' @param alpha transition probabilities switching model versions of 
 ##' \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
@@ -147,8 +148,8 @@ ellp.par <- function(lc) {
 ##' tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
 ##' plot(tr)
 ##' 
-##' tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), 
-##' tdist = "gamma", tpar = c(1, 4))
+##' tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
+##' tdist = "gamma", tpar = 1.5)
 ##' plot(tr, error = TRUE, pal = "Cividis")
 ##' 
 ##' @importFrom tmvtnorm rtmvnorm
@@ -174,8 +175,8 @@ sim <- function(N = 100,
                 tau = c(1.5, 0.75),
                 rho_o = 0,
                 tdist = c("reg", "gamma"),
-                ts = 3,
-                tpar = c(0.23, 1),
+                ts = 6,
+                tpar = 1.2,
                 alpha = c(0.9, 0.8)) {
   
   
@@ -224,8 +225,8 @@ sim <- function(N = 100,
     ## generate random time intervals (h)
     switch(tdist, 
            gamma = {
-             # 1.5, 0.5 = mean 3 h, extreme ~ 30-35 h
-             dt <- c(0, rgamma(N-1, shape = tpar[1], scale = tpar[2]))
+             # mean = ts * tpar 
+             dt <- c(0, rgamma(N-1, shape = ts * tpar, rate = tpar))
            },
            reg = {
              dt <- c(0, rep(ts, N-1))
