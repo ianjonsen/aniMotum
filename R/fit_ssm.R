@@ -6,7 +6,7 @@
 ##' combined in a single data frame (see details). Predicts locations at user-specified 
 ##' time intervals (regular or irregular).
 ##'
-##' @param d a data frame of observations including Argos KF error ellipse info (when present)
+##' @param x a data frame of observations including Argos KF error ellipse info (when present)
 ##' @param vmax max travel rate (m/s) passed to \code{\link{sda}} to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -35,7 +35,7 @@
 ##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
 ##' @param lpsi is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
-##' @details \code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
+##' @details \code{x} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type. 
 ##' Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
 ##' object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
 ##' can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are 
@@ -92,7 +92,7 @@
 ##'
 ##'
 ##' @export
-fit_ssm <- function(d,
+fit_ssm <- function(x,
                     vmax = 5,
                     ang = c(15,25),
                     distlim = c(2500,5000),
@@ -116,7 +116,7 @@ fit_ssm <- function(d,
 {
 
 ## check args - most args handled by prefilter() & sfilter()
-  if(!is.data.frame(d))  
+  if(!is.data.frame(x))  
     stop("x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
   if(!is.logical(pf)) 
     stop("pf must be either FALSE (fit model) or TRUE (only run prefilter)")
@@ -145,10 +145,12 @@ fit_ssm <- function(d,
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = lpsi)
   }
+  ## in cases where user supplies id as a factor, make sure to drop any unused factor levels
+  if(is.factor(x$id)) x$id <- droplevels(x$id)
   
-  fit <- lapply(split(d, d$id),
-                function(x) {
-                  prefilter(data = x,
+  fit <- lapply(split(x, x$id),
+                function(xx) {
+                  prefilter(data = xx,
                             vmax = vmax,
                             ang = ang,
                             distlim = distlim,
