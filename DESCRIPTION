@@ -40,7 +40,10 @@ Imports:
     tmvtnorm,
     raster,
     broom,
-    rnaturalearth
+    rnaturalearth,
+    purrr,
+    sp,
+    geosphere
 Suggests: 
     testthat,
     covr,
