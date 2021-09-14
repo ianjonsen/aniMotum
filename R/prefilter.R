@@ -110,8 +110,8 @@ prefilter <-
   ## add GL error columns, if missing
   if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf"))) {
     d <- d %>%
-      mutate(lonerr = ifelse(lc == "GL", 5, NA), 
-             laterr = ifelse(lc == "GL", 5, NA))
+      mutate(lonerr = ifelse(lc == "GL", 0.5, NA), 
+             laterr = ifelse(lc == "GL", 1, NA))
   }
   
   ##  convert dates to POSIXt
