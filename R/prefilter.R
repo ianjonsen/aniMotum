@@ -110,9 +110,10 @@ prefilter <-
   ## add GL error columns, if missing
   if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf"))) {
     d <- d %>%
-      mutate(lonerr = NA, laterr = NA)
+      mutate(lonerr = ifelse(lc == "GL", 5, NA), 
+             laterr = ifelse(lc == "GL", 5, NA))
   }
-
+  
   ##  convert dates to POSIXt
   ##  order records by time,
   ##  flag any duplicate date records,
@@ -127,7 +128,7 @@ prefilter <-
     mutate(obs.type = ifelse(lc %in% c(3,2,1,0,"A","B","Z") & (is.na(smaj) | is.na(smin) |is.na(eor)), "LS", obs.type)) %>%
     mutate(obs.type = ifelse(lc == "G" & (is.na(smaj) | is.na(smin) |is.na(eor)), "GPS", obs.type)) %>%
     mutate(obs.type = ifelse(lc == "GL" & (is.na(smaj) | is.na(smin) |is.na(eor)) & (!is.na(lonerr) & !is.na(laterr)), "GLS", obs.type))
- 
+  
   
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
