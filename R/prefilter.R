@@ -111,7 +111,7 @@ prefilter <-
   ##  convert dates to POSIXt
   ##  order records by time,
   ##  flag any duplicate date records,
-  ##  flag records as either KF or LS,
+  ##  flag records as KF, LS, GPS or GLS
   d$date <- as.POSIXct(d$date, "%Y-%m-%d %H:%M:%S", tz = "UTC")
   d <- d[order(d$date), ]
   d$keep <- with(d, difftime(date, c(as.POSIXct(NA), date[-nrow(d)]), units = "secs") > min.dt)
@@ -124,7 +124,8 @@ prefilter <-
                                  (is.na(smaj) | is.na(smin) |is.na(eor)), "GPS", obs.type))
   d$obs.type <- with(d, ifelse(lc == "GL" & (is.na(smaj) | is.na(smin) |is.na(eor)) & 
                                  (!is.na(lonerr) & !is.na(laterr)), "GLS", obs.type))
- 
+
+  
   ##  if any records with smaj/smin = 0 then set to NA and obs.type to "LS"
   ## convert error ellipse smaj & smin from m to km and eor from deg to rad
   d$smaj <- with(d, ifelse(smaj == 0 | smin == 0, NA, smaj)) / 1000
