@@ -108,7 +108,7 @@ prefilter <-
       mutate(smaj = NA, smin = NA, eor = NA)
   } 
   ## add GL error columns, if missing
-  if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf"))) {
+  if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf")) | all(!names(d) %in% "GL")) {
     d <- d %>%
       mutate(lonerr = ifelse(lc == "GL", 0.5, NA), 
              laterr = ifelse(lc == "GL", 1, NA))
