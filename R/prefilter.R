@@ -17,7 +17,7 @@
 ##' @param data input data, must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s)
 ##' @param ang angles of outlier location "spikes" (default is \code{c(15,25)} deg); \code{ang = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}
-##' @param distlim lengths of outlier location "spikes" (default is \code{c(2500, 5000)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.
+##' @param distlim lengths of outlier location "spikes" in km (default is \code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference in s between observations; \code{dt < min.dt} will be ignored by the SSM
 ##' @param emf optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details
@@ -102,8 +102,9 @@ prefilter <-
     d$smin <- NA
     d$eor <- NA
   } 
+
   ## add GL error columns, if missing
-  if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf")) | (names(d) != "GL")) {
+  if((ncol(d) != 10 & !inherits(d, "sf")) | (ncol(d) != 9 & inherits(d, "sf")) | all(!names(d) %in% "GL")) {
     d <- d %>%
       mutate(lonerr = ifelse(lc == "GL", 0.5, NA), 
              laterr = ifelse(lc == "GL", 1, NA))
