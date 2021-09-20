@@ -93,7 +93,7 @@ fmap <- function(x,
   else {
     prj <- crs
     if(!is.character(prj)) stop("\ncrs must be a proj4string, 
-                                \neg. `+proj=stere +lat_0=-90 +lon_0=0 +ellps=WGS84 +units=km +no_defs`")
+                                \neg. `+proj=stere +lat_0=-90 +lon_0=0 +datum=WGS84 +units=km +no_defs`")
     
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
       cat("\nconverting units from m to km to match SSM output")

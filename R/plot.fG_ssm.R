@@ -129,8 +129,10 @@ plot.fG_ssm <-
         dd.lst <- split(dd, dd$id)
         
         p <- lapply(1:nrow(x), function(i) {
-          px <- ggplot() +
-            geom_ribbon(
+          px <- ggplot(subset(dd.lst[[i]], keep),
+                       aes(date, value))
+          ## add ribbon
+          px <- px + geom_ribbon(
               data = pd.lst[[i]],
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
