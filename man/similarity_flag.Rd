@@ -27,9 +27,4 @@ of the difference in distance and bearing between the two paths.
 \code{flag = 1} will use an index based on Hazen (2017)\cr
 \code{flag = 2} (the default) will use a custom index
 }
-\references{
-Hazen et al. (2017) WhaleWatch: a dynamic management tool for
-predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
-\url{https://doi.org/10.1111/1365-2664.12820}
-}
 \keyword{internal}

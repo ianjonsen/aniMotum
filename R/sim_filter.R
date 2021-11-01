@@ -7,11 +7,14 @@
 ##' 
 ##' @param trs a \code{simfit} object
 ##' @param keep the quantile of flag values to retain
-##' @param flag the similarity flag method (see \code{?simlarity_flag} for details)
+##' @param flag the similarity flag method (see details)
+##' 
+##' ##' @details
+##' \code{flag = 1} will use an index based on Hazen (2017)\cr
+##' \code{flag = 2} (the default) will use a custom index
 ##' 
 ##' @return a \code{simfit} object containing the filtered paths
 ##' 
-##' @seealso \code{\link{similarity_flag}}
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
@@ -23,7 +26,11 @@
 ##' ## filter simulations and keep paths in top 25% of flag values
 ##' trs_f <- sim_filter(trs, keep = .25, flag = 2)
 ##' plot(trs_f)
-
+##' 
+##' @references Hazen et al. (2017) WhaleWatch: a dynamic management tool for 
+##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
+##' \url{https://doi.org/10.1111/1365-2664.12820}
+##' 
 ##' @importFrom dplyr group_by ungroup select "%>%" filter
 ##' @importFrom tidyr nest unnest
 ##' @importFrom stats quantile

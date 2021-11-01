@@ -16,11 +16,6 @@
 ##' 
 ##' @return a single value representing the similarity in distance and bearing between the two paths
 ##' 
-##' @references Hazen et al. (2017) WhaleWatch: a dynamic management tool for 
-##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
-##' \url{https://doi.org/10.1111/1365-2664.12820}
-##' 
-##' 
 ##' @keywords internal
 ##' 
 ##' @importFrom sp spDistsN1
@@ -44,14 +39,11 @@ similarity_flag <- function(track, sim_track, flag = 2){
   bear_sim <- bearing(p1 = cbind(first(sim_track$lon), first(sim_track$lat)),
                                  p2 = cbind(last(sim_track$lon), last(sim_track$lat)))
   
-  flag_1 <- 2 * (dist_track - dist_sim) / dist_track + (bear_track - bear_sim) / 90
-  
-  flag_2 <- ((dist_track - dist_sim) / dist_track) + ((bear_track - bear_sim) / bear_track)
-  
-  if (flag == 1){
-    return(flag_1)
+  if(flag == 1) {
+    return(2 * (dist_track - dist_sim) / dist_track + (bear_track - bear_sim) / 90)
   } else {
-    return(flag_2)
+    return(((dist_track - dist_sim) / dist_track) + ((bear_track - bear_sim) / bear_track))
   }
+
 }
 
