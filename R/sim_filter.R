@@ -24,8 +24,10 @@
 ##' trs <- simfit(fit, what = "predicted", reps = 10)
 ##' 
 ##' ## filter simulations and keep paths in top 25% of flag values
-##' trs_f <- sim_filter(trs, keep = .25, flag = 2)
-##' plot(trs_f)
+##' trs_f <- sim_filter(trs, keep = .33, flag = 2)
+##' 
+##' ## compare unfiltered and filtered simulated paths
+##' plot(trs) | plot(trs_f)
 ##' 
 ##' @references Hazen et al. (2017) WhaleWatch: a dynamic management tool for 
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
