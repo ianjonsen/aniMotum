@@ -9,7 +9,7 @@
 ##' @param keep the quantile of flag values to retain
 ##' @param flag the similarity flag method (see details)
 ##' 
-##' ##' @details
+##' @details
 ##' \code{flag = 1} will use an index based on Hazen (2017)\cr
 ##' \code{flag = 2} (the default) will use a custom index
 ##' 
