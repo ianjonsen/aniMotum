@@ -46,7 +46,6 @@ Imports:
     raster,
     broom,
     rnaturalearth,
-    purrr,
     sp,
     geosphere
 Suggests: 
@@ -59,7 +58,8 @@ Suggests:
     mapproj,
     future,
     furrr,
-    parallel
+    parallel,
+    purrr
 Depends: 
     R (>= 3.6.0)
 SystemRequirements: GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0), pandoc (>=2.7.3)

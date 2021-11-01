@@ -24,16 +24,16 @@
 ##' trs_f <- sim_filter(trs, keep = .25, flag = 2)
 ##' plot(trs_f)
 
-##' @importFrom purrr map_df
-##' @importFrom dplyr group_by ungroup
+##' @importFrom dplyr group_by ungroup select "%>%" filter
 ##' @importFrom tidyr nest unnest
+##' @importFrom stats quantile
 ##' @export
 sim_filter <- function(trs, keep = .25, flag = 2){
 
   # filter based on similarity to original path
   # apply the similarity flag function to each simulated track
   # unnest the simfit object to extract the simulations
-  trs_df <- trs %>% tidyr::unnest(cols = c(sims))
+  trs_df <- trs %>% unnest(cols = c(sims))
   
   # can't figure out a map-type way to do this...
   # loop instead?
@@ -42,13 +42,27 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     
     foo <- trs_df %>% filter(id == unique(trs_df$id)[i])
     
-    foo <- purrr::map_df(split(foo, foo$rep), 
-                         function(.x) {
-                           .x["flg"] <- similarity_flag(track = foo %>% filter(rep == 0),
-                                                        sim_track = .x,
-                                                        flag = flag)
-                           .x
-                         })
+    if (requireNamespace("purrr", quietly = TRUE)) {
+      foo <- purrr::map_df(split(foo, foo$rep),
+                           function(.x) {
+                             .x["flg"] <- similarity_flag(
+                               track = foo %>% filter(rep == 0),
+                               sim_track = .x,
+                               flag = flag
+                             )
+                             .x
+                           })
+    } else {
+      foo <- lapply(split(foo, foo$rep), function(.x) {
+        .x["flg"] <- similarity_flag(
+          track = foo %>% filter(rep == 0),
+          sim_track = .x,
+          flag = flag
+        )
+        .x
+      }) %>%
+        do.call(rbind, .)
+    }
     trs_df$flg[trs_df$id == unique(trs_df$id)[i]] <- foo$flg
   }
   
@@ -61,7 +75,7 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     ungroup()
   
   # format for foieGras output
-  trs_filt <- trs_df %>% dplyr::select(-flg) %>% nest(sims = c(rep, date, lon, lat, x, y)) # drop flag column
+  trs_filt <- trs_df %>% select(-flg) %>% nest(sims = c(rep, date, lon, lat, x, y)) # drop flag column
   class(trs_filt) <- append("fG_rws", class(trs_filt))
   class(trs_filt) <- append("fG_simfit", class(trs_filt))
   return(trs_filt)
