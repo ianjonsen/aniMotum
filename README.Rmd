@@ -54,7 +54,12 @@ On PC's running Windows, ensure you have installed [Rtools](https://cran.r-proje
 On Mac's, ensure you have installed the [Command Line Tools for Xcode](https://developer.apple.com/download/more/) by executing `xcode-select --install` in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed (e.g., https://github.com/fxcoudert/gfortran-for-macOS/releases).
 
 To get the very latest `foieGras` stable version, you can install from GitHub:
-```{r gh-installation, eval = FALSE}
+```{r gh-installation_staging, eval = FALSE}
+remotes::install_github("ianjonsen/foieGras@staging")
+```
+
+Or, for a more thoroughly tested earlier version:
+```{r gh-installation_master, eval = FALSE}
 remotes::install_github("ianjonsen/foieGras")
 ```
 
