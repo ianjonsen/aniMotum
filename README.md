@@ -21,7 +21,7 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 master branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 
-staging branch:
+staging branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging)
 
 dev branch:  
