@@ -52,18 +52,19 @@ distance to land are provided. Stronger beta parameters result in stronger
 land (water) avoidance but may also introduce undesirable/unrealistic artefacts
 (zig-zags) in the simulated paths. See Brillinger et al. (2012) and
 \code{vignette("momentuHMM", package = "momentuHMM")} for more details on the
-use of potential functions for simulating constrained animal movements. This
-application of potential functions to constain simulated paths is experimental
-and NOT guaranteed to work, especially if \code{cpf = TRUE}!
+use of potential functions for simulating constrained animal movements.
+WARNING: This application of potential functions to constrain simulated
+paths is experimental, likely to change in future release, and NOT guaranteed
+to work, especially if \code{cpf = TRUE}!
 }
 \examples{
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
-trs <- simfit(fit, what = "predicted", reps = 2)
+fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 36)
+trs <- simfit(fit, what = "predicted", reps = 3)
 plot(trs)
 
 ## use potential functions to constrain paths to avoid land
 grad <- readRDS(system.file("extdata/grad.RDS", package = "foieGras"))
-trs_c <- simfit(fit, what = "p", reps = 2, grad = grad, beta = c(-300,-300))
+trs_c <- simfit(fit, what = "p", reps = 3, grad = grad, beta = c(-300,-300))
 ## compare with unconstrained paths
 plot(trs) | plot(trs_c)
 
