@@ -85,7 +85,6 @@ sim_filter <- function(trs, keep = .25, flag = 2){
   
   # format for foieGras output
   trs_filt <- trs_df %>% select(-flg) %>% nest(sims = c(rep, date, lon, lat, x, y)) # drop flag column
-  class(trs_filt) <- append("fG_rws", class(trs_filt))
-  class(trs_filt) <- append("fG_simfit", class(trs_filt))
+  class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
   return(trs_filt)
 }
