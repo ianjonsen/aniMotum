@@ -11,9 +11,12 @@
 ##' @param coords column numbers of the location coordinates (default = 3:4)
 ##' @param control list of control settings for the outer optimizer (see \code{mpm_control} for details)
 ##' @param inner.control list of control parameters for the inner optimization
-##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
+##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
+##' see \code{ssm_control} for details
+##' @param optim is deprecated, use ssm_control(optim = "optim") instead, 
+##' see \code{ssm_control} for details
+##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, 
+##' see \code{ssm_control} for details
 ##' 
 ##' @return a list with components
 ##' \item{\code{fitted}}{a dataframe of fitted locations}
@@ -29,10 +32,6 @@
 ##' 
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
-##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr "%>%" mutate select
-##' @importFrom purrr map
-##' @importFrom lifecycle deprecate_warn
 ##' @export
 fit_mpm <- function(x,
                     what = "predicted",
@@ -49,19 +48,19 @@ fit_mpm <- function(x,
   
   ## warnings for deprecated arguments
   if(!is.null(verbose)) {
-    deprecate_warn("0.7-5", "fit_ssm(verbose)", 
-                   details = "use `control = ssm_control(verbose)` instead")
+    warning("the `verbose` arg is deprecated as of 0.7-5, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$verbose <- verbose
   }
   if(!is.null(optim)) {
-    deprecate_warn("0.7-5", "fit_ssm(optim)", 
-                   details = "use `control = ssm_control(optim)` instead")
+    warning("the `optim` arg is deprecated as of 0.7-5, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     if(optim %in% c("nlminb", "optim")) control$optim <- optim
     else stop("invalid optimiser specified, see ?ssm_control for options")
   }
   if(!is.null(optMeth)) {
-    deprecate_warn("0.7-5", "fit_ssm(optMeth)", 
-                   details = "use `control = ssm_control(method)` instead")
+    warning("the `optMeth` arg is deprecated as of 0.7-5, use `control = ssm_control(optMeth)` instead. See `?ssm_control for details",
+            call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     if(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
       control$method <- optMeth
     else stop("invalid optimisation method specified, see ?ssm_control for options")
@@ -70,19 +69,16 @@ fit_mpm <- function(x,
   
   if(control$verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
-
+  
   if(inherits(x, "fG_ssm")) {
-    x <- grab(x, what = what, as_sf = FALSE) %>%
-      select(id, date, coords[1], coords[2])
+    x <- grab(x, what = what, as_sf = FALSE)[, c(1:2, coords[1], coords[2])]
   } else {
-    x <- x %>% select(id, date, coords[1], coords[2])
+    x <- x[, c(1:2, coords[1], coords[2])]
   }
   
   if(all(c("x","y") %in% names(x))) {
     # rescale x,y in km for better optimisation
-    xm <- max(x$x)
-    ym <- max(x$y)
-    x <- x %>% mutate(x = x/xm, y = y/ym)
+    x <- with(x, data.frame(x = x/max(x), y = y/max(y)))
   } else {
     # standardise coord names to x,y 
     names(x)[3:4] <- c("x","y")
@@ -90,22 +86,23 @@ fit_mpm <- function(x,
 
   switch(model,
          mpm = {
-           fit <- split(x, x$id) %>%
-             map(~ try(mpmf(.x, 
-                        model = model,
-                        control = control,
-                        inner.control = inner.control
-             ), silent = TRUE)
-             )
-           
-          fit <- tibble(id = names(fit), mpm = fit) %>%
-            mutate(converged = sapply(.$mpm, function(x) 
-              if(length(x) == 8) {
-                x$opt$convergence == 0
-              } else if(length(x) < 8) {
-                FALSE
-              })) %>%
-            mutate(model = model)
+           fit <- lapply(split(x, x$id), function(x) {
+             try(mpmf(x, 
+                      model = model,
+                      control = control,
+                      inner.control = inner.control
+                      ), silent = TRUE)
+           })
+          fit <- tibble(id = names(fit), mpm = fit) 
+          fit <- with(fit, tibble(fit,
+                                  converged = sapply(mpm, function(x) 
+                                    if(length(x) == 8) {
+                                      x$opt$convergence == 0
+                                    } else if(length(x) < 8) {
+                                      FALSE
+                                    }),
+                                  model = model)
+                      )
          },
          jmpm = {
            fit <- try(mpmf( 
@@ -115,11 +112,15 @@ fit_mpm <- function(x,
                inner.control = inner.control
              ), silent = TRUE)
            
-           fit <- tibble(mpm = list(fit)) %>%
-             mutate(converged = ifelse(length(.$mpm[[1]]) == 8, 
-                                       .$mpm[[1]]$opt$convergence == 0, 
-                                       FALSE)) %>%
-             mutate(model = model)
+           fit <- tibble(mpm = list(fit)) 
+           fit <- with(fit, 
+                       tibble(fit, 
+                              converged = 
+                                    ifelse(length(mpm[[1]]) == 8, 
+                                           mpm[[1]]$opt$convergence == 0, 
+                                                          FALSE),
+                                  model = model)
+                       )
          })
 
   class(fit) <- append("fG_mpm", class(fit))  

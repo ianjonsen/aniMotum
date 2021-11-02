@@ -13,12 +13,12 @@
 ##' @param control list of control settings for the outer optimizer (see \code{mpm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
-##' @param verbose `r lifecycle::badge("deprecated")` use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim `r lifecycle::badge("deprecated")` use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth `r lifecycle::badge("deprecated")` use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
+##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
+##' @param optim is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
+##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
-##' @importFrom dplyr mutate arrange "%>%" count
+##' @importFrom dplyr count
 ##' @importFrom tibble tibble
 ##' @importFrom stats plogis median
 ##' @keywords internal
@@ -38,16 +38,13 @@ mpmf <-
     }
     
     # ordering the data to make sure we have continuous tracks and ids are ordered
-    x <- x %>% arrange(id, tid, date)
+    x <- x[order(x$id, x$tid, x$date), ]
     
     # get index of start and end of tracks
-    x <- x %>% mutate(idtid = paste(id, tid, sep=""))
-    idx <- x$idtid %>%
-      table() %>%
-      as.numeric() %>%
-      cumsum() %>%
-      c(0, .)
-    
+    x$idtid <- paste(x$id, x$tid, sep="")
+    idx <- as.numeric(table(x$idtid))
+    idx <- c(0, cumsum(idx))
+
     # Create dt vector
     # dt = t_i - t_{i-1} and include in data.tmb
     x$dt <- c(NA, diff(x$date))
@@ -124,7 +121,7 @@ mpmf <-
     names(L) <- c("log_sigma", "log_sigma", "log_sigma_g")
     names(U) <- c("log_sigma", "log_sigma", "log_sigma_g")
     
-#    if(model == "jmpm") map <- list(log_sigma_g = factor(NA))
+    map <- NULL
     
     # Remove inactive parameters from bounds
     L <- L[!names(L) %in% names(map)]

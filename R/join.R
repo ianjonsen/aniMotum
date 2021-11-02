@@ -10,7 +10,6 @@
 ##'
 ##' @return a single tbl with all individuals
 ##'
-##' @importFrom dplyr bind_cols select "%>%"
 ##' @importFrom tibble as_tibble
 ##' @examples
 ##' ## load example foieGras fit objects (to save time)
@@ -30,16 +29,24 @@ join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
   if(!inherits(mpm, "fG_mpm")) stop("mpm must be a foieGras mpm fit object with class `fG_mpm`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
-  y <- grab(mpm, what = "fitted") %>% select(g, g.se)
+  y <- grab(mpm, what = "fitted")[, c("g","g.se")] 
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
-  xy <- bind_cols(x, y) 
+  xy <- cbind(x, y) 
+  
   if(!as_sf) {
     xy <- as_tibble(xy)
+  } else {
+    ## ensures geometry is last column (for cases using older sf)
+    nc <- ncol(xy)
+    ng <- which(names(xy) == "geometry")
+    if(nc != ng) {
+      xy <- xy[, c(1:(ng-1), (ng+1):nc, ng)]
+    }
   }
   
-  class(xy) <- append(class(xy), "fG_ssmp", after = 0)
+#  class(xy) <- append(class(xy), "fG_ssmp", after = 0)
   return(xy)
   
 }

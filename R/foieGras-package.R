@@ -12,18 +12,14 @@
 ##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 https://doi.org/10.1002/ecy.2566
 ##'
 ##' @keywords foieGras
-##' @importFrom assertthat assert_that
 ##' @importFrom utils data flush.console globalVariables
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
-##' @importFrom furrr future_map
-##' @importFrom future availableCores cluster makeClusterPSOCK plan
 ##' @importFrom tibble as_tibble tibble
-##' @importFrom lubridate ymd_hms
-##' @importFrom purrr map
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
+##' @importFrom raster extent extract nlayers
 ##' @importFrom trip sda speedfilter trip
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median qlogis qnorm pnorm runif
@@ -32,6 +28,8 @@
 ##' @importFrom ggplot2 theme element_blank geom_sf xlim ylim unit aes_string
 ##' @importFrom ggplot2 element_text scale_colour_manual scale_colour_gradientn
 ##' @importFrom grDevices extendrange grey hcl.colors
+##' @importFrom rnaturalearth ne_countries
+##' @importFrom broom tidy
 NULL
 
 ##' @name ellie
@@ -101,7 +99,7 @@ NULL
 globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se", "y.se",
                   "geometry", "u", "v", "u.se", "v.se", "lc", "smaj", "smin", "eor",
                   "obs.type", "emf.x", "emf.y", "lon", "lat", "rename", "X", "Y", 
-                  "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", 
-                  "lonerr", "laterr", "coord", "value", "resid", 
-                  "se", "g", "g.se", "id1", "mpm", "residual",
-                  "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab"))
+                  "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", "map",
+                  "lonerr", "laterr", "coord", "value", "resid", "long", "cluster",
+                  "se", "g", "g.se", "id1", "mpm", "residual", "group", "availableCores",
+                  "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab", "sims", "flg"))
