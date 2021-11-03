@@ -14,11 +14,8 @@
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path geom_line theme_minimal 
 ##' @importFrom ggplot2 element_blank xlab ylab unit scale_colour_gradientn guides guide_legend
 ##' @importFrom ggplot2 theme ylim coord_fixed scale_colour_manual scale_size
-##' @importFrom dplyr "%>%"
-##' @importFrom stringr str_split
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
-##' @importFrom assertthat assert_that
 ##' @method plot fG_sim
 ##'
 ##' @examples
@@ -41,18 +38,18 @@ plot.fG_sim <- function(x,
   bts <- names(x)[names(x) %in% c("g", "b")]
   if(length(bts) == 0 & !is.null(bts)) bts <- NULL
   
-  model <- str_split(class(x)[2], "_", simplify = TRUE)[,2]
+  model <- strsplit(class(x)[2], "_")[[1]][2]
   
   switch(model, 
          crws = {
-           x <- x %>% mutate(s = sqrt(u^2 + v^2))
+           x$s <- with(x, sqrt(u^2 + v^2))
          },
          rws = {
-           x <- x %>% mutate(s = c(0, sqrt(diff(x)^2 + diff(y)^2)))
+           x$s <- with(x, c(0, sqrt(diff(x)^2 + diff(y)^2)))
          },
          mpms = {
-           x <- x %>% mutate(s = c(0, sqrt(diff(x)^2 + diff(y)^2))) %>%
-             mutate(s = s / c(0, diff(date)))
+           x$s <- with(x, c(0, sqrt(diff(x)^2 + diff(y)^2)))
+           x$s <- with(x, s / c(0, diff(date)))
          })
   
   if(!error) {

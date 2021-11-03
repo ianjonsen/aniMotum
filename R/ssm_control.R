@@ -22,9 +22,8 @@
 ##' defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}
 ##' @param verbose integer; report progress during minimization: 0 = silent;
 ##' 1 = optimizer trace; 2 = parameter trace (default))
-##' @param se logical; should standard errors for fixed effects be calculated (default = TRUE). 
-##' Turning this off will speed up computation time at the expense of reporting uncertainty for 
-##' fixed effects
+##' @param se logical; should standard errors for speed estimates be calculated (default = FALSE). 
+##' Turning this on will slow down computation time but provide SE's for speed-along-track calculations
 ##' @param ... control parameters for the chosen optimizer
 ##' @return Returns a list with components
 ##'   \item{\code{optim}}{the name of the numerical optimizer as a
@@ -44,7 +43,6 @@
 ##'     optim = "nlminb",
 ##'     eval.max = 2000)
 ##'     )
-##' @importFrom assertthat assert_that
 ##' @export
 
 ssm_control <-
@@ -53,7 +51,7 @@ ssm_control <-
            lower = NULL,
            upper = NULL,
            verbose = 1,
-           se = TRUE,
+           se = FALSE,
            ...) {
     optim <- match.arg(optim)
     method <- match.arg(method)
@@ -66,12 +64,12 @@ ssm_control <-
     if ((!is.null(lower) | !is.null(upper)) & (length(lower) > 7 | length(upper) > 7))
       stop("\nthe number of parameters must be <= 7")
     
-    assert_that(optim %in% c("nlminb", "optim"),
-                msg = "optimiser can only be either `nlminb` or `optim`")
-    assert_that(method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-                msg = "optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
-    assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
-                msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
+    if(!optim %in% c("nlminb", "optim")) 
+      stop("optimiser can only be either `nlminb` or `optim`")
+    if(!method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent")) 
+      stop("optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
+    if(!(is.numeric(verbose) & verbose %in% c(0,1,2))) 
+      stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
     
     dots <- list(...)
     

@@ -21,7 +21,7 @@ prefilter(
 
 \item{ang}{angles of outlier location "spikes" (default is \code{c(15,25)} deg); \code{ang = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}}
 
-\item{distlim}{lengths of outlier location "spikes" (default is \code{c(2500, 5000)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.}
+\item{distlim}{lengths of outlier location "spikes" in km (default is \code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.}
 
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 

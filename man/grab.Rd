@@ -4,7 +4,7 @@
 \alias{grab}
 \title{grab tibble's by name from a foieGras model object}
 \usage{
-grab(x, what = "fitted", as_sf = TRUE)
+grab(x, what = "fitted", as_sf = FALSE)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm or mpm model object}
@@ -12,7 +12,7 @@ grab(x, what = "fitted", as_sf = TRUE)
 \item{what}{the tibble to be grabbed; either \code{fitted}, \code{predicted} (ssm only), or
 \code{data} (single letters can be used)}
 
-\item{as_sf}{logical; if FALSE then return a tibble with un-projected lonlat
+\item{as_sf}{logical; if FALSE (default) then return a tibble with un-projected lonlat
 coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.}
 }
 \value{

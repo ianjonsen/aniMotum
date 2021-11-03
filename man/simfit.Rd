@@ -8,6 +8,8 @@ simfit(
   x,
   what = c("fitted", "predicted"),
   reps = 1,
+  grad = NULL,
+  beta = c(-300, -300),
   cpf = FALSE,
   sim_only = FALSE
 )
@@ -19,21 +21,54 @@ simfit(
 (typically regular in time) locations}
 
 \item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model
-fit object (ignored if x is NULL)}
+fit object}
 
-\item{cpf}{logical; should simulated tracks return to their start point (ie. a central-place forager)}
+\item{grad}{a rasterStack of x- and y-gradients as separate layers (see details)}
+
+\item{beta}{a 2-element vector of parameters defining the potential function
+magnitude in x- and y-directions (ignored if \code{is.null(grad)},
+ie. no potential function; see details).}
+
+\item{cpf}{logical; should simulated tracks return to their start point
+(ie. a central-place forager)}
 
 \item{sim_only}{logical, do not include \code{fG_ssm} estimated location in output
 (default is FALSE)}
 }
+\value{
+a \code{fG_simfit} object containing the paths simulated from a
+\code{fG_ssm} fit object
+}
 \description{
 simulate from the \code{rw} or \code{crw} process models to generate
-either a set of x,y (or lon,lat) coordinates from a \code{fG_ssm} fit with length
+either a set of x,y or lon,lat coordinates from a \code{fG_ssm} fit with length
 equal to the number of observations used in the SSM fit.
 }
+\details{
+A potential function can be applied to the simulated paths to help
+avoid locations on land (or in water), using the \code{grad} and \code{beta}
+arguments. A coarse-resolution rasterStack of global x- and y-gradients of
+distance to land are provided. Stronger beta parameters result in stronger
+land (water) avoidance but may also introduce undesirable/unrealistic artefacts
+(zig-zags) in the simulated paths. See Brillinger et al. (2012) and
+\code{vignette("momentuHMM", package = "momentuHMM")} for more details on the
+use of potential functions for simulating constrained animal movements.
+WARNING: This application of potential functions to constrain simulated
+paths is experimental, likely to change in future release, and NOT guaranteed
+to work, especially if \code{cpf = TRUE}!
+}
 \examples{
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48, control = ssm_control(se = FALSE))
-trs <- simfit(fit, reps = 2, what = "predicted")
+fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 36)
+trs <- simfit(fit, what = "predicted", reps = 3)
 plot(trs)
 
+## use potential functions to constrain paths to avoid land
+grad <- readRDS(system.file("extdata/grad.RDS", package = "foieGras"))
+trs_c <- simfit(fit, what = "p", reps = 3, grad = grad, beta = c(-300,-300))
+## compare with unconstrained paths
+plot(trs) | plot(trs_c)
+
+}
+\references{
+Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://doi.org/10.1007/978-1-4614-1344-8_22
 }

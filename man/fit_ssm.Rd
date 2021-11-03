@@ -5,7 +5,7 @@
 \title{Fit a continuous-time state-space model to filter Argos satellite geolocation data}
 \usage{
 fit_ssm(
-  d,
+  x,
   vmax = 5,
   ang = c(15, 25),
   distlim = c(2500, 5000),
@@ -28,7 +28,7 @@ fit_ssm(
 )
 }
 \arguments{
-\item{d}{a data frame of observations including Argos KF error ellipse info (when present)}
+\item{x}{a data frame of observations including Argos KF error ellipse info (when present)}
 
 \item{vmax}{max travel rate (m/s) passed to \code{\link{sda}} to identify
 outlier locations}
@@ -68,13 +68,13 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer (see \code{\link{MakeADFun}} for additional details)}
 
-\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
 
-\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+\item{optim}{is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
 
-\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+\item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
 
-\item{lpsi}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
+\item{lpsi}{is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
 }
 \value{
 a list with components
@@ -100,7 +100,7 @@ combined in a single data frame (see details). Predicts locations at user-specif
 time intervals (regular or irregular).
 }
 \details{
-\code{d} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type.
+\code{x} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8 columns, depending on the tracking data type.
 Argos Least-Squares and GPS data should have 5 columns in the following order: "id", "date", "lc", "lon", "lat". Where "date" can be a POSIX
 object or text string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the time zone is assumed to be "GMT". lc (location class)
 can include the following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS and GLS locations, respectively. Class Z values are
@@ -132,6 +132,7 @@ plot(fit, what = "fitted", type = 1, ask = FALSE)
 
 ## track plots of predicted value fit to data
 plot(fit, what = "predicted", type = 2, ask = FALSE)
+
 
 }
 \references{

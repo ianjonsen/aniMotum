@@ -7,12 +7,11 @@
 ##' @param x a \code{foieGras} ssm or mpm model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
 ##' `data` (single letters can be used)
-##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
+##' @param as_sf logical; if FALSE (default) then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
-##' @importFrom dplyr select bind_rows "%>%" everything
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom tibble as_tibble
 ##'
@@ -26,11 +25,11 @@
 ##' 
 ##' @export
 ##'
-grab <- function(x, what = "fitted", as_sf = TRUE) {
+grab <- function(x, what = "fitted", as_sf = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","data"))
 
-  if(!inherits(x, "fG_ssm") & !inherits(x, "fG_mpm")) 
+  if(!any(inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
     stop("a foieGras ssm or mpm model object with class `fG_ssm` of `fG_mpm`, respectively, must be supplied")
   if(!what %in% c("fitted","predicted","data"))
     stop("only `fitted`, `predicted` or `data` objects can be grabbed from an fG_ssm fit object")
@@ -38,7 +37,8 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
     stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
   if(inherits(x, "fG_ssm")) {
     if(any(sapply(x$ssm, function(.) is.na(.$ts))) && what == "predicted")
-      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. \n Either grab `fitted` values or re-fit with a positive-valued `time.step`")
+      stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. 
+           \n Either grab `fitted` values or re-fit with a positive integer value for `time.step`")
   }
   
   switch(class(x)[1],
@@ -60,13 +60,10 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  data = .$data
                )
              prj <- st_crs(x)
-             xy <- st_coordinates(x) %>%
-               as.data.frame(.)
+             xy <- as.data.frame(st_coordinates(x))
              names(xy) <- c("x", "y")
-             ll <- x %>%
-               st_transform("+proj=longlat +datum=WGS84 +no_defs") %>%
-               st_coordinates(.) %>%
-               as.data.frame(.)
+             ll <- st_transform(x, "+proj=longlat +datum=WGS84 +no_defs")
+             ll <- as.data.frame(st_coordinates(ll))
              names(ll) <- c("lon", "lat")
              st_geometry(x) <- NULL
              cbind(x, xy, ll)
@@ -82,66 +79,58 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
                  data = st_crs(.$data)
                ))
              out <- lapply(1:length(out_lst), function(i) {
-               st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
-                 st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
-                 st_transform(., prj[[i]])
-             }) %>%
-               bind_rows(.)
+              tmp <- st_as_sf(out_lst[[i]], coords = c("lon", "lat"))
+              tmp <- st_set_crs(tmp, "+proj=longlat +datum=WGS84 +no_defs")
+              tmp <- st_transform(tmp, prj[[i]])
+              tmp
+             })
+             out <- do.call(rbind, out)
              
              if (what != "data") {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
-                   out %>% select(id, date, x.se, y.se, geometry)
+                   out[, c("id", "date", "x.se", "y.se", "geometry")]
                    },
                  crw = {
-                   ## use everything() to deal w fit objects from <= 0.6-9, which don't contain s, s.se
-                   out %>% select(id, date, u, v, u.se, v.se, x.se, 
-                                      y.se, everything())
-                 }
-               )
+                   ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
+                   if(all(c("s","s.se") %in% names(out))) {
+                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
+                             "y.se", "s", "s.se", "geometry")]
+                   } else {
+                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
+                             "y.se", "geometry")]
+                   }
+                 })
                
              } else {
-               out <-
-                 out %>% select(id,
-                                   date,
-                                   lc,
-                                   smaj,
-                                   smin,
-                                   eor,
-                                   keep,
-                                   obs.type,
-                                   emf.x,
-                                   emf.y,
-                                   geometry)
+               out <- out[, c("id", "date", "lc", "smaj", "smin", "eor", "keep", 
+                         "obs.type", "emf.x", "emf.y", "geometry")]
              }
              
            } else {
-             out <- do.call(bind_rows, out_lst)
+             out <- do.call(rbind, out_lst)
              if (what != "data") {
                out <- switch(
                  x$ssm[[1]]$pm,
-                 rw = out %>% select(id, date, lon, lat, x, y, x.se, y.se),
-                 crw = out  %>% select(id, date, lon, lat, x, y, x.se, y.se, 
-                                       u, v, u.se, v.se, everything())
-               ) %>% as_tibble()
+                 rw = {
+                   out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                   },
+                 crw = {
+                   if(all(c("s","s.se") %in% names(out))) {
+                     out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
+                             "y.se", "u", "v", "u.se", "v.se", "s", "s.se")]
+                   } else {
+                     out[, c("id", "date", "lon", "lat", "x", "y", 
+                             "x.se", "y.se", "u", "v", "u.se", "v.se")]
+                   }
+                 })
+               out <- as_tibble(out)
              } else {
-               out <- out %>%
-                 select(id,
-                        date,
-                        lc,
-                        lon,
-                        lat,
-                        smaj,
-                        smin,
-                        eor,
-                        obs.type,
-                        keep,
-                        x,
-                        y,
-                        emf.x,
-                        emf.y) %>%
-                 as_tibble()
+               out <- out[, c("id", "date", "lc", "lon", "lat", 
+                              "smaj", "smin", "eor", "obs.type", "keep", 
+                              "x", "y", "emf.x", "emf.y")]
+               out <- as_tibble(out)
              }
            }
          },
@@ -155,16 +144,13 @@ grab <- function(x, what = "fitted", as_sf = TRUE) {
            }
 
            out <- lapply(x$mpm, function(.) {
-             x <-
-               switch(
-                 what,
-                 fitted = .$fitted,
-                 data = .$data
-               )
-             }) %>% do.call(rbind, .)
+             x <- switch(what, fitted = .$fitted, data = .$data)
+             }) 
+           out <- do.call(rbind, out)
+           out <- as_tibble(out)
          }
          )
       
-  return(out)       
+  return(out)
 
 }

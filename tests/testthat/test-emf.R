@@ -3,7 +3,7 @@ context("test emf")
 ## emf builds a suitable data.frame for use in fit_ssm call
 data(ellie)
 
-test_that("p has s3 classes `fG_ssmp`, `sf`, `data.frame`", {
+test_that("f has s3 classes `fG_ssmp`, `sf`, `data.frame`", {
   f <- fit_ssm(ellie, vmax=5, model = "rw", time.step = 48, 
                control = ssm_control(optim = "nlminb", 
                                      verbose = 0), 

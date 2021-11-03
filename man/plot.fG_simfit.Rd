@@ -4,14 +4,31 @@
 \alias{plot.fG_simfit}
 \title{plot}
 \usage{
-\method{plot}{fG_simfit}(x, ncol = 1, pal = "Zissou1", ...)
+\method{plot}{fG_simfit}(
+  x,
+  type = c("lines", "points", "both"),
+  zoom = FALSE,
+  or = NULL,
+  ncol = 1,
+  pal = "Zissou1",
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{fG_simfit}}
 
+\item{type}{plots tracks as "line", "points" or "both" (default).}
+
+\item{zoom}{logical; should map extent be defined by track extent (TRUE) or
+should global map be drawn (FALSE; default).}
+
+\item{or}{orientation of projected map, default is to centre on
+start of fitted track (ignored if \code{mapproj} package is not installed).}
+
 \item{ncol}{number of columns to arrange multiple plots}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type
+\code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -22,11 +39,8 @@ Plots of simulated tracks.
 visualize tracks simulated from a foieGras model fit
 }
 \examples{
-## generate a fG_ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "crw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
-
-trs <- simfit(xs, what = "p", reps = 1)
-plot(trs, ncol = 2)
+fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
+trs <- simfit(fit, what = "p", reps = 2)
+plot(trs, type = "b")
 
 }

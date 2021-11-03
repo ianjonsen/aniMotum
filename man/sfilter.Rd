@@ -8,7 +8,6 @@ sfilter(
   x,
   model = c("rw", "crw"),
   time.step = 6,
-  scale = FALSE,
   parameters = NULL,
   map = NULL,
   fit.to.subset = TRUE,
@@ -25,8 +24,6 @@ sfilter(
 Alternatively, a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates.}
 
-\item{scale}{scale location data for more efficient optimization.}
-
 \item{parameters}{a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specify these. Only play with
 this if you know what you are doing...}
@@ -41,13 +38,13 @@ this if you know what you are doing...}
 \item{inner.control}{list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
 
-\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
+\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
 
-\item{optim}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
+\item{optim}{is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
 
-\item{optMeth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
+\item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
 
-\item{lpsi}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
+\item{lpsi}{is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details}
 }
 \description{
 generates initial values for model parameters and unobserved states;

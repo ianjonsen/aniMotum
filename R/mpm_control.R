@@ -32,7 +32,6 @@
 ##'   \item{\code{verbose}}{level of tracing information to be reported}
 ##'   \item{\code{control}}{list of control parameters for the optimizer}
 ##' @seealso \code{\link{nlminb}}, \code{\link{optim}}.
-##' @importFrom assertthat assert_that
 ##' @export
 
 mpm_control <-
@@ -53,12 +52,12 @@ mpm_control <-
     if ((!is.null(lower) | !is.null(upper)) & (length(lower) > 2 | length(upper) > 2))
       stop("\nthe number of parameters must be <= 2")
     
-    assert_that(optim %in% c("nlminb", "optim"),
-                msg = "optimiser can only be either `nlminb` or `optim`")
-    assert_that(method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"),
-                msg = "optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
-    assert_that((is.numeric(verbose) & verbose %in% c(0,1,2)),
-                msg = "verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
+    if(!optim %in% c("nlminb", "optim")) 
+      stop("optimiser can only be either `nlminb` or `optim`")
+    if(!method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent")) 
+      stop("optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
+    if(!(is.numeric(verbose) & verbose %in% c(0,1,2))) 
+      stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
     
     dots <- list(...)
     

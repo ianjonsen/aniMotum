@@ -25,9 +25,9 @@
 ##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
-##' @importFrom dplyr summarise "%>%" group_by mutate
+##' @importFrom dplyr group_by summarise
 ##' @importFrom grDevices hcl.colors
-##' @importFrom assertthat assert_that
+##' @importFrom rnaturalearth ne_countries
 ##' @export
 
 fmap <- function(x,
@@ -49,8 +49,9 @@ fmap <- function(x,
   
   what <- match.arg(what)
 
-  assert_that(inherits(x, "fG_ssm"), msg = "x must be a foieGras ssm fit object with class `fG_ssm`")
-  if(!inherits(y, "fG_mpm") & !is.null(y)) stop("y must either be NULL or a foieGras mpm fit object with class `fG_mpm`")
+  if(!inherits(x, "fG_ssm")) stop("x must be a foieGras ssm fit object with class `fG_ssm`")
+  if(!inherits(y, "fG_mpm") & !is.null(y)) 
+    stop("y must either be NULL or a foieGras mpm fit object with class `fG_mpm`")
   
   if(inherits(x, "fG_ssm")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
@@ -59,9 +60,10 @@ fmap <- function(x,
         ## increase geom_point size if left at default and y is supplied
         if(size[1] == 0.25) size[1] <- 1
         sf_locs <- try(join(x, y, what.ssm = what), silent = TRUE)
-        if(inherits(sf_locs, "try-error")) stop("number of rows in ssm object do not match the number of rows in mpm object, try modifying the `what` argument")
+        if(inherits(sf_locs, "try-error")) 
+          stop("number of rows in ssm object do not match the number of rows in mpm object, try modifying the `what` argument")
       } else {
-        sf_locs <- grab(x, what=what)
+        sf_locs <- grab(x, what=what, as_sf = TRUE)
         if(conf) locs <- grab(x, what = what, as_sf = FALSE)
       }
       
@@ -80,9 +82,9 @@ fmap <- function(x,
       lapply(conf, function(x) st_polygon(list(x))) %>%
         st_multipolygon()
     })
-    sf_conf <- st_as_sfc(conf_poly) %>%
-      st_as_sf(crs = st_crs(sf_locs)) %>%
-      mutate(id = unique(locs$id))
+    sf_conf <- st_as_sfc(conf_poly)
+    sf_conf <- st_as_sf(sf_conf, crs = st_crs(sf_locs))
+    sf_conf$id <- unique(locs$id) 
     ## dissolve individual polygons where they overlap one another
     sf_conf <- st_union(sf_conf, by_feature = TRUE) 
     }
@@ -91,7 +93,7 @@ fmap <- function(x,
   else {
     prj <- crs
     if(!is.character(prj)) stop("\ncrs must be a proj4string, 
-                                \neg. `+proj=stere +lat_0=-90 +lon_0=0 +ellps=WGS84 +units=km +no_defs`")
+                                \neg. `+proj=stere +lat_0=-90 +lon_0=0 +datum=WGS84 +units=km +no_defs`")
     
     if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
       cat("\nconverting units from m to km to match SSM output")
@@ -102,8 +104,7 @@ fmap <- function(x,
   }
   
   if (obs) {
-    sf_data <- grab(x, "data") %>%
-      st_transform(., crs = prj)
+    sf_data <- st_transform(grab(x, "data", as_sf = TRUE), crs = prj)
     bounds <- st_bbox(sf_data)
   } else {
     bounds <- st_bbox(sf_locs)
@@ -113,18 +114,22 @@ fmap <- function(x,
   bounds[c("ymin","ymax")] <- extendrange(bounds[c("ymin","ymax")], f = ext.rng[2])
 
   if(lines) {
-   sf_lines <- sf_locs %>%
-     group_by(id) %>%
-     summarise(do_union = FALSE) %>%
-     st_cast("MULTILINESTRING")
+   sf_lines <- group_by(sf_locs, id) 
+   sf_lines <- summarise(sf_lines, do_union = FALSE)
+   sf_lines <- st_cast(sf_lines, "MULTILINESTRING")
   } 
 
-  ## get coastline
-  coast <- sf::st_as_sf(rworldmap::countriesLow) %>%
-    st_transform(crs = prj)
+  ## get worldmap
+  if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
+    wm <- ne_countries(scale = 50, returnclass = "sf")
+    wm <- st_transform(wm, crs = prj)
+  } else {
+    wm <- ne_countries(scale = 110, returnclass = "sf")
+    wm <- st_transform(wm, crs = prj)
+  }
   
   p <- ggplot() +
-    geom_sf(data = coast,
+    geom_sf(data = wm,
             fill = landfill,
             lwd=0) +
     xlim(bounds[c("xmin","xmax")]) +
@@ -135,7 +140,14 @@ fmap <- function(x,
       cat(paste0("geom size not specified for observations, using 'size = c(", size, ", 0.8)'"))
       size <- c(size, 0.8)
     }
-    p <- p + geom_sf(data = sf_data, colour = col, size = size[2], shape = obs.shp, alpha = 0.75)
+    p <-
+      p + geom_sf(
+        data = sf_data,
+        colour = col,
+        size = size[2],
+        shape = obs.shp,
+        alpha = 0.75
+      )
     
   }
 
@@ -219,7 +231,8 @@ fmap <- function(x,
     ##FIXME:: but don't dissolve them with st_union, otherwise colouring by date won't work...
     if(is.null(y)) {
     if(by.date) {
-      lab_dates <- with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
+      lab_dates <-
+        with(sf_locs, pretty(seq(min(date), max(date), l = 5))) %>% as.Date()
     }
 
     if(conf & !by.date) {
