@@ -1,2 +1,8 @@
+title: foieGras
 url: https://ianjonsen.github.io/foieGras
+template:
+  params:
+    bootswatch: cosmo
+
+
 
