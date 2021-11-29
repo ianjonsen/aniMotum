@@ -13,20 +13,22 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Coverage
 status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
-[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
-[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
+[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
+[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
 master branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 
-staging branch:  
+staging branch:
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging)
 
 dev branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
+
+<centre> ![foieGras logo](inst/logo/foieGras_logo.png) </centre>
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
 in state-space form to filter Argos (or GLS) satellite location data.
@@ -55,8 +57,7 @@ R.Version()
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras/)
 and can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies =
-c("Imports","LinkingTo","Suggests"))`
+`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
 
 ### From GitHub (source)
 
@@ -68,9 +69,17 @@ Xcode](https://developer.apple.com/download/more/) by executing
 `xcode-select --install` in the terminal; or you can download the latest
 version from the URL (free developer registration may be required). A
 full Xcode install uses up a lot of disk space and is not required.
+Also, ensure you have a suitable Gnu Fortran compiler installed (e.g.,
+<https://github.com/fxcoudert/gfortran-for-macOS/releases>).
 
 To get the very latest `foieGras` stable version, you can install from
 GitHub:
+
+``` r
+remotes::install_github("ianjonsen/foieGras@staging")
+```
+
+Or, for a more thoroughly tested earlier version:
 
 ``` r
 remotes::install_github("ianjonsen/foieGras")
@@ -101,7 +110,6 @@ plot(fmp, pages = 1, ncol = 3, pal = "Zissou1", rev = TRUE)
 ![](man/figures/README-example-1.png)<!-- -->
 
 ``` r
-
 fmap(fit, fmp, what = "predicted", pal = "Cividis")
 ```
 
