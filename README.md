@@ -28,9 +28,9 @@ dev branch:
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-<center> 
-![foieGras logo](inst/logo/foieGras_logo.png) 
-</center>
+<p align="center">
+  <img src="inst/logo/foieGras_logo.png" width="200">
+</p>
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
 in state-space form to filter Argos (or GLS) satellite location data.
