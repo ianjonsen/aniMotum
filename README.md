@@ -21,14 +21,16 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 master branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 
-staging branch:
+staging branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging)
 
 dev branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-<centre> ![foieGras logo](inst/logo/foieGras_logo.png) </centre>
+<center> 
+![foieGras logo](inst/logo/foieGras_logo.png) 
+</center>
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
 in state-space form to filter Argos (or GLS) satellite location data.
