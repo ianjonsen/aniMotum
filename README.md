@@ -29,7 +29,7 @@ dev branch:
 <!-- badges: end -->
 
 <p align="center">
-  <img src="inst/logo/foieGras_logo.png" width="300">
+  <img src="inst/logo/foieGras_logo.png" width="320">
 </p>
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
