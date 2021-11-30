@@ -1,0 +1,21 @@
+{
+    "args": [
+        "-I/Library/Developer/CommandLineTools/usr/lib/clang/12.0.5/include",
+        "-I/usr/local/include",
+        "-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1",
+        "-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include",
+        "-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
+        "-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/TMB/include",
+        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include",
+        "-std=gnu++11",
+        "-I/Library/Frameworks/R.framework/Resources/include",
+        "-DNDEBUG",
+        "-I/usr/local/include",
+        "-fPIC"
+    ],
+    "pch": "RcppEigen",
+    "is_cpp": true,
+    "hash": "163594269916197256311619725631",
+    "compiler": "7796801286636747193"
+}

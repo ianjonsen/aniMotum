@@ -1,0 +1,77 @@
+[
+    {
+        "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/crw.hpp",
+        "file_last_write": 1638028450.0,
+        "definitions": [
+            {
+                "usr": "c:@FT@>1#Tcrw#*I#t0.0#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "crw(int *)",
+                "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/crw.hpp",
+                "line": 12,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/joint_mpm.hpp",
+        "file_last_write": 1638028450.0,
+        "definitions": [
+            {
+                "usr": "c:@FT@>1#Tjoint_mpm#*I#t0.0#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "joint_mpm(int *)",
+                "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/joint_mpm.hpp",
+                "line": 10,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/mpm.hpp",
+        "file_last_write": 1638028450.0,
+        "definitions": [
+            {
+                "usr": "c:@FT@>1#Tmpm#*I#t0.0#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "mpm(int *)",
+                "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/mpm.hpp",
+                "line": 10,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/rw.hpp",
+        "file_last_write": 1638028450.0,
+        "definitions": [
+            {
+                "usr": "c:@FT@>1#Trw#*I#t0.0#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "rw(int *)",
+                "file": "/Users/jonsen/R/repos/foieGras/src/TMB/sub/rw.hpp",
+                "line": 12,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/Users/jonsen/R/repos/foieGras/src/foieGras.cpp",
+        "file_last_write": 1638028450.0,
+        "definitions": [
+            {
+                "usr": "c:@ST>1#T@objective_function@F@operator()#",
+                "kind": 7,
+                "parent_name": "objective_function<Type>",
+                "name": "operator()",
+                "file": "/Users/jonsen/R/repos/foieGras/src/foieGras.cpp",
+                "line": 9,
+                "column": 32
+            }
+        ]
+    }
+]
