@@ -4,3 +4,4 @@ template:
   params:
     bootswatch: cosmo
 
+destination: docs
