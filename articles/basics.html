@@ -159,20 +159,20 @@
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2021-12-01 14:03:25 GL 100.0 -55 0.1742107 2.5468660</span>
-<span class="co">#&gt; 2 54632 2021-12-02 02:03:25 GL 100.5 -54 0.4904578 0.8292773</span>
-<span class="co">#&gt; 3 54632 2021-12-02 14:03:25 GL 101.0 -53 0.3892676 2.7681564</span>
-<span class="co">#&gt; 4 54632 2021-12-03 02:03:25 GL 101.5 -52 0.7300176 2.4735646</span>
-<span class="co">#&gt; 5 54632 2021-12-03 14:03:25 GL 102.0 -51 0.2246991 2.6758962</span></code></pre>
+<span class="co">#&gt; 1 54632 2021-12-01 14:12:36 GL 100.0 -55 0.7180749 1.4246566</span>
+<span class="co">#&gt; 2 54632 2021-12-02 02:12:36 GL 100.5 -54 0.2266925 3.1140291</span>
+<span class="co">#&gt; 3 54632 2021-12-02 14:12:36 GL 101.0 -53 0.8249510 0.5303182</span>
+<span class="co">#&gt; 4 54632 2021-12-03 02:12:36 GL 101.5 -52 1.5234878 1.1418542</span>
+<span class="co">#&gt; 5 54632 2021-12-03 14:12:36 GL 102.0 -51 0.2261350 3.0444530</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2021-12-01 14:03:25  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2021-12-01 15:03:25  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2021-12-01 16:03:25  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2021-12-01 17:03:25  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2021-12-01 18:03:25  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2021-12-01 14:12:36  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2021-12-01 15:12:36  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2021-12-01 16:12:36  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2021-12-01 17:12:36  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2021-12-01 18:12:36  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
