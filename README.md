@@ -124,6 +124,14 @@ ggdraw() +
 
 ![](man/figures/README-example-2.png)<!-- -->
 
+Southern elephant seal silhouettes kindly provided by:  
+- female southern elephant seal, Sophia Volzke
+(\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
+Tasmania)  
+- male southern elephant seal, Anton Van de Putte
+(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
+de Bruxelles)
+
 ## What to do if you encounter a problem
 
 If you are convinced you have encountered a bug or
@@ -156,3 +164,44 @@ Please note that the foieGras project is released with a [Contributor
 Code of
 Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
+
+## Acknowledgements
+
+Development of this R package was funded by a consortium of partners
+including: Macquarie University; the US Office of Naval Research (ONR
+Marine Mammal Biology; grant N00014-18-1-2405); Australia’s Integrated
+Marine Observing System (IMOS); Canada’s Ocean Tracking Network (OTN);
+Taronga Conservation Society; Birds Canada; and Innovasea/Vemco.
+Additional support was provided by France’s Centre de Synthèse et
+d’Analyse sur la Biodiversite, part of the Fondation pour la Recherche
+sur la Biodiversité.
+
+Example southern elephant seal data included in the package were sourced
+from the IMOS Animal Tracking Facility. IMOS is a national collaborative
+research infrastructure, supported by the Australian Government and
+operated by a consortium of institutions as an unincorporated joint
+venture, with the University of Tasmania as Lead Agent. IMOS supported
+elephant seal fieldwork on Iles Kerguelen conducted as part of the IPEV
+program No 109 (PI H. Weimerskirch) and the SNO-MEMO program (PI C.
+Guinet). SMRU SRDL-CTD tags were partly funded by CNES-TOSCA and IMOS.
+All tagging procedures were approved and executed under University of
+Tasmania Animal Ethics Committee guidelines.
+
+Animal silhouettes used in the `foieGras` logo were obtained and
+modified from sources:  
+- male southern elephant seal, Anton Van de Putte
+(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
+de Bruxelles)  
+- female southern elephant seal, Sophia Volzke
+(\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
+Tasmania)  
+- humpback whale, Chris Huh via [Phylopic.org](http://phylopic.org)
+Creative Commons Attribution-ShareAlike 3.0 Unported  
+- mallard duck, Maija Karala via [Phylopic.org](http://phylopic.org)
+Creative Commons Attribution-ShareAlike 3.0 Unported  
+- leatherback turtle, James R. Spotila & Ray Chatterji via
+[Phylopic.org](http://phylopic.org) Public Domain Dedication 1.0  
+- white shark, Margo Michaud via [Phylopic.org](http://phylopic.org)
+Public Domain Dedication 1.0  
+- king penguin, Steven Traver via [Phylopic.org](http://phylopic.org)
+Public Domain Dedication 1.0
