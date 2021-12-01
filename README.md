@@ -28,9 +28,7 @@ dev branch:
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-<center>
-![foieGras logo](inst/logo/foieGras_logo.png "fig:")
-</center>
+<img src="inst/logo/foieGras_logo.png" width="35%" style="display: block; margin: auto;" />
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
 in state-space form to filter Argos (or GLS) satellite location data.
@@ -110,7 +108,7 @@ fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(ve
 plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ```
 
-![](man/figures/README-example-1.png)<!-- -->
+<img src="man/figures/README-example-1.png" width="100%" />
 
 ``` r
 m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
@@ -122,7 +120,7 @@ ggdraw() +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-![](man/figures/README-example-2.png)<!-- -->
+<img src="man/figures/README-example-2.png" width="100%" />
 
 Southern elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke
@@ -189,12 +187,9 @@ Tasmania Animal Ethics Committee guidelines.
 
 Animal silhouettes used in the `foieGras` logo were obtained and
 modified from sources:  
-- male southern elephant seal, Anton Van de Putte
+- southern elephant seal, Anton Van de Putte
 (\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
 de Bruxelles)  
-- female southern elephant seal, Sophia Volzke
-(\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
-Tasmania)  
 - humpback whale, Chris Huh via [Phylopic.org](http://phylopic.org)
 Creative Commons Attribution-ShareAlike 3.0 Unported  
 - mallard duck, Maija Karala via [Phylopic.org](http://phylopic.org)

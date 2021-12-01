@@ -1,11 +1,11 @@
-require(ggplot2)
-require(foieGras)
-require(dplyr)
-require(sf)
-require(hexSticker)
-require(cowplot)
+require(ggplot2, quietly = TRUE)
+require(foieGras, quietly = TRUE)
+require(dplyr, quietly = TRUE)
+require(sf, quietly = TRUE)
+require(hexSticker, quietly = TRUE)
+require(cowplot, quietly = TRUE)
 
-fit <- fit_ssm(sese, #%>% filter(id %in% c("ct109-186-14","ct36-E-09","ct36-F-09")),
+fit <- fit_ssm(sese,
                model = "crw",
                time.step = 24,
                control = ssm_control(verbose = 0))
@@ -36,7 +36,6 @@ m <- ggplot() +
   theme(legend.position = "none",
         panel.grid.major = element_line(size=0.05),
         panel.grid.minor = element_line(size=0.05),
-        #axis.text = element_text(colour = "white"))
         axis.text = element_blank())
 
 m1 <- ggdraw() +
@@ -48,20 +47,23 @@ m1 <- ggdraw() +
   draw_image("inst/logo/img/madu1.png",  x = 0.53, y = 1.1, scale=0.075, hjust=0.5, vjust=0.5) +
   draw_plot(m)
 
-sticker(m1, package="foieGras", 
-        p_size=18, 
-        p_y=1.6, 
-        p_family = "sans",
-        p_color = "#C4B56CFF",
-        h_color = "white",
-        s_x=0.945, 
-        s_y=0.725, 
-        s_width=1.85, 
-        s_height=1.85,
-        h_fill =  "#045a8d", 
-        spotlight = FALSE,
-        l_x=0.94,
-        l_y=1.08,
-        l_width=2,
-        filename="inst/logo/foieGras_logo.png")
+s <- sticker(
+  m1,
+  package = "foieGras",
+  p_size = 18,
+  p_y = 1.6,
+  p_family = "sans",
+  p_color = "#C4B56CFF",
+  h_color = "white",
+  s_x = 0.945,
+  s_y = 0.725,
+  s_width = 1.85,
+  s_height = 1.85,
+  h_fill =  "#045a8d",
+  spotlight = FALSE,
+  l_x = 0.94,
+  l_y = 1.08,
+  l_width = 2,
+  filename = "inst/logo/foieGras_logo.png"
+)
 
