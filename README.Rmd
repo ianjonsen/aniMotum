@@ -34,8 +34,9 @@ dev branch:
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-```{r logo, echo=FALSE, message=FALSE, fig.dim=c(1.5,1.5), fig.align='center', out.width="35%"}
-knitr::include_graphics("inst/logo/foieGras_logo.png")
+```{r logo, echo=FALSE, message=FALSE, fig.align='center', fig.dim=c(7,7)}
+source("inst/logo/create_logo.R")
+plot(s)
 ```
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (`TMB`) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.
@@ -71,7 +72,7 @@ Note: there can be issues getting compilers to work properly, especially on a Ma
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here's an example showing how to quality-control Argos tracking data, and infer a behavioural index along the estimated animal tracks:
-```{r example, message=FALSE, fig.dim=c(9,5), out.width="100%"}
+```{r example1, eval=FALSE, message=FALSE}
 library(tidyverse)
 library(foieGras)
 library(cowplot)
@@ -81,7 +82,24 @@ fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_contr
 fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
 
 plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
+```
 
+```{r render ex plots1, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
+
+plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
+```
+
+```{r example2, eval=FALSE, message=FALSE}
+m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
+
+## using cowplot to add southern elephant seal silhouettes to map
+ggdraw() +
+  draw_plot(m) +
+  draw_image("inst/logo/img/sese_female_orig.png",  x=0.175, y=0.85, scale=0.175, hjust=0.5, vjust=0.5) +
+  draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
+```
+
+```{r render ex plots2, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
 m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
 
 ## using cowplot to add southern elephant seal silhouettes to map
