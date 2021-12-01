@@ -118,8 +118,7 @@ ggdraw() +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-<img src="man/figures/README-explots2-1.png" width="100%" />
-
+<img src="man/figures/README-explots2-1.png" width="100%" /> foo
 Southern elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke
 (\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
