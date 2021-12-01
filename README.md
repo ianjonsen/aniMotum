@@ -28,9 +28,6 @@ dev branch:
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-    #> Warning in par(new = TRUE, bg = "transparent"): calling par(new=TRUE) with no
-    #> plot
-
 <img src="man/figures/README-logo-1.png" style="display: block; margin: auto;" />
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
