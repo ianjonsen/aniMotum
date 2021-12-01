@@ -81,7 +81,7 @@ fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(ve
 plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ```
 
-```{r render ex plots1, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
+```{r explots1, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
 
 plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ```
@@ -96,7 +96,7 @@ ggdraw() +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-```{r render ex plots2, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
+```{r explots2, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
 m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
 
 ## using cowplot to add southern elephant seal silhouettes to map

@@ -106,7 +106,7 @@ fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(ve
 plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ```
 
-<img src="man/figures/README-render ex plots1-1.png" width="100%" />
+<img src="man/figures/README-explots1-1.png" width="100%" />
 
 ``` r
 m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
@@ -118,7 +118,7 @@ ggdraw() +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-<img src="man/figures/README-render ex plots2-1.png" width="100%" />
+<img src="man/figures/README-explots2-1.png" width="100%" />
 
 Southern elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke
