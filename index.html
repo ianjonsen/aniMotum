@@ -84,15 +84,13 @@
 <p>master branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master" alt="R-CMD-check"></p>
 <p>staging branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging" alt="R-CMD-check"></p>
 <p>dev branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev" alt="R-CMD-check"><!-- badges: end --></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#&gt; Warning in par(new = TRUE, bg = "transparent"): calling par(new=TRUE) with no</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; plot</span></span></code></pre></div>
 <p><img src="reference/figures/README-logo-1.png" style="display: block; margin: auto;"></p>
 <p><code>foieGras</code> is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (<code>TMB</code>) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>First, ensure you have R version &gt;= 3.6.0 installed (preferably R 4.0.0 or higher):</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Version.html" class="external-link">R.Version</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="section level3">
 <h3 id="from-cran">From CRAN<a class="anchor" aria-label="anchor" href="#from-cran"></a>
@@ -105,10 +103,10 @@
 <p>On PC’s running Windows, ensure you have installed <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a></p>
 <p>On Mac’s, ensure you have installed the <a href="https://developer.apple.com/download/more/" class="external-link">Command Line Tools for Xcode</a> by executing <code>xcode-select --install</code> in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed (e.g., <a href="https://github.com/fxcoudert/gfortran-for-macOS/releases" class="external-link uri">https://github.com/fxcoudert/gfortran-for-macOS/releases</a>).</p>
 <p>To get the very latest <code>foieGras</code> stable version, you can install from GitHub:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ianjonsen/foieGras@staging"</span><span class="op">)</span></code></pre></div>
 <p>Or, for a more thoroughly tested earlier version:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ianjonsen/foieGras"</span><span class="op">)</span></code></pre></div>
 <p>Note: there can be issues getting compilers to work properly, especially on a Mac with OS X 10.13.x or higher. If you encounter install and compile issues, I recommend you consult the excellent information on the <a href="https://github.com/glmmTMB/glmmTMB" class="external-link">glmmTMB</a> GitHub.</p>
 </div>
@@ -117,7 +115,7 @@
 <h2 id="basic-example">Basic example<a class="anchor" aria-label="anchor" href="#basic-example"></a>
 </h2>
 <p><code>foieGras</code> is intended to be as easy to use as possible. Here’s an example showing how to quality-control Argos tracking data, and infer a behavioural index along the estimated animal tracks:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span>
@@ -128,7 +126,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, pages <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">3</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-render%20ex%20plots1-1.png" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">fmp</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=69 +units=km +datum=WGS84"</span><span class="op">)</span>
 
 <span class="co">## using cowplot to add southern elephant seal silhouettes to map</span>
