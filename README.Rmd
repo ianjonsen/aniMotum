@@ -23,13 +23,10 @@ knitr::opts_chunk$set(
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
-
-master:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master) 
-staging:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging) 
-dev:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
+![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master) 
 <!-- badges: end -->
 
-```{r logo, echo=FALSE, message=FALSE, fig.align='center', fig.dim=c(6,6)}
+```{r logo, echo=FALSE, message=FALSE, fig.align='center'}
 source("inst/logo/create_logo.R")
 par(bg = "transparent")
 plot(s)
