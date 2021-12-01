@@ -115,14 +115,14 @@ plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ``` r
 m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
 
-## using cowplot to add southern elephant seal images to map
+## using cowplot to add southern elephant seal silhouettes to map
 ggdraw() +
-  draw_image("inst/logo/img/sese_male_orig.png",  x=-0.4, y=0.8, scale=0.275, hjust=0.5, vjust=0.5) +
-  draw_image("inst/logo/img/sese_female_orig.png",  x=0.7, y=0.4, scale=0.275, hjust=0.5, vjust=0.5)
+  draw_plot(m) +
+  draw_image("inst/logo/img/sese_female_orig.png",  x=0.175, y=0.85, scale=0.175, hjust=0.5, vjust=0.5) +
+  draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
 ![](man/figures/README-example-2.png)<!-- -->
-
 
 ## What to do if you encounter a problem
 
