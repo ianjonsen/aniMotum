@@ -36,7 +36,7 @@ dev branch:
 
 ```{r logo, echo=FALSE, message=FALSE, fig.align='center', fig.dim=c(7,7)}
 source("inst/logo/create_logo.R")
-par(bg = "transparent")
+par(bg = "black")
 plot(s)
 ```
 
