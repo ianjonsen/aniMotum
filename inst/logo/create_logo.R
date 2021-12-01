@@ -25,7 +25,6 @@ m <- ggplot() +
   geom_sf(data = pmp_lines, col = "#414D6BFF", linetype = 5, lwd=0.1) +
   geom_sf(data = pmp %>% filter(g > 0.4), aes(col = g), size=0.1) +
   geom_sf(data = pmp %>% filter(g <= 0.4), aes(col = g), size=0.1) +
-  geom_sf(data = wm, fill = grey(0.7), lwd=0) +
   scale_colour_viridis_c(option = "E") +
   coord_sf(xlim = extendrange(r=c(bb["xmin"]-1625, bb["xmax"]), f=0.01),
            ylim = extendrange(r=c(bb["ymin"], bb["ymax"]+150), f=0.01),
@@ -41,7 +40,7 @@ m <- ggplot() +
         axis.text = element_blank())
 
 m1 <- ggdraw() +
-  draw_image("inst/logo/img/sese_male_srdl2.png",  x=0.5, y=0.82, scale=0.275, hjust=0.5, vjust=0.5, interpolate=FALSE) +
+  draw_image("inst/logo/img/sese_male.png",  x=0.5, y=0.82, scale=0.275, hjust=0.5, vjust=0.5, interpolate=FALSE) +
   draw_image("inst/logo/img/huwh2.png",  x = 0.78, y = 0.78, scale=0.25, hjust=0.5, vjust=0.5) +
   draw_image("inst/logo/img/whsh2.png",  x = 0.27, y = 0.79, scale = 0.16, hjust=0.5, vjust=0.5) +
   draw_image("inst/logo/img/lbtu2.png", x = 0.9, y = 0.725, scale = 0.125, hjust=0.5, vjust=0.5) +
