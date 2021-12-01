@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -64,7 +60,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/ianjonsen/foieGras/">
+  <a href="https://github.com/ianjonsen/foieGras/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,7 +81,7 @@
       <h1 data-toc-skip>basics</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/master/vignettes/basics.Rmd"><code>vignettes/basics.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/vignettes/basics.Rmd" class="external-link"><code>vignettes/basics.Rmd</code></a></small>
       <div class="hidden name"><code>basics.Rmd</code></div>
 
     </div>
@@ -93,15 +89,15 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/foieGras/">foieGras</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: foieGras</span></code></pre></div>
-<div id="disclaimer" class="section level2">
-<h2 class="hasAnchor">
-<a href="#disclaimer" class="anchor"></a>Disclaimer</h2>
+<div class="section level2">
+<h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
+</h2>
 <p>this vignette is an extended set of examples to highlight <code>foieGras</code>’s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!</p>
-<div id="foiegras-models" class="section level3">
-<h3 class="hasAnchor">
-<a href="#foiegras-models" class="anchor"></a>foieGras models</h3>
+<div class="section level3">
+<h3 id="foiegras-models">foieGras models<a class="anchor" aria-label="anchor" href="#foiegras-models"></a>
+</h3>
 <p>this vignette provides a (very) brief overview of how to use <code>foieGras</code> to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). <code>foieGras</code> provides two state-space models (SSM’s) for filtering (ie. estimating “true” locations and associated movement model parameters, while accounting for error-prone observations):</p>
 <ul>
 <li>a simple Random Walk model, <code>rw</code>
@@ -109,88 +105,88 @@
 <li>a Correlated Random Walk model, <code>crw</code>
 </li>
 </ul>
-<p>both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.</p>
-<p>additionally, <code>foieGras</code> provides fast models (<code>mpm</code>, <code>jmpm</code>) for estimating a behavioural index along animals’ tracks (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/">Auger-Méthé et al. 2017</a> for an example of the latter.</p>
+<p>both models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7" class="external-link">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The Random Walk model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The Correlated Random Walk model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps.</p>
+<p>additionally, <code>foieGras</code> provides fast models (<code>mpm</code>, <code>jmpm</code>) for estimating a behavioural index along animals’ tracks (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566" class="external-link">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Now, both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/" class="external-link">Auger-Méthé et al. 2017</a> for an example of the latter.</p>
 </div>
-<div id="input-data" class="section level3">
-<h3 class="hasAnchor">
-<a href="#input-data" class="anchor"></a>input data</h3>
+<div class="section level3">
+<h3 id="input-data">input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+</h3>
 <p><code>foieGras</code> expects data to be provided in one of several possible formats.</p>
 <ol style="list-style-type: decimal">
 <li>a <code>data.frame</code> or <code>tibble</code> that looks like this</li>
 </ol>
-<pre><code>#&gt;      id                date lc      lon       lat  smaj smin eor
-#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42
-#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90
-#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266  5032  472  93
-#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622  4007  286 116
-#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743 13063  956  82
-#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</code></pre>
+<pre><code><span class="co">#&gt;      id                date lc      lon       lat  smaj smin eor</span>
+<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42</span>
+<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90</span>
+<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266  5032  472  93</span>
+<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622  4007  286 116</span>
+<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743 13063  956  82</span>
+<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</span></code></pre>
 <p>where the Argos data are provided via CLS Argos’ Kalman filter model (KF) and include error ellipse information for each observed location.</p>
 <ol start="2" style="list-style-type: decimal">
 <li>a <code>data.frame</code> or <code>tibble</code> that looks like this</li>
 </ol>
-<pre><code>#&gt;             id                date lc   lon    lat
-#&gt; 1 ct109-085-14 2015-02-03 00:11:02  B 70.45 -49.93
-#&gt; 2 ct109-085-14 2015-02-03 13:26:37  B 71.00 -50.21
-#&gt; 3 ct109-085-14 2015-02-03 21:53:15  B 71.31 -50.37
-#&gt; 4 ct109-085-14 2015-02-04 04:05:35  A 71.64 -50.43
-#&gt; 5 ct109-085-14 2015-02-04 17:12:42  B 72.04 -50.46
-#&gt; 6 ct109-085-14 2015-02-05 02:05:44  B 72.44 -50.47</code></pre>
+<pre><code><span class="co">#&gt;             id                date lc   lon    lat</span>
+<span class="co">#&gt; 1 ct109-085-14 2015-02-03 00:11:02  B 70.45 -49.93</span>
+<span class="co">#&gt; 2 ct109-085-14 2015-02-03 13:26:37  B 71.00 -50.21</span>
+<span class="co">#&gt; 3 ct109-085-14 2015-02-03 21:53:15  B 71.31 -50.37</span>
+<span class="co">#&gt; 4 ct109-085-14 2015-02-04 04:05:35  A 71.64 -50.43</span>
+<span class="co">#&gt; 5 ct109-085-14 2015-02-04 17:12:42  B 72.04 -50.46</span>
+<span class="co">#&gt; 6 ct109-085-14 2015-02-05 02:05:44  B 72.44 -50.47</span></code></pre>
 <p>where the Argos data are provided via CLS Argos’ Least-Squares model (LS) and do not include error ellipse information.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>a <code>data.frame</code> or <code>tibble</code> that includes observations with missing KF error ellipse information</li>
 </ol>
-<pre><code>#&gt;      id                date lc      lon       lat  smaj smin eor
-#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42
-#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90
-#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266    NA   NA  NA
-#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622    NA   NA  NA
-#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743    NA   NA  NA
-#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</code></pre>
+<pre><code><span class="co">#&gt;      id                date lc      lon       lat  smaj smin eor</span>
+<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42</span>
+<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90</span>
+<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266    NA   NA  NA</span>
+<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622    NA   NA  NA</span>
+<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743    NA   NA  NA</span>
+<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</span></code></pre>
 <p>in this situation, <code>foieGras</code> treats observations with missing error ellipse information as though they are LS-based observations.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>an <code>sf-tibble</code> where observations have any of the previous 3 structures and also include <code>CRS</code> information</li>
 </ol>
-<pre><code>#&gt;      id                date lc  smaj smin eor                   geometry
-#&gt; 1 54591 2012-03-05 05:09:33  1  2442  416  42 POINT (2430.943 -912.3109)
-#&gt; 2 54591 2012-03-06 04:55:14  0 49660  391  90  POINT (2437.96 -903.7763)
-#&gt; 3 54591 2012-03-07 04:23:10  A  5032  472  93 POINT (2429.753 -907.3739)
-#&gt; 4 54591 2012-03-07 21:23:06  A  4007  286 116 POINT (2437.367 -905.2335)
-#&gt; 5 54591 2012-03-09 04:27:49  B 13063  956  82 POINT (2426.138 -905.8045)
-#&gt; 6 54591 2012-03-10 00:10:41  A  5099  478  79 POINT (2431.234 -909.0692)</code></pre>
+<pre><code><span class="co">#&gt;      id                date lc  smaj smin eor                   geometry</span>
+<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1  2442  416  42 POINT (2430.943 -912.3109)</span>
+<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 49660  391  90  POINT (2437.96 -903.7763)</span>
+<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A  5032  472  93 POINT (2429.753 -907.3739)</span>
+<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A  4007  286 116 POINT (2437.367 -905.2335)</span>
+<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 13063  956  82 POINT (2426.138 -905.8045)</span>
+<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A  5099  478  79 POINT (2431.234 -909.0692)</span></code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
-<pre><code>#&gt;      id                date lc   lon lat     lonerr    laterr
-#&gt; 1 54632 2021-11-30 15:17:37 GL 100.0 -55 0.20435508 3.6497399
-#&gt; 2 54632 2021-12-01 03:17:37 GL 100.5 -54 0.80263889 0.7315551
-#&gt; 3 54632 2021-12-01 15:17:37 GL 101.0 -53 0.41776251 0.7526033
-#&gt; 4 54632 2021-12-02 03:17:37 GL 101.5 -52 0.11606058 0.6790833
-#&gt; 5 54632 2021-12-02 15:17:37 GL 102.0 -51 0.00721559 0.1061614</code></pre>
+<pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
+<span class="co">#&gt; 1 54632 2021-12-01 13:57:04 GL 100.0 -55 0.2335010 0.4404026</span>
+<span class="co">#&gt; 2 54632 2021-12-02 01:57:04 GL 100.5 -54 1.4318172 0.2768589</span>
+<span class="co">#&gt; 3 54632 2021-12-02 13:57:04 GL 101.0 -53 0.4286850 0.4690260</span>
+<span class="co">#&gt; 4 54632 2021-12-03 01:57:04 GL 101.5 -52 0.8564494 1.3092977</span>
+<span class="co">#&gt; 5 54632 2021-12-03 13:57:04 GL 102.0 -51 0.9046088 0.1605286</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
-<pre><code>#&gt;         id                date lc  lon   lat
-#&gt; 1 F02-B-17 2021-11-30 15:17:37  G 70.1 -49.2
-#&gt; 2 F02-B-17 2021-11-30 16:17:37  G 70.6 -48.2
-#&gt; 3 F02-B-17 2021-11-30 17:17:37  G 71.1 -47.2
-#&gt; 4 F02-B-17 2021-11-30 18:17:37  G 71.6 -46.2
-#&gt; 5 F02-B-17 2021-11-30 19:17:37  G 72.1 -45.2</code></pre>
+<pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
+<span class="co">#&gt; 1 F02-B-17 2021-12-01 13:57:04  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2021-12-01 14:57:04  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2021-12-01 15:57:04  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2021-12-01 16:57:04  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2021-12-01 17:57:04  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
-<pre><code>#&gt;         id                date lc  lon   lat  smaj smin eor
-#&gt; 1 F02-B-17 2017-09-17 05:20:00  G 70.1 -49.2    NA   NA  NA
-#&gt; 2 F02-B-17 2017-10-04 14:35:01  2 70.2 -49.1  1890   45  77
-#&gt; 3 F02-B-17 2017-10-05 04:03:25  G 70.1 -49.3    NA   NA  NA
-#&gt; 4 F02-B-17 2017-10-05 06:28:20  A 71.1 -48.7 28532 1723 101
-#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</code></pre>
+<pre><code><span class="co">#&gt;         id                date lc  lon   lat  smaj smin eor</span>
+<span class="co">#&gt; 1 F02-B-17 2017-09-17 05:20:00  G 70.1 -49.2    NA   NA  NA</span>
+<span class="co">#&gt; 2 F02-B-17 2017-10-04 14:35:01  2 70.2 -49.1  1890   45  77</span>
+<span class="co">#&gt; 3 F02-B-17 2017-10-05 04:03:25  G 70.1 -49.3    NA   NA  NA</span>
+<span class="co">#&gt; 4 F02-B-17 2017-10-05 06:28:20  A 71.1 -48.7 28532 1723 101</span>
+<span class="co">#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</span></code></pre>
 </div>
-<div id="fitting-a-foiegras-model" class="section level3">
-<h3 class="hasAnchor">
-<a href="#fitting-a-foiegras-model" class="anchor"></a>fitting a foieGras model</h3>
-<p>model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see <code><a href="../reference/fit_ssm.html">?foieGras::fit_ssm</a></code> for details), including applying the <code><a href="https://rdrr.io/pkg/trip/man/sda.html">trip::sda</a></code> filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an <code>sf</code> object,the prefilter guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the <code>fit_ssm</code> function:</p>
+<div class="section level3">
+<h3 id="fitting-a-foiegras-model">fitting a foieGras model<a class="anchor" aria-label="anchor" href="#fitting-a-foiegras-model"></a>
+</h3>
+<p>model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see <code><a href="../reference/fit_ssm.html">?foieGras::fit_ssm</a></code> for details), including applying the <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an <code>sf</code> object,the prefilter guesses at an appropriate projection (typically world mercator, EPSG 3395) to apply to the data. The SSM is then fit to this projected version of the data. Users invoke this process via the <code>fit_ssm</code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## prefilter and fit Random Walk SSM using a 24 h time step</span>
 <span class="va">fit</span> <span class="op">&lt;-</span>
@@ -205,15 +201,15 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## list fit outcomes for both seals</span>
 <span class="va">fit</span>
-<span class="co">#&gt; # A tibble: 1 × 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="co">#&gt;   id        ssm          converged pdHess pmodel</span>
-<span class="co">#&gt;   &lt;chr&gt;     &lt;named list&gt; &lt;lgl&gt;     &lt;lgl&gt;  &lt;chr&gt; </span>
-<span class="co">#&gt; 1 ct36-E-09 &lt;ssm [15]&gt;   TRUE      TRUE   rw</span></code></pre></div>
-<p>individual <code>id</code> is displayed in the 1st column, all fit output (<code>ssm</code>) in the 2nd column, <code>convergence</code> status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (<code>pdHess</code>) is displayed in the 4th column, and the specified process model (<code>rw</code> or <code>crw</code>) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer <code>time.step</code> or set <code>time.step = NA</code> to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If <code>pdHess = FALSE</code> persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by <code>prefilter</code> are present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html">glmmTMB troubleshooting vignette</a> may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via <code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see <code><a href="https://rdrr.io/r/stats/nlminb.html">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html">?optim</a></code> for details on optimization control parameters).</p>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;named list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   rw</span></code></pre></div>
+<p>individual <code>id</code> is displayed in the 1st column, all fit output (<code>ssm</code>) in the 2nd column, <code>convergence</code> status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain standard errors (<code>pdHess</code>) is displayed in the 4th column, and the specified process model (<code>rw</code> or <code>crw</code>) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors can often be calculated but not all. One possible solution is to try specifying a longer <code>time.step</code> or set <code>time.step = NA</code> to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If <code>pdHess = FALSE</code> persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by <code>prefilter</code> are present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html" class="external-link">glmmTMB troubleshooting vignette</a> may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via <code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">?optim</a></code> for details on optimization control parameters).</p>
 </div>
-<div id="accessing-and-visualizing-model-fit-objects" class="section level3">
-<h3 class="hasAnchor">
-<a href="#accessing-and-visualizing-model-fit-objects" class="anchor"></a>accessing and visualizing model fit objects</h3>
+<div class="section level3">
+<h3 id="accessing-and-visualizing-model-fit-objects">accessing and visualizing model fit objects<a class="anchor" aria-label="anchor" href="#accessing-and-visualizing-model-fit-objects"></a>
+</h3>
 <p>simple summary information about the fit can be obtained by calling the individual fit objects:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
@@ -240,33 +236,33 @@
 <p>a summary <code>plot</code> method allows a quick visual of the SSM fit to the data:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot time-series of the predicted values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">1</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">1</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="basics_files/figure-html/fit%20plot-1.png" width="576"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">2</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">2</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="basics_files/figure-html/fit%20plot-2.png" width="576"></p>
 <p>the predicted values (red) are the state estimates predicted at regular time intervals, specified by <code>time.step</code> (here every 24 h). These estimates are plotted on top of the observations that passed the <code>prefilter</code> stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - <code>plot(fit)</code>. A 2-D time series plot of the track is invoked by the argument <code>type = 2</code>.</p>
 <p>Assessing goodness-of-fit is an important component of any model fitting exercise. Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction residual, or one-step-ahead residual, provides a useful alternative - albeit more computationally demanding to calculate. In <code>foieGras</code>, prediction residuals from state-space model fits are calculated using the <code>osar</code> function and can be visualised as time-series plots, Q-Q plots, or autocorrelation functions:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
 <span class="co"># calculate &amp; plot residuals</span>
 <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
 
-<span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> 
-  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> 
+  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="basics_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
 <p>As calculation of these residuals is computationally demanding, especially for multiple individual tracks, the <code>osar</code> function is automatically implemented in parallel when calculating residuals for more than 2 tracks.</p>
 </div>
-<div id="inferring-behaviour" class="section level3">
-<h3 class="hasAnchor">
-<a href="#inferring-behaviour" class="anchor"></a>inferring behaviour</h3>
+<div class="section level3">
+<h3 id="inferring-behaviour">inferring behaviour<a class="anchor" aria-label="anchor" href="#inferring-behaviour"></a>
+</h3>
 <p>A behavioural index, movement persistence, can be estimated along SSM-fitted tracks by using the <code>fit_mpm</code> function. This index ranges continuously from 0, associated with frequent changes in direction and/or speed, to 1, associated with infrequent changes (persistence) in direction and/or speed. Here we use the <code>fG_ssm</code> fit object from earlier as data to estimate and visualise the time-varying movement persistence as a 1-D time-series and along an animal’s ssm-filtered track:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, model <span class="op">=</span> <span class="st">"mpm"</span>, control <span class="op">=</span> <span class="fu"><a href="../reference/mpm_control.html">mpm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fmp</span>, pages <span class="op">=</span> <span class="fl">1</span>, pal <span class="op">=</span> <span class="st">"Zissou1"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, pages <span class="op">=</span> <span class="fl">1</span>, pal <span class="op">=</span> <span class="st">"Zissou1"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fmp</span>, <span class="va">fit</span>, pages <span class="op">=</span> <span class="fl">1</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, <span class="va">fit</span>, pages <span class="op">=</span> <span class="fl">1</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>
@@ -282,11 +278,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
+  <p></p>
+<p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.0.</p>
 </div>
 
       </footer>
@@ -294,6 +292,8 @@
 
   
 
+
+  
 
   </body>
 </html>
