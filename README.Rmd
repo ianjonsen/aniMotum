@@ -24,20 +24,16 @@ knitr::opts_chunk$set(
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 
-master branch:  
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
-
-staging branch:  
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging)
-
-dev branch:  
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
+master:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master) 
+staging:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging) 
+dev:  ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
 
-```{r logo, echo=FALSE, message=FALSE, fig.align='center', fig.dim=c(7,7)}
+```{r logo, echo=FALSE, message=FALSE, fig.align='center', fig.dim=c(6,6)}
 source("inst/logo/create_logo.R")
 par(bg = "transparent")
 plot(s)
+#knitr::include_graphics("inst/logo/foieGras_logo.png")
 ```
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (`TMB`) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.
