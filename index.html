@@ -84,9 +84,7 @@
 <p>master branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master" alt="R-CMD-check"></p>
 <p>staging branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging" alt="R-CMD-check"></p>
 <p>dev branch:<br><img src="https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev" alt="R-CMD-check"><!-- badges: end --></p>
-<center>
-<img src="inst/logo/foieGras_logo.png" title="fig:fig:" alt="foieGras logo">
-</center>
+<p><img src="reference/figures/README-logo-1.png" style="display: block; margin: auto;"></p>
 <p><code>foieGras</code> is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (<code>TMB</code>) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -127,7 +125,7 @@
 <span class="va">fmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, model <span class="op">=</span> <span class="st">"jmpm"</span>, control <span class="op">=</span> <span class="fu"><a href="reference/mpm_control.html">mpm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, pages <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">3</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-example-1.png"><!-- --></p>
+<p><img src="reference/figures/README-render%20ex%20plots1-1.png" width="100%"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">fmp</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=69 +units=km +datum=WGS84"</span><span class="op">)</span>
 
@@ -136,7 +134,7 @@
   <span class="fu">draw_plot</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">draw_image</span><span class="op">(</span><span class="st">"inst/logo/img/sese_female_orig.png"</span>,  x<span class="op">=</span><span class="fl">0.175</span>, y<span class="op">=</span><span class="fl">0.85</span>, scale<span class="op">=</span><span class="fl">0.175</span>, hjust<span class="op">=</span><span class="fl">0.5</span>, vjust<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">draw_image</span><span class="op">(</span><span class="st">"inst/logo/img/sese_male_orig.png"</span>,  x<span class="op">=</span><span class="fl">0.85</span>, y<span class="op">=</span><span class="fl">0.45</span>, scale<span class="op">=</span><span class="fl">0.25</span>, hjust<span class="op">=</span><span class="fl">0.5</span>, vjust<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-example-2.png"><!-- --></p>
+<p><img src="reference/figures/README-render%20ex%20plots2-1.png" width="100%"></p>
 <p>Southern elephant seal silhouettes kindly provided by:<br>
 - female southern elephant seal, Sophia Volzke ([@SophiaVolzke](<a href="https://twitter.com/SophiaVolzke" class="external-link uri">https://twitter.com/SophiaVolzke</a>), University of Tasmania)<br>
 - male southern elephant seal, Anton Van de Putte ([@AntonArctica](<a href="https://twitter.com/Antonarctica" class="external-link uri">https://twitter.com/Antonarctica</a>), Université Libre de Bruxelles)</p>
@@ -162,8 +160,7 @@
 <p>Development of this R package was funded by a consortium of partners including: Macquarie University; the US Office of Naval Research (ONR Marine Mammal Biology; grant N00014-18-1-2405); Australia’s Integrated Marine Observing System (IMOS); Canada’s Ocean Tracking Network (OTN); Taronga Conservation Society; Birds Canada; and Innovasea/Vemco. Additional support was provided by France’s Centre de Synthèse et d’Analyse sur la Biodiversite, part of the Fondation pour la Recherche sur la Biodiversité.</p>
 <p>Example southern elephant seal data included in the package were sourced from the IMOS Animal Tracking Facility. IMOS is a national collaborative research infrastructure, supported by the Australian Government and operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent. IMOS supported elephant seal fieldwork on Iles Kerguelen conducted as part of the IPEV program No 109 (PI H. Weimerskirch) and the SNO-MEMO program (PI C. Guinet). SMRU SRDL-CTD tags were partly funded by CNES-TOSCA and IMOS. All tagging procedures were approved and executed under University of Tasmania Animal Ethics Committee guidelines.</p>
 <p>Animal silhouettes used in the <code>foieGras</code> logo were obtained and modified from sources:<br>
-- male southern elephant seal, Anton Van de Putte ([@AntonArctica](<a href="https://twitter.com/Antonarctica" class="external-link uri">https://twitter.com/Antonarctica</a>), Université Libre de Bruxelles)<br>
-- female southern elephant seal, Sophia Volzke ([@SophiaVolzke](<a href="https://twitter.com/SophiaVolzke" class="external-link uri">https://twitter.com/SophiaVolzke</a>), University of Tasmania)<br>
+- southern elephant seal, Anton Van de Putte ([@AntonArctica](<a href="https://twitter.com/Antonarctica" class="external-link uri">https://twitter.com/Antonarctica</a>), Université Libre de Bruxelles)<br>
 - humpback whale, Chris Huh via <a href="http://phylopic.org" class="external-link">Phylopic.org</a> Creative Commons Attribution-ShareAlike 3.0 Unported<br>
 - mallard duck, Maija Karala via <a href="http://phylopic.org" class="external-link">Phylopic.org</a> Creative Commons Attribution-ShareAlike 3.0 Unported<br>
 - leatherback turtle, James R. Spotila &amp; Ray Chatterji via <a href="http://phylopic.org" class="external-link">Phylopic.org</a> Public Domain Dedication 1.0<br>
