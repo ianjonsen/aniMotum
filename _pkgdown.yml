@@ -5,3 +5,15 @@ template:
     bootswatch: cosmo
 
 destination: docs
+
+navbar:
+  title: "foieGras"
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Vignettes"
+      href: articles/index.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: "News"
+      href: news/index.html
