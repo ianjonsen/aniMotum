@@ -11,7 +11,7 @@
   pages = 0,
   ncol = 1,
   ask = TRUE,
-  pal = "Zissou1",
+  pal = "Cividis",
   rev = FALSE,
   ...
 )
@@ -30,7 +30,7 @@ otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendere
 
 \item{ask}{logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+\item{pal}{\code{hcl.colors} palette to use (default: "Cividis"; type \code{hcl.pals()} for options)}
 
 \item{rev}{reverse colour palette (logical)}
 

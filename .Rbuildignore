@@ -20,3 +20,5 @@
 ^pkgdown$
 ^inst\/logo$
 ^foieGras\_logo\.png$
+^rosm\.cache$
+

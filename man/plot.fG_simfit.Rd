@@ -10,7 +10,7 @@
   zoom = FALSE,
   or = NULL,
   ncol = 1,
-  pal = "Zissou1",
+  pal = "Viridis",
   ...
 )
 }
@@ -27,7 +27,7 @@ start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type
+\item{pal}{\code{hcl.colors} palette to use (default: "Viridis"; type
 \code{hcl.pals()} for options)}
 
 \item{...}{additional arguments to be ignored}
