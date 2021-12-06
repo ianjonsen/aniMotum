@@ -25,13 +25,13 @@
 ##' locations (default = FALSE)
 ##' @param landfill colour to use for land (default = grey(0.6))
 ##' @param map_type background map type (default = NULL, which uses rnaturalearth 
-##' to add landmasses); if \link{ggspatial} &  \link{rosm} are installed then any map type 
-##' returned by \link{rosm::osm.types} can be used for a more detailed map 
-##' background.
-##' @param pal \code{hcl.colors} palette to use (default: "Cividis"; type 
-##' \code{hcl.pals()} for options)
+##' to add landmasses); if packages \code{ggspatial} & \code{rosm} are installed 
+##' then any map type returned by [rosm::osm.types] can be used for a more 
+##' detailed map background.
+##' @param pal [hcl.colors] palette to use (default: "Cividis"; type 
+##' [hcl.pals()] for options)
 ##' @param rev reverse colour palette (logical)
-##' @param ... additional arguments passed to \link{ggspatial::annotation_map_tile}
+##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
@@ -157,8 +157,11 @@ fmap <- function(x,
 #      ylim(bounds[c("ymin", "ymax")])
     
   } else {
-    p <- ggplot() +
-      ggspatial::annotation_map_tile(type = map_type, ...)
+    if (requireNamespace("ggspatial", quietly = TRUE) &
+        requireNamespace("rosm", quietly = TRUE)) {
+      p <- ggplot() +
+        ggspatial::annotation_map_tile(type = map_type, ...)
+    }
   }
 
   if(obs) {

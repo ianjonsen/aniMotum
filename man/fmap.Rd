@@ -60,16 +60,16 @@ locations (default = FALSE)}
 \item{landfill}{colour to use for land (default = grey(0.6))}
 
 \item{map_type}{background map type (default = NULL, which uses rnaturalearth
-to add landmasses); if \link{ggspatial} &  \link{rosm} are installed then any map type
-returned by \link{rosm::osm.types} can be used for a more detailed map
-background.}
+to add landmasses); if packages \code{ggspatial} & \code{rosm} are installed
+then any map type returned by \link[rosm:osm.types]{rosm::osm.types} can be used for a more
+detailed map background.}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Cividis"; type
-\code{hcl.pals()} for options)}
+\item{pal}{\link{hcl.colors} palette to use (default: "Cividis"; type
+\code{\link[=hcl.pals]{hcl.pals()}} for options)}
 
 \item{rev}{reverse colour palette (logical)}
 
-\item{...}{additional arguments passed to \link{ggspatial::annotation_map_tile}}
+\item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }
 \description{
 map foieGras fitted or predicted locations, with or without
