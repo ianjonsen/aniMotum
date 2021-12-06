@@ -1,3 +1,8 @@
+# foieGras 1.0.0 (sometime soon)
+* adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile`
+* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument
+*
+
 # foieGras 0.7-5 (23/04/2021)
 
 * adds `sim()` to simulate animal tracks using the `rw`, `crw` or `mpm` process models. The `rw` and `crw` models can also be specified with state-switching between multiple behavioural states. Tracks can be simulated with or without Argos (LS or KF) errors, as time-regular or time-irregular
