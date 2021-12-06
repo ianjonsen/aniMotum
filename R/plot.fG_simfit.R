@@ -9,7 +9,7 @@
 ##' @param or orientation of projected map, default is to centre on 
 ##' start of fitted track (ignored if \code{mapproj} package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
-##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type 
+##' @param pal \code{hcl.colors} palette to use (default: "Viridis"; type 
 ##' \code{hcl.pals()} for options)
 ##' @param ... additional arguments to be ignored
 ##' 
@@ -36,7 +36,7 @@ plot.fG_simfit <- function(x,
                            zoom = FALSE,
                            or = NULL,
                            ncol = 1,
-                           pal = "Zissou1",
+                           pal = "Viridis",
                         ...)
 {
   if (length(list(...)) > 0) {
@@ -45,7 +45,7 @@ plot.fG_simfit <- function(x,
   
   type <- match.arg(type)
   
-  ## get worldmap
+  ## get worldmapAs the estimation of $\gamma_t$ is sensitive to choice of time scale, we examined the influence of different prediction intervals (1 - 20 min) on the ability of the movement persistence model to resolve changes in movement pattern along the penguin tracks.
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
     wm <- ne_countries(scale = 50, returnclass = "sp")
   } else {

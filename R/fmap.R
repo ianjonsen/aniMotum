@@ -4,25 +4,40 @@
 ##' Argos observations, optionally apply a different projection
 ##'
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
-##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; default is NULL
+##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; 
+##' default is NULL
 ##' @param what specify which location estimates to map: fitted or predicted
-##' @param conf include confidence regions around estimated location (logical; default = TRUE, unless y is an mpm fit object then conf is FALSE)
+##' @param conf include confidence regions around estimated location (logical; 
+##' default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
 ##' @param obs.shp point shape for observations (default = 17)
-##' @param by.date when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)
+##' @param by.date when mapping single tracks, should locations be coloured by 
+##' date (logical; default = TRUE if nrow(x) == 1 else FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection ("+proj=merc") for the fitting the SSM will be used
 ##' @param ext.rng factors to extend the plot range in x and y dimensions
 ##' (can exceed 1)
-##' @param size size of estimated location points (size = NA will draw no points). Optionally, a vector of length 2 with size of observed locations given by 2nd value (ignored if obs = FALSE)
+##' @param size size of estimated location points (size = NA will draw no points). 
+##' Optionally, a vector of length 2 with size of observed locations given by 2nd 
+##' value (ignored if obs = FALSE)
 ##' @param col colour of observed locations (ignored if obs = FALSE)
-##' @param lines logical indicating if lines are added to connect estimated locations (default = FALSE)
+##' @param lines logical indicating if lines are added to connect estimated 
+##' locations (default = FALSE)
 ##' @param landfill colour to use for land (default = grey(0.6))
-##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param map_type background map type (default = NULL, which uses rnaturalearth 
+##' to add landmasses); if \link{ggspatial} &  \link{rosm} are installed then any map type 
+##' returned by \link{rosm::osm.types} can be used for a more detailed map 
+##' background.
+##' @param pal \code{hcl.colors} palette to use (default: "Cividis"; type 
+##' \code{hcl.pals()} for options)
 ##' @param rev reverse colour palette (logical)
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit element_text theme 
-##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn scale_fill_gradientn scale_fill_manual element_line
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
+##' @param ... additional arguments passed to \link{ggspatial::annotation_map_tile}
+##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
+##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
+##' @importFrom ggplot2 element_line coord_sf
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer 
+##' @importFrom sf st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr group_by summarise
@@ -43,8 +58,10 @@ fmap <- function(x,
                  col = "black",
                  lines = FALSE,
                  landfill = grey(0.6),
-                 pal = "Zissou1",
-                 rev = FALSE)
+                 map_type = "default",
+                 pal = "Cividis",
+                 rev = FALSE, 
+                 ...)
 {
   
   what <- match.arg(what)
@@ -52,6 +69,10 @@ fmap <- function(x,
   if(!inherits(x, "fG_ssm")) stop("x must be a foieGras ssm fit object with class `fG_ssm`")
   if(!inherits(y, "fG_mpm") & !is.null(y)) 
     stop("y must either be NULL or a foieGras mpm fit object with class `fG_mpm`")
+  if(map_type != "default" & !(requireNamespace("rosm", quietly = TRUE) | requireNamespace("ggspatial", quietly = TRUE))) {
+    cat("required packages `rosm` and/or `ggspatial` are not installed, switching map_type to default\n")
+    map_type <- "default"
+  }
   
   if(inherits(x, "fG_ssm")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
@@ -89,22 +110,21 @@ fmap <- function(x,
     sf_conf <- st_union(sf_conf, by_feature = TRUE) 
     }
   
-  if (is.null(crs)) prj <- st_crs(sf_locs)
+  if (is.null(crs)) crs <- st_crs(sf_locs)
   else {
-    prj <- crs
-    if(!is.character(prj)) stop("\ncrs must be a proj4string, 
+    if(!is.character(crs)) stop("\ncrs must be a proj4string, 
                                 \neg. `+proj=stere +lat_0=-90 +lon_0=0 +datum=WGS84 +units=km +no_defs`")
     
-    if(length(grep("+units=km", prj, fixed = TRUE)) == 0) {
+    if(length(grep("+units=km", crs, fixed = TRUE)) == 0) {
       cat("\nconverting units from m to km to match SSM output")
-      prj <- paste(prj, "+units=km")
+      crs <- paste(crs, "+units=km")
     }
-    sf_locs <- st_transform(sf_locs, crs = prj)
-    if(conf) sf_conf <- st_transform(sf_conf, crs = prj)
+    sf_locs <- st_transform(sf_locs, crs = crs)
+    if(conf) sf_conf <- st_transform(sf_conf, crs = crs)
   }
   
   if (obs) {
-    sf_data <- st_transform(grab(x, "data", as_sf = TRUE), crs = prj)
+    sf_data <- st_transform(grab(x, "data", as_sf = TRUE), crs = crs)
     bounds <- st_bbox(sf_data)
   } else {
     bounds <- st_bbox(sf_locs)
@@ -120,20 +140,26 @@ fmap <- function(x,
   } 
 
   ## get worldmap
-  if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sf")
-    wm <- st_transform(wm, crs = prj)
+  if (map_type == "default") {
+    if (requireNamespace("rnaturalearthdata", quietly = TRUE)) {
+      wm <- ne_countries(scale = 50, returnclass = "sf")
+      wm <- st_transform(wm, crs = crs)
+    } else {
+      wm <- ne_countries(scale = 110, returnclass = "sf")
+      wm <- st_transform(wm, crs = crs)
+    }
+    
+    p <- ggplot() +
+      geom_sf(data = wm,
+              fill = landfill,
+              lwd = 0) #+
+#      xlim(bounds[c("xmin", "xmax")]) +
+#      ylim(bounds[c("ymin", "ymax")])
+    
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sf")
-    wm <- st_transform(wm, crs = prj)
+    p <- ggplot() +
+      ggspatial::annotation_map_tile(type = map_type, ...)
   }
-  
-  p <- ggplot() +
-    geom_sf(data = wm,
-            fill = landfill,
-            lwd=0) +
-    xlim(bounds[c("xmin","xmax")]) +
-    ylim(bounds[c("ymin","ymax")])
 
   if(obs) {
     if(length(size) == 1) {
@@ -333,6 +359,12 @@ fmap <- function(x,
       
       
   }
-
+#  if(map_type != "default") {
+    p <- p +
+      coord_sf(xlim = c(bounds["xmin"], bounds["xmax"]),
+               ylim = c(bounds["ymin"], bounds["ymax"]),
+               crs = crs)
+#  }
+  
   return(p)
 }
