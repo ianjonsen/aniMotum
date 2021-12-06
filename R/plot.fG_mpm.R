@@ -9,7 +9,7 @@
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0
 ##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
-##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param pal \code{hcl.colors} palette to use (default: "Cividis"; type \code{hcl.pals()} for options)
 ##' @param rev reverse colour palette (logical)
 ##' @param ... additional arguments to be ignored
 ##' 
@@ -45,7 +45,7 @@ plot.fG_mpm <-
            pages = 0,
            ncol = 1,
            ask = TRUE,
-           pal = "Zissou1",
+           pal = "Cividis",
            rev = FALSE,
            ...
   )
@@ -54,7 +54,7 @@ plot.fG_mpm <-
     warning("additional arguments ignored")
   }
   
-  wpal <- hcl.colors(n = 5, "Zissou1")
+  wpal <- hcl.colors(n = 5, "Cividis")
   
   
   if(inherits(x, "fG_mpm") & (inherits(y, "fG_ssm") | is.null(y))) {

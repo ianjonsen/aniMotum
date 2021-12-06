@@ -18,24 +18,29 @@ fmap(
   col = "black",
   lines = FALSE,
   landfill = grey(0.6),
-  pal = "Zissou1",
-  rev = FALSE
+  map_type = "default",
+  pal = "Cividis",
+  rev = FALSE,
+  ...
 )
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class \code{fG_ssm}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm}; default is NULL}
+\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm};
+default is NULL}
 
 \item{what}{specify which location estimates to map: fitted or predicted}
 
-\item{conf}{include confidence regions around estimated location (logical; default = TRUE, unless y is an mpm fit object then conf is FALSE)}
+\item{conf}{include confidence regions around estimated location (logical;
+default = TRUE, unless y is an mpm fit object then conf is FALSE)}
 
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
 
 \item{obs.shp}{point shape for observations (default = 17)}
 
-\item{by.date}{when mapping single tracks, should locations be coloured by date (logical; default = TRUE if nrow(x) == 1 else FALSE)}
+\item{by.date}{when mapping single tracks, should locations be coloured by
+date (logical; default = TRUE if nrow(x) == 1 else FALSE)}
 
 \item{crs}{\code{proj4string} for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used}
@@ -43,17 +48,28 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 \item{ext.rng}{factors to extend the plot range in x and y dimensions
 (can exceed 1)}
 
-\item{size}{size of estimated location points (size = NA will draw no points). Optionally, a vector of length 2 with size of observed locations given by 2nd value (ignored if obs = FALSE)}
+\item{size}{size of estimated location points (size = NA will draw no points).
+Optionally, a vector of length 2 with size of observed locations given by 2nd
+value (ignored if obs = FALSE)}
 
 \item{col}{colour of observed locations (ignored if obs = FALSE)}
 
-\item{lines}{logical indicating if lines are added to connect estimated locations (default = FALSE)}
+\item{lines}{logical indicating if lines are added to connect estimated
+locations (default = FALSE)}
 
 \item{landfill}{colour to use for land (default = grey(0.6))}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+\item{map_type}{background map type (default = NULL, which uses rnaturalearth
+to add landmasses); if packages \code{ggspatial} & \code{rosm} are installed
+then any map type returned by \link[rosm:osm.types]{rosm::osm.types} can be used for a more
+detailed map background.}
+
+\item{pal}{\link{hcl.colors} palette to use (default: "Cividis"; type
+\code{\link[=hcl.pals]{hcl.pals()}} for options)}
 
 \item{rev}{reverse colour palette (logical)}
+
+\item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }
 \description{
 map foieGras fitted or predicted locations, with or without

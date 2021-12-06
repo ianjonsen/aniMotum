@@ -1,3 +1,9 @@
+# foieGras 1.0.0 (sometime soon)
+
+* adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile`  
+* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument  
+
+
 # foieGras 0.7-6 (26/04/2021)
 
 * adds fixes to example data for testing/examples so pkg builds on solaris and various linux boxes with older GDAL/PROJ libraries

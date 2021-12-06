@@ -60,7 +60,9 @@ Suggests:
     future,
     furrr,
     parallel,
-    purrr
+    purrr,
+    ggspatial,
+    rosm
 Depends: 
     R (>= 3.6.0)
 SystemRequirements: GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0), pandoc (>=2.7.3)
