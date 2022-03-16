@@ -11,7 +11,7 @@ Authors@R:
            person(given = "James",
            family = "Grecian",
            role = c("aut", "ctb"),
-           email = "wjg5@st-andrews.ac.uk"),
+           email = "james.grecian@gmail.com"),
            person(given = "Toby",
            family = "Patterson",
            role = c("aut", "ctb"),
@@ -48,7 +48,8 @@ Imports:
     broom,
     rnaturalearth,
     sp,
-    geosphere
+    geosphere,
+    purrr
 Suggests: 
     testthat,
     covr,
@@ -60,7 +61,7 @@ Suggests:
     future,
     furrr,
     parallel,
-    purrr,
+    pathroutr,
     ggspatial,
     rosm
 Depends: 
