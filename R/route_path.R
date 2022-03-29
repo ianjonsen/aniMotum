@@ -31,7 +31,6 @@
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union st_convex_hull st_intersection st_collection_extract st_sf st_coordinates st_drop_geometry
 ##' @importFrom rnaturalearth ne_countries
-##' @importFrom pathroutr prt_visgraph prt_trim prt_reroute prt_update_points
 ##' @importFrom dplyr nest_by rowwise select
 ##' 
 ##' @export
@@ -60,19 +59,19 @@ route_path <-
     
       # this should be trimmed to reduce computation time
       # base the trimming on the trs data
-      df_sf <- df %>% st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% st_transform(crs = 3857)
+      df_sf <- df %>% sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% sf::st_transform(crs = 3857)
     
       # pathroutr needs a land shapefile to create a visibility graph from
       world_mc <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
+        sf::st_transform(crs = 3857) %>%
         sf::st_make_valid()
     
       land_region <- sf::st_buffer(df_sf, dist = 50000) %>% 
         sf::st_union() %>% 
         sf::st_convex_hull() %>% 
         sf::st_intersection(world_mc) %>% 
-        st_collection_extract('POLYGON') %>% 
-        st_sf()
+        sf::st_collection_extract('POLYGON') %>% 
+        sf::st_sf()
     
       # create visibility graph
       vis_graph <- pathroutr::prt_visgraph(land_region)
@@ -88,11 +87,11 @@ route_path <-
       # pull the corrected points from the object and reformat for foieGras
       df_rrt <- df_rrt %>%
         dplyr::select(id, pts_fix) %>%
-        mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
-                              mutate(lon = st_coordinates(.)[,1],
-                                     lat = st_coordinates(.)[,2]) %>%
-                              st_drop_geometry() %>%
-                              dplyr::select(date, lon, lat, x, y)))
+        mutate(pts_fix = list(pts_fix %>% sf::st_transform(crs = 4326) %>%
+                              mutate(lon = sf::st_coordinates(.)[,1],
+                                     lat = sf::st_coordinates(.)[,2]) %>%
+                                sf::st_drop_geometry() %>%
+                                dplyr::select(date, lon, lat, x, y)))
     
       # remove nesting by individual path
       df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
@@ -109,19 +108,19 @@ route_path <-
     
     # this should be trimmed to reduce computation time
     # base the trimming on the trs data
-    df_sf <- df %>% st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% st_transform(crs = 3857)
+    df_sf <- df %>% st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% sf::st_transform(crs = 3857)
     
     # pathroutr needs a land shapefile to create a visibility graph from
     world_mc <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>%
-      st_transform(crs = 3857) %>%
+      sf::st_transform(crs = 3857) %>%
       sf::st_make_valid()
     
     land_region <- sf::st_buffer(df_sf, dist = 50000) %>% 
       sf::st_union() %>% 
       sf::st_convex_hull() %>% 
       sf::st_intersection(world_mc) %>% 
-      st_collection_extract('POLYGON') %>% 
-      st_sf()
+      sf::st_collection_extract('POLYGON') %>% 
+      sf::st_sf()
     
     # create visibility graph
     vis_graph <- pathroutr::prt_visgraph(land_region)
@@ -137,10 +136,10 @@ route_path <-
     # pull the corrected points from the object and reformat for foieGras
     df_rrt <- df_rrt %>%
       dplyr::select(id, rep, pts_fix) %>%
-      mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
-                            mutate(lon = st_coordinates(.)[,1],
-                                   lat = st_coordinates(.)[,2]) %>%
-                            st_drop_geometry() %>%
+      mutate(pts_fix = list(pts_fix %>% sf::st_transform(crs = 4326) %>%
+                            mutate(lon = sf::st_coordinates(.)[,1],
+                                   lat = sf::st_coordinates(.)[,2]) %>%
+                            sf::st_drop_geometry() %>%
                             dplyr::select(model, date, lon, lat, x, y)))
     
     # remove nesting by individual path
