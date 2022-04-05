@@ -62,7 +62,8 @@ Suggests:
     furrr,
     parallel,
     ggspatial,
-    rosm
+    rosm,
+    pathroutr (>= 0.2.1)
 Depends: 
     R (>= 3.6.0)
 Remotes:
