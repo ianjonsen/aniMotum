@@ -52,6 +52,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Restore R package cache
+        if: runner.os != 'Windows'
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
@@ -79,7 +80,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          remotes::install_deps(dependencies = TRUE)
+          remotes::install_deps(dependencies = TRUE, INSTALL_opts=c("--no-multiarch"))
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
