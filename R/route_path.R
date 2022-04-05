@@ -20,7 +20,7 @@
 ##' \url{https://doi.org/10.5281/zenodo.4321827}
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(sese, vmax = 4, model = "crw", time.step = 24)
+##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
 ##' rrt_preds <- route_path(fit, what = "predicted")
 ##' 
 ##' trs <- simfit(fit, what = "predicted", reps = 5)
@@ -47,7 +47,7 @@ route_path <-
          or a `fG_simfit` object containing the paths simulated from a `fG_ssm` fit object" = 
                 inherits(x, c("fG_ssm", "fG_simfit"))
     )
-    ## possibly required for pathroutr fn's
+    ## required for pathroutr fn's
     if(!"package:dplyr" %in% search()) {
       detach.dplyr.on.end <- TRUE
       suppressMessages(attachNamespace("dplyr"))
