@@ -76,22 +76,8 @@ jobs:
           # conflicts with gfortran from r-lib/actions when linking gcc
           rm '/usr/local/bin/gfortran'
           brew install pkg-config gdal proj geos
-          
-      - name: "[Custom block] [Windows] Install system dependencies"
-        if: runner.os == 'Windows'
-        run: |
-          pacman -Sy mingw-w64-x86_64-glpk mingw-w64-x86_64-libxml2 mingw-w64-x86_64-gmp
         
-      - name: "[Custom block] [Windows] Install dependencies"
-        if: runner.os == 'Windows'
-        run: |
-          install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-        
-      - name: "[Custom block] [!Windows] Install dependencies"
-        if: runner.os != 'Windows'
+      - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
@@ -107,6 +93,8 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
+          if: runner.os == 'Windows'
+          _R_CHECK_SUGGESTS_FORCE_: false
         run: |
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "error", check_dir = "check")
