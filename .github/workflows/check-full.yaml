@@ -77,13 +77,21 @@ jobs:
           rm '/usr/local/bin/gfortran'
           brew install pkg-config gdal proj geos
       
-      - name: Install dependencies
+      - name: "[Custom block] [Windows] Install dependencies"
+        if: runner.os == 'Windows'
         run: |
-          install.packages("remotes")
+          install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
-
+        
+      - name: "[Custom block] [!Windows] Install dependencies"
+        if: runner.os != 'Windows'
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
+        
       - name: Session info
         run: |
           options(width = 100)
@@ -94,8 +102,6 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
-          if: runner.os == 'Windows'
-          _R_CHECK_FORCE_SUGGESTS_: false
         run: |
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "error", check_dir = "check")
