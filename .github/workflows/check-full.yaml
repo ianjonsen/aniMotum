@@ -80,7 +80,7 @@ jobs:
       - name: "[Custom block] [Windows] Install system dependencies"
         if: runner.os == 'Windows'
         run: |
-          pacman -Sy mingw-w64-{i686,x86_64}-glpk mingw-w64-{i686,x86_64}-libxml2 mingw-w64-{i686,x86_64}-gmp
+          pacman -Sy mingw-w64-x86_64-glpk mingw-w64-x86_64-libxml2 mingw-w64-x86_64-gmp
         
       - name: "[Custom block] [Windows] Install dependencies"
         if: runner.os == 'Windows'
