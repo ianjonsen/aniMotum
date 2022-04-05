@@ -25,7 +25,7 @@ the input is a \code{fG_simfit} object then \code{route_path} returns the same o
 but with the locations within each simulation re-routed.
 }
 \examples{
-fit <- fit_ssm(sese, vmax = 4, model = "crw", time.step = 24)
+fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
 rrt_preds <- route_path(fit, what = "predicted")
 
 trs <- simfit(fit, what = "predicted", reps = 5)
