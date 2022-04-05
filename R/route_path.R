@@ -27,13 +27,12 @@
 ##' rrt_sims <- route_path(trs)
 ##' 
 ##' @importFrom purrr map_df
-##' @importFrom dplyr group_by ungroup
+##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
 ##' @importFrom sf st_coordinates st_drop_geometry
 ##' @importFrom rnaturalearth ne_countries
-##' @importFrom dplyr nest_by rowwise select
 ##' 
 ##' @export
 
@@ -41,19 +40,26 @@ route_path <-
   function(x,
            what = c("fitted", "predicted")){
     
-    if (!requireNamespace("pathroutr", quietly = TRUE)) {
-      stop(
-        cat("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n")
-      )
+    stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
+                requireNamespace("pathroutr", quietly = TRUE)
+              )
+    stopifnot("x must be either a foieGras ssm fit object with class `fG_ssm`
+         or a `fG_simfit` object containing the paths simulated from a `fG_ssm` fit object" = 
+                inherits(x, c("fG_ssm", "fG_simfit"))
+    )
+    ## possibly required for pathroutr fn's
+    if(!"package:dplyr" %in% search()) {
+      detach.dplyr.on.end <- TRUE
+      suppressMessages(attachNamespace("dplyr"))
+    }
+    if(!"package:sf" %in% search()) {
+      detach.sf.on.end <- TRUE
+      suppressMessages(attachNamespace("sf"))
     }
     
     # what to do with the error information if the location is being moved by pathroutr...?
     
     what <- match.arg(what)
-    
-    if(!inherits(x, c("fG_ssm", "fG_simfit")))
-    stop("x must be either a foieGras ssm fit object with class `fG_ssm`
-         or a `fG_simfit` object containing the paths simulated from a `fG_ssm` fit object")
     
     if(inherits(x, "fG_ssm")) {
       # unnest foieGras ssm object
@@ -84,19 +90,19 @@ route_path <-
       # use rowwise to process each row in turn
       df_rrt <- df_sf %>% 
         nest_by(id) %>%
-        dplyr::rowwise() %>%
+        rowwise() %>%
         mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
                rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
                pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
     
       # pull the corrected points from the object and reformat for foieGras
       df_rrt <- df_rrt %>%
-        dplyr::select(id, pts_fix) %>%
+        select(id, pts_fix) %>%
         mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
                               mutate(lon = st_coordinates(.)[,1],
                                      lat = st_coordinates(.)[,2]) %>%
                                 st_drop_geometry() %>%
-                                dplyr::select(date, lon, lat, x, y)))
+                                select(date, lon, lat, x, y)))
     
       # remove nesting by individual path
       df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
@@ -136,19 +142,19 @@ route_path <-
     # use rowwise to process each row in turn
     df_rrt <- df_sf %>% 
       nest_by(id, rep) %>%
-      dplyr::rowwise() %>%
+      rowwise() %>%
       mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
              rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
              pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
     
     # pull the corrected points from the object and reformat for foieGras
     df_rrt <- df_rrt %>%
-      dplyr::select(id, rep, pts_fix) %>%
+      select(id, rep, pts_fix) %>%
       mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
                             mutate(lon = st_coordinates(.)[,1],
                                    lat = st_coordinates(.)[,2]) %>%
                             st_drop_geometry() %>%
-                            dplyr::select(model, date, lon, lat, x, y)))
+                            select(model, date, lon, lat, x, y)))
     
     # remove nesting by individual path
     df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
@@ -158,6 +164,9 @@ route_path <-
     class(df_rrt) <- append("fG_rws", class(df_rrt))
     class(df_rrt) <- append("fG_simfit", class(df_rrt))
     }
+    
+    if(detach.dplyr.on.end) detach(package:dplyr)
+    if(detach.sf.on.end) detach(package:sf)
     
     return(df_rrt)
   }
