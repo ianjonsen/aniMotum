@@ -7,7 +7,7 @@
 fmap(
   x,
   y = NULL,
-  what = c("fitted", "predicted"),
+  what = c("fitted", "predicted", "rerouted"),
   conf = TRUE,
   obs = FALSE,
   obs.shp = 17,
@@ -33,7 +33,8 @@ fmap(
 \item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm};
 default is NULL}
 
-\item{what}{specify which location estimates to map: fitted or predicted}
+\item{what}{specify which location estimates to map: fitted, predicted or
+rerouted}
 
 \item{conf}{include confidence regions around estimated location (logical;
 default = TRUE, unless y is an mpm fit object then conf is FALSE)}

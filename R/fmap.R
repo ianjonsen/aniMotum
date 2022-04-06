@@ -6,7 +6,8 @@
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; 
 ##' default is NULL
-##' @param what specify which location estimates to map: fitted or predicted
+##' @param what specify which location estimates to map: fitted, predicted or
+##' rerouted
 ##' @param conf include confidence regions around estimated location (logical; 
 ##' default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
@@ -51,7 +52,7 @@
 
 fmap <- function(x,
                  y = NULL,
-                 what = c("fitted", "predicted"),
+                 what = c("fitted", "predicted", "rerouted"),
                  conf = TRUE,
                  obs = FALSE,
                  obs.shp = 17,
