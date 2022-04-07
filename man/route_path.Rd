@@ -20,8 +20,14 @@ aid re-routing of points on land. Larger buffers can result in longer
 computation times. See London (2020) for further details. The default buffer
 distance is a constant 50000 m.}
 
-\item{append}{should re-routed locations be appended to the \code{fit_ssm} output
-(default = TRUE), or returned as a tibble.}
+\item{append}{should re-routed locations be appended to the \code{fG_ssm}
+(ssm fit) object (default = TRUE), or returned as a tibble.}
+
+\item{shapefile}{polygon shapefile of movement barrier(s) as an \code{sf} object
+with WGS84 Pseudo-Mercator projection (EPSG 3857). The default is NULL, in
+which case \code{route_path} uses \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} at the medium (50)
+scale to generate a land barrier. For efficient computation, \code{route_path}
+clips the polygons to the buffered bounds of the movement track(s).}
 }
 \description{
 A wrapper function that uses the \code{pathroutr} package to re-route
@@ -30,14 +36,23 @@ take either the output from a \code{fit_ssm} model or the simulations generated
 by \code{simfit}.
 }
 \details{
-When the input is a \code{fG_ssm} object \code{route_path} returns a \code{tibble}
-with the same dimensions as either the fitted or predicted locations. When
-the input is a \code{fG_simfit} object then \code{route_path} returns the same
+When the input is a \code{fG_ssm} object \code{route_path} can append the
+re-routed path locations to the \code{fG_ssm} (ssm fit) object. This is useful
+when move persistence is to be estimated from the re-routed locations via
+\code{fit_mpm}, or tracks are to be visualised with \code{fmap}. \code{route_path} can also
+return a standalone \code{tibble} of the re-routed path with the same number of
+locations as either the original fitted or predicted locations.
+
+When the re-routed path is appended to the \code{fG_ssm} object, the path can be
+extracted using the \code{grab} function, e.g. \verb{grab(fit, what = \\"rerouted\\")}.
+
+When the input is a \code{fG_simfit} object then \code{route_path} returns the same
 object but with the locations within each simulation re-routed.
 }
 \examples{
 fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
-rrt_preds <- route_path(fit, what = "predicted")
+fit <- route_path(fit, what = "predicted")
+grab(fit, what = "rerouted")
 
 trs <- simfit(fit, what = "predicted", reps = 5)
 rrt_sims <- route_path(trs)

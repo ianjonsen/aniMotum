@@ -15,13 +15,26 @@
 ##' aid re-routing of points on land. Larger buffers can result in longer 
 ##' computation times. See London (2020) for further details. The default buffer
 ##' distance is a constant 50000 m.
-##' @param append should re-routed locations be appended to the `fit_ssm` output 
-##' (default = TRUE), or returned as a tibble.
+##' @param append should re-routed locations be appended to the `fG_ssm` 
+##' (ssm fit) object (default = TRUE), or returned as a tibble.
+##' @param shapefile polygon shapefile of movement barrier(s) as an `sf` object 
+##' with WGS84 Pseudo-Mercator projection (EPSG 3857). The default is NULL, in 
+##' which case `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
+##' scale to generate a land barrier. For efficient computation, `route_path` 
+##' clips the polygons to the buffered bounds of the movement track(s).
 ##' 
 ##' @details
-##' When the input is a \code{fG_ssm} object `route_path` returns a `tibble` 
-##' with the same dimensions as either the fitted or predicted locations. When 
-##' the input is a \code{fG_simfit} object then `route_path` returns the same 
+##' When the input is a \code{fG_ssm} object `route_path` can append the 
+##' re-routed path locations to the `fG_ssm` (ssm fit) object. This is useful 
+##' when move persistence is to be estimated from the re-routed locations via
+##' `fit_mpm`, or tracks are to be visualised with `fmap`. `route_path` can also
+##' return a standalone `tibble` of the re-routed path with the same number of 
+##' locations as either the original fitted or predicted locations. 
+##' 
+##' When the re-routed path is appended to the `fG_ssm` object, the path can be 
+##' extracted using the `grab` function, e.g. `grab(fit, what = \"rerouted\")`.
+##' 
+##' When the input is a \code{fG_simfit} object then `route_path` returns the same 
 ##' object but with the locations within each simulation re-routed.
 ##' 
 ##' @references
@@ -30,13 +43,14 @@
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
-##' rrt_preds <- route_path(fit, what = "predicted")
+##' fit <- route_path(fit, what = "predicted")
+##' grab(fit, what = "rerouted")
 ##' 
 ##' trs <- simfit(fit, what = "predicted", reps = 5)
 ##' rrt_sims <- route_path(trs)
 ##' 
 ##' @importFrom purrr map_df
-##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate
+##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
@@ -131,8 +145,22 @@ route_path <-
         return(x)
       } else {
         ## return as a single tibble, need to remove outer `id` to avoid error
-        return(df_rrt %>% select(-id) %>% unnest(cols = c(pts_rrt)))
-        }
+        
+       out <-  lapply(1:nrow(df_rrt), function(i) {
+          df_rrt$pts_rrt[[i]] %>% 
+            mutate(x = st_coordinates(.)[,1], 
+                   y = st_coordinates(.)[,2]) %>% 
+            st_transform(4326) %>% 
+            mutate(lon = st_coordinates(.)[,1], 
+                   lat = st_coordinates(.)[,2]) %>% 
+            st_drop_geometry() %>%
+            select(id, date, lon, lat, x, y, x.se, y.se)
+        }) %>%
+          bind_rows()
+       
+       return(out)
+      }
+      
       
     } else if (inherits(x, "fG_simfit")) {
       
