@@ -44,7 +44,7 @@ return a standalone \code{tibble} of the re-routed path with the same number of
 locations as either the original fitted or predicted locations.
 
 When the re-routed path is appended to the \code{fG_ssm} object, the path can be
-extracted using the \code{grab} function, e.g. \verb{grab(fit, what = \\"rerouted\\")}.
+extracted using the \code{grab} function, e.g. \code{grab(fit, what = "rerouted")}.
 
 When the input is a \code{fG_simfit} object then \code{route_path} returns the same
 object but with the locations within each simulation re-routed.

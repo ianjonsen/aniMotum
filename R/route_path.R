@@ -32,7 +32,7 @@
 ##' locations as either the original fitted or predicted locations. 
 ##' 
 ##' When the re-routed path is appended to the `fG_ssm` object, the path can be 
-##' extracted using the `grab` function, e.g. `grab(fit, what = \"rerouted\")`.
+##' extracted using the `grab` function, e.g. `grab(fit, what = "rerouted")`.
 ##' 
 ##' When the input is a \code{fG_simfit} object then `route_path` returns the same 
 ##' object but with the locations within each simulation re-routed.
@@ -142,7 +142,9 @@ route_path <-
           x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
           x$ssm[[i]]
         })
-        return(x)
+        
+        out <- x
+        
       } else {
         ## return as a single tibble, need to remove outer `id` to avoid error
         
@@ -158,7 +160,6 @@ route_path <-
         }) %>%
           bind_rows()
        
-       return(out)
       }
       
       
@@ -213,12 +214,14 @@ route_path <-
     df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
     class(df_rrt) <- append("fG_rws", class(df_rrt))
     class(df_rrt) <- append("fG_simfit", class(df_rrt))
+    
+    out <- df_rrt
     }
     
     if(detach.dplyr.on.end) detach(package:dplyr)
     if(detach.sf.on.end) detach(package:sf)
-    
-    return(df_rrt)
+
+    return(out)
   }
 
 
