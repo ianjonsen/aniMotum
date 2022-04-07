@@ -6,11 +6,14 @@
 ##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
 ##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; 
 ##' default is NULL
-##' @param what specify which location estimates to map: fitted or predicted
+##' @param what specify which location estimates to map: fitted, predicted or
+##' rerouted
 ##' @param conf include confidence regions around estimated location (logical; 
 ##' default = TRUE, unless y is an mpm fit object then conf is FALSE)
 ##' @param obs include Argos observations on map (logical; default = FALSE)
 ##' @param obs.shp point shape for observations (default = 17)
+##' @param by.id when mapping multiple tracks, should locations be coloured by
+##' id (logical; default = TRUE if nrow(x) > 1 else FALSE)
 ##' @param by.date when mapping single tracks, should locations be coloured by 
 ##' date (logical; default = TRUE if nrow(x) == 1 else FALSE)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
@@ -20,7 +23,8 @@
 ##' @param size size of estimated location points (size = NA will draw no points). 
 ##' Optionally, a vector of length 2 with size of observed locations given by 2nd 
 ##' value (ignored if obs = FALSE)
-##' @param col colour of observed locations (ignored if obs = FALSE)
+##' @param col.ssm colour of ssm-fitted or ssm-predicted locations (ignored if by.id = TRUE)
+##' @param col.obs colour of observed locations (ignored if obs = FALSE)
 ##' @param lines logical indicating if lines are added to connect estimated 
 ##' locations (default = FALSE)
 ##' @param landfill colour to use for land (default = grey(0.6))
@@ -31,6 +35,7 @@
 ##' @param pal [hcl.colors] palette to use (default: "Cividis"; type 
 ##' [hcl.pals()] for options)
 ##' @param rev reverse colour palette (logical)
+##' @param last_loc colour to render last location of each track (default = NULL)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
@@ -47,22 +52,24 @@
 
 fmap <- function(x,
                  y = NULL,
-                 what = c("fitted", "predicted"),
+                 what = c("fitted", "predicted", "rerouted"),
                  conf = TRUE,
                  obs = FALSE,
                  obs.shp = 17,
+                 by.id = TRUE,
                  by.date = TRUE,
                  crs = NULL,
                  ext.rng = c(0.05, 0.05),
                  size = 0.25,
-                 col = "black",
+                 col.ssm = "dodgerblue",
+                 col.obs = "black",
                  lines = FALSE,
                  landfill = grey(0.6),
                  map_type = "default",
                  pal = "Cividis",
                  rev = FALSE, 
-                 ...)
-{
+                 last_loc = NULL,
+                 ...) {
   
   what <- match.arg(what)
 
@@ -85,6 +92,11 @@ fmap <- function(x,
           stop("number of rows in ssm object do not match the number of rows in mpm object, try modifying the `what` argument")
       } else {
         sf_locs <- grab(x, what=what, as_sf = TRUE)
+        if(!is.null(last_loc)) {
+          sf_locs_last <- sf_locs %>%
+            group_by(id) %>%
+            filter(date == max(date))
+        }
         if(conf) locs <- grab(x, what = what, as_sf = FALSE)
       }
       
@@ -120,6 +132,7 @@ fmap <- function(x,
       crs <- paste(crs, "+units=km")
     }
     sf_locs <- st_transform(sf_locs, crs = crs)
+    if(!is.null(last_loc)) sf_locs_last <- st_transform(sf_locs_last, crs = crs)
     if(conf) sf_conf <- st_transform(sf_conf, crs = crs)
   }
   
@@ -172,7 +185,7 @@ fmap <- function(x,
     p <-
       p + geom_sf(
         data = sf_data,
-        colour = col,
+        colour = col.obs,
         size = size[2],
         shape = obs.shp,
         alpha = 0.75
@@ -193,33 +206,66 @@ fmap <- function(x,
 
     if(is.null(y)) {
       if(lines & is.na(size)[1]) {
-        p <- p + geom_sf(data = sf_lines,
+        if(by.id) {
+          p <- p + geom_sf(data = sf_lines,
                        aes_string(colour = "id"),
                        lwd = 0.25,
                        show.legend = "line"
                        )
+        } else {
+          p <- p + geom_sf(data = sf_lines,
+                           colour = col.ssm,
+                           lwd = 0.25,
+                           show.legend = "line"
+          )
+        }
       } else if(lines & !is.na(size)[1]) {
-        p <- p + geom_sf(data = sf_lines,
+          if(by.id) {
+            p <- p + geom_sf(data = sf_lines,
                          aes_string(colour = "id"),
                          lwd = 0.25
-        ) + geom_sf(data = sf_locs,
+            ) + geom_sf(data = sf_locs,
                     aes_string(colour = "id"),
                     size = ifelse(length(size) == 2, size[1], size),
                     show.legend = "point"
-        )
+            )
+          } else {
+            p <- p + geom_sf(data = sf_lines,
+                             colour = col.ssm,
+                             lwd = 0.25
+            ) + geom_sf(data = sf_locs,
+                        colour = col.ssm,
+                        size = ifelse(length(size) == 2, size[1], size),
+                        show.legend = "point"
+            )
+          }
       } else if(!lines & !is.na(size)[1]) {
-        
-       p <- p + geom_sf(data = sf_locs,
-              aes_string(colour = "id"),
-              size = ifelse(length(size) == 2, size[1], size),
-              show.legend = "point"
-                     ) 
-       }
-      p <- p + scale_colour_manual(values = 
-                                     hcl.colors(n = nrow(x), 
-                                                palette = pal, 
-                                                rev = rev)
-                          ) 
+          if(by.id) {
+            p <- p + geom_sf(data = sf_locs,
+                             aes_string(colour = "id"),
+                             size = ifelse(length(size) == 2, size[1], size),
+                             show.legend = "point"
+            ) 
+            p <- p + scale_colour_manual(values = 
+                                           hcl.colors(n = nrow(x), 
+                                                      palette = pal, 
+                                                      rev = rev)
+            ) 
+          } else {
+            p <- p + geom_sf(data = sf_locs,
+                             colour = col.ssm,
+                             size = ifelse(length(size) == 2, size[1], size),
+                             show.legend = "point"
+            ) 
+          }
+      }
+      
+      if(!is.null(last_loc)) {
+        p <- p + geom_sf(data = sf_locs_last,
+                         size = 1,
+                         colour = last_loc)
+      }
+     
     } else if(!is.null(y)) {
       if(lines) {
         p <- p + geom_sf(data = sf_lines,

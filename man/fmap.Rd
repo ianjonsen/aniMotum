@@ -7,20 +7,23 @@
 fmap(
   x,
   y = NULL,
-  what = c("fitted", "predicted"),
+  what = c("fitted", "predicted", "rerouted"),
   conf = TRUE,
   obs = FALSE,
   obs.shp = 17,
+  by.id = TRUE,
   by.date = TRUE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
   size = 0.25,
-  col = "black",
+  col.ssm = "dodgerblue",
+  col.obs = "black",
   lines = FALSE,
   landfill = grey(0.6),
   map_type = "default",
   pal = "Cividis",
   rev = FALSE,
+  last_loc = NULL,
   ...
 )
 }
@@ -30,7 +33,8 @@ fmap(
 \item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm};
 default is NULL}
 
-\item{what}{specify which location estimates to map: fitted or predicted}
+\item{what}{specify which location estimates to map: fitted, predicted or
+rerouted}
 
 \item{conf}{include confidence regions around estimated location (logical;
 default = TRUE, unless y is an mpm fit object then conf is FALSE)}
@@ -38,6 +42,9 @@ default = TRUE, unless y is an mpm fit object then conf is FALSE)}
 \item{obs}{include Argos observations on map (logical; default = FALSE)}
 
 \item{obs.shp}{point shape for observations (default = 17)}
+
+\item{by.id}{when mapping multiple tracks, should locations be coloured by
+id (logical; default = TRUE if nrow(x) > 1 else FALSE)}
 
 \item{by.date}{when mapping single tracks, should locations be coloured by
 date (logical; default = TRUE if nrow(x) == 1 else FALSE)}
@@ -52,7 +59,9 @@ default projection ("+proj=merc") for the fitting the SSM will be used}
 Optionally, a vector of length 2 with size of observed locations given by 2nd
 value (ignored if obs = FALSE)}
 
-\item{col}{colour of observed locations (ignored if obs = FALSE)}
+\item{col.ssm}{colour of ssm-fitted or ssm-predicted locations (ignored if by.id = TRUE)}
+
+\item{col.obs}{colour of observed locations (ignored if obs = FALSE)}
 
 \item{lines}{logical indicating if lines are added to connect estimated
 locations (default = FALSE)}
@@ -68,6 +77,8 @@ detailed map background.}
 \code{\link[=hcl.pals]{hcl.pals()}} for options)}
 
 \item{rev}{reverse colour palette (logical)}
+
+\item{last_loc}{colour to render last location of each track (default = NULL)}
 
 \item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }

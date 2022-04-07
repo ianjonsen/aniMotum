@@ -1,14 +1,16 @@
 ##' @title grab tibble's by name from a foieGras model object
 ##'
-##' @description `grab()` lets you obtain `fitted`, `predicted`, or `data` tibble's
-##' from a compound tibble created when fitting to multiple individual data sets.
-##' The specified tibble's are appended to a single output tibble.
+##' @description `grab()` lets you obtain `fitted`, `predicted`, `rerouted` or 
+##' `data` tibble's from a compound tibble created when fitting to multiple 
+##' individual data sets. The specified tibble's are appended to a single output
+##' tibble.
 ##'
 ##' @param x a \code{foieGras} ssm or mpm model object
-##' @param what the tibble to be grabbed; either `fitted`, `predicted` (ssm only), or
-##' `data` (single letters can be used)
-##' @param as_sf logical; if FALSE (default) then return a tibble with un-projected lonlat
-##' coordinates, otherwise return an sf tibble. Ignored if x is an mpm model object.
+##' @param what the tibble to be grabbed; either `fitted`, `predicted`, 
+##' `rerouted` (ssm only), or `data` (single letters can be used).
+##' @param as_sf logical; if FALSE (default) then return a tibble with 
+##' un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
+##' is an mpm model object.
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
@@ -27,12 +29,12 @@
 ##'
 grab <- function(x, what = "fitted", as_sf = FALSE) {
 
-  what <- match.arg(what, choices = c("fitted","predicted","data"))
+  what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))
 
   if(!any(inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
     stop("a foieGras ssm or mpm model object with class `fG_ssm` of `fG_mpm`, respectively, must be supplied")
-  if(!what %in% c("fitted","predicted","data"))
-    stop("only `fitted`, `predicted` or `data` objects can be grabbed from an fG_ssm fit object")
+  if(!what %in% c("fitted","predicted","rerouted","data"))
+    stop("only `fitted`, `predicted`, `rerouted`, or `data` objects can be grabbed from an fG_ssm fit object")
   if(inherits(x, "fG_mpm") & what == "predicted")
     stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
   if(inherits(x, "fG_ssm")) {
@@ -57,6 +59,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                  what,
                  fitted = .$fitted,
                  predicted = .$predicted,
+                 rerouted = .$rerouted,
                  data = .$data
                )
              prj <- st_crs(x)
@@ -76,6 +79,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                  what,
                  fitted = st_crs(.$fitted),
                  predicted = st_crs(.$predicted),
+                 rerouted = st_crs(.$rerouted),
                  data = st_crs(.$data)
                ))
              out <- lapply(1:length(out_lst), function(i) {
@@ -86,7 +90,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
              })
              out <- do.call(rbind, out)
              
-             if (what != "data") {
+             if (what %in% c("fitted","predicted")) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
@@ -103,14 +107,16 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    }
                  })
                
-             } else {
+             } else if (what == "rerouted") {
+               out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
+             } else if (what == "data") {
                out <- out[, c("id", "date", "lc", "smaj", "smin", "eor", "keep", 
                          "obs.type", "emf.x", "emf.y", "geometry")]
              }
              
            } else {
              out <- do.call(rbind, out_lst)
-             if (what != "data") {
+             if (what %in% c("fitted","predicted")) {
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
@@ -126,7 +132,10 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    }
                  })
                out <- as_tibble(out)
-             } else {
+             } else if (what == "rerouted") {
+               out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+               out <- as_tibble(out)
+             } else if (what == "data") {
                out <- out[, c("id", "date", "lc", "lon", "lat", 
                               "smaj", "smin", "eor", "obs.type", "keep", 
                               "x", "y", "emf.x", "emf.y")]

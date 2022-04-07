@@ -1,0 +1,227 @@
+##' @title Re-route a movement path around land using \code{pathroutr}
+##'
+##' @description A wrapper function that uses the `pathroutr` package to re-route
+##' movement paths that cross a land barrier. The current implementation will 
+##' take either the output from a `fit_ssm` model or the simulations generated 
+##' by `simfit`.
+##'  
+##' @param x either a \code{fG_ssm} model object or
+##' a \code{fG_simfit} object containing simulated paths
+##' @param what if using a \code{fG_ssm} object should the fitted (typically 
+##' irregular in time) or predicted (typically regular in time) locations be 
+##' re-routed.
+##' @param dist buffer distance (m) to add around track locations. The convex 
+##' hull of these buffered locations defines the size of land polygon used to 
+##' aid re-routing of points on land. Larger buffers can result in longer 
+##' computation times. See London (2020) for further details. The default buffer
+##' distance is a constant 50000 m.
+##' @param append should re-routed locations be appended to the `fG_ssm` 
+##' (ssm fit) object (default = TRUE), or returned as a tibble.
+##' @param shapefile polygon shapefile of movement barrier(s) as an `sf` object 
+##' with WGS84 Pseudo-Mercator projection (EPSG 3857). The default is NULL, in 
+##' which case `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
+##' scale to generate a land barrier. For efficient computation, `route_path` 
+##' clips the polygons to the buffered bounds of the movement track(s).
+##' 
+##' @details
+##' When the input is a \code{fG_ssm} object `route_path` can append the 
+##' re-routed path locations to the `fG_ssm` (ssm fit) object. This is useful 
+##' when move persistence is to be estimated from the re-routed locations via
+##' `fit_mpm`, or tracks are to be visualised with `fmap`. `route_path` can also
+##' return a standalone `tibble` of the re-routed path with the same number of 
+##' locations as either the original fitted or predicted locations. 
+##' 
+##' When the re-routed path is appended to the `fG_ssm` object, the path can be 
+##' extracted using the `grab` function, e.g. `grab(fit, what = "rerouted")`.
+##' 
+##' When the input is a \code{fG_simfit} object then `route_path` returns the same 
+##' object but with the locations within each simulation re-routed.
+##' 
+##' @references
+##' Josh M. London. (2020) pathroutr: An R Package for (Re-)Routing Paths Around 
+##' Barriers (Version v0.2.1) \url{https://doi.org/10.5281/zenodo.4321827}
+##' 
+##' @examples 
+##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
+##' fit <- route_path(fit, what = "predicted")
+##' grab(fit, what = "rerouted")
+##' 
+##' trs <- simfit(fit, what = "predicted", reps = 5)
+##' rrt_sims <- route_path(trs)
+##' 
+##' @importFrom purrr map_df
+##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
+##' @importFrom tidyr nest unnest
+##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
+##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
+##' @importFrom sf st_coordinates st_drop_geometry st_is_valid
+##' @importFrom rnaturalearth ne_countries
+##' 
+##' @export
+
+route_path <- 
+  function(x,
+           what = c("fitted", "predicted"),
+           dist = 50000,
+           append = TRUE,
+           shapefile = NULL){
+    
+    stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
+                requireNamespace("pathroutr", quietly = TRUE)
+              )
+    stopifnot("x must be either a foieGras ssm fit object with class `fG_ssm`
+         or a `fG_simfit` object containing the paths simulated from a `fG_ssm` fit object" = 
+                inherits(x, c("fG_ssm", "fG_simfit"))
+    )
+    ## required for pathroutr fn's
+    # default vals 
+    detach.dplyr.on.end <- FALSE
+    detach.sf.on.end <- FALSE
+    
+    if(!"package:dplyr" %in% search()) {
+      detach.dplyr.on.end <- TRUE
+      suppressMessages(attachNamespace("dplyr"))
+    }
+    if(!"package:sf" %in% search()) {
+      detach.sf.on.end <- TRUE
+      suppressMessages(attachNamespace("sf"))
+    }
+    
+    # what to do with the error information if the location is being moved by pathroutr...?
+    
+    what <- match.arg(what)
+    
+    # pathroutr needs a land shapefile to create a visibility graph from
+    if (is.null(shapefile)) {
+      world_mc <- ne_countries(scale = "medium", returnclass = "sf") %>%
+        st_transform(crs = 3857) %>%
+        st_make_valid()
+    } else if (!is.null(shapefile)) {
+      stopifnot("shapefile must be an `sf` object, see `?route_path`" = inherits(shapefile, "sf"))
+      stopifnot("shapefile geometry not valid, consider using `sf::st_make_valid(shapefile)`" = st_is_valid(shapefile))
+      stopifnot("shapefile must have WGS84 Pseudo-Mercator projection (EPSG 3857)" = st_crs(shapefile)$epsg == 3857)
+      world_mc <- shapefile
+    }
+    
+    if (inherits(x, "fG_ssm")) {
+      # unnest foieGras ssm object
+      df <- x %>% grab(what)
+    
+      # this should be trimmed to reduce computation time
+      # base the trimming on the trs data
+      df_sf <- df %>% 
+        st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+        st_transform(crs = 3857)
+      
+    } else if (inherits(x, "fG_simfit")) {
+      # unnest foieGras simfit object
+      df <- x %>% unnest(cols = c(sims))
+      
+      # this should be trimmed to reduce computation time
+      # base the trimming on the trs data
+      df_sf <- df %>% 
+        st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+        st_transform(crs = 3857)
+      
+    }
+  
+      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
+        st_union() %>% 
+        st_convex_hull() %>% 
+        st_intersection(world_mc) %>% 
+        st_collection_extract('POLYGON') %>% 
+        st_sf())
+    
+      # create visibility graph
+      vis_graph <- pathroutr::prt_visgraph(land_region)
+      
+      
+    if (inherits(x, "fG_ssm")) {
+      # create nested tibble grouped by individual track
+      # use rowwise to process each row in turn
+      df_rrt <- df_sf %>% 
+        nest_by(id) %>%
+        rowwise() %>%
+        mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
+               rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
+               pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
+   
+      # pull the corrected points from the object and reformat for foieGras
+      df_rrt <- df_rrt %>%
+        select(id, pts_fix) %>%
+        mutate(pts_rrt = 
+          list(pts_fix %>%
+            st_transform(crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
+              select(date,x.se,y.se))) %>%
+        select(id, pts_rrt) %>%
+        ungroup()
+      ## append id to each sf tibble
+      df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
+        df_rrt$pts_rrt[[i]] %>% 
+          mutate(id = df_rrt$id[i]) %>%
+          select(id, everything())
+      })
+      
+      ## append rerouted sf tibble to fit_ssm objects  
+      if(append) {
+        x$ssm <- lapply(1:nrow(x), function(i) {
+          x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+          x$ssm[[i]]
+        })
+        
+        out <- x
+        
+      } else {
+        ## return as a single tibble, need to remove outer `id` to avoid error
+        
+       out <-  lapply(1:nrow(df_rrt), function(i) {
+          df_rrt$pts_rrt[[i]] %>% 
+            mutate(x = st_coordinates(.)[,1], 
+                   y = st_coordinates(.)[,2]) %>% 
+            st_transform(4326) %>% 
+            mutate(lon = st_coordinates(.)[,1], 
+                   lat = st_coordinates(.)[,2]) %>% 
+            st_drop_geometry() %>%
+            select(id, date, lon, lat, x, y, x.se, y.se)
+        }) %>%
+          bind_rows()
+       
+      }
+      
+    } else if (inherits(x, "fG_simfit")) {
+    # create nested tibble grouped by individual track
+    # use rowwise to process each row in turn
+    df_rrt <- df_sf %>% 
+      nest_by(id, rep) %>%
+      rowwise() %>%
+      mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
+             rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
+             pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
+    
+    # pull the corrected points from the object and reformat for foieGras
+    df_rrt <- df_rrt %>%
+      select(id, rep, pts_fix) %>%
+      mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
+                            mutate(lon = st_coordinates(.)[,1],
+                                   lat = st_coordinates(.)[,2]) %>%
+                            st_drop_geometry() %>%
+                            select(model, date, lon, lat, x, y)))
+    
+    # remove nesting by individual path
+    df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
+    
+    # format to foieGras object - including nexting by animal id
+    df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
+    class(df_rrt) <- append("fG_rws", class(df_rrt))
+    class(df_rrt) <- append("fG_simfit", class(df_rrt))
+    
+    out <- df_rrt
+    }
+    
+    if(detach.dplyr.on.end) detach(package:dplyr)
+    if(detach.sf.on.end) detach(package:sf)
+
+    return(out)
+  }
+
+

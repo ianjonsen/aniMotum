@@ -1,7 +1,7 @@
 Package: foieGras
 Title: Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Movement Behaviour
-Version: 1.0.0.9501
-Date: 2021-12-06
+Version: 1.0.0.9527
+Date: 2022-04-07
 Authors@R: 
     c(
       person(given = "Ian",
@@ -11,7 +11,7 @@ Authors@R:
            person(given = "James",
            family = "Grecian",
            role = c("aut", "ctb"),
-           email = "wjg5@st-andrews.ac.uk"),
+           email = "james.grecian@gmail.com"),
            person(given = "Toby",
            family = "Patterson",
            role = c("aut", "ctb"),
@@ -48,7 +48,8 @@ Imports:
     broom,
     rnaturalearth,
     sp,
-    geosphere
+    geosphere,
+    purrr
 Suggests: 
     testthat,
     covr,
@@ -60,11 +61,13 @@ Suggests:
     future,
     furrr,
     parallel,
-    purrr,
     ggspatial,
-    rosm
+    rosm,
+    pathroutr (>= 0.2.1)
 Depends: 
     R (>= 3.6.0)
+Remotes:
+    github::jmlondon/pathroutr
 SystemRequirements: GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0), pandoc (>=2.7.3)
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

@@ -20,7 +20,7 @@ fit_mpm(
 \item{x}{a \code{fG_ssm} fit object or a data frame of observations (see details)}
 
 \item{what}{if a \code{fG_ssm} fit object is supplied then \code{what} determines
-whether fitted or predicted (default) values are mapped; ignored if
+whether fitted, predicted (default), or rerouted values are mapped; ignored if
 \code{x} is a data frame}
 
 \item{model}{mpm model to fit; either \code{mpm} with unpooled random walk
