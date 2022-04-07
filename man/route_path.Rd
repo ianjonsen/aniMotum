@@ -4,7 +4,13 @@
 \alias{route_path}
 \title{Re-route a movement path around land using \code{pathroutr}}
 \usage{
-route_path(x, what = c("fitted", "predicted"), dist = 50000, append = TRUE)
+route_path(
+  x,
+  what = c("fitted", "predicted"),
+  dist = 50000,
+  append = TRUE,
+  shapefile = NULL
+)
 }
 \arguments{
 \item{x}{either a \code{fG_ssm} model object or

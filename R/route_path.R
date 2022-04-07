@@ -54,7 +54,7 @@
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
-##' @importFrom sf st_coordinates st_drop_geometry
+##' @importFrom sf st_coordinates st_drop_geometry st_is_valid
 ##' @importFrom rnaturalearth ne_countries
 ##' 
 ##' @export
@@ -63,7 +63,8 @@ route_path <-
   function(x,
            what = c("fitted", "predicted"),
            dist = 50000,
-           append = TRUE){
+           append = TRUE,
+           shapefile = NULL){
     
     stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
                 requireNamespace("pathroutr", quietly = TRUE)
@@ -73,6 +74,10 @@ route_path <-
                 inherits(x, c("fG_ssm", "fG_simfit"))
     )
     ## required for pathroutr fn's
+    # default vals 
+    detach.dplyr.on.end <- FALSE
+    detach.sf.on.end <- FALSE
+    
     if(!"package:dplyr" %in% search()) {
       detach.dplyr.on.end <- TRUE
       suppressMessages(attachNamespace("dplyr"))
@@ -86,7 +91,19 @@ route_path <-
     
     what <- match.arg(what)
     
-    if(inherits(x, "fG_ssm")) {
+    # pathroutr needs a land shapefile to create a visibility graph from
+    if (is.null(shapefile)) {
+      world_mc <- ne_countries(scale = "medium", returnclass = "sf") %>%
+        st_transform(crs = 3857) %>%
+        st_make_valid()
+    } else if (!is.null(shapefile)) {
+      stopifnot("shapefile must be an `sf` object, see `?route_path`" = inherits(shapefile, "sf"))
+      stopifnot("shapefile geometry not valid, consider using `sf::st_make_valid(shapefile)`" = st_is_valid(shapefile))
+      stopifnot("shapefile must have WGS84 Pseudo-Mercator projection (EPSG 3857)" = st_crs(shapefile)$epsg == 3857)
+      world_mc <- shapefile
+    }
+    
+    if (inherits(x, "fG_ssm")) {
       # unnest foieGras ssm object
       df <- x %>% grab(what)
     
@@ -95,11 +112,18 @@ route_path <-
       df_sf <- df %>% 
         st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
         st_transform(crs = 3857)
-    
-      # pathroutr needs a land shapefile to create a visibility graph from
-      world_mc <- ne_countries(scale = "medium", returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
+      
+    } else if (inherits(x, "fG_simfit")) {
+      # unnest foieGras simfit object
+      df <- x %>% unnest(cols = c(sims))
+      
+      # this should be trimmed to reduce computation time
+      # base the trimming on the trs data
+      df_sf <- df %>% 
+        st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+        st_transform(crs = 3857)
+      
+    }
   
       land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
         st_union() %>% 
@@ -111,6 +135,8 @@ route_path <-
       # create visibility graph
       vis_graph <- pathroutr::prt_visgraph(land_region)
       
+      
+    if (inherits(x, "fG_ssm")) {
       # create nested tibble grouped by individual track
       # use rowwise to process each row in turn
       df_rrt <- df_sf %>% 
@@ -162,33 +188,7 @@ route_path <-
        
       }
       
-      
     } else if (inherits(x, "fG_simfit")) {
-      
-    # unnest foieGras simfit object
-    df <- x %>% unnest(cols = c(sims))
-    
-    # this should be trimmed to reduce computation time
-    # base the trimming on the trs data
-    df_sf <- df %>% 
-      st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
-      st_transform(crs = 3857)
-    
-    # pathroutr needs a land shapefile to create a visibility graph from
-    world_mc <- ne_countries(scale = "medium", returnclass = "sf") %>%
-      st_transform(crs = 3857) %>%
-      st_make_valid()
-    
-    land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
-      st_union() %>% 
-      st_convex_hull() %>% 
-      st_intersection(world_mc) %>% 
-      st_collection_extract('POLYGON') %>% 
-      st_sf())
-    
-    # create visibility graph
-    vis_graph <- pathroutr::prt_visgraph(land_region)
-
     # create nested tibble grouped by individual track
     # use rowwise to process each row in turn
     df_rrt <- df_sf %>% 
