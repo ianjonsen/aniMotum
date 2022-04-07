@@ -1,7 +1,10 @@
 # foieGras 1.0.0 (sometime soon)
 
+* adds `route_path()` a wrapper function calling [`pathroutr`](https://github.com/jmlondon/pathroutr) to re-route `fit_ssm` estimated or `simfit` simulated tracks around land barriers
 * adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile`  
-* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument  
+* adds option to turn on/off average travel rate (s) standard error (s.se) estimation in `ssm_control()`; default is off - no SE estimation for much faster `model = "crw"` fitting
+* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument 
+
 
 
 # foieGras 0.7-6 (26/04/2021)
