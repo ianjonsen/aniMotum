@@ -4,7 +4,7 @@ checkTMBPackageVersion <- function() {
   ##  likely cause errors when attempting to fit foieGras models.
   
   file <- paste0(system.file(package="foieGras"), "/TMB-version")
-  cur.TMB.version <- as.character(packageVersion("TMB"))
+  cur.TMB.version <- as.character(utils::packageVersion("TMB"))
   if(!file.exists(file)) {
     writeLines(cur.TMB.version, con = file)
   }
