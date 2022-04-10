@@ -58,7 +58,9 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.0" id="foiegras-100-sometime-soon">foieGras 1.0.0 (sometime soon)<a class="anchor" aria-label="anchor" href="#foiegras-100-sometime-soon"></a></h2>
-<ul><li>adds rosm map tile layers to <code><a href="../reference/fmap.html">fmap()</a></code> via <code><a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a></code><br></li>
+<ul><li>adds <code><a href="../reference/route_path.html">route_path()</a></code> a wrapper function calling <a href="https://github.com/jmlondon/pathroutr" class="external-link"><code>pathroutr</code></a> to re-route <code>fit_ssm</code> estimated or <code>simfit</code> simulated tracks around land barriers</li>
+<li>adds rosm map tile layers to <code><a href="../reference/fmap.html">fmap()</a></code> via <code><a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a></code><br></li>
+<li>adds option to turn on/off average travel rate (s) standard error (s.se) estimation in <code><a href="../reference/ssm_control.html">ssm_control()</a></code>; default is off - no SE estimation for much faster <code>model = "crw"</code> fitting</li>
 <li>replaces hcl.colors(“Zissou1”) palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases “Cividis” is now the default but users can specify any <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.pals()</a></code> palette, using the <code>pal</code> argument</li>
 </ul></div>
     <div class="section level2">
@@ -142,7 +144,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer></div>

@@ -67,20 +67,23 @@ Argos observations, optionally apply a different projection</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fmap</span><span class="op">(</span>
   <span class="va">x</span>,
   y <span class="op">=</span> <span class="cn">NULL</span>,
-  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fitted"</span>, <span class="st">"predicted"</span><span class="op">)</span>,
+  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fitted"</span>, <span class="st">"predicted"</span>, <span class="st">"rerouted"</span><span class="op">)</span>,
   conf <span class="op">=</span> <span class="cn">TRUE</span>,
   obs <span class="op">=</span> <span class="cn">FALSE</span>,
   obs.shp <span class="op">=</span> <span class="fl">17</span>,
+  by.id <span class="op">=</span> <span class="cn">TRUE</span>,
   by.date <span class="op">=</span> <span class="cn">TRUE</span>,
   crs <span class="op">=</span> <span class="cn">NULL</span>,
   ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.05</span><span class="op">)</span>,
   size <span class="op">=</span> <span class="fl">0.25</span>,
-  col <span class="op">=</span> <span class="st">"black"</span>,
+  col.ssm <span class="op">=</span> <span class="st">"dodgerblue"</span>,
+  col.obs <span class="op">=</span> <span class="st">"black"</span>,
   lines <span class="op">=</span> <span class="cn">FALSE</span>,
   landfill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/gray.html" class="external-link">grey</a></span><span class="op">(</span><span class="fl">0.6</span><span class="op">)</span>,
   map_type <span class="op">=</span> <span class="st">"default"</span>,
   pal <span class="op">=</span> <span class="st">"Cividis"</span>,
   rev <span class="op">=</span> <span class="cn">FALSE</span>,
+  last_loc <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -93,7 +96,8 @@ Argos observations, optionally apply a different projection</p>
 <dd><p>optionally, a <code>foieGras</code> mpm fit object with class <code>fG_mpm</code>;
 default is NULL</p></dd>
 <dt>what</dt>
-<dd><p>specify which location estimates to map: fitted or predicted</p></dd>
+<dd><p>specify which location estimates to map: fitted, predicted or
+rerouted</p></dd>
 <dt>conf</dt>
 <dd><p>include confidence regions around estimated location (logical;
 default = TRUE, unless y is an mpm fit object then conf is FALSE)</p></dd>
@@ -101,6 +105,9 @@ default = TRUE, unless y is an mpm fit object then conf is FALSE)</p></dd>
 <dd><p>include Argos observations on map (logical; default = FALSE)</p></dd>
 <dt>obs.shp</dt>
 <dd><p>point shape for observations (default = 17)</p></dd>
+<dt>by.id</dt>
+<dd><p>when mapping multiple tracks, should locations be coloured by
+id (logical; default = TRUE if nrow(x) &gt; 1 else FALSE)</p></dd>
 <dt>by.date</dt>
 <dd><p>when mapping single tracks, should locations be coloured by
 date (logical; default = TRUE if nrow(x) == 1 else FALSE)</p></dd>
@@ -114,7 +121,9 @@ default projection ("+proj=merc") for the fitting the SSM will be used</p></dd>
 <dd><p>size of estimated location points (size = NA will draw no points).
 Optionally, a vector of length 2 with size of observed locations given by 2nd
 value (ignored if obs = FALSE)</p></dd>
-<dt>col</dt>
+<dt>col.ssm</dt>
+<dd><p>colour of ssm-fitted or ssm-predicted locations (ignored if by.id = TRUE)</p></dd>
+<dt>col.obs</dt>
 <dd><p>colour of observed locations (ignored if obs = FALSE)</p></dd>
 <dt>lines</dt>
 <dd><p>logical indicating if lines are added to connect estimated
@@ -131,6 +140,8 @@ detailed map background.</p></dd>
 <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.pals()</a></code> for options)</p></dd>
 <dt>rev</dt>
 <dd><p>reverse colour palette (logical)</p></dd>
+<dt>last_loc</dt>
+<dd><p>colour to render last location of each track (default = NULL)</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments passed to <a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a></p></dd>
 </dl></div>
@@ -147,7 +158,7 @@ detailed map background.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer></div>
