@@ -30,12 +30,12 @@ LazyData: true
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 LinkingTo: 
-    TMB (>= 1.8.1),
+    TMB (>= 1.7.22),
     RcppEigen
 Imports: 
     tibble (>= 2.1.3),
     ggplot2 (>= 3.0.0),
-    TMB (>= 1.8.1),
+    TMB (>= 1.7.22),
     sf (>= 0.9-4),
     tidyr,
     dplyr (>= 1.0.0),
