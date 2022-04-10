@@ -13,20 +13,14 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Coverage
 status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
-[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
-[![CRAN\_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
+[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
+[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
-
-master branch:  
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
-
-staging branch:  
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=staging)
-
-dev branch:  
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=dev)
 <!-- badges: end -->
+
+<img src="man/figures/README-logo-1.png" style="display: block; margin: auto;" />
 
 `foieGras` is an R package that fits a continuous-time model (RW or CRW)
 in state-space form to filter Argos (or GLS) satellite location data.
@@ -55,8 +49,7 @@ R.Version()
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras/)
 and can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies =
-c("Imports","LinkingTo","Suggests"))`
+`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
 
 ### From GitHub (source)
 
@@ -68,9 +61,17 @@ Xcode](https://developer.apple.com/download/more/) by executing
 `xcode-select --install` in the terminal; or you can download the latest
 version from the URL (free developer registration may be required). A
 full Xcode install uses up a lot of disk space and is not required.
+Also, ensure you have a suitable Gnu Fortran compiler installed (e.g.,
+<https://github.com/fxcoudert/gfortran-for-macOS/releases>).
 
 To get the very latest `foieGras` stable version, you can install from
 GitHub:
+
+``` r
+remotes::install_github("ianjonsen/foieGras@staging")
+```
+
+Or, for a more thoroughly tested earlier version:
 
 ``` r
 remotes::install_github("ianjonsen/foieGras")
@@ -90,22 +91,35 @@ behavioural index along the estimated animal tracks:
 ``` r
 library(tidyverse)
 library(foieGras)
+library(cowplot)
 
 fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
 
 fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
 
-plot(fmp, pages = 1, ncol = 3, pal = "Zissou1", rev = TRUE)
+plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
 ```
 
-![](man/figures/README-example-1.png)<!-- -->
+<img src="man/figures/README-explots1-1.png" width="100%" />
 
 ``` r
+m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
 
-fmap(fit, fmp, what = "predicted", pal = "Cividis")
+## using cowplot to add southern elephant seal silhouettes to map
+ggdraw() +
+  draw_plot(m) +
+  draw_image("inst/logo/img/sese_female_orig.png",  x=0.175, y=0.85, scale=0.175, hjust=0.5, vjust=0.5) +
+  draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-![](man/figures/README-example-2.png)<!-- -->
+<img src="man/figures/README-explots2-1.png" width="100%" /> foo
+Southern elephant seal silhouettes kindly provided by:  
+- female southern elephant seal, Sophia Volzke
+(\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
+Tasmania)  
+- male southern elephant seal, Anton Van de Putte
+(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
+de Bruxelles)
 
 ## What to do if you encounter a problem
 
@@ -139,3 +153,41 @@ Please note that the foieGras project is released with a [Contributor
 Code of
 Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
+
+## Acknowledgements
+
+Development of this R package was funded by a consortium of partners
+including: Macquarie University; the US Office of Naval Research (ONR
+Marine Mammal Biology; grant N00014-18-1-2405); Australia’s Integrated
+Marine Observing System (IMOS); Canada’s Ocean Tracking Network (OTN);
+Taronga Conservation Society; Birds Canada; and Innovasea/Vemco.
+Additional support was provided by France’s Centre de Synthèse et
+d’Analyse sur la Biodiversite, part of the Fondation pour la Recherche
+sur la Biodiversité.
+
+Example southern elephant seal data included in the package were sourced
+from the IMOS Animal Tracking Facility. IMOS is a national collaborative
+research infrastructure, supported by the Australian Government and
+operated by a consortium of institutions as an unincorporated joint
+venture, with the University of Tasmania as Lead Agent. IMOS supported
+elephant seal fieldwork on Iles Kerguelen conducted as part of the IPEV
+program No 109 (PI H. Weimerskirch) and the SNO-MEMO program (PI C.
+Guinet). SMRU SRDL-CTD tags were partly funded by CNES-TOSCA and IMOS.
+All tagging procedures were approved and executed under University of
+Tasmania Animal Ethics Committee guidelines.
+
+Animal silhouettes used in the `foieGras` logo were obtained and
+modified from sources:  
+- southern elephant seal, Anton Van de Putte
+(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
+de Bruxelles)  
+- humpback whale, Chris Huh via [Phylopic.org](http://phylopic.org)
+Creative Commons Attribution-ShareAlike 3.0 Unported  
+- mallard duck, Maija Karala via [Phylopic.org](http://phylopic.org)
+Creative Commons Attribution-ShareAlike 3.0 Unported  
+- leatherback turtle, James R. Spotila & Ray Chatterji via
+[Phylopic.org](http://phylopic.org) Public Domain Dedication 1.0  
+- white shark, Margo Michaud via [Phylopic.org](http://phylopic.org)
+Public Domain Dedication 1.0  
+- king penguin, Steven Traver via [Phylopic.org](http://phylopic.org)
+Public Domain Dedication 1.0
