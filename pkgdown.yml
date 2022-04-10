@@ -3,7 +3,7 @@ pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   basics: basics.html
-last_built: 2022-04-10T15:46Z
+last_built: 2022-04-10T15:49Z
 urls:
   reference: https://ianjonsen.github.io/foieGras/reference
   article: https://ianjonsen.github.io/foieGras/articles
