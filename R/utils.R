@@ -51,7 +51,7 @@ emf <- function(gps = 0.1,
 ##'
 ##' @importFrom stats pnorm qnorm runif
 ##' @examples
-##' x <- rtnorm(10, l = -5, u = 5)
+##' x <- foieGras:::rtnorm(10, l = -5, u = 5)
 ##' range(x)
 ##' @keywords internal
 rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
