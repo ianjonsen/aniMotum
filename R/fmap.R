@@ -3,8 +3,8 @@
 ##' @description map foieGras fitted or predicted locations, with or without
 ##' Argos observations, optionally apply a different projection
 ##'
-##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
-##' @param y optionally, a \code{foieGras} mpm fit object with class `fG_mpm`; 
+##' @param x a \code{foieGras} ssm fit object with class `ssm_df`
+##' @param y optionally, a \code{foieGras} mpm fit object with class `mpm`; 
 ##' default is NULL
 ##' @param what specify which location estimates to map: fitted, predicted or
 ##' rerouted
@@ -73,21 +73,21 @@ fmap <- function(x,
   
   what <- match.arg(what)
 
-  if(!inherits(x, "fG_ssm")) stop("x must be a foieGras ssm fit object with class `fG_ssm`")
-  if(!inherits(y, "fG_mpm") & !is.null(y)) 
-    stop("y must either be NULL or a foieGras mpm fit object with class `fG_mpm`")
+  if(!inherits(x, "ssm_df")) stop("x must be a foieGras ssm fit object with class `ssm_df`")
+  if(!inherits(y, "mpm_df") & !is.null(y)) 
+    stop("y must either be NULL or a foieGras mpm fit object with class `mpm_df`")
   if(map_type != "default" & !(requireNamespace("rosm", quietly = TRUE) | requireNamespace("ggspatial", quietly = TRUE))) {
     cat("required packages `rosm` and/or `ggspatial` are not installed, switching map_type to default\n")
     map_type <- "default"
   }
   
-  if(inherits(x, "fG_ssm")) {
+  if(inherits(x, "ssm_df")) {
     if(length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1) {
       if(!is.null(y)) {
         conf <- FALSE
         ## increase geom_point size if left at default and y is supplied
         if(size[1] == 0.25) size[1] <- 1
-        sf_locs <- try(join(x, y, what.ssm = what), silent = TRUE)
+        sf_locs <- try(join(x, y, what.ssm = what, as_sf = TRUE), silent = TRUE)
         if(inherits(sf_locs, "try-error")) 
           stop("number of rows in ssm object do not match the number of rows in mpm object, try modifying the `what` argument")
       } else {

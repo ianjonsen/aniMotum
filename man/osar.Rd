@@ -2,29 +2,29 @@
 % Please edit documentation in R/osar.r
 \name{osar}
 \alias{osar}
-\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit}
+\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit}
 \usage{
 osar(x, method = "fullGaussian", ...)
 }
 \arguments{
-\item{x}{a compound \code{fG} tbl fit object}
+\item{x}{a foieGras ssm fit object with class \code{ssm_df}}
 
 \item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see \code{?TMB::oneStepPrediction} for details)}
 
 \item{...}{other arguments to TMB::oneStepPrediction}
 }
 \description{
-calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
+calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit
 }
 \details{
 One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version). \code{osar} tries the "fullGaussian" (fastest) method first and falls back to the "oneStepGaussianOffMode" (slower) method for any failures. Subsequent failures are dropped from the output and a warning message is given. Note, OSA residuals can take a considerable time to calculate if there are many individual fits and/or deployments are long. The method is automatically parallelized across 2 x the number of individual fits, up to the number of processor cores available.
 }
 \examples{
-## generate a fG_ssm fit object (call is for speed only)
+# generate a ssm fit object (call is for speed only)
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
+control = ssm_control(verbose = 0))
 
-## just use one seal to save time
+# just use one individual to save time
 dres <- osar(xs[2,])
 
 }

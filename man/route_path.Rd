@@ -13,10 +13,10 @@ route_path(
 )
 }
 \arguments{
-\item{x}{either a \code{fG_ssm} model object or
-a \code{fG_simfit} object containing simulated paths}
+\item{x}{either a \code{ssm} fit object or
+a \code{simfit} object containing simulated paths}
 
-\item{what}{if using a \code{fG_ssm} object should the fitted (typically
+\item{what}{if using a \code{ssm} object should the fitted (typically
 irregular in time) or predicted (typically regular in time) locations be
 re-routed.}
 
@@ -26,7 +26,7 @@ aid re-routing of points on land. Larger buffers can result in longer
 computation times. See London (2020) for further details. The default buffer
 distance is a constant 50000 m.}
 
-\item{append}{should re-routed locations be appended to the \code{fG_ssm}
+\item{append}{should re-routed locations be appended to the \code{ssm}
 (ssm fit) object (default = TRUE), or returned as a tibble.}
 
 \item{shapefile}{polygon shapefile of movement barrier(s) as an \code{sf} object
@@ -42,17 +42,17 @@ take either the output from a \code{fit_ssm} model or the simulations generated
 by \code{simfit}.
 }
 \details{
-When the input is a \code{fG_ssm} object \code{route_path} can append the
-re-routed path locations to the \code{fG_ssm} (ssm fit) object. This is useful
+When the input is a \code{ssm} object \code{route_path} can append the
+re-routed path locations to the \code{ssm} (ssm fit) object. This is useful
 when move persistence is to be estimated from the re-routed locations via
 \code{fit_mpm}, or tracks are to be visualised with \code{fmap}. \code{route_path} can also
 return a standalone \code{tibble} of the re-routed path with the same number of
 locations as either the original fitted or predicted locations.
 
-When the re-routed path is appended to the \code{fG_ssm} object, the path can be
+When the re-routed path is appended to the \code{ssm} object, the path can be
 extracted using the \code{grab} function, e.g. \code{grab(fit, what = "rerouted")}.
 
-When the input is a \code{fG_simfit} object then \code{route_path} returns the same
+When the input is a \code{simfit} object then \code{route_path} returns the same
 object but with the locations within each simulation re-routed.
 }
 \examples{

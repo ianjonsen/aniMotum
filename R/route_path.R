@@ -5,9 +5,9 @@
 ##' take either the output from a `fit_ssm` model or the simulations generated 
 ##' by `simfit`.
 ##'  
-##' @param x either a \code{fG_ssm} model object or
-##' a \code{fG_simfit} object containing simulated paths
-##' @param what if using a \code{fG_ssm} object should the fitted (typically 
+##' @param x either a \code{ssm} fit object or
+##' a \code{simfit} object containing simulated paths
+##' @param what if using a \code{ssm} object should the fitted (typically 
 ##' irregular in time) or predicted (typically regular in time) locations be 
 ##' re-routed.
 ##' @param dist buffer distance (m) to add around track locations. The convex 
@@ -15,7 +15,7 @@
 ##' aid re-routing of points on land. Larger buffers can result in longer 
 ##' computation times. See London (2020) for further details. The default buffer
 ##' distance is a constant 50000 m.
-##' @param append should re-routed locations be appended to the `fG_ssm` 
+##' @param append should re-routed locations be appended to the `ssm` 
 ##' (ssm fit) object (default = TRUE), or returned as a tibble.
 ##' @param shapefile polygon shapefile of movement barrier(s) as an `sf` object 
 ##' with WGS84 Pseudo-Mercator projection (EPSG 3857). The default is NULL, in 
@@ -24,17 +24,17 @@
 ##' clips the polygons to the buffered bounds of the movement track(s).
 ##' 
 ##' @details
-##' When the input is a \code{fG_ssm} object `route_path` can append the 
-##' re-routed path locations to the `fG_ssm` (ssm fit) object. This is useful 
+##' When the input is a \code{ssm} object `route_path` can append the 
+##' re-routed path locations to the `ssm` (ssm fit) object. This is useful 
 ##' when move persistence is to be estimated from the re-routed locations via
 ##' `fit_mpm`, or tracks are to be visualised with `fmap`. `route_path` can also
 ##' return a standalone `tibble` of the re-routed path with the same number of 
 ##' locations as either the original fitted or predicted locations. 
 ##' 
-##' When the re-routed path is appended to the `fG_ssm` object, the path can be 
+##' When the re-routed path is appended to the `ssm` object, the path can be 
 ##' extracted using the `grab` function, e.g. `grab(fit, what = "rerouted")`.
 ##' 
-##' When the input is a \code{fG_simfit} object then `route_path` returns the same 
+##' When the input is a \code{simfit} object then `route_path` returns the same 
 ##' object but with the locations within each simulation re-routed.
 ##' 
 ##' @references
@@ -69,9 +69,9 @@ route_path <-
     stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
                 requireNamespace("pathroutr", quietly = TRUE)
               )
-    stopifnot("x must be either a foieGras ssm fit object with class `fG_ssm`
-         or a `fG_simfit` object containing the paths simulated from a `fG_ssm` fit object" = 
-                inherits(x, c("fG_ssm", "fG_simfit"))
+    stopifnot("x must be either a foieGras ssm fit object with class `ssm_df`
+         or a `simfit` object containing the paths simulated from a `ssm` fit object" = 
+                inherits(x, c("ssm_df", "simfit"))
     )
     ## required for pathroutr fn's
     # default vals 
@@ -103,7 +103,7 @@ route_path <-
       world_mc <- shapefile
     }
     
-    if (inherits(x, "fG_ssm")) {
+    if (inherits(x, "ssm_df")) {
       # unnest foieGras ssm object
       df <- x %>% grab(what)
     
@@ -113,7 +113,7 @@ route_path <-
         st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
         st_transform(crs = 3857)
       
-    } else if (inherits(x, "fG_simfit")) {
+    } else if (inherits(x, "simfit")) {
       # unnest foieGras simfit object
       df <- x %>% unnest(cols = c(sims))
       
@@ -136,7 +136,7 @@ route_path <-
       vis_graph <- pathroutr::prt_visgraph(land_region)
       
       
-    if (inherits(x, "fG_ssm")) {
+    if (inherits(x, "ssm_df")) {
       # create nested tibble grouped by individual track
       # use rowwise to process each row in turn
       df_rrt <- df_sf %>% 
@@ -188,7 +188,7 @@ route_path <-
        
       }
       
-    } else if (inherits(x, "fG_simfit")) {
+    } else if (inherits(x, "simfit")) {
     # create nested tibble grouped by individual track
     # use rowwise to process each row in turn
     df_rrt <- df_sf %>% 
@@ -210,10 +210,10 @@ route_path <-
     # remove nesting by individual path
     df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
     
-    # format to foieGras object - including nexting by animal id
+    # format to foieGras object - including nesting by animal id
     df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
-    class(df_rrt) <- append("fG_rws", class(df_rrt))
-    class(df_rrt) <- append("fG_simfit", class(df_rrt))
+    class(df_rrt) <- append("rws", class(df_rrt))
+    class(df_rrt) <- append("simfit", class(df_rrt))
     
     out <- df_rrt
     }

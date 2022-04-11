@@ -26,11 +26,11 @@ individual data sets. The specified tibble's are appended to a single output
 tibble.
 }
 \examples{
-## generate a fG_ssm fit object
+## generate an ssm fit object
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
+control = ssm_control(verbose = 0))
 
 ## grab predicted values as an un-projected tibble
-preds <- grab(xs, what = "predicted", as_sf = FALSE)
+preds <- grab(xs, what = "predicted")
 
 }

@@ -2,7 +2,7 @@
 ##'
 ##' @description visualize tracks simulated from a foieGras model fit
 ##'
-##' @param x a \code{foieGras} simulation data.frame with class \code{fG_simfit}
+##' @param x a \code{foieGras} simulation data.frame with class \code{simfit}
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param zoom logical; should map extent be defined by track extent (TRUE) or 
 ##' should global map be drawn (FALSE; default).  
@@ -22,7 +22,7 @@
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
 ##' @importFrom rnaturalearth ne_countries
-##' @method plot fG_simfit
+##' @method plot simfit
 ##'
 ##' @examples
 ##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
@@ -31,7 +31,7 @@
 ##'
 ##' @export
 
-plot.fG_simfit <- function(x, 
+plot.simfit <- function(x, 
                            type = c("lines","points","both"),
                            zoom = FALSE,
                            or = NULL,
@@ -42,6 +42,8 @@ plot.fG_simfit <- function(x,
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
+  
+  stopifnot("x must be a simfit object with class `simfit`" = inherits(x, "simfit"))
   
   type <- match.arg(type)
   

@@ -1,12 +1,12 @@
-##' @title simulate animal tracks from a \code{fG_ssm} fit
+##' @title simulate animal tracks from a \code{ssm} fit
 ##'
 ##' @description simulate from the \code{rw} or \code{crw} process models to generate
-##' either a set of x,y or lon,lat coordinates from a \code{fG_ssm} fit with length
+##' either a set of x,y or lon,lat coordinates from a \code{ssm} fit with length
 ##' equal to the number of observations used in the SSM fit. 
-##' @param x a compound \code{fG_ssm} model fit object (ignored if NULL)
+##' @param x a \code{ssm} fit object with class `ssm_df`
 ##' @param what simulate fitted (typically irregular in time) or predicted 
 ##' (typically regular in time) locations 
-##' @param reps number of replicate tracks to simulate from an \code{fG_ssm} model 
+##' @param reps number of replicate tracks to simulate from an \code{ssm} model 
 ##' fit object
 ##' @param grad a rasterStack of x- and y-gradients as separate layers (see details)
 ##' @param beta a 2-element vector of parameters defining the potential function 
@@ -14,7 +14,7 @@
 ##' ie. no potential function; see details).
 ##' @param cpf logical; should simulated tracks return to their start point 
 ##' (ie. a central-place forager)
-##' @param sim_only logical, do not include \code{fG_ssm} estimated location in output 
+##' @param sim_only logical, do not include \code{ssm} estimated location in output 
 ##' (default is FALSE)
 ##' 
 ##' @details A potential function can be applied to the simulated paths to help 
@@ -30,7 +30,7 @@
 ##' to work, especially if \code{cpf = TRUE}!
 ##' 
 ##' @return a \code{fG_simfit} object containing the paths simulated from a 
-##' \code{fG_ssm} fit object
+##' \code{ssm} fit object
 ##' 
 ##' @references 
 ##' Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://doi.org/10.1007/978-1-4614-1344-8_22
@@ -77,6 +77,8 @@ simfit <-
   }
   if(length(beta) != 2) 
     stop("beta must be specified as a 2-element vector")
+  
+  stopifnot("x must be an `ssm_df` fit object" = inherits(x, "ssm_df"))
   
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
@@ -251,12 +253,12 @@ simfit <-
   d <- tibble(id = x$id, model = x$pmodel, sims = d)
   switch(unique(x$pmodel),
          rw = { 
-           class(d) <- append("fG_rws", class(d))
+           class(d) <- append("rws", class(d))
          },
          crw = {
-           class(d) <- append("fG_crws", class(d))
+           class(d) <- append("crws", class(d))
          })
 
-  class(d) <- append("fG_simfit", class(d))
+  class(d) <- append("simfit", class(d))
   return(d)
 }

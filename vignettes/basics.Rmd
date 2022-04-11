@@ -134,7 +134,7 @@ fit$ssm[[1]]
 here, the `[[1]]` denotes the first individual and so on. The summary table lists all estimated parameters, the specific ones listed depend on the process model selected and the data type. Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation parameter in the covariance term, `tau_x` and `tau_y` are the observation error standard deviations, and `rho_o` is the correlation parameter. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
 
 a summary `plot` method allows a quick visual of the SSM fit to the data:
-```{r fit plot, fig.width=6, fig.height=4}
+```{r fit plot, fig.width=7.5, fig.height=6}
 # plot time-series of the predicted values
 plot(fit, what = "predicted", type = 1, pages = 1)
 plot(fit, what = "fitted", type = 2, pages = 1)
@@ -152,7 +152,7 @@ res <- osar(fit)
   (plot(res, type = "acf") | plot_spacer())
 ```
 
-```{r, echo=FALSE, message=FALSE, fig.width=8, fig.height=4}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7.5, fig.height=5}
 require(patchwork)
 ## load osar res data to speed vignette build
 data(res)
@@ -164,7 +164,7 @@ As calculation of these residuals is computationally demanding, especially for m
 
 ### inferring behaviour
 A behavioural index, movement persistence, can be estimated along SSM-fitted tracks by using the `fit_mpm` function. This index ranges continuously from 0, associated with frequent changes in direction and/or speed, to 1, associated with infrequent changes (persistence) in direction and/or speed. Here we use the `fG_ssm` fit object from earlier as data to estimate and visualise the time-varying movement persistence as a 1-D time-series and along an animal's ssm-filtered track:
-```{r behaviour, eval=FALSE, message=FALSE, fig.width=8, fig.height=4}
+```{r behaviour, eval=FALSE, message=FALSE, fig.width=7.5, fig.height=6}
 fmp <- fit_mpm(fit, what = "predicted", model = "mpm", control = mpm_control(verbose = 0))
 
 plot(fmp, pages = 1, pal = "Zissou1", rev = TRUE)

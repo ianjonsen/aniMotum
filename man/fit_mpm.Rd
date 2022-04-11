@@ -17,9 +17,9 @@ fit_mpm(
 )
 }
 \arguments{
-\item{x}{a \code{fG_ssm} fit object or a data frame of observations (see details)}
+\item{x}{a \code{ssm_df} fit object or a data frame of observations (see details)}
 
-\item{what}{if a \code{fG_ssm} fit object is supplied then \code{what} determines
+\item{what}{if a \code{ssm_df} fit object is supplied then \code{what} determines
 whether fitted, predicted (default), or rerouted values are mapped; ignored if
 \code{x} is a data frame}
 
@@ -57,7 +57,7 @@ temporally regular or irregular location data
 \examples{
 ## fit jmpm to two southern elephant seal tracks
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
+control = ssm_control(verbose = 0))
 
 fmpm <- fit_mpm(xs, model = "jmpm")
 

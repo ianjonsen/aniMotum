@@ -8,7 +8,7 @@
 ##'
 ##' @examples
 ##' ## see summary fit output
-##' ## generate a fG_ssm fit object (call is for speed only)
+##' ## generate a ssm fit object (call is for speed only)
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
 ##' control = ssm_control(se = FALSE, verbose = 0))
 ##' 
@@ -33,7 +33,7 @@ print.ssm <- function(x, ...)
   cat("Process model:", pm, "\n")
   cat("Time interval:", timeStep, if(is.numeric(timeStep)) {"hours"}, "\n")
   cat("number of original observations:", nobs.tot, "\n")
-  cat("number of observations:", nobs.pf, "\n")
+  cat("number of observations fitted by ssm:", nobs.pf, "\n")
   cat("number of fitted states:", n.fit, "\n")
   cat("number of predicted states:", n.pred, "\n\n")
   cat("parameter estimates\n")

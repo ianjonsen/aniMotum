@@ -21,9 +21,9 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 
 ##' @title plot
 ##'
-##' @description visualize fits from an fG_ssm object
+##' @description visualize fits from an ssm object
 ##'
-##' @param x a \code{foieGras} ssm fit object with class `fG_ssm`
+##' @param x a \code{foieGras} ssm fit object with class `ssm_df`
 ##' @param what specify which location estimates to display on time-series plots: fitted or predicted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
@@ -44,19 +44,25 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors devAskNewPage
-##' @method plot fG_ssm
+##' @method plot ssm_df
 ##'
 ##' @examples
-##' ## generate a fG_ssm fit object (call is for speed only)
+##' ## generate a ssm fit object (call is for speed only)
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
+##' control = ssm_control(verbose = 0))
 ##' 
-##' plot(xs, what = "f", type = 1)
-##' plot(xs, what = "p", type = 2)
+##' # plot fitted locations as 1-D timeseries
+##' plot(xs, what = "f")
+##' 
+##' # all on 1 page
+##' plot(xs, what = "f", pages = 1)
+##' 
+##' # plot predicted locations as 2-D tracks
+##' plot(xs, what = "p", type = 2, pages = 1, ncol = 2)
 ##'
 ##' @export
 
-plot.fG_ssm <-
+plot.ssm_df <-
   function(x,
            what = c("fitted", "predicted"),
            type = 1,
@@ -75,7 +81,7 @@ plot.fG_ssm <-
     
     wpal <- hcl.colors(n = 5, palette = pal)
     
-    if (inherits(x, "fG_ssm")) {
+    if (inherits(x, "ssm_df")) {
       switch(what,
              fitted = {
                ssm <- grab(x, "fitted", as_sf = FALSE)
@@ -206,7 +212,7 @@ plot.fG_ssm <-
         names(p) <- x$id
         
         if (!pages) {
-          if(ask) {
+          if(ask & nrow(x) > 1) {
             devAskNewPage(ask = TRUE)
             print(p)
             devAskNewPage(ask = FALSE)
@@ -306,6 +312,6 @@ plot.fG_ssm <-
         }
       }
     } else {
-      stop("x must be a fG_ssm tibble")
+      stop("x must be an `ssm_df` tibble")
     }
 }
