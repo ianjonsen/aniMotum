@@ -34,11 +34,12 @@ plot.sim <- function(x,
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
+  stopifnot("x must be a sim object with class `sim`" = inherits(x, "sim"))
   
   bts <- names(x)[names(x) %in% c("g", "b")]
   if(length(bts) == 0 & !is.null(bts)) bts <- NULL
-  
-  model <- strsplit(class(x)[2], "_")[[1]][2]
+
+  model <- class(x)[2]
   
   switch(model, 
          crws = {

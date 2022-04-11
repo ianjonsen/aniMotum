@@ -25,9 +25,8 @@ a single tbl with all individuals
 \examples{
 ## load example foieGras fit objects (to save time)
 ## generate a ssm fit object
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
-data(xm)
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72)
+xm <- fit_mpm(xs, what = "p", model = "jmpm")
 
 ## join predicted values as an un-projected tibble
 xsm <- join(xs, xm)
