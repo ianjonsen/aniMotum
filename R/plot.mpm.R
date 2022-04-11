@@ -1,9 +1,9 @@
 ##' @title plot
 ##'
-##' @description visualize fits from an fG_mpm object
+##' @description visualize fits from an mpm object
 ##'
-##' @param x a \code{foieGras} \code{mpm} fit object with class \code{fG_mpm}
-##' @param y optional \code{ssm} fit object with class \code{fG_ssm} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered 
+##' @param x a \code{foieGras} \code{mpm} fit object with class \code{mpm_df}
+##' @param y optional \code{ssm} fit object with class \code{ssm_df} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered 
 ##' otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.
 ##' @param se logical (default = FALSE); should points be scaled by \code{gamma_t} uncertainty (ignored if y is not supplied)
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
@@ -22,23 +22,26 @@
 ##' @importFrom stats qlogis
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors devAskNewPage
-##' @method plot fG_mpm
+##' @method plot mpm_df
 ##'
 ##' @examples
-##' # plot mpm fit object
-##' # 1-d time-series plots
-##' plot(xm) 
 ##' 
-##' ## generate a fG_ssm fit object (call is for speed only)
+##' # generate a ssm fit object (call is for speed only)
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
+##' control = ssm_control(verbose = 0))
 ##' 
-##' # 2-d track plots by adding ssm fit object
-##' plot(xm, xs) 
+##' # fit mpm to ssm fits
+##' xm <- fit_mpm(xs, model = "jmpm")
+##' 
+##' # plot 1-D mp timeseries on 1 page
+##' plot(xm, pages = 1)
+##' 
+##' # plot 2-D track plots coloured by mp estimates
+##' plot(xm, xs, pages = 1, ncol = 2) 
 ##'
 ##' @export
 
-plot.fG_mpm <-
+plot.mpm_df <-
   function(x,
            y = NULL,
            se = FALSE,
@@ -57,8 +60,8 @@ plot.fG_mpm <-
   wpal <- hcl.colors(n = 5, "Cividis")
   
   
-  if(inherits(x, "fG_mpm") & (inherits(y, "fG_ssm") | is.null(y))) {
-    d <- grab(x, as_sf = FALSE)
+  if(inherits(x, "mpm_df") & (inherits(y, "ssm_df") | is.null(y))) {
+    d <- grab(x)
     d <- split(d, d$id)
     
     if(is.null(y)) {
@@ -152,6 +155,6 @@ plot.fG_mpm <-
     }
     
   } else {
-    stop("x must be a fG_mpm tibble and y must be a fG_ssm tibble or NULL")
+    stop("x must be a mpm fit object with class `mpm_df` and y must either be NULL or an ssm fit object with class `ssm_df`")
   }
 }

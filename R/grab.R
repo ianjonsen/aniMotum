@@ -18,12 +18,12 @@
 ##' @importFrom tibble as_tibble
 ##'
 ##' @examples
-##' ## generate a fG_ssm fit object
+##' ## generate an ssm fit object
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
+##' control = ssm_control(verbose = 0))
 ##' 
 ##' ## grab predicted values as an un-projected tibble
-##' preds <- grab(xs, what = "predicted", as_sf = FALSE)
+##' preds <- grab(xs, what = "predicted")
 ##' 
 ##' @export
 ##'
@@ -31,20 +31,20 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))
 
-  if(!any(inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
-    stop("a foieGras ssm or mpm model object with class `fG_ssm` of `fG_mpm`, respectively, must be supplied")
+  if(!any(inherits(x, "ssm_df"), inherits(x, "mpm_df"))) 
+    stop("a foieGras ssm or mpm model object with class `ssm_df` of `mpm_df`, respectively, must be supplied")
   if(!what %in% c("fitted","predicted","rerouted","data"))
-    stop("only `fitted`, `predicted`, `rerouted`, or `data` objects can be grabbed from an fG_ssm fit object")
-  if(inherits(x, "fG_mpm") & what == "predicted")
-    stop("predicted values do not exist for `fG_mpm` objects; use what = `fitted` instead")
-  if(inherits(x, "fG_ssm")) {
+    stop("only `fitted`, `predicted`, `rerouted`, or `data` objects can be grabbed from an ssm fit object")
+  if(inherits(x, "mpm_df") & what == "predicted")
+    stop("predicted values do not exist for `mpm` objects; use what = `fitted` instead")
+  if(inherits(x, "ssm_df")) {
     if(any(sapply(x$ssm, function(.) is.na(.$ts))) && what == "predicted")
       stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. 
            \n Either grab `fitted` values or re-fit with a positive integer value for `time.step`")
   }
-  
+
   switch(class(x)[1],
-         fG_ssm = {
+         ssm_df = {
            ## remove optimizer crash results from extraction
            nf <- which(sapply(x$ssm, length) < 15)
            if (length(nf) > 0) {
@@ -143,7 +143,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
              }
            }
          },
-         fG_mpm = {
+         mpm_df = {
            ## remove optimiser crash results from extraction
            nf <- which(sapply(x$mpm, length) < 8)
            if (length(nf) > 0) {

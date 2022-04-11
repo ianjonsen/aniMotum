@@ -1,6 +1,6 @@
-##' @title calculate one-step-ahead (prediction) residuals from a \code{foieGras} fit
+##' @title calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit
 ##'
-##' @param x a compound \code{fG} tbl fit object
+##' @param x a foieGras ssm fit object with class `ssm_df`
 ##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
 ##' @param ... other arguments to TMB::oneStepPrediction
 ##'
@@ -9,11 +9,11 @@
 ##' @references Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and A. Neilsen. 2017. Validation of ecological state space models using the Laplace approximation. Environmental and Ecological Statistics 24:317–339.
 ##'
 ##' @examples
-##' ## generate a fG_ssm fit object (call is for speed only)
+##' # generate a ssm fit object (call is for speed only)
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
+##' control = ssm_control(verbose = 0))
 ##' 
-##' ## just use one seal to save time
+##' # just use one individual to save time
 ##' dres <- osar(xs[2,])
 ##'
 ##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
@@ -32,12 +32,11 @@ osar <- function(x, method = "fullGaussian", ...)
                    method = method,
                    subset = which(rep(f$isd, each = 2)),
                    discrete = FALSE,
-                   parallel = FALSE,
                    trace = FALSE,
                    ...)
   }
 
-  if(inherits(x, "fG_ssm")) {
+  if(inherits(x, "ssm_df")) {
     if(nrow(x) > 3 & 
        requireNamespace("future", quietly = TRUE) &
        requireNamespace("furrr", quietly = TRUE)
@@ -59,7 +58,7 @@ osar <- function(x, method = "fullGaussian", ...)
     })
     }
   } else {
-    stop("a foieGras ssm fit object with class fG_ssm is required")
+    stop("a foieGras ssm fit object with class `ssm_df` is required")
   }
   
   cr <- sapply(r, function(.) inherits(., "try-error"))
@@ -128,7 +127,7 @@ osar <- function(x, method = "fullGaussian", ...)
       do.call(rbind, .) %>% 
       as_tibble() 
 
-    class(out) <- append("fG_osar", class(out))
+    class(out) <- append("osar", class(out))
     return(out)
   }
 }

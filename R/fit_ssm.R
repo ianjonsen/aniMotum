@@ -81,13 +81,12 @@
 ##' @examples
 ##' ## fit crw model to Argos LS data
 ##' ## se = FALSE to speed up ex
-##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 48, 
-##' control = ssm_control(se = FALSE)) 
+##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 48) 
 ##' 
-##' ## time series plots of fitted value fit to data
+##' ## time series plots of fitted values and observations
 ##' plot(fit, what = "fitted", type = 1, ask = FALSE)
 ##'
-##' ## track plots of predicted value fit to data
+##' ## 2-D tracks plots of predicted values and observations
 ##' plot(fit, what = "predicted", type = 2, ask = FALSE)
 ##'
 ##'
@@ -205,6 +204,6 @@ fit_ssm <- function(x,
     )
   }
 
-  class(fit) <- append("fG_ssm", class(fit))
+  class(fit) <- append("ssm_df", class(fit))
   return(fit)
 }

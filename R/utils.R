@@ -48,7 +48,6 @@ emf <- function(gps = 0.1,
 ##' @param sd vector of standard deviations
 ##' @param l lower limit of distribution
 ##' @param u upper limit of distribution
-##'
 ##' @importFrom stats pnorm qnorm runif
 ##' @keywords internal
 rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
@@ -63,7 +62,6 @@ rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
 ##' @param lon a vector of longitudes
 ##' @param lon_min the minimum longitude value to wrap appropriately, eg. 0 to
 ##' wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180
-##'
 ##' @keywords internal
 wrap_lon <- function(lon, lon_min = -180) {
   

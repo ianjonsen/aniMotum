@@ -2,7 +2,7 @@
 ##'
 ##' @description plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
 ##'
-##' @param x a \code{foieGras osar} object with class `fG_osar`
+##' @param x a \code{foieGras osar} object with class `osar`
 ##' @param type type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)
 ##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
@@ -11,10 +11,10 @@
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
-##' @importFrom ggplot2 aes facet_grid theme_minimal
+##' @importFrom ggplot2 aes facet_grid theme_minimal xlab ylab element_blank geom_smooth
 ##' @importFrom stats acf qnorm
 ##' @importFrom grDevices hcl.colors
-##' @method plot fG_osar
+##' @method plot osar
 ##'
 ##' @examples
 ##' ## generate a fG_ssm fit object (call is for speed only)
@@ -26,7 +26,7 @@
 ##'
 ##' @export
 
-plot.fG_osar <-
+plot.osar <-
   function(x,
            type = c("ts", "qqnorm", "acf"),
            pages = 1,
@@ -48,15 +48,21 @@ plot.fG_osar <-
   
   wpal <- hcl.colors(n = 5, palette = pal)
   
-  if(inherits(x, "fG_osar")) {
+  if(inherits(x, "osar")) {
   
   switch(type,
          ts = {
            x.lst <- split(x, x$id)
            p <- lapply(x.lst, function(x) {
              ggplot(x) +
-             geom_point(aes(x = date, y = residual), shape = 19, colour = wpal[1]) +
+             geom_point(aes(x = date, y = residual), shape = 19, colour = wpal[1], alpha = 0.5) +
              geom_hline(aes(yintercept = 0), lty = 2, colour = wpal[4]) +
+             geom_smooth(aes(x = date, y = residual), 
+                         method = "loess", 
+                         formula = y ~ x, 
+                         span = 0.9, 
+                         colour = "darkorange", 
+                         se = FALSE) +
              facet_grid(id ~ coord) +
              theme_minimal()
            })
@@ -69,7 +75,9 @@ plot.fG_osar <-
                geom_qq(colour = wpal[1]) +
                geom_qq_line(colour = wpal[4]) +
                facet_grid(id ~ coord) +
-               theme_minimal()
+               theme_minimal() +
+               xlab(element_blank()) + 
+               ylab(element_blank())
            })
          },
          acf = {
@@ -110,6 +118,6 @@ plot.fG_osar <-
     }
     
   } else {
-    stop("an fG_osar class object is required")
+    stop("an osar class object is required")
   }
 }

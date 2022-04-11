@@ -1,8 +1,8 @@
 ##' @title plot
 ##'
-##' @description visualize simulated tracks from a fG_sim data.frame
+##' @description visualize simulated tracks from a sim data.frame
 ##'
-##' @param x a \code{foieGras} simulation data.frame with class \code{fG_sim}
+##' @param x a \code{foieGras} simulation data.frame with class \code{sim}
 ##' @param error logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots
 ##' @param pal hcl.colors palette to use (default: "Cividis"); type \code{hcl.pals()} for options
 ##' @param rev reverse direction of colour palette; logical (default = FALSE)
@@ -16,7 +16,7 @@
 ##' @importFrom ggplot2 theme ylim coord_fixed scale_colour_manual scale_size
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors extendrange
-##' @method plot fG_sim
+##' @method plot sim
 ##'
 ##' @examples
 ##' tr <- sim(N=100, model = "crw")
@@ -24,7 +24,7 @@
 ##' 
 ##' @export
 
-plot.fG_sim <- function(x, 
+plot.sim <- function(x, 
                         error = FALSE,
                         pal = "Cividis",
                         rev = FALSE,
@@ -34,11 +34,12 @@ plot.fG_sim <- function(x,
   if (length(list(...)) > 0) {
     warning("additional arguments ignored")
   }
+  stopifnot("x must be a sim object with class `sim`" = inherits(x, "sim"))
   
   bts <- names(x)[names(x) %in% c("g", "b")]
   if(length(bts) == 0 & !is.null(bts)) bts <- NULL
-  
-  model <- strsplit(class(x)[2], "_")[[1]][2]
+
+  model <- class(x)[2]
   
   switch(model, 
          crws = {

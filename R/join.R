@@ -13,20 +13,19 @@
 ##' @importFrom tibble as_tibble
 ##' @examples
 ##' ## load example foieGras fit objects (to save time)
-##' ## generate a fG_ssm fit object
-##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
-##' data(xm)
+##' ## generate a ssm fit object
+##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72)
+##' xm <- fit_mpm(xs, what = "p", model = "jmpm")
 ##' 
 ##' ## join predicted values as an un-projected tibble
-##' xsm <- join(xs, xm, as_sf = FALSE)
+##' xsm <- join(xs, xm)
 ##' xsm
 ##' @export
 
-join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
+join <- function(ssm, mpm, what.ssm = "predicted", as_sf = FALSE) {
   
-  if(!inherits(ssm, "fG_ssm")) stop("ssm must be a foieGras ssm fit object with class `fG_ssm`")
-  if(!inherits(mpm, "fG_mpm")) stop("mpm must be a foieGras mpm fit object with class `fG_mpm`")
+  if(!inherits(ssm, "ssm_df")) stop("ssm must be a foieGras ssm fit object with class `ssm_df`")
+  if(!inherits(mpm, "mpm_df")) stop("mpm must be a foieGras mpm fit object with class `mpm_df`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
   y <- grab(mpm, what = "fitted")[, c("g","g.se")] 
@@ -46,7 +45,7 @@ join <- function(ssm, mpm, what.ssm = "predicted", as_sf = TRUE) {
     }
   }
   
-#  class(xy) <- append(class(xy), "fG_ssmp", after = 0)
+  class(xy) <- append(class(xy), "ssmmpm", after = 0)
   return(xy)
   
 }

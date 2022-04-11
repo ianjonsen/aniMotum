@@ -4,7 +4,7 @@
 \alias{join}
 \title{join an mpm-estimated behavioural index to ssm-predicted locations}
 \usage{
-join(ssm, mpm, what.ssm = "predicted", as_sf = TRUE)
+join(ssm, mpm, what.ssm = "predicted", as_sf = FALSE)
 }
 \arguments{
 \item{ssm}{a \code{foieGras} ssm fitted model object}
@@ -24,12 +24,11 @@ a single tbl with all individuals
 }
 \examples{
 ## load example foieGras fit objects (to save time)
-## generate a fG_ssm fit object
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(se = FALSE, verbose = 0))
-data(xm)
+## generate a ssm fit object
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72)
+xm <- fit_mpm(xs, what = "p", model = "jmpm")
 
 ## join predicted values as an un-projected tibble
-xsm <- join(xs, xm, as_sf = FALSE)
+xsm <- join(xs, xm)
 xsm
 }

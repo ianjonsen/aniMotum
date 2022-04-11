@@ -1,8 +1,8 @@
 ##' @title fit a a Move Persistence Model (mpm)
 ##' @description fit a random walk with time-varying move persistence to 
 ##' temporally regular or irregular location data
-##' @param x a `fG_ssm` fit object or a data frame of observations (see details)
-##' @param what if a `fG_ssm` fit object is supplied then \code{what} determines
+##' @param x a `ssm_df` fit object or a data frame of observations (see details)
+##' @param what if a `ssm_df` fit object is supplied then \code{what} determines
 ##'  whether fitted, predicted (default), or rerouted values are mapped; ignored if 
 ##'  \code{x} is a data frame
 ##' @param model mpm model to fit; either \code{mpm} with unpooled random walk 
@@ -28,7 +28,7 @@
 ##' @examples
 ##' ## fit jmpm to two southern elephant seal tracks
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(se = FALSE, verbose = 0))
+##' control = ssm_control(verbose = 0))
 ##' 
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
@@ -70,7 +70,7 @@ fit_mpm <- function(x,
   if(control$verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
   
-  if(inherits(x, "fG_ssm")) {
+  if(inherits(x, "ssm_df")) {
     x <- grab(x, what = what, as_sf = FALSE)[, c(1:2, coords[1], coords[2])]
   } else {
     x <- x[, c(1:2, coords[1], coords[2])]
@@ -123,7 +123,7 @@ fit_mpm <- function(x,
                        )
          })
 
-  class(fit) <- append("fG_mpm", class(fit))  
+  class(fit) <- append("mpm_df", class(fit))  
 
 return(fit)
   

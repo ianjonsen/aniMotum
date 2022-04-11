@@ -379,16 +379,16 @@ sim <- function(N = 100,
     
     switch(model,
            rw = { 
-             class(d) <- append("fG_rws", class(d))
+             class(d) <- append("rws", class(d))
            },
            crw = {
-             class(d) <- append("fG_crws", class(d))
+             class(d) <- append("crws", class(d))
            },
            mpm = {
-             class(d) <- append("fG_mpms", class(d))
+             class(d) <- append("mpms", class(d))
            })
     
-    class(d) <- append("fG_sim", class(d))
+    class(d) <- append("sim", class(d))
     
     return(d)
   

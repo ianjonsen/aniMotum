@@ -28,9 +28,9 @@ fmap(
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class \code{fG_ssm}}
+\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{fG_mpm};
+\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{mpm};
 default is NULL}
 
 \item{what}{specify which location estimates to map: fitted, predicted or

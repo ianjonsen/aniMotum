@@ -2,7 +2,7 @@
 % Please edit documentation in R/simfit.R
 \name{simfit}
 \alias{simfit}
-\title{simulate animal tracks from a \code{fG_ssm} fit}
+\title{simulate animal tracks from a \code{ssm} fit}
 \usage{
 simfit(
   x,
@@ -15,12 +15,12 @@ simfit(
 )
 }
 \arguments{
-\item{x}{a compound \code{fG_ssm} model fit object (ignored if NULL)}
+\item{x}{a \code{ssm} fit object with class \code{ssm_df}}
 
 \item{what}{simulate fitted (typically irregular in time) or predicted
 (typically regular in time) locations}
 
-\item{reps}{number of replicate tracks to simulate from an \code{fG_ssm} model
+\item{reps}{number of replicate tracks to simulate from an \code{ssm} model
 fit object}
 
 \item{grad}{a rasterStack of x- and y-gradients as separate layers (see details)}
@@ -32,16 +32,16 @@ ie. no potential function; see details).}
 \item{cpf}{logical; should simulated tracks return to their start point
 (ie. a central-place forager)}
 
-\item{sim_only}{logical, do not include \code{fG_ssm} estimated location in output
+\item{sim_only}{logical, do not include \code{ssm} estimated location in output
 (default is FALSE)}
 }
 \value{
 a \code{fG_simfit} object containing the paths simulated from a
-\code{fG_ssm} fit object
+\code{ssm} fit object
 }
 \description{
 simulate from the \code{rw} or \code{crw} process models to generate
-either a set of x,y or lon,lat coordinates from a \code{fG_ssm} fit with length
+either a set of x,y or lon,lat coordinates from a \code{ssm} fit with length
 equal to the number of observations used in the SSM fit.
 }
 \details{
