@@ -80,10 +80,10 @@ by <code>simfit</code>.</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>either a <code>fG_ssm</code> model object or
-a <code>fG_simfit</code> object containing simulated paths</p></dd>
+<dd><p>either a <code>ssm</code> fit object or
+a <code>simfit</code> object containing simulated paths</p></dd>
 <dt>what</dt>
-<dd><p>if using a <code>fG_ssm</code> object should the fitted (typically
+<dd><p>if using a <code>ssm</code> object should the fitted (typically
 irregular in time) or predicted (typically regular in time) locations be
 re-routed.</p></dd>
 <dt>dist</dt>
@@ -93,7 +93,7 @@ aid re-routing of points on land. Larger buffers can result in longer
 computation times. See London (2020) for further details. The default buffer
 distance is a constant 50000 m.</p></dd>
 <dt>append</dt>
-<dd><p>should re-routed locations be appended to the <code>fG_ssm</code>
+<dd><p>should re-routed locations be appended to the <code>ssm</code>
 (ssm fit) object (default = TRUE), or returned as a tibble.</p></dd>
 <dt>shapefile</dt>
 <dd><p>polygon shapefile of movement barrier(s) as an <code>sf</code> object
@@ -104,15 +104,15 @@ clips the polygons to the buffered bounds of the movement track(s).</p></dd>
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>When the input is a <code>fG_ssm</code> object <code>route_path</code> can append the
-re-routed path locations to the <code>fG_ssm</code> (ssm fit) object. This is useful
+    <p>When the input is a <code>ssm</code> object <code>route_path</code> can append the
+re-routed path locations to the <code>ssm</code> (ssm fit) object. This is useful
 when move persistence is to be estimated from the re-routed locations via
 <code>fit_mpm</code>, or tracks are to be visualised with <code>fmap</code>. <code>route_path</code> can also
 return a standalone <code>tibble</code> of the re-routed path with the same number of
 locations as either the original fitted or predicted locations.</p>
-<p>When the re-routed path is appended to the <code>fG_ssm</code> object, the path can be
+<p>When the re-routed path is appended to the <code>ssm</code> object, the path can be
 extracted using the <code>grab</code> function, e.g. <code>grab(fit, what = "rerouted")</code>.</p>
-<p>When the input is a <code>fG_simfit</code> object then <code>route_path</code> returns the same
+<p>When the input is a <code>simfit</code> object then <code>route_path</code> returns the same
 object but with the locations within each simulation re-routed.</p>
     </div>
     <div id="references">

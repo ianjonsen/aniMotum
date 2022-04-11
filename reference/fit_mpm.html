@@ -80,9 +80,9 @@ temporally regular or irregular location data</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>a <code>fG_ssm</code> fit object or a data frame of observations (see details)</p></dd>
+<dd><p>a <code>ssm_df</code> fit object or a data frame of observations (see details)</p></dd>
 <dt>what</dt>
-<dd><p>if a <code>fG_ssm</code> fit object is supplied then <code>what</code> determines
+<dd><p>if a <code>ssm_df</code> fit object is supplied then <code>what</code> determines
 whether fitted, predicted (default), or rerouted values are mapped; ignored if
 <code>x</code> is a data frame</p></dd>
 <dt>model</dt>
@@ -124,7 +124,7 @@ see <code>ssm_control</code> for details</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## fit jmpm to two southern elephant seal tracks</span></span>
 <span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, </span>
-<span class="r-in">control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
