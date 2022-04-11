@@ -23,8 +23,4 @@ rtnorm
 \details{
 simulate values from a truncated normal distribution
 }
-\examples{
-x <- rtnorm(10, l = -5, u = 5)
-range(x)
-}
 \keyword{internal}

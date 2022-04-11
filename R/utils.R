@@ -50,9 +50,6 @@ emf <- function(gps = 0.1,
 ##' @param u upper limit of distribution
 ##'
 ##' @importFrom stats pnorm qnorm runif
-##' @examples
-##' x <- foieGras:::rtnorm(10, l = -5, u = 5)
-##' range(x)
 ##' @keywords internal
 rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
   x <- runif(n, pnorm(l, mean, sd), pnorm(u, mean, sd))
@@ -67,11 +64,6 @@ rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
 ##' @param lon_min the minimum longitude value to wrap appropriately, eg. 0 to
 ##' wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180
 ##'
-##' @examples
-##' lon <- seq(-180,180)
-##' lon1 <- wrap_lon(lon, 0)
-##' range(lon)
-##' range(lon1)
 ##' @keywords internal
 wrap_lon <- function(lon, lon_min = -180) {
   
