@@ -78,17 +78,6 @@ wrap -180, 180 on to 0, 360 and -180 to wrap 0,360 on to -180,180</p></dd>
     <p>wrap longitudes from an arbitrary minimum</p>
     </div>
 
-    <div id="ref-examples">
-    <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">lon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>,<span class="fl">180</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">lon1</span> <span class="op">&lt;-</span> <span class="fu">wrap_lon</span><span class="op">(</span><span class="va">lon</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in wrap_lon(lon, 0):</span> could not find function "wrap_lon"</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">lon</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -180  180</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">lon1</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'lon1' not found</span>
-</code></pre></div>
-    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
