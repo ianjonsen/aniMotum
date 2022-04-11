@@ -2,7 +2,7 @@
 title: "fitting SSM's to tracking data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{basics}
+  %\VignetteIndexEntry{fitting SSM's to track data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

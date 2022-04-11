@@ -7,6 +7,7 @@
 * replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument 
 * fit object s3 classes `fG_ssm`, `fG_mpm` migrated to `ssm_df`, `mpm_df`
 * generic plot method s3 classes migrated to `plot.ssm_df`, `plot.mpm_df`, `plot.osar`, `plot.sim`, `plot.simfit`
+* add new vignettes for more comprehensive documentation of package features
 
 
 # foieGras 0.7-6 (26/04/2021)
