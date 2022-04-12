@@ -101,10 +101,14 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    if(all(c("s","s.se") %in% names(out))) {
                      out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
                              "y.se", "s", "s.se", "geometry")]
-                   } else {
-                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
+                     } else {
+                       out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
                              "y.se", "geometry")]
-                   }
+                       }
+                   },
+                 mp = {
+                   out[, c("id", "date", "x", "y", "x.se", "y.se", 
+                           "g", "g.se", "geometry")]
                  })
                
              } else if (what == "rerouted") {
@@ -126,11 +130,16 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    if(all(c("s","s.se") %in% names(out))) {
                      out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
                              "y.se", "u", "v", "u.se", "v.se", "s", "s.se")]
-                   } else {
-                     out[, c("id", "date", "lon", "lat", "x", "y", 
+                     } else {
+                       out[, c("id", "date", "lon", "lat", "x", "y", 
                              "x.se", "y.se", "u", "v", "u.se", "v.se")]
-                   }
+                       }
+                   },
+                 mp = {
+                    out[, c("id", "date", "lon", "lat", "x", "y", 
+                            "x.se", "y.se", "g", "g.se")]
                  })
+               
                out <- as_tibble(out)
              } else if (what == "rerouted") {
                out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]

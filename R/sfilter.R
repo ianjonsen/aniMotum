@@ -473,9 +473,11 @@ sfilter <-
              })
       
       if (control$optim == "nlminb") {
-        aic <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]]
+        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 
+          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
       } else if (control$optim == "optim") {
-        aic <- 2 * length(opt[["par"]]) + 2 * opt[["value"]]
+        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["value"]] + 
+          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
       }
       ## drop sv's from fxd
       if(model == "crw") {
@@ -495,7 +497,7 @@ sfilter <-
         opt = opt,
         tmb = obj,
         rep = rep,
-        aic = aic,
+        AICc = AICc,
         optimiser = control$optim,
         time = proc.time() - st
       )

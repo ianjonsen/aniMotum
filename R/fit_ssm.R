@@ -114,6 +114,8 @@ fit_ssm <- function(x,
                     )
 {
 
+  stopifnot("model can only be 1 of `rw`, `crw`, or `mp`" = model %in% c("rw","crw","mp"))
+  
 ## check args - most args handled by prefilter() & sfilter()
   if(!is.data.frame(x))  
     stop("x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
@@ -175,20 +177,37 @@ fit_ssm <- function(x,
   } else {
     if(control$verbose == 1)
       cat(paste0("fitting ", model, "...\n"))
+    if(model %in% c("crw", "rw")) {
+      fit <- lapply(fit,
+                    function(x) {
+                      sfilter(
+                        x = x,
+                        model = model,
+                        time.step = time.step,
+                        parameters = parameters,
+                        map = map,
+                        fit.to.subset = fit.to.subset,
+                        control = control,
+                        inner.control = inner.control
+                      )
+                    })
+      
+    } else if (model == "mp") {
+      fit <- lapply(fit,
+                    function(x) {
+                      mpfilter(
+                        x = x,
+                        time.step = time.step,
+                        parameters = parameters,
+                        map = map,
+                        fit.to.subset = fit.to.subset,
+                        control = control,
+                        inner.control = inner.control
+                      )
+                    })
+      
+    }
     
-    fit <- lapply(fit,
-                  function(x) {
-                    sfilter(x = x,
-                            model = model,
-                            time.step = time.step,
-                            parameters = parameters,
-                            map = map,
-                            fit.to.subset = fit.to.subset,
-                            control = control,
-                            inner.control = inner.control
-                            )
-                  })
-
     fit <- tibble(id = names(fit), ssm = fit)
     fit <- tibble(fit,
                   converged = sapply(fit$ssm, function(x) 
@@ -202,6 +221,7 @@ fit_ssm <- function(x,
                   ),
                   pmodel = sapply(fit$ssm, function(x) x$pm)
     )
+
   }
 
   class(fit) <- append("ssm_df", class(fit))

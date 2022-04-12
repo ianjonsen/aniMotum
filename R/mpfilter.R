@@ -151,9 +151,8 @@ mpfilter <-
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
         X = t(xs),
-        mu = t(xs),
         lg = rep(0, dim(xs)[1]),
-        l_sigma_g = -10,
+        l_sigma_g = 0,
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -161,7 +160,10 @@ mpfilter <-
     } 
     
     ## start to work out which obs_mod to use for each observation
-    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
+    d <- d %>% mutate(obs.type = factor(obs.type, 
+                                        levels = c("LS","KF","GPS"), 
+                                        labels = c("LS","KF","GPS"))
+                      )
     obst <- which(table(d$obs.type) > 0)
     
     automap <- list(
@@ -171,10 +173,6 @@ mpfilter <-
       list(
         l_tau = factor(c(NA, NA)),
         l_rho_o = factor(NA)
-        ),
-      list(
-        l_tau = factor(c(NA, NA)),
-        l_psi = factor(NA)
         ),
       list(
         l_psi = factor(NA)
@@ -197,24 +195,14 @@ mpfilter <-
     ## convert from string to integer for C++
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
                       ifelse(d.all$obs.type == "KF", 1, 2)
-    )
+                      )
     ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0) so
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
     ##  as isd makes likelihood contribution goes to 0 in C++ code
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
     
-    ## calculate fitted & predicted indices + delta t for proper speed estimates
-    fidx <- which(d.all$isd)
-    fdt <- as.numeric(difftime(d.all$date[fidx], 
-                               c(as.POSIXct(NA),d.all$date[fidx][-length(fidx)]), 
-                               units = "hours"))
-    pidx <- which(!d.all$isd)
-    pdt <- as.numeric(difftime(d.all$date[pidx], 
-                               c(as.POSIXct(NA),d.all$date[pidx][-length(pidx)]), 
-                               units = "hours"))
-    
     data <- list(
-      model_name = "mp_ssm",
+      model_name = "mp",
       Y = rbind(d.all$x, d.all$y), 
       dt = dt,
       isd = as.integer(d.all$isd),
@@ -222,15 +210,14 @@ mpfilter <-
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
-      K = cbind(d.all$emf.x, d.all$emf.y),
-      GLerr = cbind(d.all$lonerr, d.all$laterr)
+      K = cbind(d.all$emf.x, d.all$emf.y)
     ) 
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-    rnd <- c("X", "lg")
+    rnd <- c("X","lg")
     
     obj <-
       MakeADFun(
@@ -263,7 +250,7 @@ mpfilter <-
           l_rho_o=-7) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
     U = c(l_sigma=c(Inf,Inf),
           l_rho_p=7,
-          l_sigma_g=-10,
+          l_sigma_g=50,
           l_psi=Inf,
           l_tau=c(Inf,Inf),
           l_rho_o=7)
@@ -330,9 +317,92 @@ mpfilter <-
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
       }
       
-      
       tmp <- summary(rep, "random")
-      browser()     
+      X <- tmp[rownames(tmp) %in% "X",]
+      lg <- tmp[rownames(tmp) %in% "lg",]
+      
+      rdm <- data.frame(cbind(X[seq(1, nrow(X), by = 2), ],
+                              X[seq(2, nrow(X), by = 2), ]
+      ))[, c(1,3,2,4)] 
+      names(rdm) <- c("x","y","x.se","y.se")
+      rdm <- data.frame(rdm, g = plogis(lg[,1]), g.se = lg[,2])
+      
+      
+      rdm$id <- unique(d.all$id)
+      rdm$date <- d.all$date
+      rdm$isd <- d.all$isd  
+      rdm <- rdm[, c("id","date","x","y","x.se","y.se","g", "g.se", "isd")]
+      
+      ## coerce x,y back to sf object
+      rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)
+      rdm <- st_set_crs(rdm, prj)
+      
+      pv <- subset(rdm, !isd)[, 1:8]
+      pv$g <- with(pv, (g - min(g))  / (max(g) - min(g)))
+      fv <- subset(rdm, isd)[, 1:8]
+      fv$g <- with(fv, (g - min(g))  / (max(g) - min(g)))
     
+      if (control$optim == "nlminb") {
+        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 
+          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
+      } else if (control$optim == "optim") {
+        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["value"]] + 
+          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
+      }
+      
+      out <- list(
+        call = call,
+        predicted = pv,
+        fitted = fv,
+        par = fxd,
+        data = x,
+        isd = d.all$isd,
+        inits = parameters,
+        pm = "mp",
+        ts = time.step,
+        opt = opt,
+        tmb = obj,
+        rep = rep,
+        AICc = AICc,
+        optimiser = control$optim,
+        time = proc.time() - st
+      )
+      
+      if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor)) & (!"l_psi" %in% names(map))) {
+      warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:
+             `map = list(psi = factor(NA))`", call. = FALSE)
+      } else if (!rep$pdHess) {
+        warning("Hessian was not positive-definite so some standard errors could not be calculated.", call. = FALSE)
+      }
+    } else if (rep$pdHess & all(is.na(x$smaj), is.na(x$smin), is.na(x$eor))){
+      warning("Hessian was not positive-definite so some standard errors could not be calculated.", 
+              call. = FALSE)
+    } else {
+      
+      ## if optimiser fails
+      out <- list(
+        call = call,
+        data = x,
+        inits = parameters,
+        pm = model,
+        ts = time.step,
+        tmb = obj,
+        errmsg = opt
+      )
+      
+      if(any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor)) & (!"l_psi" %in% names(map))) {
+        warning("The optimiser failed. Try simplifying the model with the following argument: 
+                                 `map = list(psi = factor(NA))`", call. = FALSE)
+      } else if (all(is.na(x$smaj), is.na(x$smin), is.na(x$eor)) & (!"rho_o" %in% names(map))){
+        warning("The optimiser failed. Try simplifying the model with the following argument: 
+                                 `map = list(rho_o = factor(NA))`", call. = FALSE)
+      } else {
+        warning("The optimiser failed. You could try using a different time.step or turn off prefiltering with
+                `spdf = FALSE`", call. = FALSE)
+      }
     }
+    
+    class(out) <- append("mp_ssm", class(out))
+    
+    out
 }
