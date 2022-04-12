@@ -4,6 +4,7 @@
 #include "TMB/sub/crw.hpp"
 #include "TMB/sub/mpm.hpp"
 #include "TMB/sub/joint_mpm.hpp"
+#include "TMB/sub/mp_ssm.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() ()
@@ -17,6 +18,8 @@ Type objective_function<Type>::operator() ()
     return mpm(this);
   } else if (model_name == "jmpm") {
     return joint_mpm(this);
+  } else if (model_name == "mp_ssm") {
+    return mp_ssm(this);
   } else {
     error ("Unknown model_name");
   }
