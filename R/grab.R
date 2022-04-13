@@ -31,18 +31,22 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))
 
-  if(!any(inherits(x, "ssm_df"), inherits(x, "mpm_df"))) 
-    stop("a foieGras ssm or mpm model object with class `ssm_df` of `mpm_df`, respectively, must be supplied")
+  if(!any(inherits(x, "ssm_df"), inherits(x, "mpm_df"), inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
+    stop("a foieGras ssm or mpm model object must be supplied")
   if(!what %in% c("fitted","predicted","rerouted","data"))
     stop("only `fitted`, `predicted`, `rerouted`, or `data` objects can be grabbed from an ssm fit object")
-  if(inherits(x, "mpm_df") & what == "predicted")
+  if(any(inherits(x, "mpm_df"), inherits(x, "fG_mpm")) & what == "predicted")
     stop("predicted values do not exist for `mpm` objects; use what = `fitted` instead")
-  if(inherits(x, "ssm_df")) {
+  if(any(inherits(x, "ssm_df"), inherits(x, "fG_ssm"))) {
     if(any(sapply(x$ssm, function(.) is.na(.$ts))) && what == "predicted")
       stop("\n there are no predicted locations because you used time.step = NA when calling `fit_ssm`. 
            \n Either grab `fitted` values or re-fit with a positive integer value for `time.step`")
   }
 
+  ## coerce old foieGras classes "fG_ssm" and "fG_mpm" to new classes
+  if(inherits(x, "fG_ssm")) class(x)[1] <- "ssm_df"
+  if(inherits(x, "fG_mpm")) class(x)[1] <- "mpm_df"
+  
   switch(class(x)[1],
          ssm_df = {
            ## remove optimizer crash results from extraction
@@ -108,7 +112,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    },
                  mp = {
                    out[, c("id", "date", "x", "y", "x.se", "y.se", 
-                           "gn", "g", "g.se", "geometry")]
+                           "logit_g", "logit_g.se", "g", "geometry")]
+                   
                  })
                
              } else if (what == "rerouted") {
@@ -137,7 +142,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    },
                  mp = {
                     out[, c("id", "date", "lon", "lat", "x", "y", 
-                            "x.se", "y.se", "gn", "g", "g.se")]
+                            "x.se", "y.se", "logit_g", "logit_g.se", "g")]
+                   
                  })
                
                out <- as_tibble(out)

@@ -325,22 +325,22 @@ mpfilter <-
                               X[seq(2, nrow(X), by = 2), ]
       ))[, c(1,3,2,4)] 
       names(rdm) <- c("x","y","x.se","y.se")
-      rdm <- data.frame(rdm, g = plogis(lg[,1]), g.se = lg[,2])
+      rdm <- data.frame(rdm, logit_g = lg[,1], logit_g.se = lg[,2], g = plogis(lg[,1]))
       
       
       rdm$id <- unique(d.all$id)
       rdm$date <- d.all$date
       rdm$isd <- d.all$isd  
-      rdm <- rdm[, c("id","date","x","y","x.se","y.se","g", "g.se", "isd")]
+      rdm <- rdm[, c("id","date","x","y","x.se","y.se", "logit_g", "logit_g.se", "g", "isd")]
       
       ## coerce x,y back to sf object
       rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)
       rdm <- st_set_crs(rdm, prj)
       
-      pv <- subset(rdm, !isd)[, 1:8]
-      pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
-      fv <- subset(rdm, isd)[, 1:8]
-      fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
+      pv <- subset(rdm, !isd)[, -10]
+      #pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
+      fv <- subset(rdm, isd)[, -10]
+      #fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
     
       if (control$optim == "nlminb") {
         AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 

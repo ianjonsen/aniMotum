@@ -60,10 +60,10 @@ Suggests:
     mapproj,
     future,
     furrr,
-    parallel,
     ggspatial,
     rosm,
-    pathroutr (>= 0.2.1)
+    pathroutr (>= 0.2.1),
+    parallelly
 Depends: 
     R (>= 3.6.0)
 Remotes:

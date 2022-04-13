@@ -19,7 +19,6 @@
 ##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
-##' @importFrom parallel stopCluster
 ##' @export
 
 osar <- function(x, method = "fullGaussian", ...)
@@ -39,17 +38,19 @@ osar <- function(x, method = "fullGaussian", ...)
   if(inherits(x, "ssm_df")) {
     if(nrow(x) > 3 & 
        requireNamespace("future", quietly = TRUE) &
-       requireNamespace("furrr", quietly = TRUE)
+       requireNamespace("furrr", quietly = TRUE) &
+       requireNamespace("parallelly", quietly = TRUE)
        ) {
     cat("running in parallel, this could take a while...\n")
-    cl <- future::makeClusterPSOCK(availableCores())
-    future::plan(cluster, workers = cl)
+    cl <- future::makeClusterPSOCK(parallelly::availableCores())
+    future::plan("future::cluster", workers = cl)
     
     r <- x$ssm %>%
       furrr::future_map(~ try(map_fn(.x, method), silent = TRUE), 
                  .options = furrr::furrr_options(seed = TRUE))
     
-    stopCluster(cl)
+    suppressWarnings(parallelly::autoStopCluster(cl))
+    
     } else {
       if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
                            running sequentially. This could take a while...\n")
@@ -69,17 +70,19 @@ osar <- function(x, method = "fullGaussian", ...)
     redo <- x[which(cr), ]
     if(nrow(x) > 3 & 
        requireNamespace("future", quietly = TRUE) &
-       requireNamespace("furrr", quietly = TRUE)
+       requireNamespace("furrr", quietly = TRUE) &
+       requireNamespace("parallelly", quietly = TRUE)
     ) {
       cat("running in parallel, this could take a while...\n")
-      cl <- future::makeClusterPSOCK(availableCores())
-      future::plan(cluster, workers = cl)
+      cl <- future::makeClusterPSOCK(parallelly::availableCores())
+      future::plan("future::cluster", workers = cl)
       
       r.redo <- redo$ssm %>%
         furrr::future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
                    .options = furrr::furrr_options(seed = TRUE))
       
-      stopCluster(cl)
+      suppressWarnings(parallelly::autoStopCluster(cl))
+      
     } else {
       if(nrow(x) > 3) cat("future and furrr packages not installed for parallel processing, 
                            running sequentially. This could take a while...\n")
