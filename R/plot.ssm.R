@@ -38,8 +38,10 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
 ##' or (type = 2) 2-d fits to data (units = km)
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug theme_minimal vars labs
-##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both label_value geom_ribbon facet_wrap
+##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug 
+##' @importFrom ggplot2 theme_minimal vars labs coord_fixed label_value geom_ribbon 
+##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both 
+##' @importFrom ggplot2 facet_wrap
 ##' @importFrom tidyr gather
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
@@ -237,7 +239,6 @@ plot.ssm_df <-
         conf_sf$id <- unique(ssm$id)
         
         d.lst <- split(d, d$id)
-        ssm.lst <- split(ssm, ssm$id)
         
         p <- lapply(1:nrow(x), function(i) {
           m <- ggplot() +
@@ -300,7 +301,86 @@ plot.ssm_df <-
         })
         names(p) <- x$id
         if (!pages) {
-          if(ask) {
+          if(ask & nrow(x) > 1) {
+            devAskNewPage(ask = TRUE)
+            print(p)
+            devAskNewPage(ask = FALSE)
+          } else {
+            return(p)
+          }
+        } else if (pages) {
+          wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+        }
+      } else if (type == 3) {
+        stopifnot("This plot type not applicable for `rw` and `crw` model fits" = 
+                    "g" %in% names(ssm))
+        ssm.lst <- split(ssm, ssm$id)
+        p <- lapply(1:nrow(x), function(i) {
+          m <- ggplot() +
+            geom_point(
+              data = ssm.lst[[i]],
+              aes(date, g, col = g),
+              shape = 20,
+              size = 3
+            ) +
+            scale_colour_viridis_c(option = "E") +
+            labs(title = paste("id:", x[i, "id"]))
+          
+          m <- m +
+            xlab(element_blank()) +
+            ylab(element_blank()) +
+            theme_minimal()
+          m
+        })
+        names(p) <- x$id
+        if (!pages) {
+          if(ask & nrow(x) > 1) {
+            devAskNewPage(ask = TRUE)
+            print(p)
+            devAskNewPage(ask = FALSE)
+          } else {
+            return(p)
+          }
+        } else if (pages) {
+          wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+        }
+      } else if (type == 4) {
+        stopifnot("This plot type not applicable for `rw` and `crw` model fits" = 
+                    "g" %in% names(ssm))
+        ssm.lst <- split(ssm, ssm$id)
+        p <- lapply(1:nrow(x), function(i) {
+          g.33 <- subset(ssm.lst[[i]], g <= quantile(ssm.lst[[i]]$g, 0.33))
+          m <- ggplot() +
+            geom_path(
+              data = ssm.lst[[i]],
+              aes(x, y), 
+              col = grey(0.7),
+              lwd = 0.2
+            ) +
+            geom_point(
+              data = ssm.lst[[i]],
+              aes(x, y, col = g),
+              shape = 20,
+              size = 3
+            ) +
+            geom_point(data = g.33,
+                       aes(x, y, col = g),
+                       shape = 20,
+                       size = 3
+            ) +
+            scale_colour_viridis_c(option = "E") +
+            labs(title = paste("id:", x[i, "id"])) +
+            coord_fixed()
+          
+          m <- m +
+            xlab(element_blank()) +
+            ylab(element_blank()) +
+            theme_minimal()
+          m
+        })
+        names(p) <- x$id
+        if (!pages) {
+          if(ask & nrow(x) > 1) {
             devAskNewPage(ask = TRUE)
             print(p)
             devAskNewPage(ask = FALSE)
