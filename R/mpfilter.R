@@ -338,9 +338,9 @@ mpfilter <-
       rdm <- st_set_crs(rdm, prj)
       
       pv <- subset(rdm, !isd)[, 1:8]
-      pv$g <- with(pv, (g - min(g))  / (max(g) - min(g)))
+      pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
       fv <- subset(rdm, isd)[, 1:8]
-      fv$g <- with(fv, (g - min(g))  / (max(g) - min(g)))
+      fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
     
       if (control$optim == "nlminb") {
         AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 

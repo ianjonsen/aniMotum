@@ -108,7 +108,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    },
                  mp = {
                    out[, c("id", "date", "x", "y", "x.se", "y.se", 
-                           "g", "g.se", "geometry")]
+                           "gn", "g", "g.se", "geometry")]
                  })
                
              } else if (what == "rerouted") {
@@ -137,7 +137,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                    },
                  mp = {
                     out[, c("id", "date", "lon", "lat", "x", "y", 
-                            "x.se", "y.se", "g", "g.se")]
+                            "x.se", "y.se", "gn", "g", "g.se")]
                  })
                
                out <- as_tibble(out)
