@@ -4,7 +4,7 @@
 \alias{grab}
 \title{grab tibble's by name from a foieGras model object}
 \usage{
-grab(x, what = "fitted", as_sf = FALSE)
+grab(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE)
 }
 \arguments{
 \item{x}{a \code{foieGras} ssm or mpm model object}
@@ -15,6 +15,12 @@ grab(x, what = "fitted", as_sf = FALSE)
 \item{as_sf}{logical; if FALSE (default) then return a tibble with
 un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
 is an mpm model object.}
+
+\item{normalise}{logical, should move persistence estimates (g) be normalised
+to 0, 1 (default = FALSE). Ignored if what is \code{data} or \code{rerouted}.}
+
+\item{group}{logical; should move persistence be normalised among individuals
+as a group (ie. relative) or separately (default = FALSE)}
 }
 \value{
 a tibble with all individual tibble's appended

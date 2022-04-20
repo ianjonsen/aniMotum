@@ -13,7 +13,6 @@
   ncol = 1,
   ask = TRUE,
   pal = "Zissou1",
-  norm_g = FALSE,
   ...
 )
 }

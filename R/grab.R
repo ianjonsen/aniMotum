@@ -11,10 +11,15 @@
 ##' @param as_sf logical; if FALSE (default) then return a tibble with 
 ##' un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
 ##' is an mpm model object.
+##' @param normalise logical, should move persistence estimates (g) be normalised 
+##' to 0, 1 (default = FALSE). Ignored if what is `data` or `rerouted`.
+##' @param group logical; should move persistence be normalised among individuals 
+##' as a group (ie. relative) or separately (default = FALSE)
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
+##' @importFrom dplyr group_by mutate ungroup "%>%"
 ##' @importFrom tibble as_tibble
 ##'
 ##' @examples
@@ -27,7 +32,7 @@
 ##' 
 ##' @export
 ##'
-grab <- function(x, what = "fitted", as_sf = FALSE) {
+grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))
 
@@ -87,10 +92,9 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                  data = st_crs(.$data)
                ))
              out <- lapply(1:length(out_lst), function(i) {
-              tmp <- st_as_sf(out_lst[[i]], coords = c("lon", "lat"))
-              tmp <- st_set_crs(tmp, "+proj=longlat +datum=WGS84 +no_defs")
-              tmp <- st_transform(tmp, prj[[i]])
-              tmp
+                st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+                  st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                  st_transform(prj[[i]])
              })
              out <- do.call(rbind, out)
              
@@ -113,7 +117,16 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                  mp = {
                    out[, c("id", "date", "x", "y", "x.se", "y.se", 
                            "logit_g", "logit_g.se", "g", "geometry")]
-                   
+                   if(normalise & !group) {
+                     out <- out %>% 
+                       group_by(id) %>%
+                       mutate(g = (g - min(g))/(max(g) - min(g))) %>%
+                       ungroup()
+                     } else if(normalise & group) {
+                     out <- out %>% 
+                       mutate(g = (g - min(g))/(max(g) - min(g)))
+                   }
+                   out
                  })
                
              } else if (what == "rerouted") {
@@ -141,9 +154,18 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
                        }
                    },
                  mp = {
-                    out[, c("id", "date", "lon", "lat", "x", "y", 
+                    out <- out[, c("id", "date", "lon", "lat", "x", "y", 
                             "x.se", "y.se", "logit_g", "logit_g.se", "g")]
-                   
+                    if(normalise & !group) {
+                      out <- out %>% 
+                        group_by(id) %>%
+                        mutate(g = (g - min(g))/(max(g) - min(g))) %>%
+                        ungroup()
+                    } else if(normalise & group) {
+                      out <- out %>% 
+                        mutate(g = (g - min(g))/(max(g) - min(g)))
+                    }
+                    out
                  })
                
                out <- as_tibble(out)
@@ -172,6 +194,16 @@ grab <- function(x, what = "fitted", as_sf = FALSE) {
              }) 
            out <- do.call(rbind, out)
            out <- as_tibble(out)
+           if(normalise & !group) {
+             out <- out %>% 
+               group_by(id) %>%
+               mutate(g = (g - min(g))/(max(g) - min(g))) %>%
+               ungroup()
+           } else if(normalise & group) {
+             out <- out %>% 
+               mutate(g = (g - min(g))/(max(g) - min(g)))
+           }
+           out
          }
          )
       

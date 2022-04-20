@@ -1,9 +1,11 @@
 # foieGras 1.0.0 (sometime soon)
 
 * adds `route_path()` a wrapper function calling [`pathroutr`](https://github.com/jmlondon/pathroutr) to re-route `fit_ssm` estimated or `simfit` simulated tracks around land barriers
-* adds `sim_filter()` to calculate similarity between simulated and ssm-estimated tracks, and returns the most similar simulated tracks based on a user-specified quantile  
-* adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile` for more detailed coastline mapping  
-* adds option to turn on/off average travel rate (s) standard error (s.se) estimation in `ssm_control()`; default is off - no SE estimation for much faster `model = "crw"` fitting
+* adds `sim_filter()` to calculate similarity between simulated and ssm-estimated tracks, and returns the most similar simulated tracks based on a user-specified quantile
+* adds option for move persistence estimates to be normalised to 0,1 in `grab()`, either on track separately or as a group for a relative measure that spans 0 - 1
+* adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile` for more detailed coastline mapping
+* adds mapping function `map()` to replace `fmap()` for faster, more flexible estimated track maps & fixes to coastline issues for tracks that span -180, 180
+* adds faster `crw` model fitting via `fit_ssm()` by turning off travel rate standard error (s.se) estimation in `ssm_control()` as the default. SE estimation can be turned on via `control = ssm_control(se = TRUE)`.
 * replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument 
 * fit object s3 classes `fG_ssm`, `fG_mpm` migrated to `ssm_df`, `mpm_df`
 * generic plot method s3 classes migrated to `plot.ssm_df`, `plot.mpm_df`, `plot.osar`, `plot.sim`, `plot.simfit`

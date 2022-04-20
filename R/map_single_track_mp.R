@@ -1,0 +1,154 @@
+##' @title map_single_track_mp
+##'
+##' @description map foieGras-estimated locations from a single track with
+##' a behavioural index
+##' 
+##' @param map_type coastline data to be used in maps
+##' @param obs_sf observed location geometry
+##' @param conf_sf confidence ellipses around estimated locations, if specified
+##' @param line_sf track line, if specified
+##' @param loc_sf estimated location geometry
+##' @param by.date colour estimated locations by date (logical)
+##' @param extents map extents
+##' @param aes a tibble of map aesthetics (size, shape, col, fill, alpha) to
+##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
+##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
+##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
+##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
+##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
+##' @importFrom ggplot2 element_rect coord_sf unit
+##' @importFrom rnaturalearth ne_countries
+##' @importFrom sf st_union st_convex_hull st_intersection st_collection_extract 
+##' @importFrom sf st_sf st_crs
+##' @importFrom dplyr "%>%" filter
+##' 
+##' @keywords internal
+map_single_track_mp <- function(map_type, 
+                                obs_sf,
+                                conf_sf, 
+                                line_sf, 
+                                loc_sf, 
+                                by.date,
+                                extents,
+                                aes,
+                                ...) {
+  ## if input aes is identical to default aes_lst() then plot components
+  if(identical(aes, aes_lst())) {
+    obs_sf <- NULL
+    line_sf <- NULL
+    conf_sf <- NULL
+  }
+  
+  ## get worldmap
+  if (map_type == "default") {
+    if (requireNamespace("rnaturalearthdata", quietly = TRUE)) {
+      wm <- ne_countries(scale = 50, returnclass = "sf") %>%
+        st_transform(crs = st_crs(loc_sf))
+    } else {
+      wm <- ne_countries(scale = 110, returnclass = "sf") %>%
+        st_transform(crs = st_crs(loc_sf))
+    }
+    
+    ## define map region & clip land polygons
+    if(!is.null(obs_sf)) pts <- obs_sf
+    else pts <- loc_sf
+    land <- suppressWarnings(st_buffer(pts, dist = 10000) %>% 
+                               st_union() %>% 
+                               st_convex_hull() %>% 
+                               st_intersection(wm) %>% 
+                               st_collection_extract('POLYGON') %>% 
+                               st_sf())
+    
+    p <- ggplot() + 
+      geom_sf(data = land,
+              fill = aes$df$fill[5],
+              colour = aes$df$col[5],
+              alpha = aes$df$alpha[5])
+  }
+  
+  else {
+    ## use OSM map tiles if pkg's installed & map_type != "default"
+    if (requireNamespace("ggspatial", quietly = TRUE) &
+        requireNamespace("rosm", quietly = TRUE)) {
+      p <- ggplot() +
+        ggspatial::annotation_map_tile(type = map_type, ...)
+    }
+  }
+  
+  ## map observations
+  if (!is.null(obs_sf)) {
+    p <- p +
+      geom_sf(
+        data = obs_sf,
+        colour = aes$df$col[4],
+        size = aes$df$size[4],
+        stroke = 0.1,
+        shape = aes$df$shape[4],
+        alpha = aes$df$alpha[4]
+      )
+  }
+  
+  ## map confidence ellipses
+  if (!is.null(conf_sf)) {
+    p <- p +
+      geom_sf(
+        data = conf_sf,
+        fill = aes$df$fill[2],
+        stroke = 0.1,
+        lwd = 0,
+        alpha = aes$df$alpha[2]
+      )
+  }
+  
+  ## map estimated track lines
+  if(!is.null(line_sf)) {
+    p <- p +
+      geom_sf(
+        data = line_sf,
+        colour = aes$df$col[3],
+        size = aes$df$size[3]
+      )
+  }
+  
+  ## map estimated locs
+  if (!is.na(aes$df[1,2])) {
+    p <- p +
+      geom_sf(
+        data = loc_sf %>% filter(g > 0.3),
+        aes_string(colour = "g"),
+        size = aes$df$size[1],
+        stroke = 0.1,
+        shape = aes$df$shape[1]
+      ) +
+      geom_sf(
+        data = loc_sf %>% filter(g <= 0.3),
+        aes_string(colour = "g"),
+        size = aes$df$size[1],
+        stroke = 0.1,
+        shape = aes$df$shape[1]
+      ) +
+      scale_colour_gradientn(
+        colours = aes$mp_pal,
+        name = expression(gamma[t]),
+        limits = c(0, 1)
+      )
+  }
+  
+  ## enforce map extents
+  p <- p +
+    coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
+             ylim = c(extents["ymin"], extents["ymax"]), 
+             crs = st_crs(loc_sf))
+  
+  ## set plot theme stuff
+  p <- p + theme_minimal() +
+    theme(legend.position = "bottom",
+          legend.key.height = unit(4, "mm"),
+          legend.text = element_text(size = 8, vjust = 0),
+          panel.background = element_rect(fill = aes$df$fill[6], 
+                                          colour = NA))
+  
+  return(p)
+}
+
