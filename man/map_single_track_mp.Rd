@@ -10,7 +10,6 @@ map_single_track_mp(
   conf_sf,
   line_sf,
   loc_sf,
-  by.date,
   extents,
   aes,
   ...
@@ -26,8 +25,6 @@ map_single_track_mp(
 \item{line_sf}{track line, if specified}
 
 \item{loc_sf}{estimated location geometry}
-
-\item{by.date}{colour estimated locations by date (logical)}
 
 \item{extents}{map extents}
 

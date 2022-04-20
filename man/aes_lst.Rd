@@ -5,6 +5,11 @@
 \title{aes_lst}
 \usage{
 aes_lst(
+  est = TRUE,
+  conf = TRUE,
+  line = FALSE,
+  mp = TRUE,
+  obs = FALSE,
   shape = c(19, NA, NA, 17, NA, NA),
   size = c(1, NA, 0.2, 1, NA, NA),
   col = c("dodgerblue", NA, "grey50", "orange", NA, NA),
@@ -12,10 +17,22 @@ aes_lst(
   alpha = c(1, 0.4, 1, 1, 1, NA),
   mp_pal = hcl.colors(100, palette = "Cividis", rev = FALSE),
   id_pal = "Harmonic",
-  date_pal = "Viridis"
+  date_pal = hcl.colors(100, palette = "Viridis", rev = FALSE)
 )
 }
 \arguments{
+\item{est}{logical; turns on estimated locations (default = TRUE)}
+
+\item{conf}{logical; turns on estimated confidence ellipses. Default varies
+depending on whether behavioural index is being mapped &/or if single versus
+multiple tracks are being mapped.}
+
+\item{line}{logical; turns on estimated track line(s) (default varies)}
+
+\item{mp}{logical; turns on move persistence index (default = TRUE, if present in model fit)}
+
+\item{obs}{logical; turns on observed locations (default = FALSE)}
+
 \item{shape}{gpplot2 shape value (integer: 0, 25) for estimated & observed
 locations}
 

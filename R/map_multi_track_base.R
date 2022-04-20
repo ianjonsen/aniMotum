@@ -40,8 +40,18 @@ map_multi_track_base <- function(map_type,
   
   ## if input aes is identical to default aes_lst() then plot components
   if(identical(aes, aes_lst())) {
-    obs_sf <- NULL
-    conf_sf <- NULL
+    aes$obs <- FALSE
+    aes$conf <- FALSE
+  }
+  if(all(by.id, by.date)) {
+    warning("Can not map locations by.id and by.date at the same time, turning off by.id",
+              immediate. = TRUE)
+    by.id <- FALSE
+  }
+  
+  if (by.date) {
+    lab_dates <-
+      with(loc_sf, pretty(seq(min(date), max(date), l = 10), n = 5)) %>% as.Date()
   }
   
   ## get worldmap
@@ -81,7 +91,7 @@ map_multi_track_base <- function(map_type,
   }
   
   ## map observations
-  if (!is.null(obs_sf)) {
+  if (aes$obs) {
     p <- p +
       geom_sf(
         data = obs_sf,
@@ -94,7 +104,7 @@ map_multi_track_base <- function(map_type,
   }
   
   ## map confidence ellipses
-  if (!is.null(conf_sf)) {
+  if (aes$conf) {
     if(by.id) {
       p <- p +
         geom_sf(
@@ -122,7 +132,7 @@ map_multi_track_base <- function(map_type,
   }
   
   ## map estimated track lines
-  if(!is.null(line_sf)) {
+  if(aes$line) {
     if(by.id) {
       p <- p +
         geom_sf(
@@ -131,7 +141,15 @@ map_multi_track_base <- function(map_type,
           size = aes$df$size[3],
           show.legend = "line"
         )
-    } else {
+    } else if (by.date) {
+      p <- p +
+        geom_sf(
+          data = line_sf,
+          aes(colour = as.numeric(as.Date(date))),
+          size = aes$df$size[3]
+        )
+      
+    } else if (!all(by.id, by.date)) {
       p <- p +
         geom_sf(
           data = line_sf,
@@ -143,7 +161,7 @@ map_multi_track_base <- function(map_type,
   }
   
   ## map estimated locs
-  if (!is.na(aes$df[1,2])) {
+  if (aes$est) {
     if(by.id) {
       p <- p +
         geom_sf(
@@ -154,7 +172,17 @@ map_multi_track_base <- function(map_type,
           shape = aes$df$shape[1],
           alpha = aes$df$alpha[1]
         )
-    } else {
+    } else if (by.date) {
+      p <- p +
+        geom_sf(
+          data = loc_sf,
+          aes(colour = as.numeric(as.Date(date))),
+          size = aes$df$size[1],
+          stroke = 0.1,
+          shape = aes$df$shape[1],
+          alpha = aes$df$alpha[1]
+        )
+    } else if (!all(by.id, by.date)) {
       p <- p +
         geom_sf(
           data = loc_sf,
@@ -166,7 +194,7 @@ map_multi_track_base <- function(map_type,
         )
     }
   }
-  if(by.id) {
+  if(all(aes$est, by.id)) {
     p <- p +
       scale_colour_manual(values =
                             hcl.colors(
@@ -174,6 +202,12 @@ map_multi_track_base <- function(map_type,
                               palette = aes$id_pal,
                               alpha = aes$df$alpha[1]
                             ))
+  } else if(all(aes$est, by.date)) {
+    p <- p +
+      scale_colour_gradientn(breaks = as.numeric(lab_dates), 
+                             colours = aes$date_pal, 
+                             labels = lab_dates,
+                             limits = range(lab_dates))
   }
   
   ## enforce map extents
@@ -185,9 +219,12 @@ map_multi_track_base <- function(map_type,
   ## set plot theme stuff
   p <- p + theme_minimal() +
     theme(legend.position = "bottom",
+          legend.title = element_blank(),
           legend.text = element_text(size = 8, vjust = 0),
-          panel.background = element_rect(fill = aes$df$fill[6], 
-                                          colour = NA))
+          legend.key.width = unit(0.1, "npc"),
+          legend.key.height = unit(0.02, "npc"),
+          panel.background = element_rect(fill = aes$df$fill[6], colour = NA)
+    )
   
   return(p)
 }

@@ -3,34 +3,39 @@
 ##' @description map foieGras-estimated locations and behavioural indices with
 ##' coastline and projection options
 ##'
-##' @param x a \code{foieGras} ssm fit object with class `ssm_df`
-##' @param y optionally, a \code{foieGras} mpm fit object with class `mpm_df`
+##' @param x a `foieGras` ssm fit object with class `ssm_df`
+##' @param y optionally, a `foieGras` mpm fit object with class `mpm_df`
 ##' @param what specify which location estimates to map: fitted, predicted or
 ##' rerouted
+##' @param aes a list of map controls and aesthetics (shape, size, col, fill, alpha)
+##' for each map feature (estimated locations, confidence ellipses, track lines, 
+##' observed locations, land masses, water bodies). Constructed by `aes_lst()` and
+##' can be modified for custom maps (see examples)
 ##' @param by.id when mapping multiple tracks, should locations be coloured by
-##' id (logical; default = TRUE if nrow(x) > 1 else FALSE; ignored if behavioural
+##' id (logical; default = TRUE if `nrow(x) > 1` else FALSE; ignored if behavioural
 ##' index provided)
 ##' @param by.date when mapping single tracks, should locations be coloured by 
-##' date (logical; default = TRUE if nrow(x) == 1 else FALSE; ignored if behavioural
+##' date (logical; default = FALSE; ignored if behavioural
 ##' index provided)
 ##' @param crs `proj4string` for re-projecting locations, if NULL the
 ##' default projection (Mercator) for the fitting the SSM will be used
-##' @param ext.rng proportion to extend the plot range in x and y dimensions
-##' @param map_type background map type (default = NULL, which uses rnaturalearth 
-##' to add landmasses); if packages \code{ggspatial} & \code{rosm} are installed 
-##' then any map type returned by [rosm::osm.types] can be used for a more 
-##' detailed coastline, given appropriate zoom settings (see 
-##' [ggspatial::annotation_map_tile] for details).
-##' @param aes a list of map aesthetics (shape, size, col, fill, alpha) for each
-##' map feature (estimated locations, confidence ellipses, track lines, observed
-##' locations, land masses, water bodies). Constructed by `aes_lst()` to be 
-##' applied, in order, to: 1) estimated locations; 2) confidence ellipses; 
-##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
+##' @param ext.rng proportion (can exceed 1) to extend the plot range in x and y
+##' dimensions
+##' @param map_type background map type ("default" uses [rnaturalearth] 
+##' to add landmasses). If [rnaturalearthdata] is installed; if packages [ggspatial]
+##' and [rosm] are installed then any tile map type returned by [rosm::osm.types]
+##' can be used for a potentially more detailed coastline at fine spatial scales,
+##' given appropriate zoom settings (see [ggspatial::annotation_map_tile] for details).
 ##' @param normalise logical; if output includes a move persistence estimate, 
-##' should g be normalised to 0, 1 (default = FALSE)
-##' @param group logical; should move persistence be normalised among individuals 
-##' as a group (ie. relative) or separately (default = FALSE)
+##' should g (the move persistence index) be normalised to have minimum = 0 and 
+##' maximum = 1 (default = FALSE). 
+##' @param group logical; should g be normalised among individuals as a group, 
+##' a 'relative g', or separately to highlight regions of lowest and highest move
+##' persistence along a track (default = FALSE).
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
+##' 
+##' @return a map as a ggplot2 object
+##' 
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
@@ -41,17 +46,42 @@
 ##' @importFrom grDevices extendrange grey
 ##' @importFrom dplyr group_by summarise
 ##' @importFrom grDevices hcl.colors
+##' 
+##' @examples 
+##' ## an ssm fit object
+##' fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
+##' 
+##' ## redner default map
+##' map(fit, what = "p")
+##' 
+##' ## construct aes list to modify map
+##' aes <- aes_lst()
+##' 
+##' ## modify aes to turn on estimated track line & observed Argos locations 
+##' aes$obs <- aes$line <- TRUE
+##' ## set ocean colour to pale blue
+##' aes$df$fill[6] <- hcl.colors(n=1, palette = "Blues", alpha = 0.3)
+##' 
+##' ## map using modified aes list, with polar stereographic projection centered
+##' ##    on approximate track midpoint, extend x,y limits by 10%
+##' m <- map(fit, what = "p", aes = aes, crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
+##' 
+##' ## use thinner graticule lines than ggplot2 default
+##' m + theme(panel.grid = element_line(size = 0.1))
+##' 
+##' 
 ##' @export
+##' @md
 
 map <- function(x,
                 y = NULL,
                 what = c("fitted", "predicted", "rerouted"),
+                aes = aes_lst(),
                 by.id = TRUE,
-                by.date = TRUE,
+                by.date = FALSE,
                 crs = NULL,
                 ext.rng = c(0.05, 0.05),
                 map_type = "default",
-                aes = aes_lst(),
                 normalise = FALSE,
                 group = FALSE,
                 ...) {
@@ -164,7 +194,6 @@ map <- function(x,
                              conf_sf, 
                              line_sf, 
                              loc_sf, 
-                             by.date,
                              extents,
                              aes,
                              ...)
@@ -175,8 +204,6 @@ map <- function(x,
                             conf_sf, 
                             line_sf, 
                             loc_sf, 
-                            by.id,
-                            by.date,
                             extents,
                             aes,
                             ...)
@@ -207,6 +234,13 @@ map <- function(x,
 ##' iv) observed locations; v) land masses; vi) water bodies; and 2) colour 
 ##' palettes for i) behavioural indices or ii) individual animal tracks
 ##' 
+##' @param est logical; turns on estimated locations (default = TRUE)
+##' @param conf logical; turns on estimated confidence ellipses. Default varies 
+##' depending on whether behavioural index is being mapped &/or if single versus
+##' multiple tracks are being mapped.
+##' @param line logical; turns on estimated track line(s) (default varies)
+##' @param mp logical; turns on move persistence index (default = TRUE, if present in model fit)
+##' @param obs logical; turns on observed locations (default = FALSE)
 ##' @param shape gpplot2 shape value (integer: 0, 25) for estimated & observed 
 ##' locations 
 ##' @param size ggplot2 size value for estimated locations & track lines, and 
@@ -222,14 +256,15 @@ map <- function(x,
 ##' @importFrom tibble tibble
 ##' @export
 
-aes_lst <- function(shape = c(19, NA, NA, 17, NA, NA),
+aes_lst <- function(est = TRUE, conf = TRUE, line = FALSE, mp = TRUE, obs = FALSE,
+    shape = c(19, NA, NA, 17, NA, NA),
                    size = c(1, NA, 0.2, 1, NA, NA),
                    col = c("dodgerblue", NA, "grey50", "orange", NA, NA),
                    fill = c("dodgerblue", "dodgerblue", NA, "orange", "grey60", "white"),
                    alpha = c(1, 0.4, 1, 1, 1, NA),
                    mp_pal = hcl.colors(100, palette = "Cividis", rev = FALSE),
                    id_pal = "Harmonic",
-                   date_pal = "Viridis"
+                   date_pal = hcl.colors(100, palette = "Viridis", rev = FALSE)
                    ) {
   
   stopifnot("aesthetic vectors must have length = 6
@@ -240,7 +275,12 @@ aes_lst <- function(shape = c(19, NA, NA, 17, NA, NA),
                 length(fill) == 6,
                 length(alpha) == 6))
   
-  list(df = data.frame(
+  list(est = est,
+       conf = conf,
+       line = line,
+       mp = mp,
+       obs = obs,
+    df = data.frame(
     feature = c("estimated locations",
                 "confindence ellipses",
                 "track lines",

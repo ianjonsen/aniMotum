@@ -16,11 +16,15 @@ grab(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE)
 un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
 is an mpm model object.}
 
-\item{normalise}{logical, should move persistence estimates (g) be normalised
-to 0, 1 (default = FALSE). Ignored if what is \code{data} or \code{rerouted}.}
+\item{normalise}{logical; if output includes a move persistence estimate,
+should \code{g} (the move persistence index) be normalised to have minimum = 0 and
+maximum = 1 (default = FALSE). Note, this normalisation is not applied to the
+standard errors of the logit-scale move persistence estimates (\code{logit_g},
+\code{logit_g.se}).}
 
-\item{group}{logical; should move persistence be normalised among individuals
-as a group (ie. relative) or separately (default = FALSE)}
+\item{group}{logical; should \code{g} be normalised among individuals as a group,
+a 'relative g', or to individuals separately to highlight regions of lowest
+and highest move persistence along single tracks (default = FALSE).}
 }
 \value{
 a tibble with all individual tibble's appended

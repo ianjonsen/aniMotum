@@ -8,7 +8,6 @@
 ##' @param conf_sf confidence ellipses around estimated locations, if specified
 ##' @param line_sf track line, if specified
 ##' @param loc_sf estimated location geometry
-##' @param by.date colour estimated locations by date (logical)
 ##' @param extents map extents
 ##' @param aes a tibble of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
@@ -29,15 +28,14 @@ map_single_track_mp <- function(map_type,
                                 conf_sf, 
                                 line_sf, 
                                 loc_sf, 
-                                by.date,
                                 extents,
                                 aes,
                                 ...) {
   ## if input aes is identical to default aes_lst() then plot components
   if(identical(aes, aes_lst())) {
-    obs_sf <- NULL
-    line_sf <- NULL
-    conf_sf <- NULL
+    aes$obs <- FALSE
+    aes$line <- FALSE
+    aes$conf <- FALSE
   }
   
   ## get worldmap
@@ -77,32 +75,32 @@ map_single_track_mp <- function(map_type,
   }
   
   ## map observations
-  if (!is.null(obs_sf)) {
+  if (aes$obs) {
     p <- p +
       geom_sf(
         data = obs_sf,
         colour = aes$df$col[4],
         size = aes$df$size[4],
-        stroke = 0.1,
+        stroke = 0.2,
         shape = aes$df$shape[4],
         alpha = aes$df$alpha[4]
       )
   }
   
   ## map confidence ellipses
-  if (!is.null(conf_sf)) {
+  if (aes$conf) {
     p <- p +
       geom_sf(
         data = conf_sf,
         fill = aes$df$fill[2],
-        stroke = 0.1,
+        stroke = 0,
         lwd = 0,
         alpha = aes$df$alpha[2]
       )
   }
   
   ## map estimated track lines
-  if(!is.null(line_sf)) {
+  if(aes$line) {
     p <- p +
       geom_sf(
         data = line_sf,
@@ -112,20 +110,20 @@ map_single_track_mp <- function(map_type,
   }
   
   ## map estimated locs
-  if (!is.na(aes$df[1,2])) {
+  if (all(aes$est, aes$mp)) {
     p <- p +
       geom_sf(
         data = loc_sf %>% filter(g > 0.3),
         aes_string(colour = "g"),
         size = aes$df$size[1],
-        stroke = 0.1,
+        stroke = 0.2,
         shape = aes$df$shape[1]
       ) +
       geom_sf(
         data = loc_sf %>% filter(g <= 0.3),
         aes_string(colour = "g"),
         size = aes$df$size[1],
-        stroke = 0.1,
+        stroke = 0.2,
         shape = aes$df$shape[1]
       ) +
       scale_colour_gradientn(
@@ -133,7 +131,16 @@ map_single_track_mp <- function(map_type,
         name = expression(gamma[t]),
         limits = c(0, 1)
       )
-  }
+  } else if(aes$est & !aes$mp) {
+    p <- p +
+      geom_sf(
+        data = loc_sf,
+        col = aes$df$col[1],
+        size = aes$df$size[1],
+        stroke = 0.2,
+        shape = aes$df$shape[1]
+      )
+  } 
   
   ## enforce map extents
   p <- p +

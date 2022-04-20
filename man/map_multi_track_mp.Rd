@@ -11,7 +11,6 @@ map_multi_track_mp(
   line_sf,
   loc_sf,
   by.id,
-  by.date,
   extents,
   aes,
   ...
@@ -29,8 +28,6 @@ map_multi_track_mp(
 \item{loc_sf}{estimated location geometry}
 
 \item{by.id}{colour estimated locations by id (logical)}
-
-\item{by.date}{colour estimated locations by date (logical)}
 
 \item{extents}{map extents}
 

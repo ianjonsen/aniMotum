@@ -9,7 +9,6 @@
 ##' @param line_sf track line, if specified
 ##' @param loc_sf estimated location geometry
 ##' @param by.id colour estimated locations by id (logical)
-##' @param by.date colour estimated locations by date (logical)
 ##' @param extents map extents
 ##' @param aes a list of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
@@ -31,17 +30,17 @@ map_multi_track_mp <- function(map_type,
                                  line_sf, 
                                  loc_sf, 
                                  by.id,
-                                 by.date,
                                  extents,
                                  aes,
                                  ...) {
   
   n <- length(unique(loc_sf$id))
   
-  ## if input aes is identical to default aes_lst() then plot components
+  ## if input aes is identical to default aes_lst() then turn off these plot components
   if(identical(aes, aes_lst())) {
-    obs_sf <- NULL
-    conf_sf <- NULL
+    aes$obs <- FALSE
+    aes$line <- FALSE
+    aes$conf <- FALSE
   }
   
   ## get worldmap
@@ -81,7 +80,7 @@ map_multi_track_mp <- function(map_type,
   }
   
   ## map observations
-  if (!is.null(obs_sf)) {
+  if (aes$obs) {
     p <- p +
       geom_sf(
         data = obs_sf,
@@ -94,7 +93,7 @@ map_multi_track_mp <- function(map_type,
   }
   
   ## map confidence ellipses
-  if (!is.null(conf_sf)) {
+  if (aes$conf) {
     if(by.id) {
       p <- p +
         geom_sf(
@@ -122,7 +121,7 @@ map_multi_track_mp <- function(map_type,
   }
   
   ## map estimated track lines
-  if(!is.null(line_sf)) {
+  if(aes$line) {
       p <- p +
         geom_sf(
           data = line_sf,
@@ -132,7 +131,7 @@ map_multi_track_mp <- function(map_type,
   }
   
   ## map estimated locs
-  if (!is.na(aes$df[1,2])) {
+  if (all(aes$est, aes$mp)) {
     p <- p +
       geom_sf(
         data = loc_sf %>% filter(g > 0.3),

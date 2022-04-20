@@ -11,10 +11,14 @@
 ##' @param as_sf logical; if FALSE (default) then return a tibble with 
 ##' un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
 ##' is an mpm model object.
-##' @param normalise logical, should move persistence estimates (g) be normalised 
-##' to 0, 1 (default = FALSE). Ignored if what is `data` or `rerouted`.
-##' @param group logical; should move persistence be normalised among individuals 
-##' as a group (ie. relative) or separately (default = FALSE)
+##' @param normalise logical; if output includes a move persistence estimate, 
+##' should `g` (the move persistence index) be normalised to have minimum = 0 and 
+##' maximum = 1 (default = FALSE). Note, this normalisation is not applied to the 
+##' standard errors of the logit-scale move persistence estimates (`logit_g`, 
+##' `logit_g.se`).
+##' @param group logical; should `g` be normalised among individuals as a group, 
+##' a 'relative g', or to individuals separately to highlight regions of lowest 
+##' and highest move persistence along single tracks (default = FALSE).
 ##'
 ##' @return a tibble with all individual tibble's appended
 ##'
