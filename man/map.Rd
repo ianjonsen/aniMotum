@@ -73,23 +73,12 @@ coastline and projection options
 ## an ssm fit object
 fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 
-## redner default map
+## render default map
 map(fit, what = "p")
 
-## construct aes list to modify map
-aes <- aes_lst()
-
-## modify aes to turn on estimated track line & observed Argos locations 
-aes$obs <- aes$line <- TRUE
-## set ocean colour to pale blue
-aes$df$fill[6] <- hcl.colors(n=1, palette = "Blues", alpha = 0.3)
-
-## map using modified aes list, with polar stereographic projection centered
-##    on approximate track midpoint, extend x,y limits by 10\%
-m <- map(fit, what = "p", aes = aes, crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
-
-## use thinner graticule lines than ggplot2 default
-m + theme(panel.grid = element_line(size = 0.1))
-
+## map with estimated track line & observed Argos locations via aes_lst(),
+##   using a polar stereographic projection centered
+##   on approximate track midpoint, extend x,y limits by 10\%
+map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 
 }

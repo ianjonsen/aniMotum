@@ -22,13 +22,18 @@
 ##' xsm
 ##' @export
 
-join <- function(ssm, mpm, what.ssm = "predicted", as_sf = FALSE) {
+join <- function(ssm, 
+                 mpm, 
+                 what.ssm = "predicted", 
+                 as_sf = FALSE,
+                 normalise = FALSE,
+                 group = FALSE) {
   
   if(!inherits(ssm, "ssm_df")) stop("ssm must be a foieGras ssm fit object with class `ssm_df`")
   if(!inherits(mpm, "mpm_df")) stop("mpm must be a foieGras mpm fit object with class `mpm_df`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
-  y <- grab(mpm, what = "fitted")[, c("g","g.se")] 
+  y <- grab(mpm, what = "fitted", normalise = normalise, group = group)[, c("logit_g","logit_g.se","g")] 
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   

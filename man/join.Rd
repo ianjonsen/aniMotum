@@ -4,7 +4,14 @@
 \alias{join}
 \title{join an mpm-estimated behavioural index to ssm-predicted locations}
 \usage{
-join(ssm, mpm, what.ssm = "predicted", as_sf = FALSE)
+join(
+  ssm,
+  mpm,
+  what.ssm = "predicted",
+  as_sf = FALSE,
+  normalise = FALSE,
+  group = FALSE
+)
 }
 \arguments{
 \item{ssm}{a \code{foieGras} ssm fitted model object}

@@ -1,8 +1,9 @@
 # foieGras 1.0.0 (sometime soon)
 
+* adds a move persistence model via `fit_ssm(model = "mp")` to allow simultaneous estimation of locations and move persistence. This approach may be preferable to using `fit_mpm()` on a `fit_ssm` model object. `fit_mpm()` is retained for historical purposes
+* adds option for move persistence estimates to be normalised to 0,1 in `grab()`, either on tracks separately or as a group for a relative measure that spans 0 - 1. 
 * adds `route_path()` a wrapper function calling [`pathroutr`](https://github.com/jmlondon/pathroutr) to re-route `fit_ssm` estimated or `simfit` simulated tracks around land barriers
 * adds `sim_filter()` to calculate similarity between simulated and ssm-estimated tracks, and returns the most similar simulated tracks based on a user-specified quantile
-* adds option for move persistence estimates to be normalised to 0,1 in `grab()`, either on track separately or as a group for a relative measure that spans 0 - 1
 * adds rosm map tile layers to `fmap()` via `ggspatial::annotation_map_tile` for more detailed coastline mapping
 * adds mapping function `map()` to replace `fmap()` for faster, more flexible estimated track maps & fixes to coastline issues for tracks that span -180, 180
 * adds faster `crw` model fitting via `fit_ssm()` by turning off travel rate standard error (s.se) estimation in `ssm_control()` as the default. SE estimation can be turned on via `control = ssm_control(se = TRUE)`.

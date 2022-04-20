@@ -134,7 +134,21 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  })
                
              } else if (what == "rerouted") {
-               out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
+               if("g" %in% names(out)) {
+                 out <- out[, c("id", "date", "x.se", "y.se", "logit_g",
+                                "logit_g.se", "g", "geometry")]
+                 if(normalise & !group) {
+                   out <- out %>% 
+                     group_by(id) %>%
+                     mutate(g = (g - min(g))/(max(g) - min(g))) %>%
+                     ungroup()
+                 } else if(normalise & group) {
+                   out <- out %>% 
+                     mutate(g = (g - min(g))/(max(g) - min(g)))
+                 }
+               } else {
+                 out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
+               }
              } else if (what == "data") {
                out <- out[, c("id", "date", "lc", "smaj", "smin", "eor", "keep", 
                          "obs.type", "emf.x", "emf.y", "geometry")]
@@ -174,7 +188,21 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                
                out <- as_tibble(out)
              } else if (what == "rerouted") {
-               out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+               if("g" %in% names(out)) {
+                out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
+                               "logit_g.se", "g")]
+                if(normalise & !group) {
+                  out <- out %>% 
+                    group_by(id) %>%
+                    mutate(g = (g - min(g))/(max(g) - min(g))) %>%
+                    ungroup()
+                } else if(normalise & group) {
+                  out <- out %>% 
+                    mutate(g = (g - min(g))/(max(g) - min(g)))
+                }
+               } else {
+                 out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+               }
                out <- as_tibble(out)
              } else if (what == "data") {
                out <- out[, c("id", "date", "lc", "lon", "lat", 

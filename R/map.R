@@ -51,24 +51,13 @@
 ##' ## an ssm fit object
 ##' fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 ##' 
-##' ## redner default map
+##' ## render default map
 ##' map(fit, what = "p")
 ##' 
-##' ## construct aes list to modify map
-##' aes <- aes_lst()
-##' 
-##' ## modify aes to turn on estimated track line & observed Argos locations 
-##' aes$obs <- aes$line <- TRUE
-##' ## set ocean colour to pale blue
-##' aes$df$fill[6] <- hcl.colors(n=1, palette = "Blues", alpha = 0.3)
-##' 
-##' ## map using modified aes list, with polar stereographic projection centered
-##' ##    on approximate track midpoint, extend x,y limits by 10%
-##' m <- map(fit, what = "p", aes = aes, crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
-##' 
-##' ## use thinner graticule lines than ggplot2 default
-##' m + theme(panel.grid = element_line(size = 0.1))
-##' 
+##' ## map with estimated track line & observed Argos locations via aes_lst(),
+##' ##   using a polar stereographic projection centered
+##' ##   on approximate track midpoint, extend x,y limits by 10%
+##' map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 ##' 
 ##' @export
 ##' @md
@@ -105,9 +94,18 @@ map <- function(x,
         switching map_type to default\n")
     map_type <- "default"
   }
- 
+
   ## estimated locations in projected form
-  loc_sf <- grab(x, what = what, as_sf = TRUE, normalise = normalise, group = group)
+  if (all(what == "rerouted", !"rerouted" %in% names(x$ssm[[1]]))){
+    stop("what = 'rerouted' can not be used as model fits do not have rerouted paths")
+  } else {
+    loc_sf <- grab(x, what = what, as_sf = TRUE, normalise = normalise, group = group)
+  }
+  
+  ## handle mpm fits if present
+  if(!is.null(y)) {
+    loc_sf <- join(x, y, what.ssm = what, as_sf = TRUE, normalise = normalise, group = group)
+  }
   
   if(!is.null(crs)) {
     if (length(grep("+units=km", crs, fixed = TRUE)) == 0) {
@@ -118,9 +116,9 @@ map <- function(x,
   } else {
     crs <- st_crs(loc_sf)
   }
-  
+
   ## generate track lines & cast tp MULTILINESTRING for plot efficiency
-  if (!is.na(aes$df[3,3])) {
+  if (aes$line) {
     line_sf <- group_by(loc_sf, id)
     line_sf <- summarise(line_sf, do_union = FALSE)
     line_sf <- st_cast(line_sf, "MULTILINESTRING")
@@ -129,7 +127,7 @@ map <- function(x,
   }
   
   ## calc confidence ellipses around estimated locations & dissolve overlapping segments
-  if(!is.na(aes$df[2,5])) {
+  if(aes$conf) {
     locs <- st_coordinates(loc_sf)
     locs <- data.frame(id = loc_sf$id, x = locs[,1], y = locs[,2], x.se = loc_sf$x.se, y.se = loc_sf$y.se)
     locs.lst <- split(locs, locs$id)
@@ -151,7 +149,7 @@ map <- function(x,
 
   
   ## get observations & set map extents
-  if (!is.na(aes$df[4,2])) {
+  if (aes$obs) {
     obs_sf <- st_transform(grab(x, "data", as_sf = TRUE), crs = crs)
     extents <- st_bbox(obs_sf)
   } else {
@@ -163,9 +161,9 @@ map <- function(x,
                                            f = ext.rng[1])
   extents[c("ymin", "ymax")] <- extendrange(extents[c("ymin", "ymax")], 
                                            f = ext.rng[2])  
-
+  
   ## select appropriate mapping fn based on x, y inputs
-  if(all(is.null(y), nrow(x) == 1, !"g" %in% names(loc_sf))) {
+  if(all(nrow(x) == 1, !"g" %in% names(loc_sf))) {
     m <- map_single_track_base(map_type, 
                                obs_sf,
                                conf_sf, 
@@ -176,7 +174,7 @@ map <- function(x,
                                aes,
                                ...)
   }
-  else if(all(is.null(y), nrow(x) > 1, !"g" %in% names(loc_sf))) {
+  else if(all(nrow(x) > 1, !"g" %in% names(loc_sf))) {
     m <- map_multi_track_base(map_type, 
                          obs_sf,
                          conf_sf, 
@@ -188,7 +186,7 @@ map <- function(x,
                          aes,
                          ...)
   }
-  else if(all(is.null(y), nrow(x) == 1, "g" %in% names(loc_sf))) {
+  else if(all(nrow(x) == 1, "g" %in% names(loc_sf))) {
     m <- map_single_track_mp(map_type, 
                              obs_sf,
                              conf_sf, 
@@ -198,7 +196,7 @@ map <- function(x,
                              aes,
                              ...)
   }
-  else if(all(is.null(y), nrow(x) > 1, "g" %in% names(loc_sf))) {
+  else if(all(nrow(x) > 1, "g" %in% names(loc_sf))) {
     m <- map_multi_track_mp(map_type, 
                             obs_sf,
                             conf_sf, 
@@ -207,18 +205,6 @@ map <- function(x,
                             extents,
                             aes,
                             ...)
-  }
-  else if(all(!is.null(y), nrow(x) == 1, !"g" %in% names(loc_sf))) map_single_track_mpm()
-  else if(all(!is.null(y), nrow(x) > 1, !"g" %in% names(loc_sf))) map_multi_track_mpm()
-  else if(all(!is.null(y), nrow(x) == 1, "g" %in% names(loc_sf))) {
-    warning("multpile move persistence estimates detected for individual animals, mapping move persistence obtained from fit_mpm()\n", 
-            immediate. = TRUE)
-    map_single_track_mpm()
-  }
-  else if(all(!is.null(y), nrow(x) > 1, "g" %in% loc_sf)) {
-    warning("multpile move persistence estimates detected for individual animals, mapping move persistence obtained from fit_mpm()\n", 
-            immediate. = TRUE)
-    map_multi_track_mpm()
   }
   
   return(m)

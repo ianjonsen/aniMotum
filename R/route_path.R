@@ -162,27 +162,47 @@ route_path <-
           select(id, everything())
       })
       
-      ## append rerouted sf tibble to fit_ssm objects  
+      ## append rerouted sf tibble to fit_ssm objects - make any mp estimates get appended
       if(append) {
         x$ssm <- lapply(1:nrow(x), function(i) {
-          x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+          if("g" %in% names(x$ssm[[i]]$predicted)) {
+            x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
+                                               select(date, logit_g, logit_g.se, g),
+                                             by = "date") %>%
+              select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
+          } else {
+            x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+          }
           x$ssm[[i]]
         })
-        
         out <- x
         
       } else {
         ## return as a single tibble, need to remove outer `id` to avoid error
         
        out <-  lapply(1:nrow(df_rrt), function(i) {
-          df_rrt$pts_rrt[[i]] %>% 
+         if("g" %in% names(x$ssm[[i]]$predicted)) {
+           left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
+                       select(date, logit_g, logit_g.se, g),
+                     by = "date") %>%
+             select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) %>%
             mutate(x = st_coordinates(.)[,1], 
                    y = st_coordinates(.)[,2]) %>% 
             st_transform(4326) %>% 
             mutate(lon = st_coordinates(.)[,1], 
                    lat = st_coordinates(.)[,2]) %>% 
             st_drop_geometry() %>%
-            select(id, date, lon, lat, x, y, x.se, y.se)
+            select(id, date, lon, lat, x, y, x.se, y.se, logit_g, logit_g.se, g)
+         } else {
+           df_rrt$pts_rrt[[i]] %>% 
+             mutate(x = st_coordinates(.)[,1], 
+                    y = st_coordinates(.)[,2]) %>% 
+             st_transform(4326) %>% 
+             mutate(lon = st_coordinates(.)[,1], 
+                    lat = st_coordinates(.)[,2]) %>% 
+             st_drop_geometry() %>%
+             select(id, date, lon, lat, x, y, x.se, y.se)
+         }
         }) %>%
           bind_rows()
        

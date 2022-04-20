@@ -170,16 +170,18 @@ mpmf <-
       fitted <- tibble(
         id = x$id,
         date = x$date,
-        g = plogis(lgs[, 1]),
-        g.se = lgs[, 2]
+        logit_g = lgs[, 1],
+        logit_g.se = lgs[, 2],
+        g = plogis(lgs[, 1])
       )
     } else {
       fitted <- tibble(
         id = x$id,
         tid = x$tid,
         date = x$date,
-        g = plogis(lgs[, 1]),
-        g.se = lgs[, 2]     
+        logit_g = lgs[, 1],
+        logit_g.se = lgs[, 2],
+        g = plogis(lgs[, 1])
       )
     }
     
