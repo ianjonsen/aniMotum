@@ -69,8 +69,8 @@ plot.mpm_df <-
         ggplot(d[[i]]) +
           geom_ribbon(aes(
             date,
-            ymin = plogis(qlogis(g) - 1.96 * g.se),
-            ymax = plogis(qlogis(g) + 1.96 * g.se)
+            ymin = plogis(logit_g - 1.96 * logit_g.se),
+            ymax = plogis(logit_g + 1.96 * logit_g.se)
           ),
           fill = grey(0.5),
           alpha = 0.25) +
@@ -117,8 +117,9 @@ plot.mpm_df <-
                     col = wpal[1],
                     alpha = 0.75)
         if(se) {
+          ## SE inidicative only
           px <- px + 
-            geom_point(aes(lon, lat, colour = g, size = g.se ^ -2),
+            geom_point(aes(lon, lat, colour = g, size = logit_g.se ^ -2),
                      show.legend = c("colour" = TRUE, "size" = FALSE)) +
             scale_size(range = c(0.1, 2.5))
         } else if(!se) {

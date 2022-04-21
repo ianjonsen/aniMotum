@@ -162,7 +162,7 @@ route_path <-
           select(id, everything())
       })
       
-      ## append rerouted sf tibble to fit_ssm objects - make any mp estimates get appended
+      ## append rerouted sf tibble to fit_ssm objects - ensure any mp estimates get appended
       if(append) {
         x$ssm <- lapply(1:nrow(x), function(i) {
           if("g" %in% names(x$ssm[[i]]$predicted)) {
