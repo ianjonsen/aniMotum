@@ -22,8 +22,8 @@
 ##' @param ext.rng proportion (can exceed 1) to extend the plot range in x and y
 ##' dimensions
 ##' @param map_type background map type ("default" uses [rnaturalearth] 
-##' to add landmasses). If [rnaturalearthdata] is installed; if packages [ggspatial]
-##' and [rosm] are installed then any tile map type returned by [rosm::osm.types]
+##' to add landmasses). If `rnaturalearthdata` is installed; if packages `ggspatial`
+##' and `rosm` are installed then any tile map type returned by [rosm::osm.types]
 ##' can be used for a potentially more detailed coastline at fine spatial scales,
 ##' given appropriate zoom settings (see [ggspatial::annotation_map_tile] for details).
 ##' @param normalise logical; if output includes a move persistence estimate, 
@@ -57,7 +57,8 @@
 ##' ## map with estimated track line & observed Argos locations via aes_lst(),
 ##' ##   using a polar stereographic projection centered
 ##' ##   on approximate track midpoint, extend x,y limits by 10%
-##' map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
+##' map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
+##' crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 ##' 
 ##' @export
 ##' @md

@@ -47,8 +47,8 @@ default projection (Mercator) for the fitting the SSM will be used}
 dimensions}
 
 \item{map_type}{background map type ("default" uses \link{rnaturalearth}
-to add landmasses). If \link{rnaturalearthdata} is installed; if packages \link{ggspatial}
-and \link{rosm} are installed then any tile map type returned by \link[rosm:osm.types]{rosm::osm.types}
+to add landmasses). If \code{rnaturalearthdata} is installed; if packages \code{ggspatial}
+and \code{rosm} are installed then any tile map type returned by \link[rosm:osm.types]{rosm::osm.types}
 can be used for a potentially more detailed coastline at fine spatial scales,
 given appropriate zoom settings (see \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile} for details).}
 
@@ -79,6 +79,7 @@ map(fit, what = "p")
 ## map with estimated track line & observed Argos locations via aes_lst(),
 ##   using a polar stereographic projection centered
 ##   on approximate track midpoint, extend x,y limits by 10\%
-map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
+map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
+crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 
 }

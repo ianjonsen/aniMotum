@@ -7,6 +7,12 @@
 ##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
 ##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble
+##' @param normalise logical; if output includes a move persistence estimate, 
+##' should g (the move persistence index) be normalised to have minimum = 0 and 
+##' maximum = 1 (default = FALSE).
+##' @param group logical; should g be normalised among individuals as a group, 
+##' a 'relative g', or separately to highlight regions of lowest and highest move
+##' persistence along a track (default = FALSE).
 ##'
 ##' @return a single tbl with all individuals
 ##'

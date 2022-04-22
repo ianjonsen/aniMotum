@@ -41,7 +41,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug 
 ##' @importFrom ggplot2 theme_minimal vars labs coord_fixed label_value geom_ribbon 
 ##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both 
-##' @importFrom ggplot2 facet_wrap
+##' @importFrom ggplot2 facet_wrap scale_colour_viridis_c
 ##' @importFrom tidyr gather
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
