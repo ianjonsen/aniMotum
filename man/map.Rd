@@ -47,10 +47,12 @@ default projection (Mercator) for the fitting the SSM will be used}
 dimensions}
 
 \item{map_type}{background map type ("default" uses \link{rnaturalearth}
-to add landmasses). If \code{rnaturalearthdata} is installed; if packages \code{ggspatial}
-and \code{rosm} are installed then any tile map type returned by \link[rosm:osm.types]{rosm::osm.types}
-can be used for a potentially more detailed coastline at fine spatial scales,
-given appropriate zoom settings (see \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile} for details).}
+to add land masses). If the \code{rnaturalearthdata} package is installed then
+high-resolution land polygons will be used. If the \code{ggspatial}
+and \code{rosm} packages are installed then any tile map type returned by
+\link[rosm:osm.types]{rosm::osm.types} can be used for a potentially more detailed coastline at
+fine spatial scales, given appropriate zoom settings
+(see \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile} for details).}
 
 \item{normalise}{logical; if output includes a move persistence estimate,
 should g (the move persistence index) be normalised to have minimum = 0 and
@@ -70,15 +72,18 @@ map foieGras-estimated locations and behavioural indices with
 coastline and projection options
 }
 \examples{
-## an ssm fit object
+# create an ssm fit object
+
 fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 
-## render default map
+# render default map
+
 map(fit, what = "p")
 
-## map with estimated track line & observed Argos locations via aes_lst(),
-##   using a polar stereographic projection centered
-##   on approximate track midpoint, extend x,y limits by 10\%
+# map with estimated track line & observed Argos locations via aes_lst(),
+#   using a polar stereographic projection centered
+#   on approximate track midpoint, extend x,y limits by 10\%
+
 map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
 crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 

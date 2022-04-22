@@ -1,4 +1,5 @@
-##' generate error ellipses from x,y coordinates, semi-major, semi-minor axes and ellipse orientation
+##' generate error ellipses from x,y coordinates, semi-major, semi-minor axes 
+##' and ellipse orientation
 ##' 
 ##' @param x x-coordinate, usually in projected units (km)
 ##' @param y y-coordinate, usually in projected units (km)
@@ -23,20 +24,27 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @description visualize fits from an ssm object
 ##'
-##' @param x a \code{foieGras} ssm fit object with class `ssm_df`
-##' @param what specify which location estimates to display on time-series plots: fitted or predicted
-##' @param type of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)
-##' @param outlier include outlier locations dropped by prefilter (outlier = TRUE, default)
-##' @param pages each individual is plotted on a separate page by default (pages = 0), 
+##' @param x a `foieGras` ssm fit object with class `ssm_df`
+##' @param what specify which location estimates to display on time-series plots: 
+##' fitted or predicted
+##' @param type of plot to generate: 1-d time series for lon and lat separately 
+##' (type = 1, default) or 2-d track plot (type = 2)
+##' @param outlier include outlier locations dropped by prefilter 
+##' (outlier = TRUE, default)
+##' @param pages each individual is plotted on a separate page by default 
+##' (pages = 0), 
 ##' multiple individuals can be combined on a single page; pages = 1
-##' @param ncol number of columns to arrange plots when combining individuals on a single page (ignored if pages = 0)
-##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
-##' @param pal \code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)
+##' @param ncol number of columns to arrange plots when combining individuals on 
+##' a single page (ignored if pages = 0)
+##' @param ask logical; if TRUE (default) user is asked for input before each plot 
+##' is rendered. set to FALSE to return ggplot objects
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Zissou1"; 
+##' see [grDevices::hcl.pals()] for options)
 ##' @param ... additional arguments to be ignored
 ##' 
-##' @return a ggplot object with either: (type = 1) 1-d time series of fits to data, 
-##' separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE); 
-##' or (type = 2) 2-d fits to data (units = km)
+##' @return a ggplot object with either: (type = 1) 1-d time series of fits to 
+##' data, separated into x and y components (units = km) with prediction 
+##' uncertainty ribbons (2 x SE); or (type = 2) 2-d fits to data (units = km)
 ##' 
 ##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug 
 ##' @importFrom ggplot2 theme_minimal vars labs coord_fixed label_value geom_ribbon 
@@ -63,6 +71,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' plot(xs, what = "p", type = 2, pages = 1, ncol = 2)
 ##'
 ##' @export
+##' @md
 
 plot.ssm_df <-
   function(x,

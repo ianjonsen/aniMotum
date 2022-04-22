@@ -19,26 +19,34 @@
 \arguments{
 \item{x}{a \code{foieGras} \code{mpm} fit object with class \code{mpm_df}}
 
-\item{y}{optional \code{ssm} fit object with class \code{ssm_df} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered
-otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.}
+\item{y}{optional \code{ssm} fit object with class \code{ssm_df} corresponding to x.
+If absent, 1-d plots of \code{gamma_t} time series are rendered
+otherwise, 2-d track plots with locations coloured by `gamma_t`` are rendered.}
 
-\item{se}{logical (default = FALSE); should points be scaled by \code{gamma_t} uncertainty (ignored if y is not supplied)}
+\item{se}{logical (default = FALSE); should points be scaled by \code{gamma_t}
+uncertainty (ignored if y is not supplied)}
 
-\item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
+\item{pages}{plots of all individuals on a single page (pages = 1; default)
+or each individual on a separate page (pages = 0)}
 
-\item{ncol}{number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0}
+\item{ncol}{number of columns to use for faceting. Default is ncol = 1 but
+this may be increased for multi-individual objects. Ignored if pages = 0}
 
-\item{ask}{logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects}
+\item{ask}{logical; if TRUE (default) user is asked for input before each
+plot is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Cividis"; type \code{hcl.pals()} for options)}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Cividis";
+see \link[grDevices:palettes]{grDevices::hcl.pals} for options)}
 
 \item{rev}{reverse colour palette (logical)}
 
 \item{...}{additional arguments to be ignored}
 }
 \value{
-a ggplot object with either: 1-d time series of \code{gamma_t} estimates (if y not provided), with estimation uncertainty ribbons (95 \% CI's);
-or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points having greater uncertainty (size is proportional to \code{SE^-2}, if se = TRUE).
+a ggplot object with either: 1-d time series of \code{gamma_t} estimates
+(if y not provided), with estimation uncertainty ribbons (95 \% CI's);
+or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points
+having greater uncertainty (size is proportional to \code{SE^-2}, if \code{se = TRUE}).
 Plots can be rendered all on a single page (pages = 1) or on separate pages.
 }
 \description{

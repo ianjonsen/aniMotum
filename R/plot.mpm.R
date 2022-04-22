@@ -2,23 +2,31 @@
 ##'
 ##' @description visualize fits from an mpm object
 ##'
-##' @param x a \code{foieGras} \code{mpm} fit object with class \code{mpm_df}
-##' @param y optional \code{ssm} fit object with class \code{ssm_df} corresponding to x. If absent, 1-d plots of \code{gamma_t} time series are rendered 
-##' otherwise, 2-d track plots with locations coloured by \code{gamma_t} are rendered.
-##' @param se logical (default = FALSE); should points be scaled by \code{gamma_t} uncertainty (ignored if y is not supplied)
-##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
-##' @param ncol number of columns to use for faceting. Default is ncol = 1 but this may be increased for multi-individual objects. Ignored if pages = 0
-##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
-##' @param pal \code{hcl.colors} palette to use (default: "Cividis"; type \code{hcl.pals()} for options)
+##' @param x a `foieGras` `mpm` fit object with class `mpm_df`
+##' @param y optional `ssm` fit object with class `ssm_df` corresponding to x. 
+##' If absent, 1-d plots of `gamma_t` time series are rendered 
+##' otherwise, 2-d track plots with locations coloured by `gamma_t`` are rendered.
+##' @param se logical (default = FALSE); should points be scaled by `gamma_t` 
+##' uncertainty (ignored if y is not supplied)
+##' @param pages plots of all individuals on a single page (pages = 1; default) 
+##' or each individual on a separate page (pages = 0) 
+##' @param ncol number of columns to use for faceting. Default is ncol = 1 but 
+##' this may be increased for multi-individual objects. Ignored if pages = 0
+##' @param ask logical; if TRUE (default) user is asked for input before each 
+##' plot is rendered. set to FALSE to return ggplot objects
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Cividis"; 
+##' see [grDevices::hcl.pals] for options)
 ##' @param rev reverse colour palette (logical)
 ##' @param ... additional arguments to be ignored
 ##' 
-##' @return a ggplot object with either: 1-d time series of \code{gamma_t} estimates (if y not provided), with estimation uncertainty ribbons (95 % CI's); 
-##' or 2-d track plots (if y provided) coloured by \code{gamma_t}, with smaller points having greater uncertainty (size is proportional to \code{SE^-2}, if se = TRUE). 
+##' @return a ggplot object with either: 1-d time series of `gamma_t` estimates 
+##' (if y not provided), with estimation uncertainty ribbons (95 % CI's); 
+##' or 2-d track plots (if y provided) coloured by `gamma_t`, with smaller points 
+##' having greater uncertainty (size is proportional to `SE^-2`, if `se = TRUE`). 
 ##' Plots can be rendered all on a single page (pages = 1) or on separate pages.
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs coord_fixed scale_size
-##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon ylim
+##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs 
+##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon ylim coord_fixed scale_size
 ##' @importFrom stats qlogis
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices hcl.colors devAskNewPage
@@ -40,6 +48,7 @@
 ##' plot(xm, xs, pages = 1, ncol = 2) 
 ##'
 ##' @export
+##' @md
 
 plot.mpm_df <-
   function(x,

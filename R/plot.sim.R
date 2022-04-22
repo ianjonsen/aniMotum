@@ -1,15 +1,18 @@
 ##' @title plot
 ##'
-##' @description visualize simulated tracks from a sim data.frame
+##' @description visualize simulated tracks from a `sim` data.frame
 ##'
-##' @param x a \code{foieGras} simulation data.frame with class \code{sim}
-##' @param error logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots
-##' @param pal hcl.colors palette to use (default: "Cividis"); type \code{hcl.pals()} for options
+##' @param x a `foieGras` simulation data.frame with class `sim`
+##' @param error logical, plot locations with error (TRUE) or without. Ignored 
+##' in 1-D time-series plots
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Cividis"); 
+##' see [grDevices::hcl.pals()] for options
 ##' @param rev reverse direction of colour palette; logical (default = FALSE)
 ##' @param col colour data points by speed; logical (default = TRUE)
 ##' @param ... additional arguments to be ignored
 ##' 
-##' @return Plots of simulated tracks. Can be rendered all on a single page (pages = 1) or on separate pages (pages = 0).
+##' @return Plots of simulated tracks. Can be rendered all on a single page 
+##' (pages = 1) or on separate pages (pages = 0).
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path geom_line theme_minimal 
 ##' @importFrom ggplot2 element_blank xlab ylab unit scale_colour_gradientn guides guide_legend
@@ -23,6 +26,7 @@
 ##' plot(tr, error = TRUE)
 ##' 
 ##' @export
+##' @md
 
 plot.sim <- function(x, 
                         error = FALSE,

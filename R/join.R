@@ -2,8 +2,8 @@
 ##'
 ##' @description `join()` joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using `as_sf = FALSE`.
 ##'
-##' @param ssm a \code{foieGras} ssm fitted model object
-##' @param mpm a \code{foieGras} mpm fitted model object
+##' @param ssm a `foieGras` ssm fitted model object
+##' @param mpm a `foieGras` mpm fitted model object
 ##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
 ##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble
@@ -27,6 +27,7 @@
 ##' xsm <- join(xs, xm)
 ##' xsm
 ##' @export
+##' @md
 
 join <- function(ssm, 
                  mpm, 

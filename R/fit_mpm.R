@@ -1,29 +1,32 @@
-##' @title fit a a Move Persistence Model (mpm)
+##' @title fit a **Move Persistence Model** (`mpm`)
+##' 
 ##' @description fit a random walk with time-varying move persistence to 
 ##' temporally regular or irregular location data
+##' 
 ##' @param x a `ssm_df` fit object or a data frame of observations (see details)
-##' @param what if a `ssm_df` fit object is supplied then \code{what} determines
+##' @param what if a `ssm_df` fit object is supplied then `what` determines
 ##'  whether fitted, predicted (default), or rerouted values are mapped; ignored if 
-##'  \code{x} is a data frame
-##' @param model mpm model to fit; either \code{mpm} with unpooled random walk 
-##' variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single, 
-##' pooled random variance parameter (\code{sigma_g})
+##'  `x` is a data frame
+##' @param model mpm model to fit; either `mpm` with unpooled random walk 
+##' variance parameters (`sigma_(g,i)`) or `jmpm` with a single, 
+##' pooled random variance parameter (`sigma_g`)
 ##' @param coords column numbers of the location coordinates (default = 3:4)
-##' @param control list of control settings for the outer optimizer (see \code{mpm_control} for details)
+##' @param control list of control settings for the outer optimizer 
+##' (see [foieGras::mpm_control] for details)
 ##' @param inner.control list of control parameters for the inner optimization
 ##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
-##' see \code{ssm_control} for details
+##' see [foieGras::ssm_control] for details
 ##' @param optim is deprecated, use ssm_control(optim = "optim") instead, 
-##' see \code{ssm_control} for details
+##' see [foieGras::ssm_control] for details
 ##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, 
-##' see \code{ssm_control} for details
+##' see [ssm_control] for details
 ##' 
 ##' @return a list with components
-##' \item{\code{fitted}}{a dataframe of fitted locations}
-##' \item{\code{par}}{model parameter summary}
-##' \item{\code{data}}{input dataframe}
-##' \item{\code{tmb}}{the tmb object}
-##' \item{\code{opt}}{the object returned by the optimizer}
+##' * `fitted` a dataframe of fitted locations
+##' * `par` model parameter summary
+##' * `data` input data.frame
+##' * `tmb` the `TMB` object
+##' * `opt` the object returned by the optimizer
 ##' 
 ##' @examples
 ##' ## fit jmpm to two southern elephant seal tracks
@@ -33,6 +36,8 @@
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 
 ##' @export
+##' @md
+
 fit_mpm <- function(x,
                     what = "predicted",
                     model = c("jmpm", "mpm"),

@@ -15,22 +15,28 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras osar} object with class \code{osar}}
+\item{x}{a \code{foieGras} \code{osar} object with class \code{osar}}
 
-\item{type}{type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)}
+\item{type}{type of residual plot to generate; time-series (ts), qqnorm
+(qq; default) or acf (note: hist is deprecated)}
 
-\item{pages}{plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0)}
+\item{pages}{plots of all individuals on a single page (pages = 1; default)
+or each individual on a separate page (pages = 0)}
 
-\item{ncol}{number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects}
+\item{ncol}{number of columns to use for faceting. Default is ncol = 2 but
+this may be increased for multi-individual fit objects}
 
-\item{ask}{logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects}
+\item{ask}{logical; if TRUE (default) user is asked for input before each
+plot is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\code{hcl.colors} colour palette to use (default = "Zissou1"; type \code{hcl.pals()} for options)}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} colour palette to use (default = "Zissou1";
+see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
 
 \item{...}{additional arguments to be ignored}
 }
 \description{
-plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
+plot \strong{One-Step-Ahead (prediction) residuals} from a
+\code{foieGras} \code{osar} object
 }
 \examples{
 ## generate a fG_ssm fit object (call is for speed only)

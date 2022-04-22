@@ -19,27 +19,34 @@
 \arguments{
 \item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
 
-\item{what}{specify which location estimates to display on time-series plots: fitted or predicted}
+\item{what}{specify which location estimates to display on time-series plots:
+fitted or predicted}
 
-\item{type}{of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)}
+\item{type}{of plot to generate: 1-d time series for lon and lat separately
+(type = 1, default) or 2-d track plot (type = 2)}
 
-\item{outlier}{include outlier locations dropped by prefilter (outlier = TRUE, default)}
+\item{outlier}{include outlier locations dropped by prefilter
+(outlier = TRUE, default)}
 
-\item{pages}{each individual is plotted on a separate page by default (pages = 0),
+\item{pages}{each individual is plotted on a separate page by default
+(pages = 0),
 multiple individuals can be combined on a single page; pages = 1}
 
-\item{ncol}{number of columns to arrange plots when combining individuals on a single page (ignored if pages = 0)}
+\item{ncol}{number of columns to arrange plots when combining individuals on
+a single page (ignored if pages = 0)}
 
-\item{ask}{logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects}
+\item{ask}{logical; if TRUE (default) user is asked for input before each plot
+is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Zissou1"; type \code{hcl.pals()} for options)}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Zissou1";
+see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
 
 \item{...}{additional arguments to be ignored}
 }
 \value{
-a ggplot object with either: (type = 1) 1-d time series of fits to data,
-separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE);
-or (type = 2) 2-d fits to data (units = km)
+a ggplot object with either: (type = 1) 1-d time series of fits to
+data, separated into x and y components (units = km) with prediction
+uncertainty ribbons (2 x SE); or (type = 2) 2-d fits to data (units = km)
 }
 \description{
 visualize fits from an ssm object

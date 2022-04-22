@@ -9,9 +9,11 @@
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{sim}}
 
-\item{error}{logical, plot locations with error (TRUE) or without. Ignored in 1-D time-series plots}
+\item{error}{logical, plot locations with error (TRUE) or without. Ignored
+in 1-D time-series plots}
 
-\item{pal}{hcl.colors palette to use (default: "Cividis"); type \code{hcl.pals()} for options}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Cividis");
+see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options}
 
 \item{rev}{reverse direction of colour palette; logical (default = FALSE)}
 
@@ -20,10 +22,11 @@
 \item{...}{additional arguments to be ignored}
 }
 \value{
-Plots of simulated tracks. Can be rendered all on a single page (pages = 1) or on separate pages (pages = 0).
+Plots of simulated tracks. Can be rendered all on a single page
+(pages = 1) or on separate pages (pages = 0).
 }
 \description{
-visualize simulated tracks from a sim data.frame
+visualize simulated tracks from a \code{sim} data.frame
 }
 \examples{
 tr <- sim(N=100, model = "crw")

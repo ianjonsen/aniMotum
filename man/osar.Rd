@@ -2,22 +2,33 @@
 % Please edit documentation in R/osar.r
 \name{osar}
 \alias{osar}
-\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit}
+\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras}
+\code{ssm} fit}
 \usage{
 osar(x, method = "fullGaussian", ...)
 }
 \arguments{
-\item{x}{a foieGras ssm fit object with class \code{ssm_df}}
+\item{x}{a \code{foieGras} \code{ssm} fit object with class \code{ssm_df}}
 
-\item{method}{method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see \code{?TMB::oneStepPrediction} for details)}
+\item{method}{method to calculate prediction residuals
+(default is \code{oneStepGaussianOffMode}; see \link[TMB:oneStepPredict]{TMB::oneStepPredict} for details)}
 
-\item{...}{other arguments to TMB::oneStepPrediction}
+\item{...}{other arguments to \link[TMB:oneStepPredict]{TMB::oneStepPredict}}
 }
 \description{
-calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit
+calculate one-step-ahead (prediction) residuals from a \code{foieGras}
+\code{ssm} fit
 }
 \details{
-One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version). \code{osar} tries the "fullGaussian" (fastest) method first and falls back to the "oneStepGaussianOffMode" (slower) method for any failures. Subsequent failures are dropped from the output and a warning message is given. Note, OSA residuals can take a considerable time to calculate if there are many individual fits and/or deployments are long. The method is automatically parallelized across 2 x the number of individual fits, up to the number of processor cores available.
+One-step-ahead residuals are useful for assessing goodness-of-fit
+in latent variable models. This is a wrapper function for \link[TMB:oneStepPredict]{TMB::oneStepPredict}
+(beta version). \code{osar} tries the \code{fullGaussian} (fastest) method first and
+falls back to the \code{oneStepGaussianOffMode} (slower) method for any failures.
+Subsequent failures are dropped from the output and a warning message is given.
+Note, OSA residuals can take a considerable time to calculate if there are
+many individual fits and/or deployments are long. The method is automatically
+parallelised across 2 x the number of individual fits, up to the number of
+processor cores available.
 }
 \examples{
 # generate a ssm fit object (call is for speed only)
@@ -29,5 +40,7 @@ dres <- osar(xs[2,])
 
 }
 \references{
-Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and A. Neilsen. 2017. Validation of ecological state space models using the Laplace approximation. Environmental and Ecological Statistics 24:317–339.
+Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and
+A. Neilsen. 2017. Validation of ecological state space models using the Laplace
+approximation. Environmental and Ecological Statistics 24:317–339.
 }

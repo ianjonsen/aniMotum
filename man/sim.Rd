@@ -44,15 +44,15 @@ sim(
 (ignored if \code{model != "mpm"})}
 
 \item{error}{indicates whether measurement error should mimic Argos
-Least-Squares ("ls") or Argos Kalman Filter ("kf")}
+Least-Squares (\code{ls}) or Argos Kalman Filter (\code{kf})}
 
 \item{tau}{vector of LS measurement error sd's (ignored if \code{error = "kf"})}
 
 \item{rho_o}{correlation parameter for LS covariance matrix
 (ignored if \code{error = "kf"})}
 
-\item{tdist}{distribution for simulating location times ("reg" generates locations
-at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random
+\item{tdist}{distribution for simulating location times (\code{reg} generates locations
+at regular ts intervals, in h; \code{gamma} uses a gamma distribution to generate random
 time intervals)}
 
 \item{ts}{time interval in h}
@@ -66,28 +66,30 @@ time intervals)}
 (ignored if sigma has length 2 or D has length 1)}
 }
 \value{
-a tibble is returned with columns that can include some or all of the following,
-depending on the arguments used
-\item{date}{time as POSIXct tz = UTC (default)}
-\item{lc}{Argos location class}
-\item{lon}{longitude with error}
-\item{lat}{latitude with error}
-\item{x}{x in km from arbitrary origin without error}
-\item{y}{y in km from arbitrary origin without error}
-\item{x.err}{a random deviate drawn from Argos LS or KF error distribution}
-\item{y.err}{a random deviate drawn from Argos LS or KF error distribution}
-\item{smaj}{Argos error ellipse semi-major axis in m (if error = "kf")}
-\item{smin}{Argos error ellipse semi-minor axis in m (if error = "kf")}
-\item{eor}{Argos error ellipse orientation in degrees (if error = "kf")}
-\item{u}{velocity in x direction (if model = "crw")}
-\item{v}{velocity in y direction (if model = "crw")}
-\item{b}{behavioural state (if model = "rw" or "crw" and multiple process variances given, see examples)}
-\item{g}{movement persistence - the autocorrelation between successive movements on the interval 0,1 (if model = "mpm")}
+a tibble is returned with columns that can include some or all of the
+following, depending on the arguments used
+\itemize{
+\item \code{date} time as POSIXct, tz = UTC (default)
+\item \code{lc} Argos location class
+\item \code{lon} longitude with error
+\item \code{lat} latitude with error
+\item \code{x} x in km from arbitrary origin without error
+\item \code{y} y in km from arbitrary origin without error
+\item \code{x.err} a random deviate drawn from Argos LS or KF error distribution
+\item \code{y.err} a random deviate drawn from Argos LS or KF error distribution
+\item \code{smaj} Argos error ellipse semi-major axis in m (if \code{error = "kf"})
+\item \code{smin} Argos error ellipse semi-minor axis in m (if \code{error = "kf"})
+\item \code{eor} Argos error ellipse orientation in degrees (if \code{error = "kf"})
+\item \code{u} velocity in x direction (if \code{model = "crw"})
+\item \code{v} velocity in y direction (if \code{model = "crw"})
+\item \code{b} behavioural state (if \code{model = "rw"} or \code{model = "crw"} and multiple process variances given, see examples)
+\item \code{g} movement persistence - the autocorrelation between successive movements on the interval 0,1 (if \code{model = "mpm"})
+}
 }
 \description{
-simulate from the \code{rw}, \code{crw} of \code{mpm} process models
-to generate a set of x,y (or lon,lat) coordinates with or without error from
-supplied input parameters.
+simulate from the \code{rw}, \code{crw}, or \code{mpm} process models
+to generate a set of \verb{x,y} (or \verb{lon,lat}) coordinates with or without error
+from supplied input parameters.
 }
 \examples{
 tr <- sim(N = 200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)

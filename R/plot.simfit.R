@@ -1,16 +1,16 @@
 ##' @title plot
 ##'
-##' @description visualize tracks simulated from a foieGras model fit
+##' @description visualize tracks simulated from a `foieGras` model fit
 ##'
-##' @param x a \code{foieGras} simulation data.frame with class \code{simfit}
+##' @param x a `foieGras` simulation data.frame with class `simfit`
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param zoom logical; should map extent be defined by track extent (TRUE) or 
 ##' should global map be drawn (FALSE; default).  
 ##' @param or orientation of projected map, default is to centre on 
-##' start of fitted track (ignored if \code{mapproj} package is not installed).
+##' start of fitted track (ignored if `mapproj` package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
-##' @param pal \code{hcl.colors} palette to use (default: "Viridis"; type 
-##' \code{hcl.pals()} for options)
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Viridis"; see 
+##' [grDevices::hcl.pals()] for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
@@ -30,6 +30,7 @@
 ##' plot(trs, type = "b")
 ##'
 ##' @export
+##' @md
 
 plot.simfit <- function(x, 
                            type = c("lines","points","both"),
@@ -47,7 +48,7 @@ plot.simfit <- function(x,
   
   type <- match.arg(type)
   
-  ## get worldmapAs the estimation of $\gamma_t$ is sensitive to choice of time scale, we examined the influence of different prediction intervals (1 - 20 min) on the ability of the movement persistence model to resolve changes in movement pattern along the penguin tracks.
+  ## get worldmap
   if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
     wm <- ne_countries(scale = 50, returnclass = "sp")
   } else {

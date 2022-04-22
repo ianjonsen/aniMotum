@@ -1,16 +1,16 @@
-##' @title grab tibble's by name from a foieGras model object
+##' @title grab `tibble`'s by name from a `foieGras` model object
 ##'
 ##' @description `grab()` lets you obtain `fitted`, `predicted`, `rerouted` or 
-##' `data` tibble's from a compound tibble created when fitting to multiple 
-##' individual data sets. The specified tibble's are appended to a single output
-##' tibble.
+##' `data` `tibble`'s from a compound `tibble` created when fitting to multiple 
+##' individual data sets. The specified `tibble`'s are appended to a single output
+##' `tibble`.
 ##'
-##' @param x a \code{foieGras} ssm or mpm model object
+##' @param x a `foieGras` `ssm_df` or `mpm_df` model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted`, 
-##' `rerouted` (ssm only), or `data` (single letters can be used).
-##' @param as_sf logical; if FALSE (default) then return a tibble with 
-##' un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
-##' is an mpm model object.
+##' `rerouted` (`ssm_df` only), or `data` (single letters can be used).
+##' @param as_sf logical; if FALSE (default) then return a `tibble` with 
+##' un-projected longlat coordinates, otherwise return an `sf tibble`. Ignored 
+##' if x is an `mpm` model object.
 ##' @param normalise logical; if output includes a move persistence estimate, 
 ##' should `g` (the move persistence index) be normalised to have minimum = 0 and 
 ##' maximum = 1 (default = FALSE). Note, this normalisation is not applied to the 
@@ -20,7 +20,7 @@
 ##' a 'relative g', or to individuals separately to highlight regions of lowest 
 ##' and highest move persistence along single tracks (default = FALSE).
 ##'
-##' @return a tibble with all individual tibble's appended
+##' @return a `tibble` with all individual `tibble`'s appended
 ##'
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
 ##' @importFrom dplyr group_by mutate ungroup "%>%"
@@ -35,7 +35,8 @@
 ##' preds <- grab(xs, what = "predicted")
 ##' 
 ##' @export
-##'
+##' @md
+
 grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE) {
 
   what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))

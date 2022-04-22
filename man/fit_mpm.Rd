@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_mpm.R
 \name{fit_mpm}
 \alias{fit_mpm}
-\title{fit a a Move Persistence Model (mpm)}
+\title{fit a \strong{Move Persistence Model} (\code{mpm})}
 \usage{
 fit_mpm(
   x,
@@ -29,26 +29,29 @@ pooled random variance parameter (\code{sigma_g})}
 
 \item{coords}{column numbers of the location coordinates (default = 3:4)}
 
-\item{control}{list of control settings for the outer optimizer (see \code{mpm_control} for details)}
+\item{control}{list of control settings for the outer optimizer
+(see \link{mpm_control} for details)}
 
 \item{inner.control}{list of control parameters for the inner optimization}
 
 \item{optim}{is deprecated, use ssm_control(optim = "optim") instead,
-see \code{ssm_control} for details}
+see \link{ssm_control} for details}
 
 \item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead,
-see \code{ssm_control} for details}
+see \link{ssm_control} for details}
 
 \item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
-see \code{ssm_control} for details}
+see \link{ssm_control} for details}
 }
 \value{
 a list with components
-\item{\code{fitted}}{a dataframe of fitted locations}
-\item{\code{par}}{model parameter summary}
-\item{\code{data}}{input dataframe}
-\item{\code{tmb}}{the tmb object}
-\item{\code{opt}}{the object returned by the optimizer}
+\itemize{
+\item \code{fitted} a dataframe of fitted locations
+\item \code{par} model parameter summary
+\item \code{data} input data.frame
+\item \code{tmb} the \code{TMB} object
+\item \code{opt} the object returned by the optimizer
+}
 }
 \description{
 fit a random walk with time-varying move persistence to

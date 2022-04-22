@@ -88,54 +88,54 @@ ellp.par <- function(lc) {
 
 ##' @title simulate animal tracks
 ##'
-##' @description simulate from the \code{rw}, \code{crw} of \code{mpm} process models 
-##' to generate a set of x,y (or lon,lat) coordinates with or without error from 
-##' supplied input parameters. 
+##' @description simulate from the `rw`, `crw`, or `mpm` process models 
+##' to generate a set of `x,y` (or `lon,lat`) coordinates with or without error 
+##' from supplied input parameters. 
 ##' @param N number of time steps to simulate
 ##' @param start coordinates and datetime of start location for simulated track
-##' @param model simulate from the \code{rw}, \code{crw} or \code{mpm} process models
+##' @param model simulate from the `rw`, `crw` or `mpm` process models
 ##' @param vmax maximum travel rate (m/s) of simulated animal
-##' @param sigma a vector of process error sd's for the \code{rw} model 
-##' (ignored if \code{model != "rw"})
-##' @param rho_p correlation parameter for \code{rw} model process covariance matrix 
-##' (ignored if \code{model != "rw"})
-##' @param D diffusion coefficient for \code{crw} model process covariance matrix 
-##' (ignored if \code{model != "crw"})
+##' @param sigma a vector of process error sd's for the `rw` model 
+##' (ignored if `model != "rw"`)
+##' @param rho_p correlation parameter for `rw` model process covariance matrix 
+##' (ignored if `model != "rw"`)
+##' @param D diffusion coefficient for `crw` model process covariance matrix 
+##' (ignored if `model != "crw"`)
 ##' @param sigma_g random walk sd for time-varying move persistence parameter 
-##' (ignored if \code{model != "mpm"})
+##' (ignored if `model != "mpm"`)
 ##' @param error indicates whether measurement error should mimic Argos 
-##' Least-Squares ("ls") or Argos Kalman Filter ("kf")
-##' @param tau vector of LS measurement error sd's (ignored if \code{error = "kf"})
+##' Least-Squares (`ls`) or Argos Kalman Filter (`kf`)
+##' @param tau vector of LS measurement error sd's (ignored if `error = "kf"`)
 ##' @param rho_o correlation parameter for LS covariance matrix 
-##' (ignored if \code{error = "kf"})
-##' @param tdist distribution for simulating location times ("reg" generates locations 
-##' at regular ts intervals, in h; "gamma" uses a gamma distribution to generate random 
+##' (ignored if `error = "kf"`)
+##' @param tdist distribution for simulating location times (`reg` generates locations 
+##' at regular ts intervals, in h; `gamma` uses a gamma distribution to generate random 
 ##' time intervals)
 ##' @param ts time interval in h
 ##' @param tpar rate parameter for the gamma distributed times, shape is take to be
-##' \code{ts * tpar} for a mean interval of approximately \code{ts} h 
-##' (ignored if \code{tdist = "reg"})
+##' `ts * tpar` for a mean interval of approximately `ts` h 
+##' (ignored if `tdist = "reg"`)
 ##' @param alpha transition probabilities switching model versions of 
-##' \code{rw} or \code{crw} models. Probabilities are the transition matrix diagonals 
+##' `rw` or `crw` models. Probabilities are the transition matrix diagonals 
 ##' (ignored if sigma has length 2 or D has length 1)
 ##' 
-##' @return a tibble is returned with columns that can include some or all of the following, 
-##' depending on the arguments used
-##' \item{date}{time as POSIXct tz = UTC (default)}
-##' \item{lc}{Argos location class}
-##' \item{lon}{longitude with error}
-##' \item{lat}{latitude with error}
-##' \item{x}{x in km from arbitrary origin without error}
-##' \item{y}{y in km from arbitrary origin without error}
-##' \item{x.err}{a random deviate drawn from Argos LS or KF error distribution}
-##' \item{y.err}{a random deviate drawn from Argos LS or KF error distribution}
-##' \item{smaj}{Argos error ellipse semi-major axis in m (if error = "kf")}
-##' \item{smin}{Argos error ellipse semi-minor axis in m (if error = "kf")}
-##' \item{eor}{Argos error ellipse orientation in degrees (if error = "kf")}
-##' \item{u}{velocity in x direction (if model = "crw")}
-##' \item{v}{velocity in y direction (if model = "crw")}
-##' \item{b}{behavioural state (if model = "rw" or "crw" and multiple process variances given, see examples)}
-##' \item{g}{movement persistence - the autocorrelation between successive movements on the interval 0,1 (if model = "mpm")}
+##' @return a tibble is returned with columns that can include some or all of the 
+##' following, depending on the arguments used
+##'  * `date` time as POSIXct, tz = UTC (default)
+##'  * `lc` Argos location class
+##'  * `lon` longitude with error
+##'  * `lat` latitude with error
+##'  * `x` x in km from arbitrary origin without error
+##'  * `y` y in km from arbitrary origin without error
+##'  * `x.err` a random deviate drawn from Argos LS or KF error distribution
+##'  * `y.err` a random deviate drawn from Argos LS or KF error distribution
+##'  * `smaj` Argos error ellipse semi-major axis in m (if `error = "kf"`)
+##'  * `smin` Argos error ellipse semi-minor axis in m (if `error = "kf"`)
+##'  * `eor` Argos error ellipse orientation in degrees (if `error = "kf"`)
+##'  * `u` velocity in x direction (if `model = "crw"`)
+##'  * `v` velocity in y direction (if `model = "crw"`)
+##'  * `b` behavioural state (if `model = "rw"` or `model = "crw"` and multiple process variances given, see examples)
+##'  * `g` movement persistence - the autocorrelation between successive movements on the interval 0,1 (if `model = "mpm"`)
 ##' 
 ##' 
 ##' @examples 
@@ -160,6 +160,7 @@ ellp.par <- function(lc) {
 ##' @importFrom CircStats rvm
 ##' 
 ##' @export
+##' @md
 
 sim <- function(N = 100,
                 start = list(c(0, 0), 

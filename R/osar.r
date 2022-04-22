@@ -1,12 +1,24 @@
-##' @title calculate one-step-ahead (prediction) residuals from a \code{foieGras} ssm fit
+##' @title calculate one-step-ahead (prediction) residuals from a `foieGras` 
+##' `ssm` fit
 ##'
-##' @param x a foieGras ssm fit object with class `ssm_df`
-##' @param method method to calculate prediction residuals (default is "oneStepGaussianOffMode"; see `?TMB::oneStepPrediction` for details)
-##' @param ... other arguments to TMB::oneStepPrediction
+##' @param x a `foieGras` `ssm` fit object with class `ssm_df`
+##' @param method method to calculate prediction residuals 
+##' (default is `oneStepGaussianOffMode`; see [TMB::oneStepPredict] for details)
+##' @param ... other arguments to [TMB::oneStepPredict]
 ##'
-##' @details One-step-ahead residuals are useful for assessing goodness-of-fit in latent variable models. This is a wrapper function for TMB::oneStepPredict (beta version). \code{osar} tries the "fullGaussian" (fastest) method first and falls back to the "oneStepGaussianOffMode" (slower) method for any failures. Subsequent failures are dropped from the output and a warning message is given. Note, OSA residuals can take a considerable time to calculate if there are many individual fits and/or deployments are long. The method is automatically parallelized across 2 x the number of individual fits, up to the number of processor cores available.
+##' @details One-step-ahead residuals are useful for assessing goodness-of-fit 
+##' in latent variable models. This is a wrapper function for [TMB::oneStepPredict]
+##' (beta version). `osar` tries the `fullGaussian` (fastest) method first and 
+##' falls back to the `oneStepGaussianOffMode` (slower) method for any failures. 
+##' Subsequent failures are dropped from the output and a warning message is given. 
+##' Note, OSA residuals can take a considerable time to calculate if there are 
+##' many individual fits and/or deployments are long. The method is automatically
+##' parallelised across 2 x the number of individual fits, up to the number of 
+##' processor cores available.
 ##'
-##' @references Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and A. Neilsen. 2017. Validation of ecological state space models using the Laplace approximation. Environmental and Ecological Statistics 24:317–339.
+##' @references Thygesen, U. H., C. M. Albertsen, C. W. Berg, K. Kristensen, and 
+##' A. Neilsen. 2017. Validation of ecological state space models using the Laplace 
+##' approximation. Environmental and Ecological Statistics 24:317–339.
 ##'
 ##' @examples
 ##' # generate a ssm fit object (call is for speed only)
@@ -20,6 +32,7 @@
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
 ##' @export
+##' @md
 
 osar <- function(x, method = "fullGaussian", ...)
 {

@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot.ssm.R
 \name{elps}
 \alias{elps}
-\title{generate error ellipses from x,y coordinates, semi-major, semi-minor axes and ellipse orientation}
+\title{generate error ellipses from x,y coordinates, semi-major, semi-minor axes
+and ellipse orientation}
 \usage{
 elps(x, y, a, b, theta = 90, conf = TRUE)
 }
@@ -18,6 +19,7 @@ elps(x, y, a, b, theta = 90, conf = TRUE)
 \item{theta}{ellipse orientation from north (degrees)}
 }
 \description{
-generate error ellipses from x,y coordinates, semi-major, semi-minor axes and ellipse orientation
+generate error ellipses from x,y coordinates, semi-major, semi-minor axes
+and ellipse orientation
 }
 \keyword{internal}

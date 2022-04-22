@@ -23,8 +23,10 @@ and returns a \code{simfit} object containing the most similar tracks based on
 a user specified quantile.
 }
 \details{
-\code{flag = 1} will use an index based on Hazen (2017)\cr
-\code{flag = 2} (the default) will use a custom index
+\itemize{
+\item \code{flag = 1} will use an index based on Hazen (2017)
+\item \code{flag = 2} (the default) will use a custom index
+}
 }
 \examples{
 ## fit crw model to Argos LS data

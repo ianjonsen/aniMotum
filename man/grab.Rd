@@ -2,19 +2,19 @@
 % Please edit documentation in R/grab.R
 \name{grab}
 \alias{grab}
-\title{grab tibble's by name from a foieGras model object}
+\title{grab \code{tibble}'s by name from a \code{foieGras} model object}
 \usage{
 grab(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE)
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm or mpm model object}
+\item{x}{a \code{foieGras} \code{ssm_df} or \code{mpm_df} model object}
 
 \item{what}{the tibble to be grabbed; either \code{fitted}, \code{predicted},
-\code{rerouted} (ssm only), or \code{data} (single letters can be used).}
+\code{rerouted} (\code{ssm_df} only), or \code{data} (single letters can be used).}
 
-\item{as_sf}{logical; if FALSE (default) then return a tibble with
-un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
-is an mpm model object.}
+\item{as_sf}{logical; if FALSE (default) then return a \code{tibble} with
+un-projected longlat coordinates, otherwise return an \verb{sf tibble}. Ignored
+if x is an \code{mpm} model object.}
 
 \item{normalise}{logical; if output includes a move persistence estimate,
 should \code{g} (the move persistence index) be normalised to have minimum = 0 and
@@ -27,13 +27,13 @@ a 'relative g', or to individuals separately to highlight regions of lowest
 and highest move persistence along single tracks (default = FALSE).}
 }
 \value{
-a tibble with all individual tibble's appended
+a \code{tibble} with all individual \code{tibble}'s appended
 }
 \description{
 \code{grab()} lets you obtain \code{fitted}, \code{predicted}, \code{rerouted} or
-\code{data} tibble's from a compound tibble created when fitting to multiple
-individual data sets. The specified tibble's are appended to a single output
-tibble.
+\code{data} \code{tibble}'s from a compound \code{tibble} created when fitting to multiple
+individual data sets. The specified \code{tibble}'s are appended to a single output
+\code{tibble}.
 }
 \examples{
 ## generate an ssm fit object

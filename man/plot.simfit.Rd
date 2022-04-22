@@ -27,8 +27,8 @@ start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
-\item{pal}{\code{hcl.colors} palette to use (default: "Viridis"; type
-\code{hcl.pals()} for options)}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Viridis"; see
+\code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -36,7 +36,7 @@ start of fitted track (ignored if \code{mapproj} package is not installed).}
 Plots of simulated tracks.
 }
 \description{
-visualize tracks simulated from a foieGras model fit
+visualize tracks simulated from a \code{foieGras} model fit
 }
 \examples{
 fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)

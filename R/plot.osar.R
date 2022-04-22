@@ -1,13 +1,19 @@
 ##' @title plot
 ##'
-##' @description plot One-Step-Ahead (prediction) residuals from a \code{foieGras osar} object
+##' @description plot **One-Step-Ahead (prediction) residuals** from a 
+##' `foieGras` `osar` object
 ##'
-##' @param x a \code{foieGras osar} object with class `osar`
-##' @param type type of residual plot to generate; time-series (ts), qqnorm (qq; default) or acf (note: hist is deprecated)
-##' @param pages plots of all individuals on a single page (pages = 1; default) or each individual on a separate page (pages = 0) 
-##' @param ncol number of columns to use for faceting. Default is ncol = 2 but this may be increased for multi-individual fit objects
-##' @param ask logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects
-##' @param pal \code{hcl.colors} colour palette to use (default = "Zissou1"; type \code{hcl.pals()} for options)
+##' @param x a `foieGras` `osar` object with class `osar`
+##' @param type type of residual plot to generate; time-series (ts), qqnorm 
+##' (qq; default) or acf (note: hist is deprecated)
+##' @param pages plots of all individuals on a single page (pages = 1; default) 
+##' or each individual on a separate page (pages = 0) 
+##' @param ncol number of columns to use for faceting. Default is ncol = 2 but 
+##' this may be increased for multi-individual fit objects
+##' @param ask logical; if TRUE (default) user is asked for input before each 
+##' plot is rendered. set to FALSE to return ggplot objects
+##' @param pal [grDevices::hcl.colors] colour palette to use (default = "Zissou1";
+##'  see [grDevices::hcl.pals()] for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @importFrom ggplot2 ggplot geom_qq geom_qq_line geom_segment geom_boxplot geom_hline
@@ -25,6 +31,7 @@
 ##' plot(dres, type = "qq")
 ##'
 ##' @export
+##' @md
 
 plot.osar <-
   function(x,
