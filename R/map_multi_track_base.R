@@ -21,7 +21,7 @@
 ##' @importFrom ggplot2 element_rect coord_sf
 ##' @importFrom rnaturalearth ne_countries
 ##' @importFrom sf st_union st_convex_hull st_intersection st_collection_extract 
-##' @importFrom sf st_sf st_crs
+##' @importFrom sf st_sf st_crs st_make_valid
 ##' @importFrom dplyr "%>%"
 ##' 
 ##' @keywords internal
@@ -58,10 +58,12 @@ map_multi_track_base <- function(map_type,
   if (map_type == "default") {
     if (requireNamespace("rnaturalearthdata", quietly = TRUE)) {
       wm <- ne_countries(scale = 50, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf))
+        st_transform(crs = st_crs(loc_sf)) %>%
+        st_make_valid()
     } else {
       wm <- ne_countries(scale = 110, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf))
+        st_transform(crs = st_crs(loc_sf)) %>%
+        st_make_valid()
     }
     
     ## define map region & clip land polygons
