@@ -114,7 +114,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    pos <- 1
                  else
                    cat(
-                     "At least 1 model fit has locations centred on lon = 180, reprojecting all locations to crs\n"
+                     "At least 1 model fit has locations centred on lon = 180, reprojecting all locations to that crs\n"
                    )
                  
                  out <- lapply(1:length(out_lst), function(i) {
