@@ -20,6 +20,11 @@
 ##' a 'relative g', or to individuals separately to highlight regions of lowest 
 ##' and highest move persistence along single tracks (default = FALSE).
 ##'
+##' @details if multiple `ssm_df` model objects are present in `x`, `as_sf = TRUE`,
+##' and at least 1 estimated track has a coordinate reference system (`crs`) with
+##' longitude centered on 180 (e.g. a track straddling -180,180) then all tracks
+##' will be re-projected to that `crs`. 
+##' 
 ##' @return a `tibble` with all individual `tibble`'s appended
 ##'
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
@@ -96,12 +101,36 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  rerouted = st_crs(.$rerouted),
                  data = st_crs(.$data)
                ))
-             out <- lapply(1:length(out_lst), function(i) {
-                st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
-                  st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
-                  st_transform(prj[[i]])
-             })
-             out <- do.call(rbind, out)
+             
+             if (nrow(x) > 1) {
+               ## test if prj's are all identical
+               tmp <- sapply(prj, function(.) .[[1]])
+               test <- sapply(2:length(tmp), function(i) {
+                 identical(tmp[i - 1], tmp[i])
+               })
+               if (!any(test)) {
+                 pos <- grep("lon_0=180", tmp)
+                 if (length(pos) == 0)
+                   pos <- 1
+                 else
+                   cat(
+                     "At least 1 model fit has locations centred on lon = 180, reprojecting all locations to crs\n"
+                   )
+                 
+                 out <- lapply(1:length(out_lst), function(i) {
+                   st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+                     st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                     st_transform(prj[[pos]])
+                 })
+               }
+               out <- do.call(rbind, out)
+               
+             } else {
+               out <- st_as_sf(out_lst[[1]], coords = c("lon", "lat")) %>%
+                 st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                 st_transform(prj[[1]])
+               
+             }
              
              if (what %in% c("fitted","predicted")) {
                out <- switch(

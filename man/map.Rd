@@ -20,9 +20,10 @@ map(
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
+\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df} or (old) \code{fG_ssm}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{mpm_df}}
+\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{mpm_df} or (old)
+\code{fG_mpm}}
 
 \item{what}{specify which location estimates to map: fitted, predicted or
 rerouted}

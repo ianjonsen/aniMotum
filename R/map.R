@@ -3,8 +3,9 @@
 ##' @description map foieGras-estimated locations and behavioural indices with
 ##' coastline and projection options
 ##'
-##' @param x a `foieGras` ssm fit object with class `ssm_df`
-##' @param y optionally, a `foieGras` mpm fit object with class `mpm_df`
+##' @param x a `foieGras` ssm fit object with class `ssm_df` or (old) `fG_ssm`
+##' @param y optionally, a `foieGras` mpm fit object with class `mpm_df` or (old)
+##' `fG_mpm`
 ##' @param what specify which location estimates to map: fitted, predicted or
 ##' rerouted
 ##' @param aes a list of map controls and aesthetics (shape, size, col, fill, alpha)
@@ -83,9 +84,9 @@ map <- function(x,
 
   what <- match.arg(what)
   stopifnot("x must be a foieGras ssm fit object with class `ssm_df`" = 
-              inherits(x, "ssm_df"))
+              any(inherits(x, "ssm_df"), inherits(x, "fG_ssm")))
   stopifnot("y must either be NULL or a foieGras mpm fit object with class `mpm_df`" = 
-              inherits(y, "mpm_df") | is.null(y))
+              any(inherits(y, "mpm_df"), inherits(y, "fG_mpm"), is.null(y)))
   stopifnot("individual `ssm` fit objects with diloc_sfering projections not currently supported" = 
               length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
   if(!is.null(crs)) {
