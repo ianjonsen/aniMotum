@@ -10,6 +10,10 @@
 ##' @param loc_sf estimated location geometry
 ##' @param by.date colour estimated locations by date (logical)
 ##' @param extents map extents
+##' @param buffer distance (in km) to buffer locations for subsetting land 
+##' polygons (default = 10000). If map extents are expanded by many factors then
+##' the buffer distance may need to be increased, otherwise this should not be
+##' used.
 ##' @param aes a tibble of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
@@ -31,6 +35,7 @@ map_single_track_base <- function(map_type,
                                   loc_sf, 
                                   by.date,
                                   extents,
+                                  buffer,
                                   aes,
                                   ...) {
   
@@ -61,12 +66,13 @@ map_single_track_base <- function(map_type,
     ## define map region & clip land polygons
     if(!is.null(obs_sf)) pts <- obs_sf
     else pts <- loc_sf
-    land <- suppressWarnings(st_buffer(pts, dist = 10000) %>% 
+    land <- st_buffer(pts, dist = buffer) %>% 
                                st_union() %>% 
                                st_convex_hull() %>% 
                                st_intersection(wm) %>% 
                                st_collection_extract('POLYGON') %>% 
-                               st_sf())
+                               st_sf() %>%
+      st_make_valid()
     
     p <- ggplot() + 
       geom_sf(data = land,
@@ -165,7 +171,8 @@ map_single_track_base <- function(map_type,
   p <- p +
     coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
              ylim = c(extents["ymin"], extents["ymax"]), 
-             crs = st_crs(loc_sf))
+             default_crs = st_crs(loc_sf),
+             expand = FALSE)
   
   ## set plot theme stuff
   p <- p + theme_minimal() +

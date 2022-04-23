@@ -11,6 +11,10 @@
 ##' @param by.id colour estimated locations by id (logical)
 ##' @param by.date colour estimated locations by date (logical)
 ##' @param extents map extents
+##' @param buffer distance (in km) to buffer locations for subsetting land 
+##' polygons (default = 10000). If map extents are expanded by many factors then
+##' the buffer distance may need to be increased, otherwise this should not be
+##' used.
 ##' @param aes a list of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
@@ -18,10 +22,10 @@
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
-##' @importFrom ggplot2 element_rect coord_sf
+##' @importFrom ggplot2 element_rect coord_sf 
 ##' @importFrom rnaturalearth ne_countries
 ##' @importFrom sf st_union st_convex_hull st_intersection st_collection_extract 
-##' @importFrom sf st_sf st_crs st_make_valid
+##' @importFrom sf st_sf st_crs st_make_valid st_geometry
 ##' @importFrom dplyr "%>%"
 ##' 
 ##' @keywords internal
@@ -33,6 +37,7 @@ map_multi_track_base <- function(map_type,
                                   by.id,
                                   by.date,
                                   extents,
+                                  buffer,
                                   aes,
                                   ...) {
   
@@ -69,12 +74,14 @@ map_multi_track_base <- function(map_type,
     ## define map region & clip land polygons
     if(!is.null(obs_sf)) pts <- obs_sf
     else pts <- loc_sf
-    land <- suppressWarnings(st_buffer(pts, dist = 10000) %>% 
-                               st_union() %>% 
-                               st_convex_hull() %>% 
-                               st_intersection(wm) %>% 
-                               st_collection_extract('POLYGON') %>% 
-                               st_sf())
+    
+    land <- st_buffer(pts, dist = buffer) %>% 
+      st_union() %>% 
+      st_convex_hull() %>% 
+      st_intersection(wm) %>% 
+      st_collection_extract('POLYGON') %>% 
+      st_sf() %>%
+      st_make_valid()
     
     p <- ggplot() + 
       geom_sf(data = land,
@@ -213,10 +220,10 @@ map_multi_track_base <- function(map_type,
   }
   
   ## enforce map extents
-  p <- p +
-    coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
-             ylim = c(extents["ymin"], extents["ymax"]), 
-             crs = st_crs(loc_sf))
+  p <- p +  coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
+              ylim = c(extents["ymin"], extents["ymax"]), 
+              default_crs = st_crs(loc_sf),
+              expand = FALSE)
   
   ## set plot theme stuff
   p <- p + theme_minimal() +

@@ -22,6 +22,10 @@
 ##' default projection (Mercator) for the fitting the SSM will be used
 ##' @param ext.rng proportion (can exceed 1) to extend the plot range in x and y
 ##' dimensions
+##' @param buffer distance (in km) to buffer locations for subsetting land 
+##' polygons (default = 10000). If map extents are expanded by many factors then
+##' the buffer distance may need to be increased, otherwise this should not be
+##' used. Ignored if `map_type != "default"`.
 ##' @param map_type background map type ("default" uses [rnaturalearth] 
 ##' to add land masses). If the `rnaturalearthdata` package is installed then 
 ##' high-resolution land polygons will be used. If the `ggspatial`
@@ -77,6 +81,7 @@ map <- function(x,
                 by.date = FALSE,
                 crs = NULL,
                 ext.rng = c(0.05, 0.05),
+                buffer = 10000, 
                 map_type = "default",
                 normalise = FALSE,
                 group = FALSE,
@@ -178,6 +183,7 @@ map <- function(x,
                                loc_sf, 
                                by.date,
                                extents,
+                               buffer,
                                aes,
                                ...)
   }
@@ -190,6 +196,7 @@ map <- function(x,
                          by.id,
                          by.date,
                          extents,
+                         buffer, 
                          aes,
                          ...)
   }
@@ -200,6 +207,7 @@ map <- function(x,
                              line_sf, 
                              loc_sf, 
                              extents,
+                             buffer,
                              aes,
                              ...)
   }
@@ -210,6 +218,7 @@ map <- function(x,
                             line_sf, 
                             loc_sf, 
                             extents,
+                            buffer,
                             aes,
                             ...)
   }

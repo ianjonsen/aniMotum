@@ -35,6 +35,12 @@ a \code{tibble} with all individual \code{tibble}'s appended
 individual data sets. The specified \code{tibble}'s are appended to a single output
 \code{tibble}.
 }
+\details{
+if multiple \code{ssm_df} model objects are present in \code{x}, \code{as_sf = TRUE},
+and at least 1 estimated track has a coordinate reference system (\code{crs}) with
+longitude centered on 180 (e.g. a track straddling -180,180) then all tracks
+will be re-projected to that \code{crs}.
+}
 \examples{
 ## generate an ssm fit object
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
