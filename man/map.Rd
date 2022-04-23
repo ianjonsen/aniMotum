@@ -13,6 +13,7 @@ map(
   by.date = FALSE,
   crs = NULL,
   ext.rng = c(0.05, 0.05),
+  buffer = 10000,
   map_type = "default",
   normalise = FALSE,
   group = FALSE,
@@ -46,6 +47,11 @@ default projection (Mercator) for the fitting the SSM will be used}
 
 \item{ext.rng}{proportion (can exceed 1) to extend the plot range in x and y
 dimensions}
+
+\item{buffer}{distance (in km) to buffer locations for subsetting land
+polygons (default = 10000). If map extents are expanded by many factors then
+the buffer distance may need to be increased, otherwise this should not be
+used. Ignored if \code{map_type != "default"}.}
 
 \item{map_type}{background map type ("default" uses \link{rnaturalearth}
 to add land masses). If the \code{rnaturalearthdata} package is installed then

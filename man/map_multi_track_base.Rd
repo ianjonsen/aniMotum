@@ -13,6 +13,7 @@ map_multi_track_base(
   by.id,
   by.date,
   extents,
+  buffer,
   aes,
   ...
 )
@@ -33,6 +34,11 @@ map_multi_track_base(
 \item{by.date}{colour estimated locations by date (logical)}
 
 \item{extents}{map extents}
+
+\item{buffer}{distance (in km) to buffer locations for subsetting land
+polygons (default = 10000). If map extents are expanded by many factors then
+the buffer distance may need to be increased, otherwise this should not be
+used.}
 
 \item{aes}{a list of map aesthetics (size, shape, col, fill, alpha) to
 be applied, in order, to: 1) estimated locations,; 2) confidence ellipses;
