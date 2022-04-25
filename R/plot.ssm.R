@@ -31,9 +31,10 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter 
 ##' (outlier = TRUE, default)
+##' @param alpha opacity of standard errors. Lower opacity can ease visualization
+##' when multiple ellipses overlap one another 
 ##' @param pages each individual is plotted on a separate page by default 
-##' (pages = 0), 
-##' multiple individuals can be combined on a single page; pages = 1
+##' (pages = 0), multiple individuals can be combined on a single page; pages = 1
 ##' @param ncol number of columns to arrange plots when combining individuals on 
 ##' a single page (ignored if pages = 0)
 ##' @param ask logical; if TRUE (default) user is asked for input before each plot 
@@ -78,6 +79,7 @@ plot.ssm_df <-
            what = c("fitted", "predicted"),
            type = 1,
            outlier = TRUE,
+           alpha = 0.3,
            pages = 0,
            ncol = 1,
            ask = TRUE,
@@ -154,7 +156,7 @@ plot.ssm_df <-
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
               fill = wpal[5],
-              alpha = 0.4
+              alpha = alpha
             )
           
           if (outlier) {
@@ -255,7 +257,7 @@ plot.ssm_df <-
               data = subset(conf_sf, id == unique(id)[i]),
               col = NA,
               fill = wpal[5],
-              alpha = 0.25
+              alpha = alpha
             )
           
           if (outlier) {

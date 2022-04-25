@@ -238,8 +238,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                out <- out[, c("id", "date", "lc", "lon", "lat", 
                               "smaj", "smin", "eor", "obs.type", "keep", 
                               "x", "y", "emf.x", "emf.y")]
-               out <- as_tibble(out)
              }
+           }
+           if(!inherits(out, "sf")) out <- as_tibble(out)
+           else {
+             rownames(out) <- 1:nrow(out)
            }
          },
          mpm_df = {

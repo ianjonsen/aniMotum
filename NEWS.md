@@ -7,10 +7,10 @@
 * adds mapping function `map()` to replace `fmap()` for faster, more flexible estimated track maps & fixes to coastline and other mapping issues for tracks that cross -180,180
 * adds rosm map tile layers to `map()` via `ggspatial::annotation_map_tile` for more detailed coastline mapping
 * adds faster `crw` model fitting via `fit_ssm()` by turning off travel rate standard error (s.se) estimation in `ssm_control()` as the default. SE estimation can be turned on via `control = ssm_control(se = TRUE)`.
-* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument 
+* replaces hcl.colors("Zissou1") palette for most plots - Zissou1 was fun but not colour blind-friendly; in most cases "Cividis" is now the default but users can specify any `hcl.pals()` palette, using the `pal` argument in many of the plot functions.
 * fit object s3 classes `fG_ssm`, `fG_mpm` migrated to `ssm_df`, `mpm_df`
 * generic plot method s3 classes migrated to `plot.ssm_df`, `plot.mpm_df`, `plot.osar`, `plot.sim`, `plot.simfit`
-* add new vignettes for more comprehensive documentation of package features
+* adds new vignettes for more comprehensive documentation of package features
 
 
 # foieGras 0.7-6 (26/04/2021)

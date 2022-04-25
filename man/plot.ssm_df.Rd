@@ -9,6 +9,7 @@
   what = c("fitted", "predicted"),
   type = 1,
   outlier = TRUE,
+  alpha = 0.3,
   pages = 0,
   ncol = 1,
   ask = TRUE,
@@ -28,9 +29,11 @@ fitted or predicted}
 \item{outlier}{include outlier locations dropped by prefilter
 (outlier = TRUE, default)}
 
+\item{alpha}{opacity of standard errors. Lower opacity can ease visualization
+when multiple ellipses overlap one another}
+
 \item{pages}{each individual is plotted on a separate page by default
-(pages = 0),
-multiple individuals can be combined on a single page; pages = 1}
+(pages = 0), multiple individuals can be combined on a single page; pages = 1}
 
 \item{ncol}{number of columns to arrange plots when combining individuals on
 a single page (ignored if pages = 0)}
