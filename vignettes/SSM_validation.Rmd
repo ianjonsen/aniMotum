@@ -1,18 +1,21 @@
 ---
-title: "model_inspection"
+title: "SSM_validation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{model_inspection}
+  %\VignetteIndexEntry{SSM_validation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 require(foieGras)
 ```
 
-Just like any other statistical model fitting exercise, inspecting SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic `plot` function on model fit objects:
+Just like any other statistical model fitting exercise, validating SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic `plot` function on model fit objects:
 
 ```{r visualise SSM fit, fig.width=7, fig.height=5}
 

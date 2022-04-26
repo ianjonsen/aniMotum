@@ -472,13 +472,15 @@ sfilter <-
                }
              })
       
+      npar <- length(opt[["par"]])
+      n <- nrow(fv)
       if (control$optim == "nlminb") {
-        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 
-          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
+        AICc <- 2 * npar + 2 * opt[["objective"]] + 2 * npar * (npar + 1)/(n - npar - 1)
+          
       } else if (control$optim == "optim") {
-        AICc <- 2 * length(opt[["par"]]) + 2 * opt[["value"]] + 
-          (2 * length(opt[["par"]])^2 + 2 * length(opt[["par"]])) / (nrow(fv) - length(opt[["par"]]))
+        AICc <- 2 * npar + 2 * opt[["value"]] + 2 * npar * (npar + 1)/(n - npar - 1)
       }
+      
       ## drop sv's from fxd
       if(model == "crw") {
         fxd <- fxd[which(row.names(fxd) != "sv"), ]
