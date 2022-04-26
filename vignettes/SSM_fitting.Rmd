@@ -32,12 +32,15 @@ fit_ssm(ellie, vmax = 3, pf = TRUE)
 By setting `pf = TRUE`, `fit_ssm` returns the processed data as a projected `sf` data.frame prior to fitting an SSM. Looking at the `keep` column, we can see that the 3rd, 4th and 7th observations have been flagged to be ignored by the SSM, in this case because they failed the distance limits imposed by the `trip::sda` filter. Also note that because the input data included CLS Argos location ellipse error information, the observation type has been designated `KF` for Kalman filter and this ensures that the appropriate measurement error model is used when fitting the SSM to these data.
 
 ### Fitting an SSM
-In the simplest case, fitting an SSM consists of specifying the model and a prediction time step:
+In the simplest case, fitting an SSM consists of specifying the process model and a prediction time step:
 ```{r model fit, message=FALSE, eval=FALSE}
 fit <- fit_ssm(ellie, model = "rw", time.step = 12)
 ```
-This call uses the defaults for data processing and all other arguments (see `?fit_ssm` for details). More control can be exerted over the model fitting process via the arguments: `emf`, `map`, and `control`. The `emf` argument is helpful when modelling Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf's used by default in `foieGras` (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies such as (Costa et al. 2010).
 
+This call uses the defaults for data processing and all other arguments (see `?fit_ssm` for details). More control can be exerted over the model fitting process via the arguments: `emf`, `map`, and `control`. 
+
+#### `emf`: Specifying custom error multiplication factors 
+The `emf` argument is helpful when modelling older Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf's used by default in `foieGras` (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies such as (Costa et al. 2010). 
 
 The default emf values are given by `emf()`:
 ```{r emf, message=FALSE}
@@ -61,10 +64,24 @@ hist(grab(fit1, "f")$y - grab(fit2, "f")$y, breaks = 20,
 ```
 In this contrived example, re-specified `emf.x` values result in differences in the predicted locations of up to about 20 km in the x-direction and a more subtle 4 km in the y-direction, even though the `emf.y` values were not edited. The latter is due to a model-estimated correlation between the x and y errors.
 
-The `map` argument can be used to turn off some model parameter estimates by fixing them at 0 on the log-scale. This can be useful in cases where model simplification can aid in convergence or simply provide a better fit to the data. For example, the `crw` has a parameter `psi` that re-scales the semi-major axis of Argos KF error ellipses to account for apparent bias in the error ellipses (Jonsen et al. 2020). Occasionally, there may be insufficient information to estimate this parameter
+Now that CLS Argos provides locations estimated by their Kalman filter algorithm, users of contemporary Argos data sets should have no need to invoke `emf` argument as location quality class-based errors are now superseded by the use of location-specific Argos error ellipse information (McClintock et al. 2015; Jonsen et al. 2020).
 
-occasionally there may be insufficient information to estimate the correlation in Argos Least-Squares observation errors  
+#### `map`: Fixing model parameters
+The `map` argument is allows estimated of some model parameters to by turned off by fixing them at 0 on the log-scale. This can be useful in cases where model simplification can aid in convergence or simply provide a better fit to the data. For example, the `crw` has a parameter `psi` that re-scales the semi-major axis of Argos KF error ellipses to account for apparent bias in the error ellipses (Jonsen et al. 2020). Occasionally, there may be insufficient information to estimate this parameter, or one might wish to compare model fits with and without error ellipse bias correction.
 
+Here we fit the `crw` model with (`fit1`) and without (`fit2`) the bias-correction parameter `psi`, by supplying a named list to the `map` argument. `factor(NA)` is a `TMB` convention that ensures `psi` is fixed during optimization.
+```{r demonstrate map use, message=FALSE, warning=FALSE}
+fit1 <- fit_ssm(ellie, model = "crw", time.step = 12,
+                control = ssm_control(verbose = 0))
+
+fit2 <- fit_ssm(ellie, model = "crw", time.step = 12, map = list(psi = factor(NA)),
+                control = ssm_control(verbose = 0))
+
+c(fit1$ssm[[1]]$AICc, fit2$ssm[[1]]$AICc)
+```
+Comparison of AIC~c~ from the model fits implies the model including the `psi` parameter `fit1` provides a slightly better fit.
+
+#### `control`: controlling the optimization
 
 
 
@@ -76,4 +93,4 @@ Freitas C, Lydersen C, Fedak MA, Kovacs KM (2008) A simple new algorithm to filt
 
 Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. _Movement Ecology_ 8:31. [https://doi.org/10.1186/s40462-020-00217-7](https://doi.org/10.1186/s40462-020-00217-7)
 
-
+McClintock BT, London JM, Cameron MF, Boveng PL (2015) Modelling animal movement using the Argos satellite telemetry location error ellipse. _Methods in Ecology and Evolution_ 2015;6:266–77. [https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12311](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12311)
