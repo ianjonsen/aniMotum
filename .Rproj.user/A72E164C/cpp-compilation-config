@@ -1,0 +1,22 @@
+{
+    "args": [
+        "-std=gnu++11",
+        "-I/Library/Frameworks/R.framework/Resources/include",
+        "-DNDEBUG",
+        "-I/opt/R/arm64/include",
+        "-fPIC",
+        "-falign-functions=64",
+        "-I/Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/library/TMB/include",
+        "-I/Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/library/RcppEigen/include",
+        "-I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include",
+        "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1",
+        "-I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include",
+        "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
+        "-I/Library/Developer/CommandLineTools/usr/include"
+    ],
+    "pch": "RcppEigen",
+    "is_cpp": true,
+    "hash": "1637086147164986207016382866521638286652",
+    "compiler": "9181207410682352290",
+    "rversion": "4.1.3"
+}
