@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(tidyverse)
+require(dplyr)
 require(patchwork)
 require(foieGras)
 ```
@@ -48,8 +48,7 @@ emf()
 ```
 These can be adjusted by modifying the data.frame and passing this to `fit_ssm` via `emf.
 ```{r emf mod, message=FALSE, fig.width=7, fig.height=6}
-emf2 <- emf() %>%
-  mutate(emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
+emf2 <- mutate(emf(), emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
 
 fit1 <- fit_ssm(sese1, model = "rw", time.step=24, 
                 control = ssm_control(verbose = 0))
