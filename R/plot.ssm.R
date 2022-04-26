@@ -26,7 +26,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @param x a `foieGras` ssm fit object with class `ssm_df`
 ##' @param what specify which location estimates to display on time-series plots: 
-##' fitted or predicted
+##' fitted, predicted, or rerouted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately 
 ##' (type = 1, default) or 2-d track plot (type = 2)
 ##' @param outlier include outlier locations dropped by prefilter 
@@ -76,7 +76,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 
 plot.ssm_df <-
   function(x,
-           what = c("fitted", "predicted"),
+           what = c("fitted", "predicted", "rerouted"),
            type = 1,
            outlier = TRUE,
            alpha = 0.3,
@@ -110,7 +110,18 @@ plot.ssm_df <-
                } else {
                  ssm <- grab(x, "predicted", as_sf = FALSE)
                }
+             },
+             rerouted = {
+               if (any(sapply(x$ssm, function(.) "rerouted" %in% names(.)))) {
+                 ssm <- grab(x, "rerouted", as_sf = FALSE)
+               } else {
+                 stop(
+                   "there are no rerouted locations present",
+                   call. = FALSE
+                 )
+               }
              })
+             
       
       if (outlier) {
         d <- grab(x, "data", as_sf = FALSE)

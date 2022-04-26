@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{ssm_df}(
   x,
-  what = c("fitted", "predicted"),
+  what = c("fitted", "predicted", "rerouted"),
   type = 1,
   outlier = TRUE,
   alpha = 0.3,
@@ -21,7 +21,7 @@
 \item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
 
 \item{what}{specify which location estimates to display on time-series plots:
-fitted or predicted}
+fitted, predicted, or rerouted}
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately
 (type = 1, default) or 2-d track plot (type = 2)}
