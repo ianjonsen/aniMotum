@@ -1,0 +1,33 @@
+---
+title: "foo2"
+author: "Ian Jonsen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, fig.height = 5, fig.width=10, warning=FALSE, message=FALSE}
+require(foieGras)
+require(ggplot2)
+
+fit.mp <- fit_ssm(sese, 
+                  model = "mp", 
+                  time.step = 24, 
+                  control = ssm_control(verbose = 0))
+
+aes <- aes_lst(conf = FALSE, 
+               mp_pal = hcl.colors(n=100, "RdBu"))
+aes$df$size[1] <- 1.5
+aes$df$fill[6] <- grey(0.85)
+
+map(fit.mp, 
+    what = "p", 
+    normalise = TRUE, 
+    aes = aes,
+    crs = "+proj=stere +lon_0=68 +datum=WGS84 +units=km") +
+  theme(panel.grid = element_line(size=0.1, colour="grey60")) +
+  labs(title = expression("Time-varying move persistence, "~gamma[t]))
+```

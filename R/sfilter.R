@@ -485,7 +485,7 @@ sfilter <-
       if(model == "crw") {
         fxd <- fxd[which(row.names(fxd) != "sv"), ]
       }
-      
+    
       out <- list(
         call = call,
         predicted = pv,

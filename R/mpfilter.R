@@ -337,9 +337,11 @@ mpfilter <-
       rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)
       rdm <- st_set_crs(rdm, prj)
       
-      pv <- subset(rdm, !isd)[, -10]
+      # drop x,y as we have the geom
+      rdm <- rdm[, c("id","date","x.se","y.se", "logit_g", "logit_g.se", "g", "isd")]
+      pv <- subset(rdm, !isd)[, -8]
       #pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
-      fv <- subset(rdm, isd)[, -10]
+      fv <- subset(rdm, isd)[, -8]
       #fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
     
       if (control$optim == "nlminb") {

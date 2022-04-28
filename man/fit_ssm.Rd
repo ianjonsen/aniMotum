@@ -105,8 +105,8 @@ a list with components
 }
 }
 \description{
-fits: 1) a simple random walk (\code{rw}) 2) a correlated random walk
-(\code{crw} - a random walk on velocity), or 3) a time-varying move persistence
+fits: i) a simple random walk (\code{rw}) ii) a correlated random walk
+(\code{crw} - a random walk on velocity), or iii) a time-varying move persistence
 model (\code{mp}), all in continuous-time, to filter Argos LS, and/or KF/KS
 location data, processed light-level geolocation data (GLS), and/or GPS data.
 Location data of different types can combined in a single data frame

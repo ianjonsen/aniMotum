@@ -59,8 +59,7 @@ res.crw <- osar(fit.crw)
 (plot(res.crw, type = "ts") | plot(res.crw, type = "qq")) / 
   (plot(res.crw, type = "acf") | plot_spacer())
 
-fit.rw$ssm[[1]]$AICc
-fit.crw$ssm[[1]]$AICc
+c(fit.rw$ssm[[1]]$AICc, fit.crw$ssm[[1]]$AICc)
 ```
 
 As calculation of prediction residuals can be computationally demanding, typically requiring more time than fitting the model, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 

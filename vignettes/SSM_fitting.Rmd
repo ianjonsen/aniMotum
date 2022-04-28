@@ -52,12 +52,15 @@ emf2 <- mutate(emf(), emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
 
 fit1 <- fit_ssm(sese1, model = "rw", time.step=24, 
                 control = ssm_control(verbose = 0))
+
 fit2 <- fit_ssm(sese1, model = "rw", time.step=24, emf = emf2, 
                 control = ssm_control(verbose = 0))
 
 par(mfrow = c(2,1), mar = c(4,3,1,1))
+
 hist(grab(fit1, "f")$x - grab(fit2, "f")$x, breaks = 20, 
      main = "fit1$x - fit2$x", xlim = c(-20,20), xlab = "")
+
 hist(grab(fit1, "f")$y - grab(fit2, "f")$y, breaks = 20, 
      main = "fit1$y - fit2$y", xlim = c(-20,20), xlab = "Distance (km)")
 ```
@@ -82,6 +85,7 @@ Comparison of AIC~c~ from the model fits implies the model including the `psi` p
 
 #### `control`: controlling the optimization
 
+`foieGras` can use either of two commonly used R optimizers, `nlminb` or `optim`, to minimize the objective function defined by the built-in `TMB` C++ templates.
 
 
 ## References

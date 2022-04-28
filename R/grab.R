@@ -90,7 +90,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              st_geometry(x) <- NULL
              cbind(x, xy, ll)
            })
-           
+          
            if (as_sf) {
              ## get crs from fit object x, allow for different crs' among individuals to handle -180,180; 0,360 wrapping
              prj <- lapply(x$ssm, function(.)
@@ -149,8 +149,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                        }
                    },
                  mp = {
-                   out[, c("id", "date", "x", "y", "x.se", "y.se", 
-                           "logit_g", "logit_g.se", "g", "geometry")]
+                   out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
+                           "g", "geometry")]
                    if(normalise & !group) {
                      out <- out %>% 
                        group_by(id) %>%
@@ -242,7 +242,10 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            }
            if(!inherits(out, "sf")) out <- as_tibble(out)
            else {
-             rownames(out) <- 1:nrow(out)
+             ## coerce from tibble to data.frame so row.names can be set to 1:nrow(out)
+             class(out) <- c("sf", "data.frame")
+             row.names(out) <- 1:nrow(out)
+             class(out) <- c("sf", "tbl_df", "tbl", "data.frame")
            }
          },
          mpm_df = {
