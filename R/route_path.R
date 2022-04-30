@@ -22,13 +22,14 @@
 ##' distance is a constant 50000 m.
 ##' @param append should re-routed locations be appended to the `ssm` 
 ##' (ssm fit) object (default = TRUE), or returned as a tibble.
-##' @param shapefile polygon shapefile of movement barrier(s) as an `sf` object 
-##' with WGS84 Pseudo-Mercator projection (EPSG 3857). The default is NULL, in 
-##' which case `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
-##' scale to generate a land barrier. For efficient computation, `route_path` 
-##' clips the polygons to the buffered bounds of the movement track(s).
+##' @param ... additional arguments passed to [pathroutr::prt_visgraph]
 ##' 
 ##' @details
+##' `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
+##' scale, by default, to generate a land barrier. For efficient computation, 
+##' `route_path` clips the polygons to the buffered bounds (set by `dist` (in m)
+##' of the movement track(s). 
+##' 
 ##' When the input is a `ssm` object `route_path` can append the 
 ##' re-routed path locations to the `ssm` (ssm fit) object. This is useful 
 ##' when move persistence is to be estimated from the re-routed locations via
@@ -41,6 +42,12 @@
 ##' 
 ##' When the input is a `simfit` object then `route_path` returns the same 
 ##' object but with the locations within each simulation re-routed.
+##' 
+##' We recommend that users working on complex rerouting problems and/or 
+##' requiring higher resolution land barrier data work with the `pathroutr`
+##' package directly by first exctracting foieGras-estimated locations with 
+##' `grab`. Higher resolution land barrier data (polygon shapefiles) must be
+##' obtained independently.
 ##' 
 ##' @references
 ##' Josh M. London. (2020) pathroutr: An R Package for (Re-)Routing Paths Around 
@@ -71,7 +78,7 @@ route_path <-
            map_scale = 50,
            dist = 50000,
            append = TRUE,
-           shapefile = NULL){
+           ...){
     
     stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
                 requireNamespace("pathroutr", quietly = TRUE)
@@ -104,25 +111,14 @@ route_path <-
     what <- match.arg(what)
     
     # pathroutr needs a land shapefile to create a visibility graph from
-    if (is.null(shapefile)) {
-      if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-        world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-          st_transform(crs = 3857) %>%
-          st_make_valid()
-      } else {
-        world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-          st_transform(crs = 3857) %>%
-          st_make_valid()
-      }
-    } else if (!is.null(shapefile)) {
-      stopifnot("shapefile must be an `sf` object, see `?route_path`" = inherits(shapefile, "sf"))
-      stopifnot(
-        "shapefile geometry not valid, consider using `sf::st_make_valid(shapefile)`" = st_is_valid(shapefile)
-      )
-      stopifnot(
-        "shapefile must have WGS84 Pseudo-Mercator projection (EPSG 3857)" = st_crs(shapefile)$epsg == 3857
-      )
-      world_mc <- shapefile
+    if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+        st_transform(crs = 3857) %>%
+        st_make_valid()
+    } else {
+      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+        st_transform(crs = 3857) %>%
+        st_make_valid()
     }
     
     if (inherits(x, "ssm_df")) {
@@ -155,7 +151,7 @@ route_path <-
         st_sf())
     
       # create visibility graph
-      vis_graph <- pathroutr::prt_visgraph(land_region)
+      vis_graph <- pathroutr::prt_visgraph(land_region, ...)
 
     if (inherits(x, "ssm_df")) {
       # create nested tibble grouped by individual track

@@ -175,7 +175,7 @@ map <- function(x,
                                            f = ext.rng[2])  
   
   ## select appropriate mapping fn based on x, y inputs
-  if(all(nrow(x) == 1, !"g" %in% names(loc_sf))) {
+  if(all(nrow(x) == 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
     m <- map_single_track_base(map_type, 
                                obs_sf,
                                conf_sf, 
@@ -187,7 +187,7 @@ map <- function(x,
                                aes,
                                ...)
   }
-  else if(all(nrow(x) > 1, !"g" %in% names(loc_sf))) {
+  else if(all(nrow(x) > 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
     m <- map_multi_track_base(map_type, 
                          obs_sf,
                          conf_sf, 
@@ -200,7 +200,7 @@ map <- function(x,
                          aes,
                          ...)
   }
-  else if(all(nrow(x) == 1, "g" %in% names(loc_sf))) {
+  else if(all(nrow(x) == 1, "g" %in% names(loc_sf), aes$mp)) {
     m <- map_single_track_mp(map_type, 
                              obs_sf,
                              conf_sf, 
@@ -211,7 +211,7 @@ map <- function(x,
                              aes,
                              ...)
   }
-  else if(all(nrow(x) > 1, "g" %in% names(loc_sf))) {
+  else if(all(nrow(x) > 1, "g" %in% names(loc_sf), aes$mp)) {
     m <- map_multi_track_mp(map_type, 
                             obs_sf,
                             conf_sf, 
