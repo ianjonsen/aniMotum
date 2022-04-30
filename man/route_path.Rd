@@ -7,6 +7,7 @@
 route_path(
   x,
   what = c("fitted", "predicted"),
+  map_scale = 50,
   dist = 50000,
   append = TRUE,
   shapefile = NULL
@@ -19,6 +20,11 @@ a \code{simfit} object containing simulated paths}
 \item{what}{if using a \code{ssm} object should the fitted (typically
 irregular in time) or predicted (typically regular in time) locations be
 re-routed.}
+
+\item{map_scale}{scale of rnaturalearth map to use for land mass: one of 110,
+50 (default), or 10. Note that map_scale = 10 is only available if you have
+the \code{rnaturalearthhires} package installed see:
+\url{https://github.com/ropensci/rnaturalearthhires}}
 
 \item{dist}{buffer distance (m) to add around track locations. The convex
 hull of these buffered locations defines the size of land polygon used to

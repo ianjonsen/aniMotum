@@ -11,6 +11,10 @@
 ##' @param what if using a `ssm` object should the fitted (typically 
 ##' irregular in time) or predicted (typically regular in time) locations be 
 ##' re-routed.
+##' @param  map_scale scale of rnaturalearth map to use for land mass: one of 110,
+##' 50 (default), or 10. Note that map_scale = 10 is only available if you have 
+##' the `rnaturalearthhires` package installed see: 
+##' [https://github.com/ropensci/rnaturalearthhires](https://github.com/ropensci/rnaturalearthhires)
 ##' @param dist buffer distance (m) to add around track locations. The convex 
 ##' hull of these buffered locations defines the size of land polygon used to 
 ##' aid re-routing of points on land. Larger buffers can result in longer 
@@ -64,6 +68,7 @@
 route_path <- 
   function(x,
            what = c("fitted", "predicted"),
+           map_scale = 50,
            dist = 50000,
            append = TRUE,
            shapefile = NULL){
@@ -75,6 +80,11 @@ route_path <-
          or a `simfit` object containing the paths simulated from a `ssm` fit object" = 
                 inherits(x, c("ssm_df", "simfit"))
     )
+    if(map_scale == 10) {
+      stopifnot("map_scale = 10 not available because rnaturalearthhires package not installed" = 
+                requireNamespace("rnaturalearthhires", quietly = TRUE))
+    }
+    
     ## required for pathroutr fn's
     # default vals 
     detach.dplyr.on.end <- FALSE
@@ -95,13 +105,23 @@ route_path <-
     
     # pathroutr needs a land shapefile to create a visibility graph from
     if (is.null(shapefile)) {
-      world_mc <- ne_countries(scale = "medium", returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
+      if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+        world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+          st_transform(crs = 3857) %>%
+          st_make_valid()
+      } else {
+        world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+          st_transform(crs = 3857) %>%
+          st_make_valid()
+      }
     } else if (!is.null(shapefile)) {
       stopifnot("shapefile must be an `sf` object, see `?route_path`" = inherits(shapefile, "sf"))
-      stopifnot("shapefile geometry not valid, consider using `sf::st_make_valid(shapefile)`" = st_is_valid(shapefile))
-      stopifnot("shapefile must have WGS84 Pseudo-Mercator projection (EPSG 3857)" = st_crs(shapefile)$epsg == 3857)
+      stopifnot(
+        "shapefile geometry not valid, consider using `sf::st_make_valid(shapefile)`" = st_is_valid(shapefile)
+      )
+      stopifnot(
+        "shapefile must have WGS84 Pseudo-Mercator projection (EPSG 3857)" = st_crs(shapefile)$epsg == 3857
+      )
       world_mc <- shapefile
     }
     
@@ -136,8 +156,7 @@ route_path <-
     
       # create visibility graph
       vis_graph <- pathroutr::prt_visgraph(land_region)
-      
-      
+
     if (inherits(x, "ssm_df")) {
       # create nested tibble grouped by individual track
       # use rowwise to process each row in turn
@@ -147,7 +166,7 @@ route_path <-
         mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
                rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
                pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
-   
+      
       # pull the corrected points from the object and reformat for foieGras
       df_rrt <- df_rrt %>%
         select(id, pts_fix) %>%
@@ -168,13 +187,14 @@ route_path <-
       if(append) {
         x$ssm <- lapply(1:nrow(x), function(i) {
           if("g" %in% names(x$ssm[[i]]$predicted)) {
-            x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
+            x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
                                                select(date, logit_g, logit_g.se, g),
                                              by = "date") %>%
               select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
           } else {
             x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
           }
+          
           x$ssm[[i]]
         })
         out <- x

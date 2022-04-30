@@ -71,7 +71,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              sprintf("ids: %s", x[nf, "id"])
              x <- x[-nf,]
            }
-           
+         
            out_lst <- lapply(x$ssm, function(.) {
              x <-
                switch(
@@ -101,35 +101,44 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  rerouted = st_crs(.$rerouted),
                  data = st_crs(.$data)
                ))
-             
+
              if (nrow(x) > 1) {
                ## test if prj's are all identical
-               tmp <- sapply(prj, function(.) .[[1]])
+               tmp <- sapply(prj, function(.)
+                 .[[1]])
                test <- sapply(2:length(tmp), function(i) {
                  identical(tmp[i - 1], tmp[i])
                })
                if (!any(test)) {
                  pos <- grep("lon_0=180", tmp)
-                 if (length(pos) == 0)
+                 if (length(pos) == 0) {
                    pos <- 1
-                 else
+                 } else {
                    cat(
                      "At least 1 model fit has locations centred on lon = 180, reprojecting all locations to that crs\n"
                    )
+                 }
                  
                  out <- lapply(1:length(out_lst), function(i) {
                    st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
                      st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
                      st_transform(prj[[pos]])
                  })
+                 out <- bind_rows(out)
+                 
+               } else if (any(test)) {
+                 out <- lapply(1:length(out_lst), function(i) {
+                   st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+                     st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                     st_transform(prj[[1]])
+                 })
+                 out <- bind_rows(out)
+                 
                }
-               out <- do.call(rbind, out)
-               
-             } else {
+             } else if (nrow(x) == 1) {
                out <- st_as_sf(out_lst[[1]], coords = c("lon", "lat")) %>%
                  st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
                  st_transform(prj[[1]])
-               
              }
              
              if (what %in% c("fitted","predicted")) {
@@ -184,7 +193,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                          "obs.type", "emf.x", "emf.y", "geometry")]
              }
              
-           } else {
+            } else if (!as_sf) {
              out <- do.call(rbind, out_lst)
              if (what %in% c("fitted","predicted")) {
                out <- switch(
@@ -217,6 +226,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  })
                
                out <- as_tibble(out)
+               
              } else if (what == "rerouted") {
                if("g" %in% names(out)) {
                 out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
@@ -239,7 +249,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                               "smaj", "smin", "eor", "obs.type", "keep", 
                               "x", "y", "emf.x", "emf.y")]
              }
-           }
+            }
+           
            if(!inherits(out, "sf")) out <- as_tibble(out)
            else {
              ## coerce from tibble to data.frame so row.names can be set to 1:nrow(out)
@@ -272,9 +283,8 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                mutate(g = (g - min(g))/(max(g) - min(g)))
            }
            out
-         }
-         )
-      
+         })
+         
   return(out)
 
 }

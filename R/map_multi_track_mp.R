@@ -48,12 +48,12 @@ map_multi_track_mp <- function(map_type,
   
   ## get worldmap
   if (map_type == "default") {
-    if (requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-      wm <- ne_countries(scale = 50, returnclass = "sf") %>%
+    if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+      wm <- ne_countries(scale = 10, returnclass = "sf") %>%
         st_transform(crs = st_crs(loc_sf)) %>%
         st_make_valid()
     } else {
-      wm <- ne_countries(scale = 110, returnclass = "sf") %>%
+      wm <- ne_countries(scale = 50, returnclass = "sf") %>%
         st_transform(crs = st_crs(loc_sf)) %>%
         st_make_valid()
     }
