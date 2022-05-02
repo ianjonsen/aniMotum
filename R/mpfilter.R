@@ -38,6 +38,7 @@
 
 mpfilter <-
   function(x,
+           model = model,
            time.step = 6,
            parameters = NULL,
            map = NULL,
@@ -202,7 +203,7 @@ mpfilter <-
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
     
     data <- list(
-      model_name = "mp",
+      model_name = model,
       Y = rbind(d.all$x, d.all$y), 
       dt = dt,
       isd = as.integer(d.all$isd),
@@ -217,7 +218,7 @@ mpfilter <-
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-    rnd <- c("X","lg")
+    rnd <- c("X", "lg")
     
     obj <-
       MakeADFun(
@@ -281,7 +282,7 @@ mpfilter <-
                                  control = control$control,
                                  lower = L,
                                  upper = U
-             )),
+             ), silent = TRUE),
              optim = try(do.call(
                optim,
                args = list(
@@ -300,7 +301,7 @@ mpfilter <-
     
     ## if error then exit with limited output to aid debugging
     ## check if pdHess is FALSE at end and return warning
-    rep <- try(sdreport(obj)) #, skip.delta.method = !control$se
+    rep <- try(sdreport(obj), silent = TRUE) #, skip.delta.method = !control$se
     
     options(warn = oldw) ## turn warnings back on
   

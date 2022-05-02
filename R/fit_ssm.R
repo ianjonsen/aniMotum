@@ -227,6 +227,7 @@ fit_ssm <- function(x,
                     function(x) {
                       mpfilter(
                         x = x,
+                        model = model,
                         time.step = time.step,
                         parameters = parameters,
                         map = map,
