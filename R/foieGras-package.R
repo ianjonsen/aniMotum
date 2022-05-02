@@ -47,9 +47,11 @@ NULL
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
-##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
-##' Australian Government through the National Collaborative Research Infrastructure
-##' Strategy and the Super Science Initiative.
+##' the Integrated Marine Observing System (IMOS) Sourced 
+##' from the Australian Integrated Marine Observing System (IMOS) deployments at 
+##' Davis Research Station, Antarctica and are publicly available (http:// imos.aodn.org.au). 
+##' IMOS is supported by the Australian Government through the National Collaborative 
+##' Research Infrastructure Strategy and the Super Science Initiative. 
 NULL
 
 ##' @name sese
@@ -58,9 +60,12 @@ NULL
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
-##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
+##' the Integrated Marine Observing System (IMOS) Sourced 
+##' from the Australian Integrated Marine Observing System (IMOS) in collaboration
+##' with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and 
+##' are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
 ##' Australian Government through the National Collaborative Research Infrastructure
-##' Strategy and the Super Science Initiative.
+##' Strategy and the Super Science Initiative. 
 NULL
 
 ##' @name sese1
@@ -69,9 +74,12 @@ NULL
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
-##' the Integrated Marine Observing System (IMOS) - IMOS is supported by the
+##' the Integrated Marine Observing System (IMOS) Sourced 
+##' from the Australian Integrated Marine Observing System (IMOS) in collaboration
+##' with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and 
+##' are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
 ##' Australian Government through the National Collaborative Research Infrastructure
-##' Strategy and the Super Science Initiative.
+##' Strategy and the Super Science Initiative. 
 NULL
 
 ##' @name sese2
@@ -82,8 +90,28 @@ NULL
 ##' @description Example elephant seal Argos tracking data, highly sub-sampled. 
 ##' These example data are included purely to speed up examples where a fit 
 ##' object is required. Generating a fit object is preferred as storing an 
-##' example fit risks GDAL errors on platforms with older GDAL libraries
+##' example fit risks GDAL errors on platforms with older GDAL libraries. Sourced 
+##' from the Australian Integrated Marine Observing System (IMOS) in collaboration
+##' with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and 
+##' are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
+##' Australian Government through the National Collaborative Research Infrastructure
+##' Strategy and the Super Science Initiative. 
 NULL
+
+##' @name wese_sb
+##' @docType data
+##' @title Weddell seal Argos satellite data (1 individual)
+##' @format .RData
+##' @keywords data
+##' @description Example Weddell seal Argos tracking data, deployed at Scott Base,
+##' Ross Island, Antarctica. This example data set is included for demonstration
+##' purposes. Sourced from the Australian Integrated Marine Observing System (IMOS) 
+##' & the New Zealand National Institute of Water and Atmospheric Research (NIWA)
+##' deployments at Scott Base, Antarctica and are publicly available (http:// imos.aodn.org.au).
+##' IMOS is supported by the Australian Government through the National Collaborative 
+##' Research Infrastructure Strategy and the Super Science Initiative. 
+NULL
+
 
 ##' @name xm
 ##' @docType data
