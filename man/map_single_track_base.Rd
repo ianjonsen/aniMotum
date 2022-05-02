@@ -14,6 +14,7 @@ map_single_track_base(
   extents,
   buffer,
   aes,
+  silent,
   ...
 )
 }
@@ -40,6 +41,8 @@ used.}
 \item{aes}{a tibble of map aesthetics (size, shape, col, fill, alpha) to
 be applied, in order, to: 1) estimated locations,; 2) confidence ellipses;
 3) track lines; 4) observed locations; 5) land regions; 6) water regions}
+
+\item{silent}{logical; map silently (default = FALSE)}
 
 \item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }

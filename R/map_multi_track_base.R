@@ -18,6 +18,7 @@
 ##' @param aes a list of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
+##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
@@ -39,6 +40,7 @@ map_multi_track_base <- function(map_type,
                                   extents,
                                   buffer,
                                   aes,
+                                  silent, 
                                   ...) {
   
   n <- length(unique(loc_sf$id))
@@ -65,10 +67,12 @@ map_multi_track_base <- function(map_type,
       wm <- ne_countries(scale = 10, returnclass = "sf") %>%
         st_transform(crs = st_crs(loc_sf)) %>%
         st_make_valid()
+      if(!silent) cat("using map scale: 10\n")
     } else {
       wm <- ne_countries(scale = 50, returnclass = "sf") %>%
         st_transform(crs = st_crs(loc_sf)) %>%
         st_make_valid()
+      if(!silent) cat("using map scale: 50\n")
     }
     
     ## define map region & clip land polygons

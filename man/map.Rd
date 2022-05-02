@@ -17,6 +17,7 @@ map(
   map_type = "default",
   normalise = FALSE,
   group = FALSE,
+  silent = FALSE,
   ...
 )
 }
@@ -68,6 +69,8 @@ maximum = 1 (default = FALSE).}
 \item{group}{logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move
 persistence along a track (default = FALSE).}
+
+\item{silent}{logical; generate maps silently (default = FALSE).}
 
 \item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }

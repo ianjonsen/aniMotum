@@ -17,6 +17,7 @@
 ##' @param aes a tibble of map aesthetics (size, shape, col, fill, alpha) to
 ##' be applied, in order, to: 1) estimated locations,; 2) confidence ellipses; 
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
+##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
 ##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
@@ -37,6 +38,7 @@ map_single_track_base <- function(map_type,
                                   extents,
                                   buffer,
                                   aes,
+                                  silent,
                                   ...) {
   
   ## if input aes is identical to default aes_df() then plot components
@@ -50,29 +52,32 @@ map_single_track_base <- function(map_type,
       with(loc_sf, pretty(seq(min(date), max(date), l = 10), n = 5)) %>% as.Date()
   }
   
+  prj <- st_crs(loc_sf)
   
   ## get worldmap
   if (map_type == "default") {
     if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
       wm <- ne_countries(scale = 10, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf)) %>%
+        st_transform(crs = prj) %>%
         st_make_valid()
+      if(!silent) cat("using map scale: 10\n")
     } else {
       wm <- ne_countries(scale = 50, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf)) %>%
+        st_transform(crs = prj) %>%
         st_make_valid()
+      if(!silent) cat("using map scale 50\n")
     }
-    
+
     ## define map region & clip land polygons
     if(!is.null(obs_sf)) pts <- obs_sf
     else pts <- loc_sf
-    land <- st_buffer(pts, dist = buffer) %>% 
+    land <- suppressWarnings(st_buffer(pts, dist = buffer) %>% 
                                st_union() %>% 
                                st_convex_hull() %>% 
                                st_intersection(wm) %>% 
                                st_collection_extract('POLYGON') %>% 
                                st_sf() %>%
-      st_make_valid()
+      st_make_valid())
     
     p <- ggplot() + 
       geom_sf(data = land,
@@ -171,7 +176,8 @@ map_single_track_base <- function(map_type,
   p <- p +
     coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
              ylim = c(extents["ymin"], extents["ymax"]), 
-             default_crs = st_crs(loc_sf),
+             crs = prj, # req'd for rosm baselayers
+             default_crs = prj,
              expand = FALSE)
   
   ## set plot theme stuff

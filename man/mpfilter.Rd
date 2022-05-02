@@ -6,6 +6,7 @@
 \usage{
 mpfilter(
   x,
+  model = model,
   time.step = 6,
   parameters = NULL,
   map = NULL,

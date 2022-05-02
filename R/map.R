@@ -39,6 +39,7 @@
 ##' @param group logical; should g be normalised among individuals as a group, 
 ##' a 'relative g', or separately to highlight regions of lowest and highest move
 ##' persistence along a track (default = FALSE).
+##' @param silent logical; generate maps silently (default = FALSE).
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
 ##' 
 ##' @return a map as a ggplot2 object
@@ -85,6 +86,7 @@ map <- function(x,
                 map_type = "default",
                 normalise = FALSE,
                 group = FALSE,
+                silent = FALSE,
                 ...) {
 
   what <- match.arg(what)
@@ -92,7 +94,7 @@ map <- function(x,
               any(inherits(x, "ssm_df"), inherits(x, "fG_ssm")))
   stopifnot("y must either be NULL or a foieGras mpm fit object with class `mpm_df`" = 
               any(inherits(y, "mpm_df"), inherits(y, "fG_mpm"), is.null(y)))
-  stopifnot("individual `ssm` fit objects with diloc_sfering projections not currently supported" = 
+  stopifnot("individual `ssm` fit objects with differing projections not currently supported" = 
               length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
   if(!is.null(crs)) {
     stopifnot("crs must be a proj4string with units=km,
@@ -129,7 +131,7 @@ map <- function(x,
     crs <- st_crs(loc_sf)
   }
 
-  ## generate track lines & cast tp MULTILINESTRING for plot efficiency
+  ## generate track lines & cast to MULTILINESTRING for plot efficiency
   if (aes$line) {
     line_sf <- group_by(loc_sf, id)
     line_sf <- summarise(line_sf, do_union = FALSE)
@@ -185,6 +187,7 @@ map <- function(x,
                                extents,
                                buffer,
                                aes,
+                               silent,
                                ...)
   }
   else if(all(nrow(x) > 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
@@ -198,6 +201,7 @@ map <- function(x,
                          extents,
                          buffer, 
                          aes,
+                         silent,
                          ...)
   }
   else if(all(nrow(x) == 1, "g" %in% names(loc_sf), aes$mp)) {
@@ -209,6 +213,7 @@ map <- function(x,
                              extents,
                              buffer,
                              aes,
+                             silent,
                              ...)
   }
   else if(all(nrow(x) > 1, "g" %in% names(loc_sf), aes$mp)) {
@@ -220,6 +225,7 @@ map <- function(x,
                             extents,
                             buffer,
                             aes,
+                            silent,
                             ...)
   }
   
