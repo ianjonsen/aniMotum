@@ -48,7 +48,6 @@ emf <- function(gps = 0.1,
 ##' @param sd vector of standard deviations
 ##' @param l lower limit of distribution
 ##' @param u upper limit of distribution
-##'
 ##' @importFrom stats pnorm qnorm runif
 ##' @keywords internal
 rtnorm <- function(n, mean = 0, sd = 1, l = -Inf, u = Inf) {
