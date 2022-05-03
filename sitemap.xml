@@ -13,13 +13,19 @@
     <loc>https://ianjonsen.github.io/foieGras/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://ianjonsen.github.io/foieGras/articles/basics.html</loc>
+    <loc>https://ianjonsen.github.io/foieGras/articles/Move_persistence_models.html</loc>
   </url>
   <url>
-    <loc>https://ianjonsen.github.io/foieGras/articles/fitting_SSMs_to_data.html</loc>
+    <loc>https://ianjonsen.github.io/foieGras/articles/SSM_fitting.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/articles/SSM_validation.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/articles/overview.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/authors.html</loc>
@@ -29,6 +35,9 @@
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/aes_lst.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/argos_lc.html</loc>
@@ -68,6 +77,24 @@
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/join.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/map.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/map_multi_track_base.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/map_multi_track_mp.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/map_single_track_base.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/map_single_track_mp.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/mpfilter.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/mpm_control.html</loc>
@@ -134,6 +161,12 @@
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/ssm_control.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/summary.ssm_df.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/wese_sb.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/wrap_lon.html</loc>

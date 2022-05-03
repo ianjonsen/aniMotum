@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-5</span>
       </span>
     </div>
 
@@ -65,9 +65,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for ssm_df</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>
   <span class="va">x</span>,
-  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fitted"</span>, <span class="st">"predicted"</span><span class="op">)</span>,
+  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fitted"</span>, <span class="st">"predicted"</span>, <span class="st">"rerouted"</span><span class="op">)</span>,
   type <span class="op">=</span> <span class="fl">1</span>,
   outlier <span class="op">=</span> <span class="cn">TRUE</span>,
+  alpha <span class="op">=</span> <span class="fl">0.3</span>,
   pages <span class="op">=</span> <span class="fl">0</span>,
   ncol <span class="op">=</span> <span class="fl">1</span>,
   ask <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -81,28 +82,37 @@
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> ssm fit object with class <code>ssm_df</code></p></dd>
 <dt>what</dt>
-<dd><p>specify which location estimates to display on time-series plots: fitted or predicted</p></dd>
+<dd><p>specify which location estimates to display on time-series plots:
+fitted, predicted, or rerouted</p></dd>
 <dt>type</dt>
-<dd><p>of plot to generate: 1-d time series for lon and lat separately (type = 1, default) or 2-d track plot (type = 2)</p></dd>
+<dd><p>of plot to generate: 1-d time series for lon and lat separately
+(type = 1, default) or 2-d track plot (type = 2)</p></dd>
 <dt>outlier</dt>
-<dd><p>include outlier locations dropped by prefilter (outlier = TRUE, default)</p></dd>
+<dd><p>include outlier locations dropped by prefilter
+(outlier = TRUE, default)</p></dd>
+<dt>alpha</dt>
+<dd><p>opacity of standard errors. Lower opacity can ease visualization
+when multiple ellipses overlap one another</p></dd>
 <dt>pages</dt>
-<dd><p>each individual is plotted on a separate page by default (pages = 0),
-multiple individuals can be combined on a single page; pages = 1</p></dd>
+<dd><p>each individual is plotted on a separate page by default
+(pages = 0), multiple individuals can be combined on a single page; pages = 1</p></dd>
 <dt>ncol</dt>
-<dd><p>number of columns to arrange plots when combining individuals on a single page (ignored if pages = 0)</p></dd>
+<dd><p>number of columns to arrange plots when combining individuals on
+a single page (ignored if pages = 0)</p></dd>
 <dt>ask</dt>
-<dd><p>logical; if TRUE (default) user is asked for input before each plot is rendered. set to FALSE to return ggplot objects</p></dd>
+<dd><p>logical; if TRUE (default) user is asked for input before each plot
+is rendered. set to FALSE to return ggplot objects</p></dd>
 <dt>pal</dt>
-<dd><p><code>hcl.colors</code> palette to use (default: "Zissou1"; type <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.pals()</a></code> for options)</p></dd>
+<dd><p>grDevices::hcl.colors palette to use (default: "Zissou1";
+see <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">grDevices::hcl.pals()</a></code> for options)</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments to be ignored</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a ggplot object with either: (type = 1) 1-d time series of fits to data,
-separated into x and y components (units = km) with prediction uncertainty ribbons (2 x SE);
-or (type = 2) 2-d fits to data (units = km)</p>
+    <p>a ggplot object with either: (type = 1) 1-d time series of fits to
+data, separated into x and y components (units = km) with prediction
+uncertainty ribbons (2 x SE); or (type = 2) 2-d fits to data (units = km)</p>
     </div>
 
     <div id="ref-examples">
@@ -144,7 +154,7 @@ or (type = 2) 2-d fits to data (units = km)</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

@@ -1,10 +1,12 @@
 pandoc: 2.7.3
-pkgdown: 2.0.2
+pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
-  basics: basics.html
-  fitting_SSMs_to_data: fitting_SSMs_to_data.html
-last_built: 2022-04-11T17:38Z
+  Move_persistence_models: Move_persistence_models.html
+  SSM_fitting: SSM_fitting.html
+  SSM_validation: SSM_validation.html
+  overview: overview.html
+last_built: 2022-05-03T18:44Z
 urls:
   reference: https://ianjonsen.github.io/foieGras/reference
   article: https://ianjonsen.github.io/foieGras/articles

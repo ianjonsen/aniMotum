@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-5</span>
       </span>
     </div>
 
@@ -77,7 +77,6 @@
 
 <p><strong>foieGras</strong> - fit latent variable movement models to animal tracking data for location quality control and behavioural inference</p>
 <!-- badges: start -->
-
 <p><img src="reference/figures/README-logo-1.png" style="display: block; margin: auto;"></p>
 <p><code>foieGras</code> is an R package that fits a continuous-time model (RW or CRW) in state-space form to filter Argos (or GLS) satellite location data. Template Model Builder (<code>TMB</code>) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space model estimates two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). Additional models are provided to infer movement behaviour along the SSM-estimated most-probable track.</p>
 <div class="section level2">
@@ -228,7 +227,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>

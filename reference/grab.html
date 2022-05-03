@@ -20,7 +20,7 @@ tibble."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-5</span>
       </span>
     </div>
 
@@ -55,37 +55,54 @@ tibble."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mat
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>grab tibble's by name from a foieGras model object</h1>
+    <h1>grab <code>tibble</code>'s by name from a <code>foieGras</code> model object</h1>
     <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/R/grab.R" class="external-link"><code>R/grab.R</code></a></small>
     <div class="hidden name"><code>grab.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p><code>grab()</code> lets you obtain <code>fitted</code>, <code>predicted</code>, <code>rerouted</code> or
-<code>data</code> tibble's from a compound tibble created when fitting to multiple
-individual data sets. The specified tibble's are appended to a single output
-tibble.</p>
+<code>data</code> <code>tibble</code>'s from a compound <code>tibble</code> created when fitting to multiple
+individual data sets. The specified <code>tibble</code>'s are appended to a single output
+<code>tibble</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">grab</span><span class="op">(</span><span class="va">x</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, as_sf <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">grab</span><span class="op">(</span><span class="va">x</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, as_sf <span class="op">=</span> <span class="cn">FALSE</span>, normalise <span class="op">=</span> <span class="cn">FALSE</span>, group <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>a <code>foieGras</code> ssm or mpm model object</p></dd>
+<dd><p>a <code>foieGras</code> <code>ssm_df</code> or <code>mpm_df</code> model object</p></dd>
 <dt>what</dt>
 <dd><p>the tibble to be grabbed; either <code>fitted</code>, <code>predicted</code>,
-<code>rerouted</code> (ssm only), or <code>data</code> (single letters can be used).</p></dd>
+<code>rerouted</code> (<code>ssm_df</code> only), or <code>data</code> (single letters can be used).</p></dd>
 <dt>as_sf</dt>
-<dd><p>logical; if FALSE (default) then return a tibble with
-un-projected lonlat coordinates, otherwise return an sf tibble. Ignored if x
-is an mpm model object.</p></dd>
+<dd><p>logical; if FALSE (default) then return a <code>tibble</code> with
+un-projected longlat coordinates, otherwise return an <code>sf tibble</code>. Ignored
+if x is an <code>mpm</code> model object.</p></dd>
+<dt>normalise</dt>
+<dd><p>logical; if output includes a move persistence estimate,
+should <code>g</code> (the move persistence index) be normalised to have minimum = 0 and
+maximum = 1 (default = FALSE). Note, this normalisation is not applied to the
+standard errors of the logit-scale move persistence estimates (<code>logit_g</code>,
+<code>logit_g.se</code>).</p></dd>
+<dt>group</dt>
+<dd><p>logical; should <code>g</code> be normalised among individuals as a group,
+a 'relative g', or to individuals separately to highlight regions of lowest
+and highest move persistence along single tracks (default = FALSE).</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a tibble with all individual tibble's appended</p>
+    <p>a <code>tibble</code> with all individual <code>tibble</code>'s appended</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>if multiple <code>ssm_df</code> model objects are present in <code>x</code>, <code>as_sf = TRUE</code>,
+and at least 1 estimated track has a coordinate reference system (<code>crs</code>) with
+longitude centered on 180 (e.g. a track straddling -180,180) then all tracks
+will be re-projected to that <code>crs</code>.</p>
     </div>
 
     <div id="ref-examples">
@@ -113,7 +130,7 @@ is an mpm model object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>
