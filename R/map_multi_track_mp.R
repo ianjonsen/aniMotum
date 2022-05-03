@@ -163,7 +163,8 @@ map_multi_track_mp <- function(map_type,
           legend.key.height = unit(4, "mm"),
           legend.text = element_text(size = 8, vjust = 0),
           panel.background = element_rect(fill = aes$df$fill[6], 
-                                          colour = NA))
+                                          colour = NA),
+          panel.grid = element_line(size = 0.1, colour = grey(0.6)))
   
   return(p)
 }
