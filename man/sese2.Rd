@@ -11,6 +11,11 @@
 Example elephant seal Argos tracking data, highly sub-sampled.
 These example data are included purely to speed up examples where a fit
 object is required. Generating a fit object is preferred as storing an
-example fit risks GDAL errors on platforms with older GDAL libraries
+example fit risks GDAL errors on platforms with older GDAL libraries. Sourced
+from the Australian Integrated Marine Observing System (IMOS) in collaboration
+with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and
+are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
+Australian Government through the National Collaborative Research Infrastructure
+Strategy and the Super Science Initiative.
 }
 \keyword{data}

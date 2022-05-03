@@ -31,7 +31,7 @@ defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are:
 defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}}
 
 \item{verbose}{integer; report progress during minimization: 0 = silent;
-1 = optimizer trace; 2 = parameter trace (default))}
+1 = parameter trace (default); 2 = optimizer trace}
 
 \item{se}{logical; should standard errors for speed estimates be calculated (default = FALSE).
 Turning this on will slow down computation time but provide SE's for speed-along-track calculations}

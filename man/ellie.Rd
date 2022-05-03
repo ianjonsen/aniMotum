@@ -9,8 +9,10 @@
 }
 \description{
 Example elephant seal Argos tracking data. Data were sourced from
-the Integrated Marine Observing System (IMOS) - IMOS is supported by the
-Australian Government through the National Collaborative Research Infrastructure
-Strategy and the Super Science Initiative.
+the Integrated Marine Observing System (IMOS) Sourced
+from the Australian Integrated Marine Observing System (IMOS) deployments at
+Davis Research Station, Antarctica and are publicly available (http:// imos.aodn.org.au).
+IMOS is supported by the Australian Government through the National Collaborative
+Research Infrastructure Strategy and the Super Science Initiative.
 }
 \keyword{data}
