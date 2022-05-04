@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSM_validation • foieGras</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -38,28 +38,37 @@
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../articles/index.html">Vignettes</a>
-</li>
+      <ul class="nav navbar-nav"></ul>
+<ul class="nav navbar-nav navbar-right">
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/ianjonsen/foieGras/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Vignettes
      
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/Overview.html">Overview</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_fitting.html">SSM_fitting</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_validation.html">SSM_validation</a>
+    </li>
+    <li>
+      <a href="../articles/Move_persistence_models.html">Move_persistence_models</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -87,8 +96,10 @@
     
 <p>Just like any other statistical model fitting exercise, validating SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic <code>plot</code> function on model fit objects:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step <span class="op">=</span> <span class="fl">12</span>, control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
+                  model <span class="op">=</span> <span class="st">"rw"</span>, 
+                  time.step <span class="op">=</span> <span class="fl">12</span>, 
+                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span>
 <span class="co">#&gt; $`54591`</span></code></pre></div>
@@ -98,15 +109,14 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span>
 <span class="co">#&gt; $`54591`</span></code></pre></div>
 <p><img src="SSM_validation_files/figure-html/visualise%20SSM%20fit-2.png" width="672"></p>
-<p>Both fitted and predicted locations (red) can be plotted as 1-D time-series on top of the observations (blue) to visually detect any lack of fit. Observations that failed to pass the <code>prefilter</code> stage prior to SSM fitting (gold x’s) can be included (default) or omitted with the <code>outlier</code> argument. A rug plot along the x-axis aids detection of data gaps in the time-series. Note, in second plot, the larger standard errors for predicted locations through small data gaps.</p>
+<p>Both fitted and predicted locations (red) can be plotted as 1-D time-series on top of the observations (blue) to visually detect any lack of fit. Observations that failed to pass the <code>prefilter</code> stage prior to SSM fitting (orange x’s) can be included (default) or omitted with the <code>outlier</code> argument. A rug plot along the x-axis aids detection of data gaps in the time-series. Note, in second plot, the larger standard errors for predicted locations through small data gaps.</p>
 <p>The SSM fits can also be visualised as 2-D tracks via the <code>type</code> argument:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"p"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"p"</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; $`54591`</span></code></pre></div>
 <p><img src="SSM_validation_files/figure-html/visualise%20as%20track-1.png" width="672"></p>
-<p>This option can provides an intuitive view of the estimated track (red) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (red ellipses). Here, the alpha (error ellipse opacity), argument is set to a small value so that the many overlapping error ellipses don’t overwhelm visualization of the location point estimates.</p>
-<p>Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction (one-step-ahead) residual, provides a useful, albeit computationally demanding, alternative. In <code>foieGras</code>, prediction residuals from state-space model fits are calculated using the <code>osar</code> function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:</p>
+<p>This option can provides an intuitive view of the estimated track (red) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (red ellipses).</p>
+<p>Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a one-step-ahead prediction residual, provides a useful if computationally demanding alternative. In <code>foieGras</code>, prediction residuals from state-space model fits are calculated using the <code>osar</code> function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># use patchwork package to arrange plot.osar options</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
@@ -119,8 +129,10 @@
 <p>Here, the 3 residual plots highlight a poor fit of the <code>rw</code> SSM to the x-coordinate. The time-series residual plot implies a bias in the <code>rw</code> SSM fit over the latter half of the track, the Q-Q plot highlights a distinct departure from normality in the x residuals, and the x residuals are positively autocorrelated.</p>
 <p>Fitting the <code>crw</code> SSM to the same data, we can see the prediction residual plots imply a less biased fit with approximately normal residuals that have little autocorrelation in both coordinates. Additionally, the <code>crw</code> model fit has a lower AIC<sub>c</sub> than the <code>rw</code>. Although note that AIC statistics can be misleading for time-series models and should not be used as the sole criterion for preferring one model fit over another. Here, at least, the AIC<sub>c</sub> values are in agreement with the prediction residual diagnostics.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">12</span>, control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
+                   model <span class="op">=</span> <span class="st">"crw"</span>, 
+                   time.step <span class="op">=</span> <span class="fl">12</span>, 
+                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">res.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.crw</span><span class="op">)</span>
 

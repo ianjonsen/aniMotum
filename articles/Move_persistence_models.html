@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Move_persistence_models • foieGras</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -38,28 +38,37 @@
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../articles/index.html">Vignettes</a>
-</li>
+      <ul class="nav navbar-nav"></ul>
+<ul class="nav navbar-nav navbar-right">
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/ianjonsen/foieGras/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Vignettes
      
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/Overview.html">Overview</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_fitting.html">SSM_fitting</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_validation.html">SSM_validation</a>
+    </li>
+    <li>
+      <a href="../articles/Move_persistence_models.html">Move_persistence_models</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -115,15 +124,11 @@
                model <span class="op">=</span> <span class="st">"mp"</span>, 
                time.step <span class="op">=</span> <span class="fl">24</span>,
                control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>We can extract move persistence estimates as either fitted (corresponding to observation times) or predicted (corresponding to regular time intervals) values using <code><a href="../reference/grab.html">grab()</a></code>. Here the <code>normalise</code> argument rescales the estimates to span the interval 0,1. Move persistence estimates from <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> tend to be smoothed more extremely compared those obtained from <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and can lack contrast. Normalising the estimates provides a clearer view of changes in movement behaviour along tracks, highlighting regions where animals spend disproportionately more or less time. When fitting to a collection of individuals, the normalisation can be applied separately to each individual or collectively via <code>normalise = TRUE, group = TRUE</code>. In the latter case, the relative magnitudes of move persistence are preserved across individuals.</p>
 <p>Move persistence estimates can be plotted as a time-series. Note the broadly similar time-series of move persistence estimates as above, but here considerably more variability is apparent because we have not smoothed away that variability by fitting to SSM-smoothed location estimates as in the above example.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">fmp</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">g</span>, colour <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_line</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_colour_viridis_c</span><span class="op">(</span>option <span class="op">=</span> <span class="st">"E"</span><span class="op">)</span></code></pre></div>
-<p><img src="Move_persistence_models_files/figure-html/ts2-1.png" width="672"></p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">3</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co">#&gt; $`ct109-186-14`</span></code></pre></div>
+<p><img src="Move_persistence_models_files/figure-html/ts2-1.png" width="672"> Here, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> extracts move persistence estimates as either fitted (corresponding to observation times) or predicted (corresponding to regular time intervals) values using <code><a href="../reference/grab.html">grab()</a></code> internally. The <code>normalise</code> argument rescales the estimates to span the interval 0,1. Move persistence estimates from <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> tend to be smoothed more extremely compared those obtained from <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and can lack contrast. Normalising the estimates provides a clearer view of changes in movement behaviour along tracks, highlighting regions where animals spend disproportionately more or less time. When fitting to a collection of individuals, the normalisation can be applied separately to each individual or collectively via <code>normalise = TRUE, group = TRUE</code>. In the latter case, the relative magnitudes of move persistence are preserved across individuals.</p>
 <p>When mapping these move persistence estimates along the 2-D track, we can see that segments of low (dark blue) and high (bright yellow) move persistence correspond to areas where the seal spends disproportionately more or less time, respectively. The pattern is overall quite similar to the map using <code>fit_mpm</code> estimates, but there are subtle differences apparent.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>

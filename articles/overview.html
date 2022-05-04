@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Overview • foieGras</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -38,28 +38,37 @@
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../articles/index.html">Vignettes</a>
-</li>
+      <ul class="nav navbar-nav"></ul>
+<ul class="nav navbar-nav navbar-right">
 <li>
   <a href="../reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/ianjonsen/foieGras/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Vignettes
      
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/Overview.html">Overview</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_fitting.html">SSM_fitting</a>
+    </li>
+    <li>
+      <a href="../articles/SSM_validation.html">SSM_validation</a>
+    </li>
+    <li>
+      <a href="../articles/Move_persistence_models.html">Move_persistence_models</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -155,20 +164,20 @@
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-03 18:46:15 GL 100.0 -55 0.8193692 1.0757156</span>
-<span class="co">#&gt; 2 54632 2022-05-04 06:46:15 GL 100.5 -54 0.2307357 1.9020324</span>
-<span class="co">#&gt; 3 54632 2022-05-04 18:46:15 GL 101.0 -53 0.8699577 1.3603881</span>
-<span class="co">#&gt; 4 54632 2022-05-05 06:46:15 GL 101.5 -52 0.1304583 0.6495556</span>
-<span class="co">#&gt; 5 54632 2022-05-05 18:46:15 GL 102.0 -51 0.5385434 0.7879156</span></code></pre>
+<span class="co">#&gt; 1 54632 2022-05-04 16:12:25 GL 100.0 -55 0.5481211 0.4274595</span>
+<span class="co">#&gt; 2 54632 2022-05-05 04:12:25 GL 100.5 -54 0.2658209 4.2128452</span>
+<span class="co">#&gt; 3 54632 2022-05-05 16:12:25 GL 101.0 -53 3.1255351 4.3294445</span>
+<span class="co">#&gt; 4 54632 2022-05-06 04:12:25 GL 101.5 -52 0.9072270 1.5307793</span>
+<span class="co">#&gt; 5 54632 2022-05-06 16:12:25 GL 102.0 -51 1.2164981 0.5776108</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-03 18:46:15  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-03 19:46:15  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-03 20:46:15  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-03 21:46:15  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-03 22:46:15  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-04 16:12:25  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-04 17:12:25  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-04 18:12:25  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-04 19:12:25  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-04 20:12:25  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
