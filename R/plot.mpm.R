@@ -29,7 +29,7 @@
 ##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon ylim coord_fixed scale_size
 ##' @importFrom stats qlogis
 ##' @importFrom patchwork wrap_plots
-##' @importFrom grDevices hcl.colors devAskNewPage
+##' @importFrom grDevices hcl.colors hcl.pals devAskNewPage
 ##' @method plot mpm_df
 ##'
 ##' @examples
