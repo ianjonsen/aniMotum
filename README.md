@@ -22,22 +22,24 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 
 <img src="man/figures/README-logo-1.png" style="display: block; margin: auto;" />
 
-`foieGras` is an R package that fits a continuous-time model (RW or CRW)
-in state-space form to filter Argos (or GLS) satellite location data.
-Template Model Builder (`TMB`) is used for fast estimation. Argos data
-can be either (older) Least Squares-based locations, (newer) Kalman
-Filter-based locations with error ellipse information, or a mixture of
-the two. The state-space model estimates two sets of location states: 1)
-corresponding to each observation, which are usually irregularly timed
-(fitted states); and 2) corresponding to (usually) regular time
-intervals specified by the user (predicted states). Locations are
-returned as both LongLat and on the Mercator projection (units=km).
-Additional models are provided to infer movement behaviour along the
-SSM-estimated most-probable track.
+`foieGras` is an R package that fits continuous-time models in
+state-space form to filter error-prone animal movement data obtained via
+the Argos satellite system, and to estimate changes in movement
+behaviour. Template Model Builder (`TMB`) is used for fast estimation.
+Argos data can be either (older) Least Squares-based locations, (newer)
+Kalman Filter-based locations with error ellipse information, or a
+mixture of the two. The state-space models estimate two sets of location
+states: 1) corresponding to each observation, which are usually
+irregularly timed (fitted states); and 2) corresponding to (usually)
+regular time intervals specified by the user (predicted states).
+Locations are returned as both LongLat and on the Mercator projection
+(units=km). The models may be applied with appropriate caution to
+tracking data obtained from other systems, such as light-level
+geolocations and GPS.
 
 ## Installation
 
-First, ensure you have R version \>= 3.6.0 installed (preferably R 4.0.0
+First, ensure you have R version \>= 3.6.0 installed (preferably R 4.1.0
 or higher):
 
 ``` r
@@ -64,62 +66,66 @@ full Xcode install uses up a lot of disk space and is not required.
 Also, ensure you have a suitable Gnu Fortran compiler installed (e.g.,
 <https://github.com/fxcoudert/gfortran-for-macOS/releases>).
 
-To get the very latest `foieGras` stable version, you can install from
-GitHub:
+To get the very latest `foieGras` version, you can install from GitHub:
 
 ``` r
 remotes::install_github("ianjonsen/foieGras@staging")
 ```
 
-Or, for a more thoroughly tested earlier version:
+Or, for a more stable version:
 
 ``` r
 remotes::install_github("ianjonsen/foieGras")
 ```
 
 Note: there can be issues getting compilers to work properly, especially
-on a Mac with OS X 10.13.x or higher. If you encounter install and
-compile issues, I recommend you consult the excellent information on the
-[glmmTMB](https://github.com/glmmTMB/glmmTMB) GitHub.
+on M1 Macs. Often, this is due to missing or incorrect Xcode Command
+Line Tools and/or Fortran compiler. If you encounter install and compile
+issues, you may find a solution in the excellent documentation here
+[glmmTMB](https://github.com/glmmTMB/glmmTMB).
 
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here’s an
-example showing how to quality-control Argos tracking data, and infer a
-behavioural index along the estimated animal tracks:
+example showing how to quality-control Argos tracking data:
 
 ``` r
 library(tidyverse)
 library(foieGras)
 library(cowplot)
 
-fit <- fit_ssm(sese, vmax= 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
+fit <- fit_ssm(sese, 
+               vmax= 4, 
+               model = "mp", 
+               time.step = 24, 
+               control = ssm_control(verbose = 0))
 
-fmp <- fit_mpm(fit, what = "predicted", model = "jmpm", control = mpm_control(verbose = 0))
-
-plot(fmp, pages = 1, ncol = 3, pal = "Cividis", rev = TRUE)
+plot(fit, pages = 1, ncol = 2)
 ```
 
 <img src="man/figures/README-explots1-1.png" width="100%" />
 
 ``` r
-m <- fmap(fit, fmp, what = "predicted", pal = "Cividis", crs = "+proj=stere +lon_0=69 +units=km +datum=WGS84")
+m <- map(fit, 
+         what = "predicted", 
+         normalise = TRUE,
+         crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 
 ## using cowplot to add southern elephant seal silhouettes to map
 ggdraw() +
   draw_plot(m) +
-  draw_image("inst/logo/img/sese_female_orig.png",  x=0.175, y=0.85, scale=0.175, hjust=0.5, vjust=0.5) +
+  draw_image("inst/logo/img/sese_female_orig.png",  x=0.172, y=0.87, scale=0.175, hjust=0.5, vjust=0.5) +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
-<img src="man/figures/README-explots2-1.png" width="100%" /> foo
-Southern elephant seal silhouettes kindly provided by:  
+<img src="man/figures/README-explots2-1.png" width="100%" /> Southern
+elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke
-(\[@SophiaVolzke\](<https://twitter.com/SophiaVolzke>), University of
+([@SophiaVolzke](https://twitter.com/SophiaVolzke), University of
 Tasmania)  
 - male southern elephant seal, Anton Van de Putte
-(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
-de Bruxelles)
+([@AntonArctica](https://twitter.com/Antonarctica), Université Libre de
+Bruxelles)
 
 ## What to do if you encounter a problem
 
@@ -157,10 +163,15 @@ By contributing to this project, you agree to abide by its terms.
 ## Acknowledgements
 
 Development of this R package was funded by a consortium of partners
-including: Macquarie University; the US Office of Naval Research (ONR
-Marine Mammal Biology; grant N00014-18-1-2405); Australia’s Integrated
-Marine Observing System (IMOS); Canada’s Ocean Tracking Network (OTN);
-Taronga Conservation Society; Birds Canada; and Innovasea/Vemco.
+including:  
+- **Macquarie University**  
+- **US Office of Naval Research** (ONR Marine Mammal Biology;grant
+N00014-18-1-2405)  
+- Australia’s **Integrated Marine Observing System** (IMOS)  
+- Canada’s **Ocean Tracking Network** (OTN)  
+- **Taronga Conservation Society**  
+- **Birds Canada**  
+- **Innovasea/Vemco**  
 Additional support was provided by France’s Centre de Synthèse et
 d’Analyse sur la Biodiversite, part of the Fondation pour la Recherche
 sur la Biodiversité.
@@ -179,8 +190,8 @@ Tasmania Animal Ethics Committee guidelines.
 Animal silhouettes used in the `foieGras` logo were obtained and
 modified from sources:  
 - southern elephant seal, Anton Van de Putte
-(\[@AntonArctica\](<https://twitter.com/Antonarctica>), Université Libre
-de Bruxelles)  
+([@AntonArctica](https://twitter.com/Antonarctica), Université Libre de
+Bruxelles)  
 - humpback whale, Chris Huh via [Phylopic.org](http://phylopic.org)
 Creative Commons Attribution-ShareAlike 3.0 Unported  
 - mallard duck, Maija Karala via [Phylopic.org](http://phylopic.org)

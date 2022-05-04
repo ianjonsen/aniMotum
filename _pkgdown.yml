@@ -2,18 +2,33 @@ title: foieGras
 url: https://ianjonsen.github.io/foieGras
 template:
   params:
-    bootswatch: cosmo
+    bootswatch: cerulean
 
 destination: docs
 
 navbar:
-  title: "foieGras"
-  left:
-    - icon: fa-home fa-lg
-      href: index.html
-    - text: "Vignettes"
-      href: articles/index.html
-    - text: "Functions"
+  structure:
+    left:  [home]
+    right: [reference, articles, github]
+  components:
+    reference:
+      text: Functions
       href: reference/index.html
-    - text: "News"
+    articles:
+      text: Vignettes
+      menu:
+        - text: Overview
+          href: articles/Overview.html
+        - text: SSM_fitting
+          href: articles/SSM_fitting.html
+        - text: SSM_validation
+          href: articles/SSM_validation.html
+        - text: Move_persistence_models
+          href: articles/Move_persistence_models.html
+    news:
+      text: News
       href: news/index.html
+    github:
+      text: GitHub
+      icon: fa-github fa-lg
+      href: https://github.com/ianjonsen/foieGras

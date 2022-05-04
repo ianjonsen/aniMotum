@@ -6,23 +6,18 @@ require(hexSticker, quietly = TRUE)
 require(cowplot, quietly = TRUE)
 
 fit <- fit_ssm(sese,
-               model = "crw",
+               model = "mp",
                time.step = 24,
                control = ssm_control(verbose = 0))
-fmp <- fit_mpm(fit, what = "pred", control = mpm_control(verbose = 0))
 
 d <- grab(fit, "data", as_sf = TRUE)
-pmp <- join(fit, fmp)
-pmp_lines <- group_by(pmp, id) %>%
-  summarise(do_union = FALSE) %>%
-  st_cast("MULTILINESTRING")
+pmp <- grab(fit, "predicted", as_sf = TRUE, normalise = TRUE)
 
-prj <- "+proj=stere +lon_0=70 +units=km +datum=WGS84"
+prj <- "+proj=stere +lon_0=68 +units=km +datum=WGS84"
 bb <- st_bbox(d %>% st_transform(crs = prj))
 
 m <- ggplot() + 
   geom_sf(data = d, col="steelblue3", size=0.15) + 
-  geom_sf(data = pmp_lines, col = "#414D6BFF", linetype = 5, lwd=0.1) +
   geom_sf(data = pmp %>% filter(g > 0.4), aes(col = g), size=0.1) +
   geom_sf(data = pmp %>% filter(g <= 0.4), aes(col = g), size=0.1) +
   scale_colour_viridis_c(option = "E") +
