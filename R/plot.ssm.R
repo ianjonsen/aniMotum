@@ -61,7 +61,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @importFrom tidyr gather
 ##' @importFrom sf st_multipolygon st_polygon st_as_sfc st_as_sf
 ##' @importFrom patchwork wrap_plots
-##' @importFrom grDevices hcl.colors devAskNewPage
+##' @importFrom grDevices hcl.colors hcl.pals devAskNewPage
 ##' @method plot ssm_df
 ##'
 ##' @examples
@@ -399,7 +399,7 @@ plot.ssm_df <-
               size = 3
             ) +
             scale_colour_gradientn(
-              colours = hcl.colors(n = 100, pal = pal),
+              colours = hcl.colors(n = 100, palette = pal),
               limits = c(0,1),
               name = expression(gamma[t])
             ) +
