@@ -18,25 +18,26 @@ require(foieGras)
 Just like any other statistical model fitting exercise, validating SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic `plot` function on model fit objects:
 
 ```{r visualise SSM fit, fig.width=7, fig.height=5}
-
-fit.rw <- fit_ssm(ellie, model = "rw", time.step = 12, control = ssm_control(verbose = 0))
+fit.rw <- fit_ssm(ellie, 
+                  model = "rw", 
+                  time.step = 12, 
+                  control = ssm_control(verbose = 0))
 
 plot(fit.rw, what = "fitted")
 
 plot(fit.rw, what = "predicted")
 ```
 
-Both fitted and predicted locations (red) can be plotted as 1-D time-series on top of the observations (blue) to visually detect any lack of fit. Observations that failed to pass the `prefilter` stage prior to SSM fitting (gold x's) can be included (default) or omitted with the `outlier` argument. A rug plot along the x-axis aids detection of data gaps in the time-series. Note, in second plot, the larger standard errors for predicted locations through small data gaps.
+Both fitted and predicted locations (red) can be plotted as 1-D time-series on top of the observations (blue) to visually detect any lack of fit. Observations that failed to pass the `prefilter` stage prior to SSM fitting (orange x's) can be included (default) or omitted with the `outlier` argument. A rug plot along the x-axis aids detection of data gaps in the time-series. Note, in second plot, the larger standard errors for predicted locations through small data gaps.
 
 The SSM fits can also be visualised as 2-D tracks via the `type` argument:
 ```{r visualise as track, fig.width=7, fig.height=6}
-
-plot(fit.rw, "p", type = 2, alpha = 0.02)
+plot(fit.rw, "p", type = 2)
 ```
 
-This option can provides an intuitive view of the estimated track (red) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (red ellipses). Here, the alpha (error ellipse opacity), argument is set to a small value so that the many overlapping error ellipses don't overwhelm visualization of the location point estimates.
+This option can provides an intuitive view of the estimated track (red) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (red ellipses). 
 
-Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a prediction (one-step-ahead) residual, provides a useful, albeit computationally demanding, alternative. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:
+Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a one-step-ahead prediction residual, provides a useful if computationally demanding alternative. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:
 ```{r osar plots, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 # use patchwork package to arrange plot.osar options
 require(patchwork)
@@ -51,8 +52,10 @@ Here, the 3 residual plots highlight a poor fit of the `rw` SSM to the x-coordin
 
 Fitting the `crw` SSM to the same data, we can see the prediction residual plots imply a less biased fit with approximately normal residuals that have little autocorrelation in both coordinates. Additionally, the `crw` model fit has a lower AIC~c~ than the `rw`. Although note that AIC statistics can be misleading for time-series models and should not be used as the sole criterion for preferring one model fit over another. Here, at least, the AIC~c~ values are in agreement with the prediction residual diagnostics.
 ```{r fit crw and plot osar, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
-
-fit.crw <- fit_ssm(ellie, model = "crw", time.step = 12, control = ssm_control(verbose = 0))
+fit.crw <- fit_ssm(ellie, 
+                   model = "crw", 
+                   time.step = 12, 
+                   control = ssm_control(verbose = 0))
 
 res.crw <- osar(fit.crw)
 

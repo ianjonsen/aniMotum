@@ -86,7 +86,7 @@ plot.ssm_df <-
            what = c("fitted", "predicted", "rerouted"),
            type = 1,
            outlier = TRUE,
-           alpha = 0.1,
+           alpha = 0.05,
            pages = 0,
            ncol = 1,
            ask = TRUE,
@@ -108,13 +108,11 @@ plot.ssm_df <-
     if(pal != "default") {
       cpal <- hcl.colors(n = 5, palette = pal)
     } else {
-      cpal <- paste0("#", 
-                     as.hexmode(c(256^(2:0) %*% 
-                                    col2rgb(c("dodgerblue", 
-                                              "firebrick", 
-                                              "orange", 
-                                              "black"))))
-                     )
+      cpal <- c("#1e90ff", # dodgerblue
+                "#b22222", # firebrick
+                "#ffa500", # orange
+                "#000000") # black
+      
       pal <- "Cividis"
     }
     
@@ -191,7 +189,7 @@ plot.ssm_df <-
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
               fill = cpal[2],
-              alpha = alpha
+              alpha = alpha + 0.15
             )
           
           if (outlier) {
@@ -328,6 +326,7 @@ plot.ssm_df <-
               data = subset(ssm, id == unique(id)[i]),
               aes(x, y),
               col = cpal[4],
+              alpha = 0.5,
               lwd = 0.2
             ) +
             geom_point(
