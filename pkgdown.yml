@@ -3,10 +3,10 @@ pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
   Move_persistence_models: Move_persistence_models.html
+  Overview: Overview.html
   SSM_fitting: SSM_fitting.html
   SSM_validation: SSM_validation.html
-  overview: overview.html
-last_built: 2022-05-04T17:01Z
+last_built: 2022-05-04T17:14Z
 urls:
   reference: https://ianjonsen.github.io/foieGras/reference
   article: https://ianjonsen.github.io/foieGras/articles

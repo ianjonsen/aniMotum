@@ -81,14 +81,14 @@
 
       
 
-      </header><script src="overview_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="Overview_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Overview</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/vignettes/overview.Rmd" class="external-link"><code>vignettes/overview.Rmd</code></a></small>
-      <div class="hidden name"><code>overview.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/vignettes/Overview.Rmd" class="external-link"><code>vignettes/Overview.Rmd</code></a></small>
+      <div class="hidden name"><code>Overview.Rmd</code></div>
 
     </div>
 
@@ -163,21 +163,21 @@
 <ol start="5" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
-<pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-04 17:04:13 GL 100.0 -55 0.5667123 1.77076950</span>
-<span class="co">#&gt; 2 54632 2022-05-05 05:04:13 GL 100.5 -54 1.2418748 0.38008577</span>
-<span class="co">#&gt; 3 54632 2022-05-05 17:04:13 GL 101.0 -53 0.1963860 0.01145257</span>
-<span class="co">#&gt; 4 54632 2022-05-06 05:04:13 GL 101.5 -52 0.1755354 2.14621263</span>
-<span class="co">#&gt; 5 54632 2022-05-06 17:04:13 GL 102.0 -51 0.4311832 0.48209468</span></code></pre>
+<pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
+<span class="co">#&gt; 1 54632 2022-05-04 17:16:05 GL 100.0 -55 0.4531172 1.3369092</span>
+<span class="co">#&gt; 2 54632 2022-05-05 05:16:05 GL 100.5 -54 0.0122828 0.8461084</span>
+<span class="co">#&gt; 3 54632 2022-05-05 17:16:05 GL 101.0 -53 1.2663259 1.7980836</span>
+<span class="co">#&gt; 4 54632 2022-05-06 05:16:05 GL 101.5 -52 0.3429379 3.4290211</span>
+<span class="co">#&gt; 5 54632 2022-05-06 17:16:05 GL 102.0 -51 0.2545461 1.1360721</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-04 17:04:14  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-04 18:04:14  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-04 19:04:14  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-04 20:04:14  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-04 21:04:14  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-04 17:16:05  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-04 18:16:05  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-04 19:16:05  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-04 20:16:05  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-04 21:16:05  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
@@ -266,13 +266,13 @@
 <code class="sourceCode R"><span class="co"># plot time-series of the fitted values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="co">#&gt; $`54591`</span></code></pre></div>
-<p><img src="overview_files/figure-html/fit%20plot-1.png" width="672"></p>
+<p><img src="Overview_files/figure-html/fit%20plot-1.png" width="672"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># plot fitted values as a 2-d track</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
 <span class="co">#&gt; $`54591`</span></code></pre></div>
-<p><img src="overview_files/figure-html/fit%20plot-2.png" width="672"></p>
+<p><img src="Overview_files/figure-html/fit%20plot-2.png" width="672"></p>
 <p>The predicted values (red points) are the state estimates predicted at regular time intervals, specified by <code>time.step</code> (here a 24 h interval). These estimates are plotted on top of 2 x SE intervals (red-filled ribbon), and the observations that passed the <code>prefilter</code> stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - <code>plot(fit)</code>. A 2-D time series plot of the track is invoked by the argument <code>type = 2</code>, and includes the 95 % confidence ellipses (red-filled ellipses) around the predicted locations.</p>
 </div>
 </div>
