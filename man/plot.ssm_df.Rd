@@ -9,11 +9,13 @@
   what = c("fitted", "predicted", "rerouted"),
   type = 1,
   outlier = TRUE,
-  alpha = 0.3,
+  alpha = 0.1,
   pages = 0,
   ncol = 1,
   ask = TRUE,
-  pal = "Zissou1",
+  pal = "default",
+  normalise = TRUE,
+  group = FALSE,
   ...
 )
 }
@@ -24,7 +26,9 @@
 fitted, predicted, or rerouted}
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately
-(type = 1, default) or 2-d track plot (type = 2)}
+(type = 1, default); 2-d track plot (type = 2); 1-d time series of move
+persistence estimates (type = 3; if fitted model was \code{mp}); 2-d track plot
+with locations coloured by move persistence (type = 4; if fitted model was \code{mp})}
 
 \item{outlier}{include outlier locations dropped by prefilter
 (outlier = TRUE, default)}
@@ -43,6 +47,13 @@ is rendered. set to FALSE to return ggplot objects}
 
 \item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Zissou1";
 see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
+
+\item{normalise}{logical; if plotting move persistence estimates from an \code{mp}
+model fit, should estimates be normalised to 0,1 (default = TRUE).}
+
+\item{group}{logical; should \code{g} be normalised among individuals as a group,
+a 'relative g', or to individuals separately to highlight regions of lowest
+and highest move persistence along single tracks (default = FALSE).}
 
 \item{...}{additional arguments to be ignored}
 }

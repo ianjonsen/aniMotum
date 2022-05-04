@@ -28,7 +28,9 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' @param what specify which location estimates to display on time-series plots: 
 ##' fitted, predicted, or rerouted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately 
-##' (type = 1, default) or 2-d track plot (type = 2)
+##' (type = 1, default); 2-d track plot (type = 2); 1-d time series of move
+##' persistence estimates (type = 3; if fitted model was `mp`); 2-d track plot 
+##' with locations coloured by move persistence (type = 4; if fitted model was `mp`)
 ##' @param outlier include outlier locations dropped by prefilter 
 ##' (outlier = TRUE, default)
 ##' @param alpha opacity of standard errors. Lower opacity can ease visualization
@@ -41,6 +43,11 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' is rendered. set to FALSE to return ggplot objects
 ##' @param pal [grDevices::hcl.colors] palette to use (default: "Zissou1"; 
 ##' see [grDevices::hcl.pals()] for options)
+##' @param normalise logical; if plotting move persistence estimates from an `mp`
+##' model fit, should estimates be normalised to 0,1 (default = TRUE).
+##' @param group logical; should `g` be normalised among individuals as a group, 
+##' a 'relative g', or to individuals separately to highlight regions of lowest 
+##' and highest move persistence along single tracks (default = FALSE).
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: (type = 1) 1-d time series of fits to 
@@ -79,11 +86,13 @@ plot.ssm_df <-
            what = c("fitted", "predicted", "rerouted"),
            type = 1,
            outlier = TRUE,
-           alpha = 0.3,
+           alpha = 0.1,
            pages = 0,
            ncol = 1,
            ask = TRUE,
-           pal = "Zissou1",
+           pal = "default",
+           normalise = TRUE,
+           group = FALSE,
            ...)
   {
     if (length(list(...)) > 0) {
@@ -92,28 +101,43 @@ plot.ssm_df <-
     
     what <- match.arg(what)
     
-    wpal <- hcl.colors(n = 5, palette = pal)
+    stopifnot("palette is not an hcl.palette, type 'hcl.pals()' to see the list of palettes" = 
+                pal %in% c(hcl.pals(), "default"))
+    stopifnot("plot 'type' can only be one of 1, 2, 3, or 4" = type %in% 1:4)
+    
+    if(pal != "default") {
+      cpal <- hcl.colors(n = 5, palette = pal)
+    } else {
+      cpal <- paste0("#", 
+                     as.hexmode(c(256^(2:0) %*% 
+                                    col2rgb(c("dodgerblue", 
+                                              "firebrick", 
+                                              "orange", 
+                                              "black"))))
+                     )
+      pal <- "Cividis"
+    }
     
     if (inherits(x, "ssm_df")) {
       switch(what,
              fitted = {
-               ssm <- grab(x, "fitted", as_sf = FALSE)
+               ssm <- grab(x, "fitted", as_sf = FALSE, normalise = normalise, group = group)
              },
              predicted = {
                if (any(sapply(x$ssm, function(.)
                  is.na(.$ts)))) {
-                 ssm <- grab(x, "fitted", as_sf = FALSE)
+                 ssm <- grab(x, "fitted", as_sf = FALSE, normalise = normalise, group = group)
                  warning(
                    "there are no predicted locations because you used time.step = NA when calling `fit_ssm`, plotting fitted locations instead",
                    call. = FALSE
                  )
                } else {
-                 ssm <- grab(x, "predicted", as_sf = FALSE)
+                 ssm <- grab(x, "predicted", as_sf = FALSE, normalise = normalise, group = group)
                }
              },
              rerouted = {
                if (any(sapply(x$ssm, function(.) "rerouted" %in% names(.)))) {
-                 ssm <- grab(x, "rerouted", as_sf = FALSE)
+                 ssm <- grab(x, "rerouted", as_sf = FALSE, normalise = normalise, group = group)
                } else {
                  stop(
                    "there are no rerouted locations present",
@@ -166,7 +190,7 @@ plot.ssm_df <-
               data = pd.lst[[i]],
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
-              fill = wpal[5],
+              fill = cpal[2],
               alpha = alpha
             )
           
@@ -175,26 +199,26 @@ plot.ssm_df <-
               geom_point(
                 data = subset(dd.lst[[i]], !keep),
                 aes(date, value),
-                colour = wpal[4],
+                colour = cpal[3],
                 shape = 4
               ) +
               geom_point(
                 data = subset(dd.lst[[i]], keep),
                 aes(date, value),
-                colour = wpal[1],
+                colour = cpal[1],
                 shape = 19,
                 size = 2
               ) +
               geom_rug(
                 data = subset(dd.lst[[i]], !keep),
                 aes(date),
-                colour = wpal[4],
+                colour = cpal[3],
                 sides = "b"
               ) +
               geom_rug(
                 data = subset(dd.lst[[i]], keep),
                 aes(date),
-                colour = wpal[1],
+                colour = cpal[1],
                 sides = "b"
               )
           } else {
@@ -202,14 +226,14 @@ plot.ssm_df <-
               geom_point(
                 data = subset(dd.lst[[i]], keep),
                 aes(date, value),
-                colour = wpal[1],
+                colour = cpal[1],
                 shape = 19,
                 size = 2
               ) +
               geom_rug(
                 data = subset(dd.lst[[i]], keep),
                 aes(date),
-                colour = wpal[1],
+                colour = cpal[1],
                 sides = "b"
               )
           }
@@ -217,7 +241,7 @@ plot.ssm_df <-
             geom_point(
               data = pd.lst[[i]],
               aes(date, value),
-              col = wpal[5],
+              col = cpal[2],
               shape = 20,
               size = 0.75
             ) +
@@ -267,7 +291,7 @@ plot.ssm_df <-
             geom_sf(
               data = subset(conf_sf, id == unique(id)[i]),
               col = NA,
-              fill = wpal[5],
+              fill = cpal[2],
               alpha = alpha
             )
           
@@ -277,14 +301,14 @@ plot.ssm_df <-
                 data = subset(d, !keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 1,
-                colour = wpal[4],
+                colour = cpal[3],
                 shape = 4
               ) +
               geom_point(
                 data = subset(d, keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 2,
-                colour = wpal[1],
+                colour = cpal[1],
                 shape = 19,
                 alpha = 0.6
               )
@@ -294,7 +318,7 @@ plot.ssm_df <-
                 data = subset(d, keep & id == unique(id)[i]),
                 aes(x, y),
                 size = 2,
-                colour = wpal[1],
+                colour = cpal[1],
                 shape = 19,
                 alpha = 0.6
               )
@@ -303,13 +327,13 @@ plot.ssm_df <-
             geom_path(
               data = subset(ssm, id == unique(id)[i]),
               aes(x, y),
-              col = wpal[5],
+              col = cpal[4],
               lwd = 0.2
             ) +
             geom_point(
               data = subset(ssm, id == unique(id)[i]),
               aes(x, y),
-              col = wpal[5],
+              col = cpal[2],
               shape = 20,
               size = 0.75
             ) +
@@ -338,14 +362,48 @@ plot.ssm_df <-
                     "g" %in% names(ssm))
         ssm.lst <- split(ssm, ssm$id)
         p <- lapply(1:nrow(x), function(i) {
+          if(normalise) {
+            ## rescale CI's naively
+            ymin <- plogis(ifelse(
+              qlogis(ssm.lst[[i]]$g) == Inf,
+              6,
+              ifelse(qlogis(ssm.lst[[i]]$g) == -Inf,-6, qlogis(ssm.lst[[i]]$g))
+            )
+            - 1.96 * ssm.lst[[i]]$logit_g.se)
+            ymax <- plogis(ifelse(
+              qlogis(ssm.lst[[i]]$g) == Inf,
+              6,
+              ifelse(qlogis(ssm.lst[[i]]$g) == -Inf,-6, qlogis(ssm.lst[[i]]$g))
+            )
+            + 1.96 * ssm.lst[[i]]$logit_g.se)
+          } else {
+            ymin <- plogis(ssm.lst[[i]]$logit_g - 1.96 * ssm.lst[[i]]$logit_g.se)
+            ymax <- plogis(ssm.lst[[i]]$logit_g + 1.96 * ssm.lst[[i]]$logit_g.se)
+          }
           m <- ggplot() +
+            geom_ribbon(
+              data = ssm.lst[[i]],
+              aes(date,
+              ymin = ymin,
+              ymax = ymax),
+              fill = grey(0.5),
+              alpha = 0.25) +
+            geom_line(
+              data = ssm.lst[[i]],
+              aes(date, g, col = g),
+              size = 0.3
+            ) +
             geom_point(
               data = ssm.lst[[i]],
               aes(date, g, col = g),
               shape = 20,
               size = 3
             ) +
-            scale_colour_viridis_c(option = "E") +
+            scale_colour_gradientn(
+              colours = hcl.colors(n = 100, pal = pal),
+              limits = c(0,1),
+              name = expression(gamma[t])
+            ) +
             labs(title = paste("id:", x[i, "id"]))
           
           m <- m +
@@ -364,7 +422,8 @@ plot.ssm_df <-
             return(p)
           }
         } else if (pages) {
-          wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+          wrap_plots(p, ncol = ncol, byrow = TRUE, guides = "collect") 
+            
         }
       } else if (type == 4) {
         stopifnot("This plot type not applicable for `rw` and `crw` model fits" = 
@@ -383,14 +442,18 @@ plot.ssm_df <-
               data = ssm.lst[[i]],
               aes(x, y, col = g),
               shape = 20,
-              size = 3
+              size = 2
             ) +
             geom_point(data = g.33,
                        aes(x, y, col = g),
                        shape = 20,
-                       size = 3
+                       size = 2
             ) +
-            scale_colour_viridis_c(option = "E") +
+            scale_colour_gradientn(
+              colours = hcl.colors(n=100, palette = pal),
+              limits = c(0,1),
+              name = expression(gamma[t])
+              ) +
             labs(title = paste("id:", x[i, "id"])) +
             coord_fixed()
           
@@ -410,7 +473,10 @@ plot.ssm_df <-
             return(p)
           }
         } else if (pages) {
-          wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
+          wrap_plots(p, 
+                     ncol = ncol, 
+                     heights = rep(1, ceiling(length(p) / ncol)),
+                     guides = "collect")
         }
       }
     } else {

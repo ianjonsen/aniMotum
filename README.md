@@ -87,7 +87,8 @@ issues, you may find a solution in the excellent documentation here
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here’s an
-example showing how to quality-control Argos tracking data:
+example showing how to fit a move persistence model to Argos tracking
+data:
 
 ``` r
 library(tidyverse)
@@ -100,7 +101,7 @@ fit <- fit_ssm(sese,
                time.step = 24, 
                control = ssm_control(verbose = 0))
 
-plot(fit, pages = 1, ncol = 2)
+plot(fit, type = 3, pages = 1, ncol = 2)
 ```
 
 <img src="man/figures/README-explots1-1.png" width="100%" />
@@ -110,12 +111,6 @@ m <- map(fit,
          what = "predicted", 
          normalise = TRUE,
          crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
-
-## using cowplot to add southern elephant seal silhouettes to map
-ggdraw() +
-  draw_plot(m) +
-  draw_image("inst/logo/img/sese_female_orig.png",  x=0.172, y=0.87, scale=0.175, hjust=0.5, vjust=0.5) +
-  draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.45, scale=0.25, hjust=0.5, vjust=0.5)
 ```
 
 <img src="man/figures/README-explots2-1.png" width="100%" /> Southern

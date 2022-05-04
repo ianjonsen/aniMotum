@@ -52,16 +52,11 @@ fit <- fit_ssm(d,
                control = ssm_control(verbose = 0))
 ```
 
-We can extract move persistence estimates as either fitted (corresponding to observation times) or predicted (corresponding to regular time intervals) values using `grab()`. Here the `normalise` argument rescales the estimates to span the interval 0,1. Move persistence estimates from `fit_ssm()` tend to be smoothed more extremely compared those obtained from `fit_mpm()` and can lack contrast. Normalising the estimates provides a clearer view of changes in movement behaviour along tracks, highlighting regions where animals spend disproportionately more or less time. When fitting to a collection of individuals, the normalisation can be applied separately to each individual or collectively via `normalise = TRUE, group = TRUE`. In the latter case, the relative magnitudes of move persistence are preserved across individuals.
-
 Move persistence estimates can be plotted as a time-series. Note the broadly similar time-series of move persistence estimates as above, but here considerably more variability is apparent because we have not smoothed away that variability by fitting to SSM-smoothed location estimates as in the above example.
 ```{r ts2, fig.width=7, fig.height=3}
-fmp <- grab(fit, what = "predicted", normalise = TRUE)
-ggplot(fmp, aes(date, g, colour = g)) + 
-  geom_line(size = 0.3) + 
-  geom_point() +
-  scale_colour_viridis_c(option = "E")
+plot(fit, what = "predicted", type = 3, normalise = TRUE)
 ```
+Here, `plot()` extracts move persistence estimates as either fitted (corresponding to observation times) or predicted (corresponding to regular time intervals) values using `grab()` internally. The `normalise` argument rescales the estimates to span the interval 0,1. Move persistence estimates from `fit_ssm()` tend to be smoothed more extremely compared those obtained from `fit_mpm()` and can lack contrast. Normalising the estimates provides a clearer view of changes in movement behaviour along tracks, highlighting regions where animals spend disproportionately more or less time. When fitting to a collection of individuals, the normalisation can be applied separately to each individual or collectively via `normalise = TRUE, group = TRUE`. In the latter case, the relative magnitudes of move persistence are preserved across individuals.
 
 When mapping these move persistence estimates along the 2-D track, we can see that segments of low (dark blue) and high (bright yellow) move persistence correspond to areas where the seal spends disproportionately more or less time, respectively. The pattern is overall quite similar to the map using `fit_mpm` estimates, but there are subtle differences apparent.
 ```{r map2, fig.width=7, fig.height=6}

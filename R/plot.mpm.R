@@ -66,7 +66,10 @@ plot.mpm_df <-
     warning("additional arguments ignored")
   }
   
-  wpal <- hcl.colors(n = 5, "Cividis")
+  stopifnot("palette is not an hcl.palette, type 'hcl.pals()' to see the list of palettes" = 
+              pal %in% hcl.pals())
+  
+  cpal <- hcl.colors(n = 5, pal)
   
   
   if(inherits(x, "mpm_df") & (inherits(y, "ssm_df") | is.null(y))) {
@@ -123,7 +126,7 @@ plot.mpm_df <-
         px <- ggplot(x) +
           geom_path(aes(lon, lat),
                     size = 0.25,
-                    col = wpal[1],
+                    col = cpal[1],
                     alpha = 0.75)
         if(se) {
           ## SE inidicative only
