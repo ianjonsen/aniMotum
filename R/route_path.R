@@ -51,7 +51,7 @@
 ##' 
 ##' @references
 ##' Josh M. London. (2020) pathroutr: An R Package for (Re-)Routing Paths Around 
-##' Barriers (Version v0.2.1) \url{https://doi.org/10.5281/zenodo.4321827}
+##' Barriers (Version v0.2.1) [https://zenodo.org/record/5522909#.YnPxEy_b1qs](https://zenodo.org/record/5522909#.YnPxEy_b1qs)
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
