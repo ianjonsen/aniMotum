@@ -80,16 +80,16 @@ route_path <-
            append = TRUE,
            ...){
     
-    stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
-                requireNamespace("pathroutr", quietly = TRUE)
-              )
+    if(requireNamespace("pathroutr", quietly = TRUE)) {
+    
     stopifnot("x must be either a foieGras ssm fit object with class `ssm_df`
          or a `simfit` object containing the paths simulated from a `ssm` fit object" = 
                 inherits(x, c("ssm_df", "simfit"))
     )
-    if(map_scale == 10) {
-      stopifnot("map_scale = 10 not available because rnaturalearthhires package not installed" = 
-                requireNamespace("rnaturalearthhires", quietly = TRUE))
+    if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+      map_scale <- 50
+      cat("resetting map_scale = 50 because rnaturalearthhires is not installed, 
+          use remotes::install_github(\"ropensci/rnaturalearthhires\") to install\n")
     }
     
     ## required for pathroutr fn's
@@ -111,15 +111,9 @@ route_path <-
     what <- match.arg(what)
     
     # pathroutr needs a land shapefile to create a visibility graph from
-    if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
-    } else {
-      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
-    }
+    world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+      st_transform(crs = 3857) %>%
+      st_make_valid()
     
     if (inherits(x, "ssm_df")) {
       # unnest foieGras ssm object
@@ -260,6 +254,10 @@ route_path <-
     if(detach.sf.on.end) detach(package:sf)
 
     return(out)
+    } else {
+      cat("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
+          or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
+    }
   }
 
 
