@@ -17,7 +17,7 @@ Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environ
 Useful Links:
 \itemize{
 \item \url{https://ianjonsen.github.io/foieGras/}
-\item \url{https://github.com/ianjonsen/foieGras}
+\item \href{https://github.com/ianjonsen/foieGras/}{https://github.com/ianjonsen/foieGras}
 \item Report bugs/issues at \url{https://github.com/ianjonsen/foieGras/issues}
 }
 }
