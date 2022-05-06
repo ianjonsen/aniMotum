@@ -58,7 +58,7 @@ paths is experimental, likely to change in future release, and NOT guaranteed
 to work, especially if \code{cpf = TRUE}!
 }
 \examples{
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 36)
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
 trs <- simfit(fit, what = "predicted", reps = 3)
 plot(trs)
 
