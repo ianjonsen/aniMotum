@@ -70,12 +70,10 @@ package directly by first exctracting foieGras-estimated locations with
 obtained independently.
 }
 \examples{
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
 fit <- route_path(fit, what = "predicted")
 grab(fit, what = "rerouted")
 
-trs <- simfit(fit, what = "predicted", reps = 5)
-rrt_sims <- route_path(trs)
 
 }
 \references{

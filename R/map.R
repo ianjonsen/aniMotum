@@ -58,18 +58,11 @@
 ##' @examples 
 ##' # create an ssm fit object
 ##' 
-##' fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
+##' fit <- fit_ssm(ellie, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 ##' 
 ##' # render default map
 ##' 
 ##' map(fit, what = "p")
-##' 
-##' # map with estimated track line & observed Argos locations via aes_lst(),
-##' #   using a polar stereographic projection centered
-##' #   on approximate track midpoint, extend x,y limits by 10%
-##' 
-##' map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
-##' crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 ##' 
 ##' @export
 ##' @md

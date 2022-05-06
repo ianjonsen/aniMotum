@@ -54,12 +54,10 @@
 ##' Barriers (Version v0.2.1) [https://zenodo.org/record/5522909#.YnPxEy_b1qs](https://zenodo.org/record/5522909#.YnPxEy_b1qs)
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
 ##' fit <- route_path(fit, what = "predicted")
 ##' grab(fit, what = "rerouted")
 ##' 
-##' trs <- simfit(fit, what = "predicted", reps = 5)
-##' rrt_sims <- route_path(trs)
 ##' 
 ##' @importFrom purrr map_df
 ##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows

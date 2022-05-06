@@ -25,7 +25,7 @@
 ##' @method plot simfit
 ##'
 ##' @examples
-##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
 ##' trs <- simfit(fit, what = "p", reps = 2)
 ##' plot(trs, type = "b")
 ##'
