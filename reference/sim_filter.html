@@ -102,15 +102,15 @@ a user specified quantile.</p>
     <h2>References</h2>
     <p>Hazen et al. (2017) WhaleWatch: a dynamic management tool for
 predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
-<a href="https://doi.org/10.1111/1365-2664.12820" class="external-link">https://doi.org/10.1111/1365-2664.12820</a></p>
+<a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820" class="external-link">https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820</a></p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## fit crw model to Argos LS data</span></span>
-<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese1</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0 0       pars:   -0.08444 -0.6562 -0.74977 0.01049       pars:   0.60691 -0.30123 -1.21402 0.43536       pars:   0.13025 -0.54597 -0.89394 0.14242       pars:   0.26113 -0.78913 -0.79861 0.2477       pars:   0.46583 -0.63521 -0.89295 0.3958       pars:   0.53372 -0.75758 -0.89446 0.673       pars:   0.61565 -0.70933 -0.9104 0.5513       pars:   0.61565 -0.70933 -0.9104 0.5513      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0       pars:   -0.99985 -0.01735       pars:   -3.9994 -0.0694       pars:   -1.96165 -0.9409       pars:   -2.90468 -0.08719       pars:   -3.06264 -1.08284       pars:   -3.2409 -3.52513       pars:   -3.18326 -3.61981       pars:   -3.18326 -3.61981      </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## generate 10 simulated paths from ssm fit</span></span>
 <span class="r-in"><span class="va">trs</span> <span class="op">&lt;-</span> <span class="fu"><a href="simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
@@ -132,7 +132,7 @@ predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
+  <p></p><p>Developed by Ian Jonsen, W. James Grecian, Toby Patterson.</p>
 </div>
 
 <div class="pkgdown">

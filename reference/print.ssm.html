@@ -86,30 +86,27 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## see summary fit output</span></span>
 <span class="r-in"><span class="co">## generate a ssm fit object (call is for speed only)</span></span>
-<span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, </span>
+<span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">24</span>, </span>
 <span class="r-in">control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">xs</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Process model: rw </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time interval: 72 hours </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of original observations: 170 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of observations fitted by ssm: 170 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of fitted states: 170 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of predicted states: 20 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time interval: 24 hours </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of original observations: 64 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of observations fitted by ssm: 64 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of fitted states: 64 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> number of predicted states: 113 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> parameter estimates</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Estimate Std. Error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rho_p   -0.71189    0.06391</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_x  6.97753    0.48271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_y  5.96933    0.38754</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rho_o    0.81653    0.07353</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_x    1.88497    0.14763</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_y    1.12770    0.11330</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rho_p   -0.86827    0.03320</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_x  4.50053    0.42428</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_y  3.97017    0.37505</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rho_o    0.00000    0.00000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> negative log-likelihood: 1893.213 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> negative log-likelihood: 732.3869 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence: yes </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
@@ -123,7 +120,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
+  <p></p><p>Developed by Ian Jonsen, W. James Grecian, Toby Patterson.</p>
 </div>
 
 <div class="pkgdown">
