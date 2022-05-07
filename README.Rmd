@@ -16,21 +16,19 @@ knitr::opts_chunk$set(
 **foieGras** - fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
 <!-- badges: start -->
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
-[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
+[![Coverage status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master) 
 <!-- badges: end -->
 
-```{r logo, echo=FALSE, message=FALSE, fig.align='center'}
-source("inst/logo/create_logo.R")
-par(bg = "transparent")
-plot(s)
-#knitr::include_graphics("inst/logo/foieGras_logo.png")
+```{r logo, echo=FALSE, message=FALSE, fig.align='left', out.width = "300px"}
+#source("inst/logo/create_logo.R")
+#par(bg = "transparent")
+#plot(s)
+knitr::include_graphics("inst/logo/foieGras_logo.png")
 ```
 
 `foieGras` is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder (`TMB`) is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS. 
@@ -66,10 +64,8 @@ Note: there can be issues getting compilers to work properly, especially on M1 M
 ## Basic example
 
 `foieGras` is intended to be as easy to use as possible. Here's an example showing how to fit a move persistence model to Argos tracking data:
-```{r example1, eval=FALSE, message=FALSE}
-library(tidyverse)
+```{r example1, message=FALSE}
 library(foieGras)
-library(cowplot)
 
 fit <- fit_ssm(sese, 
                vmax= 4, 
@@ -80,15 +76,11 @@ fit <- fit_ssm(sese,
 plot(fit, type = 3, pages = 1, ncol = 2)
 ```
 
-```{r explots1, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
-plot(fit, type = 3, pages = 1, ncol = 2)
-```
-
 ```{r example2, eval=FALSE, message=FALSE}
-m <- map(fit, 
-         what = "predicted", 
-         normalise = TRUE,
-         crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
+map(fit, 
+    what = "predicted", 
+    normalise = TRUE,
+    crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
 
 ```{r explots2, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
@@ -98,6 +90,7 @@ m <- map(fit,
          crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84",
          silent = TRUE)
 
+require(cowplot)
 ## using cowplot to add southern elephant seal silhouettes to map
 ggdraw() +
   draw_plot(m) +

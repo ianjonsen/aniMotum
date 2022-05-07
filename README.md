@@ -6,21 +6,18 @@ data for location quality control and behavioural inference
 
 <!-- badges: start -->
 
-[![Lifecycle:
-stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
+[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![Coverage
 status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
-[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/foieGras?color=brightgreen)](https://www.r-pkg.org/pkg/foieGras)
-[![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
 
-<img src="man/figures/README-logo-1.png" style="display: block; margin: auto;" />
+<img src="inst/logo/foieGras_logo.png" width="300px" style="display: block; margin: auto auto auto 0;" />
 
 `foieGras` is an R package that fits continuous-time models in
 state-space form to filter error-prone animal movement data obtained via
@@ -91,9 +88,7 @@ example showing how to fit a move persistence model to Argos tracking
 data:
 
 ``` r
-library(tidyverse)
 library(foieGras)
-library(cowplot)
 
 fit <- fit_ssm(sese, 
                vmax= 4, 
@@ -104,13 +99,13 @@ fit <- fit_ssm(sese,
 plot(fit, type = 3, pages = 1, ncol = 2)
 ```
 
-<img src="man/figures/README-explots1-1.png" width="100%" />
+![](man/figures/README-example1-1.png)<!-- -->
 
 ``` r
-m <- map(fit, 
-         what = "predicted", 
-         normalise = TRUE,
-         crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
+map(fit, 
+    what = "predicted", 
+    normalise = TRUE,
+    crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
 
 <img src="man/figures/README-explots2-1.png" width="100%" /> Southern
