@@ -134,9 +134,9 @@ to work, especially if <code>cpf = TRUE</code>!</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese1</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">36</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0 0       pars:   -0.08418 -0.65589 -0.75008 0.01014       pars:   0.59058 -0.27138 -1.22513 0.42389       pars:   0.11334 -0.54333 -0.88914 0.13125       pars:   0.23537 -0.77533 -0.80322 0.22918       pars:   0.42699 -0.62408 -0.88845 0.36638       pars:   0.51009 -0.74888 -0.89146 0.61777       pars:   0.70524 -0.73444 -0.94212 0.40604       pars:   0.51009 -0.74888 -0.89146 0.61777      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0       pars:   -0.99985 -0.01735       pars:   -3.9994 -0.0694       pars:   -1.96165 -0.9409       pars:   -2.90468 -0.08719       pars:   -3.06264 -1.08284       pars:   -3.2409 -3.52513       pars:   -3.18326 -3.61981       pars:   -3.18326 -3.61981      </span>
 <span class="r-in"><span class="va">trs</span> <span class="op">&lt;-</span> <span class="fu">simfit</span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trs</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="simfit-1.png" alt="" width="700" height="433"></span>
@@ -158,7 +158,7 @@ to work, especially if <code>cpf = TRUE</code>!</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
+  <p></p><p>Developed by Ian Jonsen, W. James Grecian, Toby Patterson.</p>
 </div>
 
 <div class="pkgdown">

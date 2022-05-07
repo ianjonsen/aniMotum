@@ -109,9 +109,9 @@ start of fitted track (ignored if <code>mapproj</code> package is not installed)
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese1</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">72</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0 0       pars:   -0.08614 -0.6572 -0.7487 0.01093       pars:   0.59213 -0.31158 -1.232 0.44326       pars:   0.11659 -0.5539 -0.89315 0.14015       pars:   0.24115 -0.7847 -0.79254 0.24228       pars:   0.43252 -0.63624 -0.89367 0.38527       pars:   0.51713 -0.75421 -0.88914 0.6465       pars:   0.57726 -0.70556 -0.91113 0.52054       pars:   0.57726 -0.70556 -0.91113 0.52054      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0       pars:   -0.99985 -0.01735       pars:   -3.9994 -0.0694       pars:   -1.96165 -0.9409       pars:   -2.90468 -0.08719       pars:   -3.06264 -1.08284       pars:   -3.2409 -3.52513       pars:   -3.18326 -3.61981       pars:   -3.18326 -3.61981      </span>
 <span class="r-in"><span class="va">trs</span> <span class="op">&lt;-</span> <span class="fu"><a href="simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, reps <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trs</span>, type <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="plot.simfit-1.png" alt="" width="700" height="433"></span>
@@ -126,7 +126,7 @@ start of fitted track (ignored if <code>mapproj</code> package is not installed)
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Ian Jonsen, James Grecian, Toby Patterson.</p>
+  <p></p><p>Developed by Ian Jonsen, W. James Grecian, Toby Patterson.</p>
 </div>
 
 <div class="pkgdown">
