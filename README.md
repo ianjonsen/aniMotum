@@ -1,14 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-**foieGras** - fit latent variable movement models to animal tracking
-data for location quality control and behavioural inference
+# foieGras <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='inst/logo/foieGras_logo.png' align="right" height="300" /></a>
+
+#### fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
 <!-- badges: start -->
 
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![Coverage
@@ -16,8 +14,6 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
-
-<img src="inst/logo/foieGras_logo.png" width="300px" style="display: block; margin: auto auto auto 0;" />
 
 `foieGras` is an R package that fits continuous-time models in
 state-space form to filter error-prone animal movement data obtained via
@@ -43,14 +39,14 @@ or higher):
 R.Version()
 ```
 
-### From CRAN
+#### From CRAN
 
 `foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras/)
 and can be downloaded within `R`, in the usual way
 `install.packages("foieGras")` or, more completely:
 `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
 
-### From GitHub (source)
+#### From GitHub (source)
 
 On PC’s running Windows, ensure you have installed
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
@@ -81,11 +77,11 @@ Line Tools and/or Fortran compiler. If you encounter install and compile
 issues, you may find a solution in the excellent documentation here
 [glmmTMB](https://github.com/glmmTMB/glmmTMB).
 
-## Basic example
+## Usage
 
-`foieGras` is intended to be as easy to use as possible. Here’s an
+`foieGras` is intended to be as easy to use as possible. Here’s a simple
 example showing how to fit a move persistence model to Argos tracking
-data:
+data and visualise the result:
 
 ``` r
 library(foieGras)
