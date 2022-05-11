@@ -33,7 +33,7 @@
 ##' \code{ssm} fit object
 ##' 
 ##' @references 
-##' Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://doi.org/10.1007/978-1-4614-1344-8_22
+##' Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://link.springer.com/chapter/10.1007/978-1-4614-1344-8_22
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
@@ -251,6 +251,8 @@ simfit <-
   }) 
   
   d <- tibble(id = x$id, model = x$pmodel, sims = d)
+  if(cpf) class(d) <- append("cpf", class(d))
+  
   switch(unique(x$pmodel),
          rw = { 
            class(d) <- append("rws", class(d))

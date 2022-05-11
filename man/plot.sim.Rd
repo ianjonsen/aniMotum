@@ -4,10 +4,15 @@
 \alias{plot.sim}
 \title{plot}
 \usage{
-\method{plot}{sim}(x, error = FALSE, pal = "Cividis", rev = FALSE, col = TRUE, ...)
+\method{plot}{sim}(x, type = 2, error = FALSE, pal = "Cividis", rev = FALSE, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{sim}}
+
+\item{type}{either 1, a 1-D time-series of speed (if model is \code{rw} or \code{crw}
+specified behavioural states) or move persistence (g; if model is \code{mp}); or
+2 (default), a 2-D track with location coloured by move persistence (g; if
+model = "mp")}
 
 \item{error}{logical, plot locations with error (TRUE) or without. Ignored
 in 1-D time-series plots}
@@ -16,8 +21,6 @@ in 1-D time-series plots}
 see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options}
 
 \item{rev}{reverse direction of colour palette; logical (default = FALSE)}
-
-\item{col}{colour data points by speed; logical (default = TRUE)}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -29,7 +32,7 @@ Plots of simulated tracks. Can be rendered all on a single page
 visualize simulated tracks from a \code{sim} data.frame
 }
 \examples{
-tr <- sim(N=100, model = "crw")
-plot(tr, error = TRUE)
+tr <- sim(N=200, model = "mp")
+plot(tr)
 
 }

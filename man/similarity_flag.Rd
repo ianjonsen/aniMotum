@@ -4,7 +4,7 @@
 \alias{similarity_flag}
 \title{Add similarity flag value to a \code{simfit} object}
 \usage{
-similarity_flag(track, sim_track, flag = 2)
+similarity_flag(track, sim_track, flag = 2, cpf)
 }
 \arguments{
 \item{track}{a dataframe containing longitude and latitudes of the observed
@@ -14,6 +14,11 @@ path used in the SSM fit}
 simulated path from simfit}
 
 \item{flag}{set to either 1 or 2 to define similarity index (see details)}
+
+\item{cpf}{logical; are tracks simulated as central place foraging trips. If
+cpf = TRUE then distance & bearing are calculated from the first location to
+the most distant location, otherwise distance & bearing are calculated from
+the first to the last location on each track.}
 }
 \value{
 a single value representing the similarity in distance and bearing between the two paths

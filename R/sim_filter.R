@@ -18,7 +18,7 @@
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
-##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48)
 ##' 
 ##' ## generate 10 simulated paths from ssm fit
 ##' trs <- simfit(fit, what = "predicted", reps = 10)
@@ -33,62 +33,60 @@
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
 ##' [https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820)
 ##' 
-##' @importFrom dplyr group_by ungroup select "%>%" filter
+##' @importFrom dplyr group_by ungroup select "%>%" filter bind_rows
 ##' @importFrom tidyr nest unnest
+##' @importFrom traipse track_distance_to track_bearing_to
 ##' @importFrom stats quantile
 ##' @export
 ##' @md
 
 sim_filter <- function(trs, keep = .25, flag = 2){
 
-  stopifnot("trs must be an `simfit` object" = inherits(trs, "simfit"))
+  stopifnot("trs must be a `simfit` object" = inherits(trs, "simfit"))
   
   # filter based on similarity to original path
   # apply the similarity flag function to each simulated track
   # unnest the simfit object to extract the simulations
   trs_df <- trs %>% unnest(cols = c(sims))
   
-  # can't figure out a map-type way to do this...
-  # loop instead?
-  trs_df$flg <- NA
-  for (i in 1:length(unique(trs_df$id))){
-    
-    foo <- trs_df %>% filter(id == unique(trs_df$id)[i])
-    
-    if (requireNamespace("purrr", quietly = TRUE)) {
-      foo <- purrr::map_df(split(foo, foo$rep),
-                           function(.x) {
-                             .x["flg"] <- similarity_flag(
-                               track = foo %>% filter(rep == 0),
-                               sim_track = .x,
-                               flag = flag
-                             )
-                             .x
-                           })
-    } else {
-      foo <- lapply(split(foo, foo$rep), function(.x) {
-        .x["flg"] <- similarity_flag(
-          track = foo %>% filter(rep == 0),
-          sim_track = .x,
-          flag = flag
-        )
-        .x
-      }) %>%
-        do.call(rbind, .)
-    }
-    trs_df$flg[trs_df$id == unique(trs_df$id)[i]] <- foo$flg
-  }
+  ## append distance (km), bearing along tracks via traipse fn's
+  trs_df <- trs_df %>%
+    group_by(rep) %>%
+    mutate(dist = track_distance_to(lon, lat, first(lon), first(lat)) / 1000) %>%
+    mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) %>%
+    ungroup()
   
+  trs_lst <- split(trs_df, trs_df$id)
+  flg <- lapply(trs_lst, function(x) {
+    sapply(split(x, x$rep)[-1], function(.x) {
+      similarity_flag(
+        track = x %>% filter(rep == 0),
+        sim_track = .x,
+        flag = flag,
+        cpf = ifelse("cpf" %in% class(trs), TRUE, FALSE)
+      )
+    }) 
+  })
+  
+  k.idx <- lapply(flg, function(x) {
+    which(abs(x) < quantile(abs(x), keep))
+  })
+
   # filter based on user defined 'keep'
   # flag values can be positive or negative but will be centered around 0 (perfect match)
   # select only those tracks that have a flag value in the top 'keep' of flag values
-  trs_df <- trs_df %>%
-    group_by(id) %>%
-    filter(abs(flg) < quantile(abs(flg), keep)) %>%
-    ungroup()
+  foo <- lapply(1:length(trs_lst), function(i) {
+    rep0 <- split(trs_lst[[i]], trs_lst[[i]]$rep)[[1]]
+    tmp <- split(trs_lst[[i]], trs_lst[[i]]$rep)[-1]
+    reps <- tmp[k.idx[[i]]] %>% bind_rows()
+    rbind(rep0, reps)
+  }) %>%
+    bind_rows() %>%
+    select(-dist, -bear)
   
   # format for foieGras output
-  trs_filt <- trs_df %>% select(-flg) %>% nest(sims = c(rep, date, lon, lat, x, y)) # drop flag column
+  trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y))
   class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
-  return(trs_filt)
+  
+  return(trs_filt) 
 }

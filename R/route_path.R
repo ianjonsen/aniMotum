@@ -59,7 +59,6 @@
 ##' grab(fit, what = "rerouted")
 ##' 
 ##' 
-##' @importFrom purrr map_df
 ##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 

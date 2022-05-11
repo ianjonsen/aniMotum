@@ -30,7 +30,7 @@ a user specified quantile.
 }
 \examples{
 ## fit crw model to Argos LS data
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48)
 
 ## generate 10 simulated paths from ssm fit
 trs <- simfit(fit, what = "predicted", reps = 10)

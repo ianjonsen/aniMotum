@@ -22,7 +22,6 @@ citEntry(entry = "article",
          year         = "2020",
          volume       = "8",
          pages        = "31",
-         doi          = "10.1186/s40462-020-00217-7",
          url          = "https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7",
          
          textVersion  =
@@ -44,7 +43,6 @@ citEntry(entry = "article",
          year         = "2019",
          volume       = "100",
          pages        = "e02566",
-         doi          = "10.1002/ecy.2566",
          url          = "https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566",
          
          textVersion  =
