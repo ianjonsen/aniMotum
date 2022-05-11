@@ -4,7 +4,7 @@ context("test plot_sim")
 tr <- sim(N=100, model = "crw", error = "kf")
 
 test_that("plot completes silently - fitted", {
-  tp <- plot(tr, error = TRUE, pal = "Cividis", rev = TRUE, col=TRUE)
+  tp <- plot(tr, error = TRUE, pal = "Cividis", rev = TRUE)
   expect_s3_class(tp, c("patchwork", "gg", "ggplot", exact = TRUE))
 })
 

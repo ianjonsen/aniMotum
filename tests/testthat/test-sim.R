@@ -29,19 +29,19 @@ test_that("sim returns a tibble excluding estimated track, rep = 0", {
 })
 
 test_that("sim returns a tibble with class sim", {
-  trs <- sim(N=100, model = "mpm", error = "kf", tdist = "gamma")
+  trs <- sim(N=100, model = "mp", error = "kf", tdist = "gamma")
   expect_s3_class(trs, "sim")
   expect_equal(nrow(trs), 100)
 })
 
 test_that("sim returns a tibble with class sim", {
-  trs <- sim(N=100, model = "mpm", error = "kf", tdist = "reg")
+  trs <- sim(N=100, model = "mp", error = "kf", tdist = "reg")
   expect_s3_class(trs, "sim")
   expect_equal(nrow(trs), 100)
 })
 
 test_that("sim returns a tibble with class sim", {
-  trs <- sim(N=100, model = "mpm", error = "ls", tdist = "reg")
+  trs <- sim(N=100, model = "mp", error = "ls", tdist = "reg")
   expect_s3_class(trs, "sim")
   expect_equal(nrow(trs), 100)
 })
