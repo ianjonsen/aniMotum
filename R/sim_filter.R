@@ -33,7 +33,8 @@
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
 ##' [https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.12820)
 ##' 
-##' @importFrom dplyr group_by ungroup select "%>%" filter bind_rows
+##' @importFrom dplyr group_by ungroup select "%>%" filter bind_rows mutate
+##' @importFrom dplyr first
 ##' @importFrom tidyr nest unnest
 ##' @importFrom traipse track_distance_to track_bearing_to
 ##' @importFrom stats quantile
