@@ -1,0 +1,19 @@
+---
+title: "Mapping"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mapping}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+require(foieGras)
+require(ggplot2)
+require(patchwork)
+```
+
