@@ -71,13 +71,18 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for sim</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, error <span class="op">=</span> <span class="cn">FALSE</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, rev <span class="op">=</span> <span class="cn">FALSE</span>, col <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">2</span>, error <span class="op">=</span> <span class="cn">FALSE</span>, pal <span class="op">=</span> <span class="st">"Cividis"</span>, rev <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> simulation data.frame with class <code>sim</code></p></dd>
+<dt>type</dt>
+<dd><p>either 1, a 1-D time-series of speed (if model is <code>rw</code> or <code>crw</code>
+specified behavioural states) or move persistence (g; if model is <code>mp</code>); or
+2 (default), a 2-D track with location coloured by move persistence (g; if
+model = "mp")</p></dd>
 <dt>error</dt>
 <dd><p>logical, plot locations with error (TRUE) or without. Ignored
 in 1-D time-series plots</p></dd>
@@ -86,8 +91,6 @@ in 1-D time-series plots</p></dd>
 see <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">grDevices::hcl.pals()</a></code> for options</p></dd>
 <dt>rev</dt>
 <dd><p>reverse direction of colour palette; logical (default = FALSE)</p></dd>
-<dt>col</dt>
-<dd><p>colour data points by speed; logical (default = TRUE)</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments to be ignored</p></dd>
 </dl></div>
@@ -99,8 +102,8 @@ see <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-li
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim.html">sim</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">100</span>, model <span class="op">=</span> <span class="st">"crw"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tr</span>, error <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim.html">sim</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">200</span>, model <span class="op">=</span> <span class="st">"mp"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tr</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="plot.sim-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"></span>
 </code></pre></div>

@@ -74,7 +74,7 @@ of the difference in distance and bearing between the two paths.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">similarity_flag</span><span class="op">(</span><span class="va">track</span>, <span class="va">sim_track</span>, flag <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">similarity_flag</span><span class="op">(</span><span class="va">track</span>, <span class="va">sim_track</span>, flag <span class="op">=</span> <span class="fl">2</span>, <span class="va">cpf</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -87,6 +87,11 @@ path used in the SSM fit</p></dd>
 simulated path from simfit</p></dd>
 <dt>flag</dt>
 <dd><p>set to either 1 or 2 to define similarity index (see details)</p></dd>
+<dt>cpf</dt>
+<dd><p>logical; are tracks simulated as central place foraging trips. If
+cpf = TRUE then distance &amp; bearing are calculated from the first location to
+the most distant location, otherwise distance &amp; bearing are calculated from
+the first to the last location on each track.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
