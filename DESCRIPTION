@@ -71,3 +71,4 @@ Roxygen: list(markdown = TRUE)
 Remotes:  
     https://github.com/jmlondon/pathroutr,
     https://github.com/ropensci/rnaturalearthhires
+
