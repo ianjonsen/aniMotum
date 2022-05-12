@@ -132,7 +132,8 @@ st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
 # compare
 plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
 ```
-In more severe cases, tracks could be first simulated using potential functions, filtered, and then any remaining segments re-routed from land.
+
+In more severe cases, tracks first could be simulated using potential functions, filtered, and then any remaining segments re-routed from land.
 
 ## References
 Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10. https://www.nature.com/articles/srep26677

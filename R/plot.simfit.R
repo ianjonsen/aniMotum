@@ -9,8 +9,6 @@
 ##' @param or orientation of projected map, default is to centre on 
 ##' start of fitted track (ignored if `mapproj` package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
-##' @param pal [grDevices::hcl.colors] palette to use (default: "Viridis"; see 
-##' [grDevices::hcl.pals()] for options)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
@@ -20,7 +18,7 @@
 ##' @importFrom ggplot2 coord_map coord_quickmap theme_void
 ##' @importFrom broom tidy
 ##' @importFrom patchwork wrap_plots
-##' @importFrom grDevices hcl.colors extendrange
+##' @importFrom grDevices extendrange
 ##' @importFrom rnaturalearth ne_countries
 ##' @method plot simfit
 ##'
@@ -37,7 +35,6 @@ plot.simfit <- function(x,
                         zoom = FALSE,
                         or = NULL,
                         ncol = 1,
-                        pal = "Viridis",
                         ...)
 {
   if (length(list(...)) > 0) {
@@ -72,12 +69,10 @@ plot.simfit <- function(x,
  
     if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
     
-    hcpal <- hcl.colors(n=2, palette = pal)
-    
       m <- ggplot() + 
         geom_polygon(data = wm.df, 
                      aes(long, lat, group = group), 
-                     fill = grey(0.4))
+                     fill = grey(0.6))
       
       if(requireNamespace("mapproj", quietly = TRUE)) {
         m <- m + coord_map("ortho",
@@ -96,7 +91,7 @@ plot.simfit <- function(x,
              m <- m + 
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
-                         colour = hcpal[1],
+                         colour = "dodgerblue",
                          size = 0.5,
                          alpha = 0.6
                          )
@@ -105,7 +100,7 @@ plot.simfit <- function(x,
              m <- m + 
                geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
-                          colour = hcpal[1],
+                          colour = "dodgerblue",
                           size = 0.75,
                           alpha = 0.6)
            },
@@ -113,13 +108,13 @@ plot.simfit <- function(x,
              m <- m + 
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
-                         colour = hcpal[1],
+                         colour = "dodgerblue",
                          size = 0.5,
                          alpha = 0.6
                ) +
                geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
-                          colour = hcpal[1],
+                          colour = "dodgerblue",
                           size = 0.75,
                           alpha = 0.6)
            })
@@ -127,7 +122,7 @@ plot.simfit <- function(x,
       geom_point(
         data = subset(x, rep == 0),
         aes(lon, lat),
-        colour = hcpal[2],
+        colour = "firebrick",
         size = 1
       ) +
       xlab(element_blank()) +
