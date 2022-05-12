@@ -129,10 +129,12 @@ map_single_track_base <- function(map_type,
         size = aes$df$size[3]
       )
   } else if(aes$line & by.date) {
+    browser()
     p <- p +
       geom_sf(
         data = line_sf,
-        aes(colour = as.numeric(as.Date(date))),
+        colour = aes$df$col[3],
+#        aes(colour = as.numeric(as.Date(date))), can't colour by date when cast as MULTILINESTRING
         size = aes$df$size[3]
       )
     if(!aes$est) {

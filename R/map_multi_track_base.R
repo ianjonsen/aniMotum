@@ -158,7 +158,8 @@ map_multi_track_base <- function(map_type,
       p <- p +
         geom_sf(
           data = line_sf,
-          aes(colour = as.numeric(as.Date(date))),
+          colour = aes$df$col[3],
+#          aes(colour = as.numeric(as.Date(date))), can't colour line by date when cast as MULTILINESTRING
           size = aes$df$size[3]
         )
       

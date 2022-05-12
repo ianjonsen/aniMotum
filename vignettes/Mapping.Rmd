@@ -17,3 +17,63 @@ require(ggplot2)
 require(patchwork)
 ```
 
+## `map()`
+`foieGras` provides a flexible `map` function for mapping SSM-estimated tracks along with options for including their confidence ellipses, observed locations, track lines, and behavioural estimates. Default choices are made based on the model fit object being mapped but these can be overridden via the `aes` argument and the `aes_lst()` function.
+
+#### Map an SSM fit to data, using default settings
+```{r map 1a, echo=FALSE, eval=FALSE, warning=FALSE, message=FALSE}
+fit <- fit_ssm(sese, model = "mp", time.step = 24, 
+               control = ssm_control(verbose = 0))
+saveRDS(fit, file = "fit.RDS")
+```
+
+```{r map 1b, eval=FALSE, warning=FALSE, message=FALSE}
+fit <- fit_ssm(sese, model = "mp", time.step = 24, 
+               control = ssm_control(verbose = 0))
+
+map(fit, what = "predicted")
+```
+
+```{r 1c, echo=FALSE, fig.height=4, fig.width=7, message=FALSE, warning=FALSE}
+fit <- readRDS("fit.RDS")
+map(fit, what = "predicted")
+```
+
+Here, SSM-predicted locations are coloured by the estimated move persistence index (gamma~t~). To aid visualisation of high and low move persistence regions along each track, the gamma~t~ estimates are normalised separately for each track to span the interval 0,1. This can be turned off with `normalise = FALSE`, or applied to the group of tracks with `group = TRUE`.
+
+By default, `map()` will try to use `rnaturalearth::ne_countries(scale = 10)` land polygon data if the `rnaturalearthhires` data have been installed. If not, the default will be dropped to `scale=50`. The `rnaturalearthhires` package can be installed via: `install.packages("rnaturalearthhires", repos = "https://ropensci.r-universe.dev")`
+
+#### Control track components
+We can add and remove certain track components by using the `aes` argument and `aes_lst()` function. Here, the observed locations (orange triangles) and track lines have been turned on and the move persistence index has been turned off.
+```{r map 2, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
+aes <- aes_lst(obs=TRUE, line=TRUE, mp=FALSE)
+
+map(fit, what = "p", aes = aes)
+```
+Note that when turning off the move persistence index, tracks are automatically given unique colours. This can be turned off by using `by.id = FALSE`. 
+
+Additional control over mapping aesthetics can be gained by viewing and editing the `aes$df` data.frame created by `aes_lst()`. We can subset components and assign new values as needed, here we change the observation colour and shape from orange triangles to firebrick diamonds. We also set `by.id = FALSE` so all tracks are displayed in a unique colour (default is "dodgerblue").
+```{r map 3, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
+aes$df
+
+aes$df$col[4] <- "firebrick"
+aes$df$shape[4] <- 18
+
+map(fit, what = "p", aes = aes, by.id = FALSE)
+```
+
+Alternatively, we can colour estimated locations by their date to better see how tracks evolve over time. We'll map just two of the tracks for simplicity. 
+```{r map 4, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
+map(fit[1:2,], what = "p", aes = aes_lst(mp=FALSE, conf=FALSE), by.date = TRUE, by.id=FALSE)
+```
+
+#### Change projection
+Often projecting the map to geodesic coordinates provides a more meaningful view of the tracks, especially for animals that make very broad-scale movements. This can be done easily by providing a Coordinate Reference System `proj4string`.
+```{r map 5, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
+map(fit, what = "p", crs = "+proj=stere +lon_0=68 +datum=WGS84 +units=km")
+```
+
+Here, we project the tracks onto a polar stereographic grid with longitude centered on 68^o^ East, Iles Kerguelen.
+
+
+

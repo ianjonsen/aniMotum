@@ -15,7 +15,7 @@ map(
   ext.rng = c(0.05, 0.05),
   buffer = 10000,
   map_type = "default",
-  normalise = FALSE,
+  normalise = TRUE,
   group = FALSE,
   silent = FALSE,
   ...
@@ -64,7 +64,7 @@ fine spatial scales, given appropriate zoom settings
 
 \item{normalise}{logical; if output includes a move persistence estimate,
 should g (the move persistence index) be normalised to have minimum = 0 and
-maximum = 1 (default = FALSE).}
+maximum = 1 (default = TRUE).}
 
 \item{group}{logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move

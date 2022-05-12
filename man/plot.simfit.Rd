@@ -10,7 +10,6 @@
   zoom = FALSE,
   or = NULL,
   ncol = 1,
-  pal = "Viridis",
   ...
 )
 }
@@ -26,9 +25,6 @@ should global map be drawn (FALSE; default).}
 start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
-
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Viridis"; see
-\code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
 
 \item{...}{additional arguments to be ignored}
 }

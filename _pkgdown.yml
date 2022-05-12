@@ -27,6 +27,8 @@ navbar:
           href: articles/Move_persistence_models.html
         - text: Track_simulation
           href: articles/Track_simulation.html
+        - text: Mapping
+          href: articles/Mapping.html
     news:
       text: News
       href: news/index.html
