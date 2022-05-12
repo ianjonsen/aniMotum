@@ -33,11 +33,11 @@
 ##' @md
 
 plot.simfit <- function(x, 
-                           type = c("lines","points","both"),
-                           zoom = FALSE,
-                           or = NULL,
-                           ncol = 1,
-                           pal = "Viridis",
+                        type = c("lines","points","both"),
+                        zoom = FALSE,
+                        or = NULL,
+                        ncol = 1,
+                        pal = "Viridis",
                         ...)
 {
   if (length(list(...)) > 0) {
@@ -49,10 +49,10 @@ plot.simfit <- function(x,
   type <- match.arg(type)
   
   ## get worldmap
-  if(requireNamespace("rnaturalearthdata", quietly = TRUE)) {
-    wm <- ne_countries(scale = 50, returnclass = "sp")
+  if(requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+    wm <- ne_countries(scale = 10, returnclass = "sp")
   } else {
-    wm <- ne_countries(scale = 110, returnclass = "sp")
+    wm <- ne_countries(scale = 50, returnclass = "sp")
   }
   wm <- suppressMessages(tidy(wm))
   wm$region <- wm$id
@@ -71,6 +71,8 @@ plot.simfit <- function(x,
     }
  
     if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
+    
+    hcpal <- hcl.colors(n=2, palette = pal)
     
       m <- ggplot() + 
         geom_polygon(data = wm.df, 
@@ -94,7 +96,7 @@ plot.simfit <- function(x,
              m <- m + 
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
-                         colour = hcl.colors(n=5, palette = pal)[1],
+                         colour = hcpal[1],
                          size = 0.5,
                          alpha = 0.6
                          )
@@ -103,7 +105,7 @@ plot.simfit <- function(x,
              m <- m + 
                geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
-                          colour = hcl.colors(n=5, palette = pal)[1],
+                          colour = hcpal[1],
                           size = 0.75,
                           alpha = 0.6)
            },
@@ -111,13 +113,13 @@ plot.simfit <- function(x,
              m <- m + 
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
-                         colour = hcl.colors(n=5, palette = pal)[1],
+                         colour = hcpal[1],
                          size = 0.5,
                          alpha = 0.6
                ) +
                geom_point(data = subset(x, rep != 0),
                           aes(lon, lat),
-                          colour = hcl.colors(n=5, palette = pal)[1],
+                          colour = hcpal[1],
                           size = 0.75,
                           alpha = 0.6)
            })
@@ -125,7 +127,7 @@ plot.simfit <- function(x,
       geom_point(
         data = subset(x, rep == 0),
         aes(lon, lat),
-        colour = hcl.colors(n=5, palette = pal)[3],
+        colour = hcpal[2],
         size = 1
       ) +
       xlab(element_blank()) +
