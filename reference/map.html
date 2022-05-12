@@ -47,6 +47,9 @@ coastline and projection options"><!-- mathjax --><script src="https://cdnjs.clo
     <li>
       <a href="../articles/Track_simulation.html">Track_simulation</a>
     </li>
+    <li>
+      <a href="../articles/Mapping.html">Mapping</a>
+    </li>
   </ul></li>
 <li>
   <a href="https://github.com/ianjonsen/foieGras" class="external-link">
@@ -86,7 +89,7 @@ coastline and projection options</p>
   ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.05</span><span class="op">)</span>,
   buffer <span class="op">=</span> <span class="fl">10000</span>,
   map_type <span class="op">=</span> <span class="st">"default"</span>,
-  normalise <span class="op">=</span> <span class="cn">FALSE</span>,
+  normalise <span class="op">=</span> <span class="cn">TRUE</span>,
   group <span class="op">=</span> <span class="cn">FALSE</span>,
   silent <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
@@ -138,7 +141,7 @@ fine spatial scales, given appropriate zoom settings
 <dt>normalise</dt>
 <dd><p>logical; if output includes a move persistence estimate,
 should g (the move persistence index) be normalised to have minimum = 0 and
-maximum = 1 (default = FALSE).</p></dd>
+maximum = 1 (default = TRUE).</p></dd>
 <dt>group</dt>
 <dd><p>logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move

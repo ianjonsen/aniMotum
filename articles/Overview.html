@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/Track_simulation.html">Track_simulation</a>
     </li>
+    <li>
+      <a href="../articles/Mapping.html">Mapping</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -166,21 +169,21 @@
 <ol start="5" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
-<pre><code><span class="co">#&gt;      id                date lc   lon lat      lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-12 13:24:27 GL 100.0 -55 0.128949753 0.9914074</span>
-<span class="co">#&gt; 2 54632 2022-05-13 01:24:27 GL 100.5 -54 0.924930559 1.1817163</span>
-<span class="co">#&gt; 3 54632 2022-05-13 13:24:27 GL 101.0 -53 0.268357403 0.7356384</span>
-<span class="co">#&gt; 4 54632 2022-05-14 01:24:27 GL 101.5 -52 0.123388262 1.0516924</span>
-<span class="co">#&gt; 5 54632 2022-05-14 13:24:27 GL 102.0 -51 0.003909037 0.6914042</span></code></pre>
+<pre><code><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span>
+<span class="co">#&gt; 1 54632 2022-05-12 17:50:00 GL 100.0 -55 0.01526775 0.4754827</span>
+<span class="co">#&gt; 2 54632 2022-05-13 05:50:00 GL 100.5 -54 0.01057385 1.8555941</span>
+<span class="co">#&gt; 3 54632 2022-05-13 17:50:00 GL 101.0 -53 0.61340495 4.0678429</span>
+<span class="co">#&gt; 4 54632 2022-05-14 05:50:00 GL 101.5 -52 0.04367399 1.0887895</span>
+<span class="co">#&gt; 5 54632 2022-05-14 17:50:00 GL 102.0 -51 0.07046470 0.2636068</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-12 13:24:27  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-12 14:24:27  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-12 15:24:27  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-12 16:24:27  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-12 17:24:27  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-12 17:50:01  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-12 18:50:01  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-12 19:50:01  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-12 20:50:01  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-12 21:50:01  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
