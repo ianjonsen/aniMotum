@@ -62,12 +62,6 @@ fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
 trs <- simfit(fit, what = "predicted", reps = 3)
 plot(trs)
 
-## use potential functions to constrain paths to avoid land
-grad <- readRDS(system.file("extdata/grad.RDS", package = "foieGras"))
-trs_c <- simfit(fit, what = "p", reps = 3, grad = grad, beta = c(-300,-300))
-## compare with unconstrained paths
-plot(trs) | plot(trs_c)
-
 }
 \references{
 Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://link.springer.com/chapter/10.1007/978-1-4614-1344-8_22

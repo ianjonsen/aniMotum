@@ -20,11 +20,13 @@
 ##' ## fit crw model to Argos LS data
 ##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 48)
 ##' 
-##' ## generate 10 simulated paths from ssm fit
-##' trs <- simfit(fit, what = "predicted", reps = 10)
+##' set.seed(pi)
+##' 
+##' ## generate 5 simulated paths from ssm fit
+##' trs <- simfit(fit, what = "predicted", reps = 5)
 ##' 
 ##' ## filter simulations and keep paths in top 25% of flag values
-##' trs_f <- sim_filter(trs, keep = .33, flag = 2)
+##' trs_f <- sim_filter(trs, keep = .4, flag = 2)
 ##' 
 ##' ## compare unfiltered and filtered simulated paths
 ##' plot(trs) | plot(trs_f)

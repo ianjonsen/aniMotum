@@ -40,12 +40,6 @@
 ##' trs <- simfit(fit, what = "predicted", reps = 3)
 ##' plot(trs)
 ##' 
-##' ## use potential functions to constrain paths to avoid land
-##' grad <- readRDS(system.file("extdata/grad.RDS", package = "foieGras"))
-##' trs_c <- simfit(fit, what = "p", reps = 3, grad = grad, beta = c(-300,-300))
-##' ## compare with unconstrained paths
-##' plot(trs) | plot(trs_c)
-##' 
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom tibble tibble as_tibble
