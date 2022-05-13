@@ -29,6 +29,8 @@ navbar:
           href: articles/Track_simulation.html
         - text: Mapping
           href: articles/Mapping.html
+        - text: Path_rerouting
+          href: articles/Path_rerouting.html
     news:
       text: News
       href: news/index.html

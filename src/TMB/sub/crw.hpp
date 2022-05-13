@@ -75,6 +75,8 @@ Type crw(objective_function<Type>* obj) {
     
   // CRW PROCESS MODEL
   vector<Type> x_t(4);
+  MVNORM_t<Type> nll_proc(cov); // Multivariate Normal for states
+  
   for(int i = 1; i < dt.size(); i++) {
     // process cov at time t
     cov.setZero();
@@ -91,7 +93,8 @@ Type crw(objective_function<Type>* obj) {
     x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
     x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
     
-    jnll += MVNORM<Type>(cov)(x_t); // Process likelihood
+    nll_proc.setSigma(cov);   // set up ith cov matrix
+    jnll += nll_proc(x_t);    // Process likelihood
   }
   
   // OBSERVATION MODEL

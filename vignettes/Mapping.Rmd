@@ -13,8 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 require(foieGras)
-require(ggplot2)
-require(patchwork)
 ```
 
 ## `map()`

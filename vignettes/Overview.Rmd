@@ -17,21 +17,21 @@ require(foieGras)
 
 ## Disclaimer
 
-This vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
+This vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of these vignettes. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
 
-### foieGras models
+### Models
 
-This is a brief overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). `foieGras` provides three state-space models (SSM's), two for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:
+This is an overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or (possibly) another tracking system. `foieGras` provides three state-space models (SSM's), two for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:
 
 -   a simple *Random Walk* model, `rw`
--   a *Correlated Random Walk* model, `crw`\
+-   a *Correlated Random Walk* model, `crw`
 -   a *Move Persistence* model, `mp`
 
-the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The *Random Walk* model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The *Correlated Random Walk* model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. The *Move Persistence* model can be more robust to data gaps up to a point, and estimates time-varying move persistence $\gamma_t$ along the track, which provides an index of how an animal's movement behaviour varies in space and time.
+the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The *Random Walk* model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The *Correlated Random Walk* model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., 'looping' artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The *Move Persistence* model can be more robust to data gaps up to a point, and estimates time-varying move persistence $\gamma_t$ along the track, which provides an index of how an animal's movement behaviour varies in space and time.
 
 Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating a move persistence *after* fitting either the `rw` or `crw` SSM (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Méthé et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.
 
-### Input data
+### Data
 
 `foieGras` expects data to be provided in one of several possible formats.
 
@@ -116,7 +116,7 @@ head(data.frame(foo))
   )
 ```
 
-### Fitting a foieGras model
+### Fit a model
 
 Model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::fit_ssm` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, the prefilter uses the World Mercator projection, EPSG 3395. The SSM is then fit to this projected version of the data. The prefilter step is fully automated and invoked via the `fit_ssm` function:
 
@@ -142,7 +142,7 @@ fit
 
 Individual `id` is displayed in the 1st column, all fit output resides in a list (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain parameter standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw`, `crw`, or `mp`) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors may be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette](https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via `ssm_control()` (see `?fit_ssm` and `?ssm_control` on usage) may overcome mild issues (see `?nlminb` or `?optim` for details on optimization control parameters).
 
-### Accessing model fits & estimated locations
+### Access results
 
 Summary information about the fit can be obtained via the `summary` function:
 
@@ -168,7 +168,7 @@ ploc[1:3,]
 
 Here, the fitted location data.frame includes individual id, date-time, longitude, latitude, x and y (typically from the default World Mercator projection) and their standard errors (in km). The predicted location data.frame is an `sf` object with geometry and Coordinate Reference System information. This `sf` output format is useful for custom mapping or calculating derived quantities from the estimated locations.
 
-### Quickly visualise SSM fits
+### Visualise model fit
 
 A generic `plot` (see `?plot.ssm_df`) method allows a quick visual of the SSM fit to the data:
 
