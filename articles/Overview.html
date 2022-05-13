@@ -68,6 +68,9 @@
     <li>
       <a href="../articles/Mapping.html">Mapping</a>
     </li>
+    <li>
+      <a href="../articles/Path_rerouting.html">Path_rerouting</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -103,24 +106,24 @@
 <div class="section level2">
 <h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
 </h2>
-<p>This vignette is an extended set of examples to highlight <code>foieGras</code>’s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of this document. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!</p>
+<p>This vignette is an extended set of examples to highlight <code>foieGras</code>’s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of these vignettes. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!</p>
 <div class="section level3">
-<h3 id="foiegras-models">foieGras models<a class="anchor" aria-label="anchor" href="#foiegras-models"></a>
+<h3 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
 </h3>
-<p>This is a brief overview of how to use <code>foieGras</code> to filter animal track locations obtained via the Argos satellite system or via processed light-level geolocation (GLS). <code>foieGras</code> provides three state-space models (SSM’s), two for filtering (ie. estimating “true” locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:</p>
+<p>This is an overview of how to use <code>foieGras</code> to filter animal track locations obtained via the Argos satellite system or (possibly) another tracking system. <code>foieGras</code> provides three state-space models (SSM’s), two for filtering (ie. estimating “true” locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:</p>
 <ul>
 <li>a simple <em>Random Walk</em> model, <code>rw</code>
 </li>
-<li>a <em>Correlated Random Walk</em> model, <code>crw</code><br>
+<li>a <em>Correlated Random Walk</em> model, <code>crw</code>
 </li>
 <li>a <em>Move Persistence</em> model, <code>mp</code>
 </li>
 </ul>
-<p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the commonly irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7" class="external-link">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical movement through larger data gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
+<p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7" class="external-link">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
 <p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566" class="external-link">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/" class="external-link">Auger-Méthé et al. 2017</a> for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
 </div>
 <div class="section level3">
-<h3 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+<h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
 <p><code>foieGras</code> expects data to be provided in one of several possible formats.</p>
 <ol style="list-style-type: decimal">
@@ -169,21 +172,21 @@
 <ol start="5" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
-<pre><code><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-12 17:50:00 GL 100.0 -55 0.01526775 0.4754827</span>
-<span class="co">#&gt; 2 54632 2022-05-13 05:50:00 GL 100.5 -54 0.01057385 1.8555941</span>
-<span class="co">#&gt; 3 54632 2022-05-13 17:50:00 GL 101.0 -53 0.61340495 4.0678429</span>
-<span class="co">#&gt; 4 54632 2022-05-14 05:50:00 GL 101.5 -52 0.04367399 1.0887895</span>
-<span class="co">#&gt; 5 54632 2022-05-14 17:50:00 GL 102.0 -51 0.07046470 0.2636068</span></code></pre>
+<pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
+<span class="co">#&gt; 1 54632 2022-05-13 17:03:57 GL 100.0 -55 0.4146667 0.1676797</span>
+<span class="co">#&gt; 2 54632 2022-05-14 05:03:57 GL 100.5 -54 0.1098545 0.5942963</span>
+<span class="co">#&gt; 3 54632 2022-05-14 17:03:57 GL 101.0 -53 0.1380054 1.5088828</span>
+<span class="co">#&gt; 4 54632 2022-05-15 05:03:57 GL 101.5 -52 0.2066392 1.2282377</span>
+<span class="co">#&gt; 5 54632 2022-05-15 17:03:57 GL 102.0 -51 0.5355898 0.3161572</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-12 17:50:01  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-12 18:50:01  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-12 19:50:01  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-12 20:50:01  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-12 21:50:01  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-13 17:03:58  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-13 18:03:58  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-13 19:03:58  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-13 20:03:58  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-13 21:03:58  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
@@ -195,7 +198,7 @@
 <span class="co">#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="fitting-a-foiegras-model">Fitting a foieGras model<a class="anchor" aria-label="anchor" href="#fitting-a-foiegras-model"></a>
+<h3 id="fit-a-model">Fit a model<a class="anchor" aria-label="anchor" href="#fit-a-model"></a>
 </h3>
 <p>Model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see <code><a href="../reference/fit_ssm.html">?foieGras::fit_ssm</a></code> for details), including applying the <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an <code>sf</code> object, the prefilter uses the World Mercator projection, EPSG 3395. The SSM is then fit to this projected version of the data. The prefilter step is fully automated and invoked via the <code>fit_ssm</code> function:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -219,7 +222,7 @@
 <p>Individual <code>id</code> is displayed in the 1st column, all fit output resides in a list (<code>ssm</code>) in the 2nd column, <code>convergence</code> status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain parameter standard errors (<code>pdHess</code>) is displayed in the 4th column, and the specified process model (<code>rw</code>, <code>crw</code>, or <code>mp</code>) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors may be calculated but not all. One possible solution is to try specifying a longer <code>time.step</code> or set <code>time.step = NA</code> to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If <code>pdHess = FALSE</code> persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by <code>prefilter</code> are present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html" class="external-link">glmmTMB troubleshooting vignette</a> may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via <code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">?optim</a></code> for details on optimization control parameters).</p>
 </div>
 <div class="section level3">
-<h3 id="accessing-model-fits-estimated-locations">Accessing model fits &amp; estimated locations<a class="anchor" aria-label="anchor" href="#accessing-model-fits-estimated-locations"></a>
+<h3 id="access-results">Access results<a class="anchor" aria-label="anchor" href="#access-results"></a>
 </h3>
 <p>Summary information about the fit can be obtained via the <code>summary</code> function:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -265,7 +268,7 @@
 <p>Here, the fitted location data.frame includes individual id, date-time, longitude, latitude, x and y (typically from the default World Mercator projection) and their standard errors (in km). The predicted location data.frame is an <code>sf</code> object with geometry and Coordinate Reference System information. This <code>sf</code> output format is useful for custom mapping or calculating derived quantities from the estimated locations.</p>
 </div>
 <div class="section level3">
-<h3 id="quickly-visualise-ssm-fits">Quickly visualise SSM fits<a class="anchor" aria-label="anchor" href="#quickly-visualise-ssm-fits"></a>
+<h3 id="visualise-model-fit">Visualise model fit<a class="anchor" aria-label="anchor" href="#visualise-model-fit"></a>
 </h3>
 <p>A generic <code>plot</code> (see <code><a href="../reference/plot.ssm_df.html">?plot.ssm_df</a></code>) method allows a quick visual of the SSM fit to the data:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">

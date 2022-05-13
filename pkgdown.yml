@@ -5,10 +5,11 @@ articles:
   Mapping: Mapping.html
   Move_persistence_models: Move_persistence_models.html
   Overview: Overview.html
+  Path_rerouting: Path_rerouting.html
   SSM_fitting: SSM_fitting.html
   SSM_validation: SSM_validation.html
   Track_simulation: Track_simulation.html
-last_built: 2022-05-12T17:47Z
+last_built: 2022-05-13T17:01Z
 urls:
   reference: https://ianjonsen.github.io/foieGras/reference
   article: https://ianjonsen.github.io/foieGras/articles

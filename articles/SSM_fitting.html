@@ -68,6 +68,9 @@
     <li>
       <a href="../articles/Mapping.html">Mapping</a>
     </li>
+    <li>
+      <a href="../articles/Path_rerouting.html">Path_rerouting</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -101,11 +104,11 @@
     
     
 <div class="section level3">
-<h3 id="processing-input-data">Processing input data<a class="anchor" aria-label="anchor" href="#processing-input-data"></a>
+<h3 id="processing-data">Processing data<a class="anchor" aria-label="anchor" href="#processing-data"></a>
 </h3>
-<p>Fitting SSM’s to tracking data in <code>foieGras</code> is intended to be as simple as possible using <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>. Provided input data are in an expected format (see <code><a href="../articles/Overview.html">vignette('Overview')</a></code>), <code>fit_ssm</code> can be invoked immediately to both process the data and fit the SSM. Within <code>fit_ssm</code>, data processing consists of:</p>
+<p>Fitting SSM’s to tracking data in <code>foieGras</code> is intended to be as simple as possible using <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>. Provided the data are in an expected format (see <code><a href="../articles/Overview.html">vignette('Overview')</a></code>), <code>fit_ssm</code> can be invoked immediately to both process the data and fit the SSM. Within <code>fit_ssm</code>, data processing consists of:</p>
 <ol style="list-style-type: decimal">
-<li>identifying the most appropriate measurement error model to use based on the format of the input data;<br>
+<li>identifying the most appropriate measurement error model to use based on the format of the data;<br>
 </li>
 <li>date formatting, ordering observations in time, flagging duplicate date-time observations, flagging observations occurring within a minimum time period (default = 60 s);<br>
 </li>
@@ -146,10 +149,10 @@
 <span class="co">#&gt; 54591.12  TRUE       KF    NA    NA POINT (12273.21 -9959.318)</span>
 <span class="co">#&gt; 54591.27  TRUE       KF    NA    NA POINT (12288.02 -9948.256)</span>
 <span class="co">#&gt; 54591.18  TRUE       KF    NA    NA POINT (12292.13 -9935.724)</span></code></pre></div>
-<p>By setting <code>pf = TRUE</code>, <code>fit_ssm</code> returns the processed data as a projected <code>sf</code> data.frame prior to fitting an SSM. Looking at the <code>keep</code> column, we can see that the 3rd, 4th and 7th observations have been flagged to be ignored by the SSM, in this case because they failed the distance limits imposed by the <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter. Also note that because the input data included CLS Argos location ellipse error information, the observation type has been designated <code>KF</code> for Kalman filter and this ensures that the appropriate measurement error model is used when fitting the SSM to these data.</p>
+<p>By setting <code>pf = TRUE</code>, <code>fit_ssm</code> returns the processed data as a projected <code>sf</code> data.frame prior to fitting an SSM. Looking at the <code>keep</code> column, we can see that the 3rd, 4th and 7th observations have been flagged to be ignored by the SSM, in this case because they failed the distance limits imposed by the <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter. Also note that because the data included CLS Argos location ellipse error information, the observation type has been designated <code>KF</code> for Kalman filter and this ensures that the appropriate measurement error model is used when fitting the SSM to these data.</p>
 </div>
 <div class="section level3">
-<h3 id="fitting-an-ssm">Fitting an SSM<a class="anchor" aria-label="anchor" href="#fitting-an-ssm"></a>
+<h3 id="fit-an-ssm">Fit an SSM<a class="anchor" aria-label="anchor" href="#fit-an-ssm"></a>
 </h3>
 <p>In the simplest case, fitting an SSM consists of specifying the process model and a prediction time step:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -158,10 +161,10 @@
                time.step <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></code></pre></div>
 <p>This call uses the defaults for data processing and all other arguments (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details). More control can be exerted over the model fitting process via the arguments: <code>emf</code>, <code>map</code>, and <code>control</code>.</p>
 <div class="section level4">
-<h4 id="emf-specifying-custom-error-multiplication-factors">
-<code>emf</code>: Specifying custom error multiplication factors<a class="anchor" aria-label="anchor" href="#emf-specifying-custom-error-multiplication-factors"></a>
+<h4 id="emf-specifying-error-multiplication-factors">
+<code>emf</code>: specifying error multiplication factors<a class="anchor" aria-label="anchor" href="#emf-specifying-error-multiplication-factors"></a>
 </h4>
-<p>The <code>emf</code> argument is helpful when modelling older Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf’s used by default in <code>foieGras</code> (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies such as (Costa et al. 2010).</p>
+<p>The <code>emf</code> argument is helpful when modelling older Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf’s used by default in <code>foieGras</code> (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies that draw on Argos - GPS double-tagging data such as (Costa et al. 2010).</p>
 <p>The default emf values are given by <code><a href="../reference/emf.html">emf()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/emf.html">emf</a></span><span class="op">(</span><span class="op">)</span>
@@ -201,7 +204,7 @@
 </div>
 <div class="section level4">
 <h4 id="map-fixing-model-parameters">
-<code>map</code>: Fixing model parameters<a class="anchor" aria-label="anchor" href="#map-fixing-model-parameters"></a>
+<code>map</code>: fixing model parameters<a class="anchor" aria-label="anchor" href="#map-fixing-model-parameters"></a>
 </h4>
 <p>The <code>map</code> argument allows some model parameters to by turned off by fixing them at 0 on the log-scale. This can be useful in cases where model simplification can aid in convergence or simply provide a better fit to the data. For example, the <code>crw</code> has a parameter <code>psi</code> that re-scales the semi-major axis of Argos KF error ellipses to account for apparent bias in the error ellipses (Jonsen et al. 2020). Occasionally, there may be insufficient information to reliably estimate this parameter, or one might wish to compare model fits with and without error ellipse bias correction.</p>
 <p>Here we fit the <code>crw</code> model with (<code>fit1</code>) and without (<code>fit2</code>) the bias-correction parameter <code>psi</code>, by supplying a named list to the <code>map</code> argument. Where <code>factor(NA)</code> is a <code>TMB</code> convention that ensures <code>psi</code> is fixed during optimization.</p>
