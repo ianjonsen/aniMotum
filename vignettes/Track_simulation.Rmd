@@ -124,7 +124,7 @@ plot(st.cpf) | plot(st.cpf_f)
 ```
 
 ## `route_path()` 
-We can use `route_path()` to re-route the few simulated track segments that cross land. 
+We can use `route_path()` (see `vignette('Path_rerouting')` for more details) to re-route the few simulated track segments that cross land. 
 ```{r route_path, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 # reroute simulated tracks
 st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
