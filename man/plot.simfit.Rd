@@ -10,6 +10,7 @@
   zoom = FALSE,
   or = NULL,
   ncol = 1,
+  hires = FALSE,
   ...
 )
 }
@@ -25,6 +26,12 @@ should global map be drawn (FALSE; default).}
 start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
+
+\item{hires}{logical; use high-resolution coastline data. Attempts to use
+high-res coastline data via \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 10},
+if the \code{rnaturalearthhires} data package is installed. This extends the
+plot rendering time so is set to FALSE by default, in which case
+\link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 50} data are used.}
 
 \item{...}{additional arguments to be ignored}
 }

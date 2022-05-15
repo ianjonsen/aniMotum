@@ -22,7 +22,7 @@
 ##' distance is a constant 50000 m.
 ##' @param append should re-routed locations be appended to the `ssm` 
 ##' (ssm fit) object (default = TRUE), or returned as a tibble.
-##' @param ... additional arguments passed to [pathroutr::prt_visgraph]
+##' @param ... additional arguments passed to pathroutr::prt_visgraph
 ##' 
 ##' @details
 ##' `route_path` uses [rnaturalearth::ne_countries] at the medium (50)

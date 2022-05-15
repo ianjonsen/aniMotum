@@ -26,8 +26,8 @@
 ##' polygons (default = 10000). If map extents are expanded by many factors then
 ##' the buffer distance may need to be increased, otherwise this should not be
 ##' used. Ignored if `map_type != "default"`.
-##' @param map_type background map type ("default" uses [rnaturalearth] 
-##' to add land masses). If the `rnaturalearthdata` package is installed then 
+##' @param map_type background map type ("default" uses [rnaturalearth::ne_countries] 
+##' to add land polygons). If the `rnaturalearthdata` package is installed then 
 ##' high-resolution land polygons will be used. If the `ggspatial`
 ##' and `rosm` packages are installed then any tile map type returned by 
 ##' [rosm::osm.types] can be used for a potentially more detailed coastline at 

@@ -9,6 +9,11 @@
 ##' @param or orientation of projected map, default is to centre on 
 ##' start of fitted track (ignored if `mapproj` package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
+##' @param hires logical; use high-resolution coastline data. Attempts to use
+##' high-res coastline data via [rnaturalearth::ne_countries] with `scale = 10`, 
+##' if the `rnaturalearthhires` data package is installed. This extends the
+##' plot rendering time so is set to FALSE by default, in which case 
+##' [rnaturalearth::ne_countries] with `scale = 50` data are used.
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of simulated tracks. 
@@ -23,7 +28,7 @@
 ##' @method plot simfit
 ##'
 ##' @examples
-##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+##' fit <- fit_ssm(ellie, model = "crw", time.step = 24)
 ##' trs <- simfit(fit, what = "p", reps = 2)
 ##' plot(trs, type = "b")
 ##'
@@ -35,6 +40,7 @@ plot.simfit <- function(x,
                         zoom = FALSE,
                         or = NULL,
                         ncol = 1,
+                        hires = FALSE,
                         ...)
 {
   if (length(list(...)) > 0) {
@@ -46,7 +52,7 @@ plot.simfit <- function(x,
   type <- match.arg(type)
   
   ## get worldmap
-  if(requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+  if(all(hires, requireNamespace("rnaturalearthhires", quietly = TRUE))) {
     wm <- ne_countries(scale = 10, returnclass = "sp")
   } else {
     wm <- ne_countries(scale = 50, returnclass = "sp")

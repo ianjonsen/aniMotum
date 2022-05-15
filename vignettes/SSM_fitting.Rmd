@@ -31,6 +31,7 @@ fit_ssm(ellie,
         vmax = 3, 
         pf = TRUE)
 ```
+
 By setting `pf = TRUE`, `fit_ssm` returns the processed data as a projected `sf` data.frame prior to fitting an SSM. Looking at the `keep` column, we can see that the 3rd, 4th and 7th observations have been flagged to be ignored by the SSM, in this case because they failed the distance limits imposed by the `trip::sda` filter. Also note that because the data included CLS Argos location ellipse error information, the observation type has been designated `KF` for Kalman filter and this ensures that the appropriate measurement error model is used when fitting the SSM to these data.
 
 ### Fit an SSM
@@ -73,6 +74,7 @@ hist(grab(fit1, "f")$x - grab(fit2, "f")$x, breaks = 20,
 hist(grab(fit1, "f")$y - grab(fit2, "f")$y, breaks = 20, 
      main = "fit1$y - fit2$y", xlim = c(-20,20), xlab = "Distance (km)")
 ```
+
 In this contrived example, re-specified `emf.x` values result in differences in the predicted locations of up to about 20 km in the x-direction and a more subtle 4 km in the y-direction, even though the `emf.y` values were not edited. The latter is due to a model-estimated correlation between the x and y errors.
 
 Now that CLS Argos provides locations estimated by their Kalman filter algorithm, users of contemporary Argos data sets should have no need to invoke the `emf` argument as location quality class-based errors are now superseded by the use of location-specific Argos error ellipse information (McClintock et al. 2015; Jonsen et al. 2020).
@@ -95,6 +97,7 @@ fit2 <- fit_ssm(ellie,
 
 c(fit1$ssm[[1]]$AICc, fit2$ssm[[1]]$AICc)
 ```
+
 Comparison of AIC~c~ from the model fits implies the model including the `psi` parameter `fit1` provides a slightly better fit.
 
 #### `control`: controlling the optimization
@@ -115,6 +118,7 @@ fit <- fit_ssm(ellie,
                                      maxit = 1000,
                                      verbose = 0))
 ```
+
 Here we increase the maximum number of optimizer iterations from 100 (`optim` default for derivative-based methods) to 1000. Note, users must know the correct name for each optimizer's control arguments and should be familiar with their effect on the optimization before using, see `?nlminb` and `?optim` for details.
 
 The `control` argument is used to turn off parameter trace printing via `ssm_control(verbose = 0)` in all above examples. This keeps the vignette tidy as the default parameter trace would print as a long list to the vignette. In normal use in the console, the parameter trace overwrites itself on a single line per individual data set and is provided as a guide to model fitting progress. The full inner and outer optimization as reported by `TMB` (Kristensen et al. 2016) can also be printed to the console by setting `ssm_control(verbose = 2)`; this can be helpful in diagnosing convergence failures or optimization errors.

@@ -18,7 +18,7 @@
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
-##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 72)
+##' fit <- fit_ssm(ellie, model = "crw", time.step = 72)
 ##' 
 ##' set.seed(pi)
 ##' ## generate 5 simulated paths from ssm fit
@@ -28,7 +28,9 @@
 ##' trs_f <- sim_filter(trs, keep = 0.4, flag = 2)
 ##' 
 ##' ## compare unfiltered and filtered simulated paths
+##' \donttest{
 ##' plot(trs) | plot(trs_f)
+##' }
 ##' 
 ##' @references Hazen et al. (2017) WhaleWatch: a dynamic management tool for 
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428

@@ -35,7 +35,7 @@ distance is a constant 50000 m.}
 \item{append}{should re-routed locations be appended to the \code{ssm}
 (ssm fit) object (default = TRUE), or returned as a tibble.}
 
-\item{...}{additional arguments passed to \link[pathroutr:prt_visgraph]{pathroutr::prt_visgraph}}
+\item{...}{additional arguments passed to pathroutr::prt_visgraph}
 }
 \description{
 A wrapper function that uses the \code{pathroutr} package
