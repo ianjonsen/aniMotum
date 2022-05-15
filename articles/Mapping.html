@@ -119,20 +119,23 @@
 <pre><code><span class="co">#&gt; using map scale: 10</span></code></pre>
 <p><img src="Mapping_files/figure-html/1c-1.png" width="672"></p>
 <p>Here, SSM-predicted locations are coloured by the estimated move persistence index (<span class="math inline">\(\gamma_t\)</span>). To aid visualisation of high and low move persistence regions along each track, the <span class="math inline">\(\gamma_t\)</span> estimates are normalised separately for each track to span the interval 0,1. This can be turned off with <code>normalise = FALSE</code>, or applied to the group of tracks with <code>group = TRUE</code>.</p>
-<p>By default, <code><a href="../reference/map.html">map()</a></code> will try to use <code>rnaturalearth::ne_countries(scale = 10)</code> land polygon data if the <code>rnaturalearthhires</code> data package is installed. If not, the default will be dropped to the coarser <code>scale=50</code>. The <code>rnaturalearthhires</code> package can be installed via: <code>install.packages("rnaturalearthhires", repos = "https://ropensci.r-universe.dev")</code></p>
+<p>By default, <code><a href="../reference/map.html">map()</a></code> will try to use <code>rnaturalearth::ne_countries(scale = 10)</code> high-resolution land polygon data if the <code>rnaturalearthhires</code> data package is installed. If not, the default will be dropped to the coarser <code>scale=50</code>. The <code>rnaturalearthhires</code> package can be installed via: <code>install.packages("rnaturalearthhires", repos = "https://ropensci.r-universe.dev")</code> or <code>remotes::install_github("ropensci/rnaturalearthhires")</code>. Alternatively, if the <code>ggpstial</code> and <code>rosm</code> packages are installed, users may specify any of the available tile map layers returned by <code><a href="https://rdrr.io/pkg/rosm/man/osm.types.html" class="external-link">rosm::osm.types()</a></code> via the <code>map_type</code> argument. When specifying a <code>map_type</code>, <code>map</code> will take any additional arguments to <code><a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile()</a></code> for finer control; <code>zoom</code> and <code>progress</code> are used here.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, map_type <span class="op">=</span> <span class="st">"cartodark"</span>, zoom <span class="op">=</span> <span class="fl">4</span>, progress <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
+<p><img src="Mapping_files/figure-html/1d-1.png" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="control-track-components">Control track components<a class="anchor" aria-label="anchor" href="#control-track-components"></a>
 </h4>
 <p>We can add and remove certain track components by using the <code>aes</code> argument and <code><a href="../reference/aes_lst.html">aes_lst()</a></code> function. Here, the observed locations (orange triangles) and track lines have been turned on and the move persistence index has been turned off.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>obs<span class="op">=</span><span class="cn">TRUE</span>, line<span class="op">=</span><span class="cn">TRUE</span>, mp<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, aes <span class="op">=</span> <span class="va">my.aes</span><span class="op">)</span>
 <span class="co">#&gt; using map scale: 10</span></code></pre></div>
 <p><img src="Mapping_files/figure-html/map%202-1.png" width="672"> Note that when turning off the move persistence index, tracks are automatically given unique colours. This can be turned off by using <code>by.id = FALSE</code>.</p>
 <p>Additional control over mapping aesthetics can be gained by viewing and editing the <code>my.aes$df</code> data.frame created by <code><a href="../reference/aes_lst.html">aes_lst()</a></code>. We can subset components and assign new values as needed, here we change the observation colour and shape from orange triangles to firebrick diamonds. We also set <code>by.id = FALSE</code> so all tracks are displayed in a unique colour (default is “dodgerblue”).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my.aes</span><span class="op">$</span><span class="va">df</span>
 <span class="co">#&gt;                feature shape size        col       fill alpha</span>
 <span class="co">#&gt; 1  estimated locations    19 1.25 dodgerblue dodgerblue   1.0</span>
@@ -152,7 +155,7 @@
 <span class="co">#&gt; using map scale: 10</span></code></pre></div>
 <p><img src="Mapping_files/figure-html/map%203-1.png" width="672"></p>
 <p>Alternatively, we can colour estimated locations by their date to better see how tracks evolve over time. We’ll map just two of the tracks for simplicity.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>, 
     what <span class="op">=</span> <span class="st">"p"</span>, 
     aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp<span class="op">=</span><span class="cn">FALSE</span>, conf<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>, 
@@ -161,7 +164,7 @@
 <span class="co">#&gt; using map scale: 10</span></code></pre></div>
 <p><img src="Mapping_files/figure-html/map%204-1.png" width="672"></p>
 <p>If you don’t like the default colour palettes, these can be changed by modifying the default <code>aes</code> object. Here, the <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors()</a></code> function is used to specify a new colour palette for displaying date-along-track.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>, 
     what <span class="op">=</span> <span class="st">"p"</span>, 
     aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp<span class="op">=</span><span class="cn">FALSE</span>, 
@@ -171,7 +174,7 @@
 <span class="co">#&gt; using map scale: 10</span></code></pre></div>
 <p><img src="Mapping_files/figure-html/map%205-1.png" width="672"></p>
 <p>And similarly for displaying move persistence.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
     what <span class="op">=</span> <span class="st">"p"</span>, 
     aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, <span class="st">"RdBu"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -182,7 +185,7 @@
 <h4 id="change-projection">Change projection<a class="anchor" aria-label="anchor" href="#change-projection"></a>
 </h4>
 <p>Often choosing an appropriate map projection can provide a more meaningful view of the tracks, especially for animals that make very broad-scale movements, such as the southern elephant seals displayed here. This can be done easily by providing a valid <code>proj4string</code> for the Coordinate Reference System. Here, we project the tracks onto a polar stereographic grid with longitude centered on 68<sup>o</sup> East, Iles Kerguelen.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
     what <span class="op">=</span> <span class="st">"p"</span>, 
     aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, <span class="st">"RdBu"</span><span class="op">)</span><span class="op">)</span>, 

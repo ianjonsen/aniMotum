@@ -226,14 +226,13 @@
 <h2 id="route_path">
 <code>route_path()</code><a class="anchor" aria-label="anchor" href="#route_path"></a>
 </h2>
-<p>We can use <code><a href="../reference/route_path.html">route_path()</a></code> (see <code><a href="../articles/Path_rerouting.html">vignette('Path_rerouting')</a></code> for more details) to re-route the few simulated track segments that cross land.</p>
+<p>We can use <code><a href="../reference/route_path.html">route_path()</a></code> (see <code><a href="../articles/Path_rerouting.html">vignette('Path_rerouting')</a></code> for more details) to re-route the few simulated track segments that cross land. <img src="Track_simulation_files/figure-html/route_path%20a-1.png" width="672"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># reroute simulated tracks</span>
 <span class="va">st.cpf_frr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, centroids <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># compare</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_frr</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="Track_simulation_files/figure-html/route_path-1.png" width="672"></p>
 <p>In more severe cases, tracks first could be simulated using potential functions, filtered, and then any remaining segments re-routed from land.</p>
 </div>
 <div class="section level2">
