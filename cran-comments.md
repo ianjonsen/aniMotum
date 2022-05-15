@@ -12,7 +12,7 @@ This update adds functionality to the package
 
 ## R CMD check results
 
-0 errors | 0 warnings | up to 3 notes, depending on platform
+0 errors | 0 warnings | up to 2 notes, depending on platform
 
 NOTES:  
 
@@ -21,6 +21,3 @@ I have been unable to reduce this further.
 
 2. 2 suggested packages (urls in Additional_repositories) are not available 
 for testing.
-
-3. Some individuals example timings exceed 5 s on some linux platforms. 
-I have been unable to reduce these further.
