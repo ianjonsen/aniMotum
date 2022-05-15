@@ -86,6 +86,7 @@
   zoom <span class="op">=</span> <span class="cn">FALSE</span>,
   or <span class="op">=</span> <span class="cn">NULL</span>,
   ncol <span class="op">=</span> <span class="fl">1</span>,
+  hires <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -104,6 +105,12 @@ should global map be drawn (FALSE; default).</p></dd>
 start of fitted track (ignored if <code>mapproj</code> package is not installed).</p></dd>
 <dt>ncol</dt>
 <dd><p>number of columns to arrange multiple plots</p></dd>
+<dt>hires</dt>
+<dd><p>logical; use high-resolution coastline data. Attempts to use
+high-res coastline data via <a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 10</code>,
+if the <code>rnaturalearthhires</code> data package is installed. This extends the
+plot rendering time so is set to FALSE by default, in which case
+<a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 50</code> data are used.</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments to be ignored</p></dd>
 </dl></div>
