@@ -125,7 +125,20 @@ plot(st.cpf) | plot(st.cpf_f)
 
 ## `route_path()` 
 We can use `route_path()` (see `vignette('Path_rerouting')` for more details) to re-route the few simulated track segments that cross land. 
-```{r route_path, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+```{r route_path a, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+if(requireNamespace("pathroutr", quietly = TRUE)) {
+  # reroute simulated tracks
+  st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
+
+  # compare
+  plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
+} else {
+  cat("\n the 'pathroutr' pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
+          or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
+}
+```
+
+```{r route_path b, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 # reroute simulated tracks
 st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
 

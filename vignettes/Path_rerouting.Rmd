@@ -57,15 +57,62 @@ Thanks to the `pathroutr` R package (https://jmlondon.github.io/pathroutr/), we 
 
 #### re-route Weddell seal SSM-predicted locations
 Here we take the SSM fit object and pass the re-routed locations back to it.
-```{r wese2, warning=FALSE, message=FALSE}
-fit <- route_path(fit, 
-                  what ="predicted", 
-                  map_scale = 10, 
-                  buffer = 10000)
+```{r wese2a, echo = FALSE, warning=FALSE, message=FALSE}
+if(requireNamespace("pathroutr", quietly = TRUE)) {
+  fit <- route_path(fit,
+                    what = "predicted",
+                    map_scale = 10,
+                    buffer = 10000)
+} else {
+  cat("\n the 'pathroutr' pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
+          or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
+}
+```
+
+```{r wese2b, eval = FALSE, warning=FALSE, message=FALSE}
+fit <- route_path(fit,
+                    what = "predicted",
+                    map_scale = 10,
+                    buffer = 10000)
 ```
 
 We can then map these locations to see the improvement.
-```{r wese3, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
+```{r wese3a, echo = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
+aes <- aes_lst(line = TRUE,
+               conf = FALSE,
+               mp = FALSE,
+               obs = TRUE)
+m1 <- map(fit, 
+          what = "predicted", 
+          aes = aes, 
+          crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
+          ext.rng = c(0.3, 0.1),
+          silent = TRUE)
+if(requireNamespace("pathroutr", quietly = TRUE)) {
+  m2 <- map(fit, 
+            what = "rerouted", 
+            aes = aes, 
+            crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
+            ext.rng = c(0.3, 0.1),
+            silent = TRUE)
+
+  (m1 + labs(title = "SSM-predicted locations") | m2 + labs(title = "Re-routed locations")) &
+    theme(panel.grid= element_line (size=0.1, colour="grey60"))
+} else {
+  m2 <- map(fit, 
+          what = "predicted", 
+          aes = aes, 
+          crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
+          ext.rng = c(0.3, 0.1),
+          silent = TRUE)
+  (m1 + labs(title = "SSM-predicted locations") | m2 + labs(title = "'pathroutr' pkg needs installation")) &
+    theme(panel.grid= element_line (size=0.1, colour="grey60"))
+  cat("\n the 'pathroutr' pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
+          or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
+}
+```
+
+```{r wese3b, eval = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 aes <- aes_lst(line = TRUE,
                conf = FALSE,
                mp = FALSE,

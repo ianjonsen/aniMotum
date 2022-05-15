@@ -70,10 +70,12 @@ package directly by first exctracting foieGras-estimated locations with
 obtained independently.
 }
 \examples{
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
-fit <- route_path(fit, what = "predicted")
-grab(fit, what = "rerouted")
-
+# if 'pathroutr' is installed then ok to use route_path()
+if(requireNamespace("pathroutr", quietly = TRUE)) {
+  fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+  fit <- route_path(fit, what = "predicted")
+  grab(fit, what = "rerouted")
+}
 
 }
 \references{
