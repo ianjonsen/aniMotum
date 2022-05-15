@@ -54,8 +54,8 @@ polygons (default = 10000). If map extents are expanded by many factors then
 the buffer distance may need to be increased, otherwise this should not be
 used. Ignored if \code{map_type != "default"}.}
 
-\item{map_type}{background map type ("default" uses \link{rnaturalearth}
-to add land masses). If the \code{rnaturalearthdata} package is installed then
+\item{map_type}{background map type ("default" uses \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries}
+to add land polygons). If the \code{rnaturalearthdata} package is installed then
 high-resolution land polygons will be used. If the \code{ggspatial}
 and \code{rosm} packages are installed then any tile map type returned by
 \link[rosm:osm.types]{rosm::osm.types} can be used for a potentially more detailed coastline at
