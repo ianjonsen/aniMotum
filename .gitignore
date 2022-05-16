@@ -22,3 +22,5 @@ docs
 data/sese_fit.RDS
 rosm.cache
 for_remotes.R
+/doc/
+/Meta/

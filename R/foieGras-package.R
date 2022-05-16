@@ -14,7 +14,7 @@
 ##'
 ##' @seealso Useful Links:
 ##' * [https://ianjonsen.github.io/foieGras/](https://ianjonsen.github.io/foieGras/)
-##' * [https://github.com/ianjonsen/foieGras](https://github.com/ianjonsen/foieGras/)
+##' * [https://github.com/ianjonsen/foieGras/](https://github.com/ianjonsen/foieGras/)
 ##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues](https://github.com/ianjonsen/foieGras/issues)
 ##' 
 ##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 [https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7)

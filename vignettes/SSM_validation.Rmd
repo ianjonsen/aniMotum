@@ -20,7 +20,7 @@ Just like any other statistical model fitting exercise, validating SSM fits to t
 ```{r visualise SSM fit, fig.width=7, fig.height=5}
 fit.rw <- fit_ssm(ellie, 
                   model = "rw", 
-                  time.step = 12, 
+                  time.step = 24, 
                   control = ssm_control(verbose = 0))
 
 plot(fit.rw, what = "fitted")
@@ -54,7 +54,7 @@ Fitting the `crw` SSM to the same data, we can see the prediction residual plots
 ```{r fit crw and plot osar, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 fit.crw <- fit_ssm(ellie, 
                    model = "crw", 
-                   time.step = 12, 
+                   time.step = 24, 
                    control = ssm_control(verbose = 0))
 
 res.crw <- osar(fit.crw)

@@ -29,7 +29,7 @@ This is an overview of how to use `foieGras` to filter animal track locations ob
 
 the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see [Jonsen et al. 2020](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7) for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The *Random Walk* model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The *Correlated Random Walk* model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., 'looping' artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The *Move Persistence* model can be more robust to data gaps up to a point, and estimates time-varying move persistence $\gamma_t$ along the track, which provides an index of how an animal's movement behaviour varies in space and time.
 
-Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating a move persistence *after* fitting either the `rw` or `crw` SSM (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Méthé et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.
+Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating a move persistence *after* fitting either the `rw` or `crw` SSM (see [Jonsen et al. 2019](https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566) for details). The `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See [Auger-Méthé et al. 2017](https://www.int-res.com/abstracts/meps/v565/p237-249/) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.
 
 ### Data
 
@@ -75,7 +75,6 @@ head(data.frame(foo))
 5)  a `data.frame`, `tibble` or `sf-tibble` where processed GLS data are provided and include longitude and latitude error SD's (in degrees). In this case, the `lc` class is set to `GL` for all GLS locations.
 
 ```{r data 5, echo = FALSE}
-
   data.frame(
   id = rep(54632, 5),
   date = seq(Sys.time(), by = "12 hours", length.out = 5),
@@ -90,7 +89,6 @@ head(data.frame(foo))
 6)  a `data.frame`, `tibble` or `sf-tibble` where GPS data are provided. In this case, the `lc` class is set to `G` for all GPS locations.
 
 ```{r data 6, echo = FALSE}
-
   data.frame(
   id = rep("F02-B-17", 5),
   date = seq(Sys.time(), by = "1 hours", length.out = 5),
@@ -103,7 +101,6 @@ head(data.frame(foo))
 7)  a `data.frame`, `tibble` or `sf-tibble` where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.
 
 ```{r data 7, echo = FALSE}
-
   data.frame(
     id = rep("F02-B-17", 5),
     date = c("2017-09-17 05:20:00", "2017-10-04 14:35:01", "2017-10-05 04:03:25", "2017-10-05 06:28:20", "2017-10-05 10:21:18"),
@@ -120,7 +117,7 @@ head(data.frame(foo))
 
 Model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::fit_ssm` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, the prefilter uses the World Mercator projection, EPSG 3395. The SSM is then fit to this projected version of the data. The prefilter step is fully automated and invoked via the `fit_ssm` function:
 
-```{r fit_ssm, message=FALSE}
+```{r fit_ssm, eval=FALSE, message=FALSE}
 ## prefilter and fit Random Walk SSM using a 24 h time step
 fit <-
   fit_ssm(

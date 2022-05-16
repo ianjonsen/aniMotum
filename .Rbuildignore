@@ -24,3 +24,5 @@
 ^for_remotes\.R$
 
 ^CRAN-SUBMISSION$
+^doc$
+^Meta$

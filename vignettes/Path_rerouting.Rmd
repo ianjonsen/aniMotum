@@ -20,7 +20,7 @@ When fitting SSM's to error-prone tracking data, estimated locations can occur i
 
 ### Example
 Here's an example using a Weddell seal track from Scott Base, Antarctica. Note the numerous Argos locations (red) and SSM_predicted locations (blue) on land/fast-ice.
-```{r wese1, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
+```{r wese1, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 # fit SSM to Weddell seal Argos data
 fit <- fit_ssm(wese_sb, 
                vmax = 3,
@@ -51,13 +51,14 @@ m2 <- map(fit,
 (m1 + labs(title = "Argos locations") | m2 + labs(title = "SSM-predicted locations")) &
     theme(panel.grid= element_line (size=0.1, colour="grey60"))
 ```
+![](images/path_rerouting/map_1ab.jpg){width=95%}
 
 ### `route_path()`
 Thanks to the `pathroutr` R package (https://jmlondon.github.io/pathroutr/), we can quickly and objectively re-route estimated tracks off of land. `route_path()` is a wrapper function for the `pathroutr` package, which must be installed separately (via `install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")`). Our implementation is intended to be easy to use and integrate into a `foieGras` workflow, but for complicated re-routing problems we recommend using the `pathroutr` functions directly.
 
 #### re-route Weddell seal SSM-predicted locations
 Here we take the SSM fit object and pass the re-routed locations back to it.
-```{r wese2a, echo = FALSE, warning=FALSE, message=FALSE}
+```{r wese2a, eval=FALSE, echo = FALSE, warning=FALSE, message=FALSE}
 if(requireNamespace("pathroutr", quietly = TRUE)) {
   fit <- route_path(fit,
                     what = "predicted",
@@ -99,8 +100,9 @@ m2 <- map(fit,
 (m1 + labs(title = "SSM-predicted locations") | m2 + labs(title = "Re-routed locations")) &
   theme(panel.grid= element_line (size=0.1, colour="grey60"))
 ```
+![](images/path_rerouting/map_2ab.jpg){width=95%}
 
-```{r wese3a, echo = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
+```{r wese3a, eval=FALSE, echo = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 my.aes <- aes_lst(line = TRUE,
                conf = FALSE,
                mp = FALSE,
@@ -121,6 +123,7 @@ if(requireNamespace("pathroutr", quietly = TRUE)) {
 
   (m1 + labs(title = "SSM-predicted locations") | m2 + labs(title = "Re-routed locations")) &
     theme(panel.grid= element_line (size=0.1, colour="grey60"))
+  ggsave(filename = "images/path_rerouting/map_2ab.jpg", dpi=150, bg="white")
 } else {
   m2 <- map(fit, 
           what = "predicted", 
@@ -134,3 +137,4 @@ if(requireNamespace("pathroutr", quietly = TRUE)) {
           or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
 }
 ```
+

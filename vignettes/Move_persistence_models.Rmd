@@ -21,8 +21,11 @@ d <- subset(sese, id == "ct109-186-14")
 fit <- fit_ssm(d, 
                vmax = 3,
                model = "crw", 
-               time.step=24,
+               time.step = 24,
                control = ssm_control(verbose = 0))
+```
+```{r fit ssm1, echo=FALSE}
+d <- subset(sese, id == "ct109-186-14")
 ```
 
 The second step estimates move persistence from the SSM-estimated locations:
@@ -37,6 +40,7 @@ Using this approach, location uncertainty is not carried through to the estimati
 ```{r ts1, warning=FALSE, message=FALSE, fig.width=7, fig.height=3}
 plot(fmp)
 ```
+
 ```{r map1, fig.width=7, fig.height=6}
 map(fit, fmp, what = "predicted", silent = TRUE)
 ```
@@ -46,7 +50,7 @@ map(fit, fmp, what = "predicted", silent = TRUE)
 Here, we fit the move persistence SSM to the same southern elephant seal track as above:
 ```{r fit_ssm, warning=FALSE, message=FALSE}
 fit <- fit_ssm(d, 
-               vmax=3, 
+               vmax = 3, 
                model = "mp", 
                time.step = 24,
                control = ssm_control(verbose = 0))
@@ -63,5 +67,4 @@ When mapping these move persistence estimates along the 2-D track, we can see th
 ```{r map2, fig.width=7, fig.height=6}
 map(fit, what = "p", normalise = TRUE, silent = TRUE)
 ```
-
 

@@ -39,7 +39,7 @@ In the simplest case, fitting an SSM consists of specifying the process model an
 ```{r model fit, message=FALSE, eval=FALSE}
 fit <- fit_ssm(ellie, 
                model = "rw", 
-               time.step = 12)
+               time.step = 24)
 ```
 
 This call uses the defaults for data processing and all other arguments (see `?fit_ssm` for details). More control can be exerted over the model fitting process via the arguments: `emf`, `map`, and `control`. 
@@ -86,12 +86,12 @@ Here we fit the `crw` model with (`fit1`) and without (`fit2`) the bias-correcti
 ```{r demonstrate map use, message=FALSE, warning=FALSE}
 fit1 <- fit_ssm(ellie, 
                 model = "crw", 
-                time.step = 12,
+                time.step = 24,
                 control = ssm_control(verbose = 0))
 
 fit2 <- fit_ssm(ellie, 
                 model = "crw", 
-                time.step = 12, 
+                time.step = 24, 
                 map = list(psi = factor(NA)),
                 control = ssm_control(verbose = 0))
 
@@ -105,7 +105,7 @@ By default, `foieGras` uses R's `nlminb` optimizer, but users can also select th
 ```{r ssm_control, message=FALSE, warning=FALSE, eval = FALSE}
 fit <- fit_ssm(ellie, 
                model = "crw", 
-               time.step = 12,
+               time.step = 24,
                control = ssm_control(optim = "optim",
                                      verbose = 0))
 ```
@@ -113,7 +113,7 @@ Here, we use `control = ssm_control()` to set the optimizer to `optim` and turne
 ```{r optimizer params, message=FALSE, warning=FALSE, eval = FALSE}
 fit <- fit_ssm(ellie, 
                model = "crw", 
-               time.step = 12,
+               time.step = 24,
                control = ssm_control(optim = "optim",
                                      maxit = 1000,
                                      verbose = 0))
@@ -128,12 +128,12 @@ Finally, the `ssm_control(se = TRUE)` argument can be invoked when fitting the `
 
 ## References
 
-Costa DP, Robinson PW, Arnould JPY, Harrison AL, Simmons SE, Hassrick JL, Hoskins AJ, Kirkman SP, Oosthuizen H, Villegas-Amtmann S, Crocker DE (2010) Accuracy of ARGOS locations of pinnipeds at-sea estimated using Fastloc GPS. _PLOS One_ 5:e8677. [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0008677](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0008677)
+Costa DP, Robinson PW, Arnould JPY, Harrison AL, Simmons SE, Hassrick JL, Hoskins AJ, Kirkman SP, Oosthuizen H, Villegas-Amtmann S, Crocker DE (2010) Accuracy of ARGOS locations of pinnipeds at-sea estimated using Fastloc GPS. _PLOS One_ 5:e8677. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0008677
 
-Freitas C, Lydersen C, Fedak MA, Kovacs KM (2008) A simple new algorithm to filter marine mammal Argos locations. _Marine Mammal Science_ 24: 315-325. [https://onlinelibrary.wiley.com/doi/10.1111/j.1748-7692.2007.00180.x](https://onlinelibrary.wiley.com/doi/10.1111/j.1748-7692.2007.00180.x)
+Freitas C, Lydersen C, Fedak MA, Kovacs KM (2008) A simple new algorithm to filter marine mammal Argos locations. _Marine Mammal Science_ 24: 315-325. https://onlinelibrary.wiley.com/doi/10.1111/j.1748-7692.2007.00180.x
 
-Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. _Movement Ecology_ 8:31. [https://doi.org/10.1186/s40462-020-00217-7](https://doi.org/10.1186/s40462-020-00217-7)
+Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. _Movement Ecology_ 8:31. https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7
 
-Kristense K, Nielsen A, Berg CW, Skaug H, Bell BM (2016) TMB: automatic differentiation and Laplace approximation. _Journal of Statistical Software_ 70:1-21. [https://www.jstatsoft.org/article/view/v070i05](https://www.jstatsoft.org/article/view/v070i05)
+Kristense K, Nielsen A, Berg CW, Skaug H, Bell BM (2016) TMB: automatic differentiation and Laplace approximation. _Journal of Statistical Software_ 70:1-21. (https://www.jstatsoft.org/article/view/v070i05
 
-McClintock BT, London JM, Cameron MF, Boveng PL (2015) Modelling animal movement using the Argos satellite telemetry location error ellipse. _Methods in Ecology and Evolution_ 2015;6:266–77. [https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12311](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12311)
+McClintock BT, London JM, Cameron MF, Boveng PL (2015) Modelling animal movement using the Argos satellite telemetry location error ellipse. _Methods in Ecology and Evolution_ 2015;6:266–77. https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12311
