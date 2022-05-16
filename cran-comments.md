@@ -1,7 +1,7 @@
 ## Submission  
 This is a 2nd resubmission, addressing issues identified by CRAN automated checks:  
 1. vignette build time has been reduced to speed up pkg checks
-2. invalid url's have been replaced (although I am unsure how they were corrupted at submission)
+2. url's have been replaced (although I am unsure how they were corrupted at submission)
 
 ## Test environments  
 * local macOS arm-64 (12.3.1), R 4.2.0, R 4.1.3
@@ -10,6 +10,8 @@ This is a 2nd resubmission, addressing issues identified by CRAN automated check
 * windows latest (via GitHub Actions), r-devel, r-release  
 * windows x86_64 (via win-builder), r-devel, r-release, r-oldrel  
 * solaris 10 x86 32 bit (via R-hub), r-release  
+* ubuntu GCC (via R-hub), r-release
+* debian GCC (via R-hub), r-devel
 
 
 ## R CMD check results  
