@@ -1,7 +1,7 @@
 ## Submission  
-This is a resubmission, addressing issues identified by CRAN:  
-1. package tarball size reduced to 4.8 Mb  
-2. invalid url in README.md updated  
+This is a 2nd resubmission, addressing issues identified by CRAN automated checks:  
+1. vignette build time has been reduced to speed up pkg checks
+2. invalid url's have been replaced (although I am unsure how they were corrupted at submission)
 
 ## Test environments  
 * local macOS arm-64 (12.3.1), R 4.2.0, R 4.1.3
