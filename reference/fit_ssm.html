@@ -240,20 +240,15 @@ a mixed effects model. Ecology. 100(1):e02566
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## fit crw model to Argos LS data</span></span>
 <span class="r-in"><span class="co">## se = FALSE to speed up ex</span></span>
 <span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">fit_ssm</span><span class="op">(</span><span class="va">sese1</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">48</span><span class="op">)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0 0       pars:   -0.08775 -0.65419 -0.75115 0.01052       pars:   0.58559 -0.31676 -1.25495 0.43353       pars:   0.11033 -0.55492 -0.89936 0.13496       pars:   0.23551 -0.77858 -0.79482 0.23457       pars:   0.42286 -0.63554 -0.90511 0.37176       pars:   0.53429 -0.75827 -0.89547 0.61461       pars:   0.43677 -0.64359 -0.91872 0.73324       pars:   0.53429 -0.75827 -0.89547 0.61461      </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is.data.frame(x):</span> object 'sese1' not found</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## time series plots of fitted values and observations</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`ct36-E-09`</span>
-<span class="r-plt img"><img src="fit_ssm-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot(fit, what = "fitted", type = 1, ask = FALSE):</span> object 'fit' not found</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## 2-D tracks plots of predicted values and observations</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`ct36-E-09`</span>
-<span class="r-plt img"><img src="fit_ssm-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot(fit, what = "predicted", type = 2, ask = FALSE):</span> object 'fit' not found</span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 </code></pre></div>

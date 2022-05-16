@@ -156,20 +156,20 @@
                     buffer <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></code></pre></div>
 <p>We can then map these locations to see the improvement.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>line <span class="op">=</span> <span class="cn">TRUE</span>,
+<code class="sourceCode R"><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>line <span class="op">=</span> <span class="cn">TRUE</span>,
                conf <span class="op">=</span> <span class="cn">FALSE</span>,
                mp <span class="op">=</span> <span class="cn">FALSE</span>,
                obs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
           what <span class="op">=</span> <span class="st">"predicted"</span>, 
-          aes <span class="op">=</span> <span class="va">aes</span>, 
+          aes <span class="op">=</span> <span class="va">my.aes</span>, 
           crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,
           ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,
           silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
           what <span class="op">=</span> <span class="st">"rerouted"</span>, 
-          aes <span class="op">=</span> <span class="va">aes</span>, 
+          aes <span class="op">=</span> <span class="va">my.aes</span>, 
           crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,
           ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,
           silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>

@@ -173,20 +173,20 @@
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-15 18:08:50 GL 100.0 -55 0.37137181 0.2933006</span>
-<span class="co">#&gt; 2 54632 2022-05-16 06:08:50 GL 100.5 -54 0.26828312 1.2963725</span>
-<span class="co">#&gt; 3 54632 2022-05-16 18:08:50 GL 101.0 -53 0.01554575 1.3127566</span>
-<span class="co">#&gt; 4 54632 2022-05-17 06:08:50 GL 101.5 -52 0.40747151 1.0265697</span>
-<span class="co">#&gt; 5 54632 2022-05-17 18:08:50 GL 102.0 -51 1.23036108 0.1857878</span></code></pre>
+<span class="co">#&gt; 1 54632 2022-05-16 13:42:59 GL 100.0 -55 0.70685203 0.6145709</span>
+<span class="co">#&gt; 2 54632 2022-05-17 01:42:59 GL 100.5 -54 0.02901493 1.5756254</span>
+<span class="co">#&gt; 3 54632 2022-05-17 13:42:59 GL 101.0 -53 0.42325506 1.6205590</span>
+<span class="co">#&gt; 4 54632 2022-05-18 01:42:59 GL 101.5 -52 0.52668338 3.7872293</span>
+<span class="co">#&gt; 5 54632 2022-05-18 13:42:59 GL 102.0 -51 0.27902089 2.0585398</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-15 18:08:50  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-15 19:08:50  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-15 20:08:50  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-15 21:08:50  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-15 22:08:50  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-16 13:42:59  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-16 14:42:59  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-16 15:42:59  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-16 16:42:59  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-16 17:42:59  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
@@ -213,12 +213,19 @@
 <p>These are the minimum arguments required: the input data, the model (<code>rw</code>, <code>crw</code>, or <code>mp</code>) and the time.step (in h) to which locations are predicted (the argument <code>control = ssm_control(verbose = 0)</code> turns off parameter optimization tracing and is included here for vignette tidiness). Additional control can be exerted over the prefiltering step, via the <code>vmax</code>, <code>ang</code>, <code>distlim</code>, <code>spdf</code> and <code>min.dt</code> arguments. see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the <code>control = ssm_control()</code> argument, see <code><a href="../reference/ssm_control.html">?ssm_control</a></code> for details.</p>
 <p><code>fit_ssm</code> can be applied to single or multiple tracks, without modification. The specified SSM is fit to each individual separately and the resulting output is a compound <code>tibble</code> with rows corresponding to each individual <code>ssm_df</code> fit object. The <code>converged</code> column indicates whether each model fit converged successfully.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## list fit outcomes for both seals</span>
+<code class="sourceCode R"><span class="co">## fit to data with two individuals</span>
+<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>,
+               model <span class="op">=</span> <span class="st">"crw"</span>,
+               time.step<span class="op">=</span><span class="fl">24</span>,
+               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co">## list fit outcomes for both seals</span>
 <span class="va">fit</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
-<span class="co">#&gt;   id    ssm          converged pdHess pmodel</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;named list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 54591 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   rw</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span>
+<span class="co">#&gt;   id        ssm          converged pdHess pmodel</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;named list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-F-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw</span></code></pre></div>
 <p>Individual <code>id</code> is displayed in the 1st column, all fit output resides in a list (<code>ssm</code>) in the 2nd column, <code>convergence</code> status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain parameter standard errors (<code>pdHess</code>) is displayed in the 4th column, and the specified process model (<code>rw</code>, <code>crw</code>, or <code>mp</code>) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors may be calculated but not all. One possible solution is to try specifying a longer <code>time.step</code> or set <code>time.step = NA</code> to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If <code>pdHess = FALSE</code> persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by <code>prefilter</code> are present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html" class="external-link">glmmTMB troubleshooting vignette</a> may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via <code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">?optim</a></code> for details on optimization control parameters).</p>
 </div>
 <div class="section level3">
@@ -228,15 +235,26 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt;  Animal id Model Time n.obs n.filt n.fit n.pred n.rr converged   AICc</span>
-<span class="co">#&gt;      54591    rw   24    64      6    58    113    .      TRUE 1350.6</span>
+<span class="co">#&gt;  ct36-E-09   crw   24   170     22   148     58    .      TRUE 3022.8</span>
+<span class="co">#&gt;  ct36-F-09   crw   24   125     17   108    110    .      TRUE 2531.4</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; --------------</span>
-<span class="co">#&gt; 54591 </span>
+<span class="co">#&gt; ct36-E-09 </span>
 <span class="co">#&gt; --------------</span>
 <span class="co">#&gt;  Parameter Estimate Std.Err</span>
-<span class="co">#&gt;      rho_p  -0.8593  0.0365</span>
-<span class="co">#&gt;    sigma_x   4.6566  0.4494</span>
-<span class="co">#&gt;    sigma_y   3.9633  0.3802</span></code></pre></div>
+<span class="co">#&gt;          D   0.2071  0.0356</span>
+<span class="co">#&gt;      rho_o   0.1298  0.1143</span>
+<span class="co">#&gt;      tau_x   0.9378  0.0728</span>
+<span class="co">#&gt;      tau_y   0.6794  0.0576</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; --------------</span>
+<span class="co">#&gt; ct36-F-09 </span>
+<span class="co">#&gt; --------------</span>
+<span class="co">#&gt;  Parameter Estimate Std.Err</span>
+<span class="co">#&gt;          D   0.0818  0.0145</span>
+<span class="co">#&gt;      rho_o   0.3527  0.1227</span>
+<span class="co">#&gt;      tau_x   1.3695  0.1362</span>
+<span class="co">#&gt;      tau_y   1.9665  0.1897</span></code></pre></div>
 <p>The summary table lists information about the fit, including the number of observations in the input data (<code>n.obs</code>), the number of observation flagged to be ignored by the SSM (<code>n.filt</code>), the number of fitted location estimates (<code>n.fit</code>), the number of predicted location estimates (<code>n.pred</code>), the number of rerouted location estimates (if present, <code>n.rr</code>), model convergence status, and AICc. When fitting to multiple individuals, these statistics are repeated on separate lines for each individual. Separate tables of SSM parameter estimates and their SE’s are also printed for each individual. The parameter estimates displayed vary depending on the SSM process model selected by the user (<code>rw</code>, <code>crw</code>, or <code>mp</code>) and the automatically chosen measurement model(s). Here, <code>sigma_x</code> and <code>sigma_y</code> are the process error standard deviations in the x and y directions, <code>rho_p</code> is the correlation parameter in the covariance term. The <code>Std. Error</code> column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.</p>
 <p><code>fit_ssm</code> usually returns two sets of estimated locations in the model fit object: fitted values and predicted values. The fitted values occur at the times of the observations (that passed the prefilter step) to which the SSM was fit. The predicted values occur at the regular time intervals specified by the <code>time.step</code> argument. If <code>time.step = NA</code>, then no predicted values are estimated or returned in the model fit object.</p>
 <p>Users can obtain the fitted or predicted locations as a data.frame by using <code><a href="../reference/grab.html">grab()</a></code>:</p>
@@ -244,27 +262,29 @@
 <code class="sourceCode R"><span class="co">## grab fitted locations</span>
 <span class="va">floc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span>
 <span class="va">floc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="co">#&gt;   id    date                  lon   lat      x      y  x.se  y.se</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 54591 2012-03-05 <span style="color: #949494;">05:09:33</span>  111. -<span style="color: #BB0000;">66.4</span> <span style="text-decoration: underline;">12</span>309. -<span style="color: #BB0000; text-decoration: underline;">9</span><span style="color: #BB0000;">956.</span>  1.18 1.30 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 54591 2012-03-06 <span style="color: #949494;">04:55:14</span>  110. -<span style="color: #BB0000;">66.4</span> <span style="text-decoration: underline;">12</span>286. -<span style="color: #BB0000; text-decoration: underline;">9</span><span style="color: #BB0000;">947.</span> 28.6  0.276</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 54591 2012-03-09 <span style="color: #949494;">04:27:49</span>  110. -<span style="color: #BB0000;">66.5</span> <span style="text-decoration: underline;">12</span>299. -<span style="color: #BB0000; text-decoration: underline;">9</span><span style="color: #BB0000;">972.</span>  8.88 1.41</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 14</span></span>
+<span class="co">#&gt;   id     date                  lon   lat     x      y   x.se   y.se     u      v</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-… 2009-02-01 <span style="color: #949494;">17:50:46</span>  72.5 -<span style="color: #BB0000;">50.2</span> <span style="text-decoration: underline;">8</span>069. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">450.</span>  0.486  0.483 0.343 -<span style="color: #BB0000;">0.232</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-… 2009-02-02 <span style="color: #949494;">03:30:26</span>  72.8 -<span style="color: #BB0000;">50.4</span> <span style="text-decoration: underline;">8</span>108. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">477.</span> 11.5    9.57  4.09  -<span style="color: #BB0000;">2.80</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>200. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 18.7   14.1   6.43  -<span style="color: #BB0000;">5.00</span> </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span>
 
 <span class="co">## grab predicted locations in projected form</span>
 <span class="va">ploc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, as_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">ploc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>
-<span class="co">#&gt; Simple feature collection with 3 features and 4 fields</span>
+<span class="co">#&gt; Simple feature collection with 3 features and 10 fields</span>
 <span class="co">#&gt; Geometry type: POINT</span>
 <span class="co">#&gt; Dimension:     XY</span>
-<span class="co">#&gt; Bounding box:  xmin: 12286.44 ymin: -9955.649 xmax: 12308.66 ymax: -9946.821</span>
+<span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6662.174 xmax: 8348.709 ymax: -6449.872</span>
 <span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span>
-<span class="co">#&gt;   id    date                 x.se   y.se             geometry</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;POINT [km]&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 54591 2012-03-05 <span style="color: #949494;">05:00:00</span>  1.39  1.44  (12308.66 -9955.649)</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 54591 2012-03-06 <span style="color: #949494;">05:00:00</span> 28.6   0.419 (12286.44 -9946.821)</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 54591 2012-03-07 <span style="color: #949494;">05:00:00</span> 92.9  77.4     (12290.61 -9955.4)</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 11</span></span>
+<span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:00:00</span> 9.80<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> -<span style="color: #BB0000;">6.63</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:00:00</span> 6.41<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.98</span><span style="color: #949494;">e</span>+ 0 1.11<span style="color: #949494;">e</span>+0 9.48<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.80<span style="color: #949494;">e</span>+1 1.36<span style="color: #949494;">e</span>+1</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.03<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.30<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.38<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></code></pre></div>
 <p>Here, the fitted location data.frame includes individual id, date-time, longitude, latitude, x and y (typically from the default World Mercator projection) and their standard errors (in km). The predicted location data.frame is an <code>sf</code> object with geometry and Coordinate Reference System information. This <code>sf</code> output format is useful for custom mapping or calculating derived quantities from the estimated locations.</p>
 </div>
 <div class="section level3">
@@ -274,14 +294,20 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot time-series of the fitted values</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt; $`54591`</span></code></pre></div>
+<span class="co">#&gt; $`ct36-E-09`</span></code></pre></div>
 <p><img src="Overview_files/figure-html/fit%20plot-1.png" width="672"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<pre><code><span class="co">#&gt; </span>
+<span class="co">#&gt; $`ct36-F-09`</span></code></pre>
+<p><img src="Overview_files/figure-html/fit%20plot-2.png" width="672"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># plot fitted values as a 2-d track</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
-<span class="co">#&gt; $`54591`</span></code></pre></div>
-<p><img src="Overview_files/figure-html/fit%20plot-2.png" width="672"></p>
+<span class="co">#&gt; $`ct36-E-09`</span></code></pre></div>
+<p><img src="Overview_files/figure-html/fit%20plot-3.png" width="672"></p>
+<pre><code><span class="co">#&gt; </span>
+<span class="co">#&gt; $`ct36-F-09`</span></code></pre>
+<p><img src="Overview_files/figure-html/fit%20plot-4.png" width="672"></p>
 <p>The predicted values (red points) are the state estimates predicted at regular time intervals, specified by <code>time.step</code> (here a 24 h interval). These estimates are plotted on top of 2 x SE intervals (red-filled ribbon), and the observations that passed the <code>prefilter</code> stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - <code>plot(fit)</code>. A 2-D time series plot of the track is invoked by the argument <code>type = 2</code>, and includes the 95 % confidence ellipses (red-filled ellipses) around the predicted locations.</p>
 </div>
 </div>
