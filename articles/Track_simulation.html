@@ -113,7 +113,7 @@
 <h4 id="simulate-tracks-from-each-of-the-3-process-models">Simulate tracks from each of the 3 process models<a class="anchor" aria-label="anchor" href="#simulate-tracks-from-each-of-the-3-process-models"></a>
 </h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span> 
 <span class="va">sim.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"rw"</span><span class="op">)</span>
 <span class="va">sim.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"crw"</span>, D <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
 <span class="va">sim.mp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"mp"</span>, sigma_g <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></code></pre></div>
