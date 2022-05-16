@@ -62,6 +62,7 @@ points(y ~ date, sim.rw, pch=19, col="dodgerblue") # true y-values
 points(y ~ date, loc.rw, pch=19, cex=0.7, col="firebrick") # RW SSM fitted y
 points(y ~ date, loc.crw, pch=19, cex=0.4, col="orange") # CRW SSM fitted y
 ```
+
 The `rw` (red) and `crw` (orange) SSM's yield similar, reasonable fits to the RW simulated track, although both tend to smooth through some of the natural variability in the simulated true y-values (blue). This reflects a common inability of SSM's to fully separate process and measurement variability in an unbiased manner, especially when measurement error is greater than natural variability (Auger-Méthé et al. 2016).
 
 ## `simfit()`

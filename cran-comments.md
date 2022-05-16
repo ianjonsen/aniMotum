@@ -1,5 +1,5 @@
 ## Submission
-This is a resubmission, addressing issues identified by CRAN on initial submission:
+This is a resubmission, addressing issues identified by CRAN:
 1. package tarball size reduced to 4.8 Mb
 2. invalid url in README.md updated
 

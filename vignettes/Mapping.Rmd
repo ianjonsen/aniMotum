@@ -43,6 +43,7 @@ my.aes <- aes_lst(obs=TRUE, line=TRUE, mp=FALSE)
 
 map(fit, what = "p", aes = my.aes)
 ```
+
 Note that when turning off the move persistence index, tracks are automatically given unique colours. This can be turned off by using `by.id = FALSE`. 
 
 Additional control over mapping aesthetics can be gained by viewing and editing the `my.aes$df` data.frame created by `aes_lst()`. We can subset components and assign new values as needed, here we change the observation colour and shape from orange triangles to firebrick diamonds. We also set `by.id = FALSE` so all tracks are displayed in a unique colour (default is "dodgerblue").
