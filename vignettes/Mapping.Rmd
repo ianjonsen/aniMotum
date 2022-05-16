@@ -59,9 +59,9 @@ map(fit,
     by.id = FALSE)
 ```
 
-Alternatively, we can colour estimated locations by their date to better see how tracks evolve over time. We'll map just two of the tracks for simplicity. 
+Alternatively, we can colour estimated locations by their date to better see how tracks evolve over time. 
 ```{r map 4, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
-map(fit[1:2,], 
+map(fit, 
     what = "p", 
     aes = aes_lst(mp=FALSE, conf=FALSE), 
     by.date = TRUE, 
@@ -70,7 +70,7 @@ map(fit[1:2,],
 
 If you don't like the default colour palettes, these can be changed by modifying the default `aes` object. Here, the `hcl.colors()` function is used to specify a new colour palette for displaying date-along-track.
 ```{r map 5, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
-map(fit[1:2,], 
+map(fit, 
     what = "p", 
     aes = aes_lst(mp=FALSE, 
                   conf=FALSE, 
