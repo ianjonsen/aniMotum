@@ -17,6 +17,6 @@ This is a resubmission, addressing issues identified by CRAN:
 
 NOTES:  
 
-1. installed size of up to 21.5 Mb (macOS), 29 Mb (windows), 61.2 Mb (linux). I have been unable to reduce this further.  
+1. installed size of up to 12.6 Mb (macOS), 13 Mb (windows), 52.5 Mb (linux). I have been unable to reduce this further.  
 
 2. 2 suggested packages (urls in Additional_repositories) are not available for testing.
