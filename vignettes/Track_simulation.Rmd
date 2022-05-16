@@ -23,7 +23,7 @@ The `sim` function is useful for situations where simulated random tracks are re
 
 #### Simulate tracks from each of the 3 process models
 ```{r sim}
-set.seed(pi)
+set.seed(pi) 
 sim.rw <- sim(N = 200, model = "rw")
 sim.crw <- sim(N = 200, model = "crw", D = 0.5)
 sim.mp <- sim(N = 200, model = "mp", sigma_g = 0.3)
