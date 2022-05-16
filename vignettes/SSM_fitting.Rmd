@@ -55,12 +55,12 @@ These can be adjusted by modifying the data.frame and passing this to `fit_ssm` 
 ```{r emf mod, message=FALSE, fig.width=7, fig.height=6}
 emf2 <- mutate(emf(), emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
 
-fit1 <- fit_ssm(sese1, 
+fit1 <- fit_ssm(subset(sese2, id == unique(id)[1]), 
                 model = "rw", 
                 time.step=24, 
                 control = ssm_control(verbose = 0))
 
-fit2 <- fit_ssm(sese1, 
+fit2 <- fit_ssm(subset(sese2, id == unique(id)[1]), 
                 model = "rw", 
                 time.step=24, 
                 emf = emf2, 

@@ -67,7 +67,7 @@ simfit <-
     if(!inherits(grad, "RasterStack")) 
       stop("grad must be NULL or a RasterStack with 2 layers")
     if(inherits(grad, "RasterStack") & nlayers(grad) != 2)
-      stop("grad RasterStack must have 2 layers")
+      stop("grad must have 2 layers")
   }
   if(length(beta) != 2) 
     stop("beta must be specified as a 2-element vector")

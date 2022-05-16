@@ -136,6 +136,12 @@ These are the minimum arguments required: the input data, the model (`rw`, `crw`
 `fit_ssm` can be applied to single or multiple tracks, without modification. The specified SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `ssm_df` fit object. The `converged` column indicates whether each model fit converged successfully.
 
 ```{r multi-fits, message=FALSE}
+## fit to data with two individuals
+fit <- fit_ssm(sese2,
+               model = "crw",
+               time.step=24,
+               control = ssm_control(verbose = 0))
+
 ## list fit outcomes for both seals
 fit
 ```

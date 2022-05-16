@@ -19,21 +19,12 @@ require(foieGras)
 `foieGras` provides a flexible `map` function for mapping SSM-estimated tracks along with options for including their confidence ellipses, observed locations, track lines, and behavioural estimates. Default choices are made based on the model fit object being mapped but these can be overridden via the `aes` argument and the `aes_lst()` function. 
 
 #### Map an SSM fit to data, using default settings
-```{r map 1a, echo=FALSE, eval=FALSE, warning=FALSE, message=FALSE}
-fit <- fit_ssm(sese, model = "mp", time.step = 24, 
-               control = ssm_control(verbose = 0))
-saveRDS(fit, file = "fit.RDS")
-```
-
-```{r map 1b, eval=FALSE, warning=FALSE, message=FALSE}
-fit <- fit_ssm(sese, model = "mp", time.step = 24, 
+```{r map 1, fig.height=4, fig.width=7, warning=FALSE, message=FALSE}
+fit <- fit_ssm(sese, 
+               model = "mp", 
+               time.step = 24, 
                control = ssm_control(verbose = 0))
 
-map(fit, what = "predicted")
-```
-
-```{r 1c, echo=FALSE, fig.height=4, fig.width=7, message=FALSE, warning=FALSE}
-fit <- readRDS("fit.RDS")
 map(fit, what = "predicted")
 ```
 
@@ -41,7 +32,7 @@ Here, SSM-predicted locations are coloured by the estimated move persistence ind
 
 By default, `map()` will try to use `rnaturalearth::ne_countries(scale = 10)` high-resolution land polygon data if the `rnaturalearthhires` data package is installed. If not, the default will be dropped to the coarser `scale=50`. The `rnaturalearthhires` package can be installed via: `install.packages("rnaturalearthhires", repos = "https://ropensci.r-universe.dev")` or `remotes::install_github("ropensci/rnaturalearthhires")`. Alternatively, if the `ggpstial` and `rosm` packages are installed, users may specify any of the available tile map layers returned by `rosm::osm.types()` via the `map_type` argument. When specifying a `map_type`, `map` will take any additional arguments to `ggspatial::annotation_map_tile()` for finer control; `zoom` and `progress` are used here.
 
-```{r 1d, fig.height=4, fig.width=7, message=FALSE, warning=FALSE}
+```{r 1b, fig.height=4, fig.width=7, message=FALSE, warning=FALSE}
 map(fit, what = "predicted", map_type = "cartodark", zoom = 4, progress = "none")
 ```
 

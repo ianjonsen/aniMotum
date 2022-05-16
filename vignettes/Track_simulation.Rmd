@@ -79,9 +79,9 @@ In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast 
 
 ### Simulate tracks with a potential function to help avoid land:
 ```{r simfit potential fn, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
-grad <- readRDS(system.file("extdata/grad.RDS", package = "foieGras"))
+load(system.file("extdata/grad.rda", package = "foieGras"))
 
-st.pf <- simfit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-300,-300))
+st.pf <- simfit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-350,-350))
 
 plot(st.pf, zoom=TRUE)
 ```

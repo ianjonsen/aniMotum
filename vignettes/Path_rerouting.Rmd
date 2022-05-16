@@ -78,20 +78,20 @@ fit <- route_path(fit,
 
 We can then map these locations to see the improvement.
 ```{r wese3b, eval = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
-aes <- aes_lst(line = TRUE,
+my.aes <- aes_lst(line = TRUE,
                conf = FALSE,
                mp = FALSE,
                obs = TRUE)
 m1 <- map(fit, 
           what = "predicted", 
-          aes = aes, 
+          aes = my.aes, 
           crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
           ext.rng = c(0.3, 0.1),
           silent = TRUE)
 
 m2 <- map(fit, 
           what = "rerouted", 
-          aes = aes, 
+          aes = my.aes, 
           crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
           ext.rng = c(0.3, 0.1),
           silent = TRUE)
@@ -101,20 +101,20 @@ m2 <- map(fit,
 ```
 
 ```{r wese3a, echo = FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
-aes <- aes_lst(line = TRUE,
+my.aes <- aes_lst(line = TRUE,
                conf = FALSE,
                mp = FALSE,
                obs = TRUE)
 m1 <- map(fit, 
           what = "predicted", 
-          aes = aes, 
+          aes = my.aes, 
           crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
           ext.rng = c(0.3, 0.1),
           silent = TRUE)
 if(requireNamespace("pathroutr", quietly = TRUE)) {
   m2 <- map(fit, 
             what = "rerouted", 
-            aes = aes, 
+            aes = my.aes, 
             crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
             ext.rng = c(0.3, 0.1),
             silent = TRUE)
@@ -124,7 +124,7 @@ if(requireNamespace("pathroutr", quietly = TRUE)) {
 } else {
   m2 <- map(fit, 
           what = "predicted", 
-          aes = aes, 
+          aes = my.aes, 
           crs = "+proj=stere +lon_0=166 +datum=WGS84 +units=km",
           ext.rng = c(0.3, 0.1),
           silent = TRUE)
