@@ -107,7 +107,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
                   model <span class="op">=</span> <span class="st">"rw"</span>, 
-                  time.step <span class="op">=</span> <span class="fl">12</span>, 
+                  time.step <span class="op">=</span> <span class="fl">24</span>, 
                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span>
@@ -140,7 +140,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
                    model <span class="op">=</span> <span class="st">"crw"</span>, 
-                   time.step <span class="op">=</span> <span class="fl">12</span>, 
+                   time.step <span class="op">=</span> <span class="fl">24</span>, 
                    control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">res.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.crw</span><span class="op">)</span>
@@ -151,7 +151,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit.rw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span>, <span class="va">fit.crw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span><span class="op">)</span>
-<span class="co">#&gt; [1] 1350.699 1316.251</span></code></pre></div>
+<span class="co">#&gt; [1] 1350.609 1313.279</span></code></pre></div>
 <p>As calculation of prediction residuals can be computationally demanding, typically requiring more time than fitting the model, especially for multiple individual tracks, the <code>osar</code> function is automatically implemented in parallel when calculating residuals for more than 2 tracks.</p>
   </div>
 

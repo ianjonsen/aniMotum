@@ -120,7 +120,7 @@
 </li>
 </ul>
 <p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7" class="external-link">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
-<p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2566" class="external-link">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/" class="external-link">Auger-Méthé et al. 2017</a> for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
+<p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566" class="external-link">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/" class="external-link">Auger-Méthé et al. 2017</a> for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -173,20 +173,20 @@
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-16 15:56:42 GL 100.0 -55 0.2534651 1.7514259</span>
-<span class="co">#&gt; 2 54632 2022-05-17 03:56:42 GL 100.5 -54 0.1801224 0.3608147</span>
-<span class="co">#&gt; 3 54632 2022-05-17 15:56:42 GL 101.0 -53 1.0482711 0.7900746</span>
-<span class="co">#&gt; 4 54632 2022-05-18 03:56:42 GL 101.5 -52 0.1723499 0.3915782</span>
-<span class="co">#&gt; 5 54632 2022-05-18 15:56:42 GL 102.0 -51 0.1725376 0.4326950</span></code></pre>
+<span class="co">#&gt; 1 54632 2022-05-16 19:28:42 GL 100.0 -55 0.1974066 3.8846736</span>
+<span class="co">#&gt; 2 54632 2022-05-17 07:28:42 GL 100.5 -54 0.0367932 0.1188728</span>
+<span class="co">#&gt; 3 54632 2022-05-17 19:28:42 GL 101.0 -53 0.9111004 2.6336670</span>
+<span class="co">#&gt; 4 54632 2022-05-18 07:28:42 GL 101.5 -52 1.2243252 0.1070450</span>
+<span class="co">#&gt; 5 54632 2022-05-18 19:28:42 GL 102.0 -51 0.1215695 2.9007295</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-16 15:56:42  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-16 16:56:42  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-16 17:56:42  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-16 18:56:42  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-16 19:56:42  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-16 19:28:42  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-16 20:28:42  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-16 21:28:42  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-16 22:28:42  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-16 23:28:42  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>

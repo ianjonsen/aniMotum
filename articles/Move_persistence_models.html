@@ -109,7 +109,7 @@
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
                vmax <span class="op">=</span> <span class="fl">3</span>,
                model <span class="op">=</span> <span class="st">"crw"</span>, 
-               time.step<span class="op">=</span><span class="fl">24</span>,
+               time.step <span class="op">=</span> <span class="fl">24</span>,
                control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The second step estimates move persistence from the SSM-estimated locations:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -129,7 +129,7 @@
 <p>Here, we fit the move persistence SSM to the same southern elephant seal track as above:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
-               vmax<span class="op">=</span><span class="fl">3</span>, 
+               vmax <span class="op">=</span> <span class="fl">3</span>, 
                model <span class="op">=</span> <span class="st">"mp"</span>, 
                time.step <span class="op">=</span> <span class="fl">24</span>,
                control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
