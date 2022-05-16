@@ -56,21 +56,7 @@ NULL
 
 ##' @name sese
 ##' @docType data
-##' @title Southern elephant seal Argos satellite data (5 individuals)
-##' @format .RData
-##' @keywords data
-##' @description Example elephant seal Argos tracking data. Data were sourced from
-##' the Integrated Marine Observing System (IMOS) Sourced 
-##' from the Australian Integrated Marine Observing System (IMOS) in collaboration
-##' with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and 
-##' are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
-##' Australian Government through the National Collaborative Research Infrastructure
-##' Strategy and the Super Science Initiative. 
-NULL
-
-##' @name sese1
-##' @docType data
-##' @title Southern elephant seal Argos satellite data (1 individual)
+##' @title Southern elephant seal Argos satellite data (3 individuals)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
@@ -110,17 +96,6 @@ NULL
 ##' deployments at Scott Base, Antarctica and are publicly available (http:// imos.aodn.org.au).
 ##' IMOS is supported by the Australian Government through the National Collaborative 
 ##' Research Infrastructure Strategy and the Super Science Initiative. 
-NULL
-
-
-##' @name xm
-##' @docType data
-##' @title foieGras example mpm fit object
-##' @format .RData
-##' @keywords data
-##' @description Example foieGras mpm fit object. This example fit 
-##' is included purely to speed up examples where a fit object is required
-##' but fitting to data is not the focus of the example.
 NULL
 
 ##' @name res

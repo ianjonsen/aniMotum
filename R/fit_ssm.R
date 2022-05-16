@@ -110,7 +110,7 @@
 ##' @examples
 ##' ## fit crw model to Argos LS data
 ##' ## se = FALSE to speed up ex
-##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 48) 
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24) 
 ##' 
 ##' ## time series plots of fitted values and observations
 ##' plot(fit, what = "fitted", type = 1, ask = FALSE)

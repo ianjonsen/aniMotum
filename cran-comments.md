@@ -1,5 +1,7 @@
 ## Submission
-This update adds functionality to the package
+This is a resubmission, addressing issues identified by CRAN on initial submission:
+1. package tarball size reduced to 4.8 Mb
+2. invalid url in README.md updated
 
 ## Test environments
 * local macOS arm-64 (12.3.1), R 4.2.0, R 4.1.3
@@ -11,7 +13,6 @@ This update adds functionality to the package
 
 
 ## R CMD check results
-
 0 errors | 0 warnings | up to 2 notes, depending on platform
 
 NOTES:  

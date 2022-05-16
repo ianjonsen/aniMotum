@@ -3,7 +3,7 @@
 \docType{data}
 \name{sese}
 \alias{sese}
-\title{Southern elephant seal Argos satellite data (5 individuals)}
+\title{Southern elephant seal Argos satellite data (3 individuals)}
 \format{
 .RData
 }
