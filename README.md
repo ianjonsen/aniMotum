@@ -52,7 +52,7 @@ On PC’s running Windows, ensure you have installed
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
 
 On Mac’s, ensure you have installed the [Command Line Tools for
-Xcode](https://developer.apple.com/download/more/) by executing
+Xcode](https://developer.apple.com/download/all/) by executing
 `xcode-select --install` in the terminal; or you can download the latest
 version from the URL (free developer registration may be required). A
 full Xcode install uses up a lot of disk space and is not required.

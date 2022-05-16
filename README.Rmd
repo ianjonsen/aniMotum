@@ -84,7 +84,6 @@ map(fit,
 ```{r explots2, echo=FALSE, message=FALSE, fig.dim=c(9,5), out.width="100%"}
 m <- map(fit, 
          what = "predicted", 
-         normalise = TRUE,
          crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84",
          silent = TRUE)
 
