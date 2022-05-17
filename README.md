@@ -41,26 +41,40 @@ or higher):
 R.Version()
 ```
 
-#### From R-Universe
+### From R-Universe
 
-As of `v1.0-5`, `{foieGras}` is available via R-Universe. Moving
-forward, this is where the latest stable version can be found.
-Installation is simple:
+As of `v1.0-5`, `{foieGras}` is available via R-Universe. This is where
+the latest stable version can always be found. Installation is simple:
 
 ``` r
 # install from my R-universe repository
 install.packages("foieGras", 
-                 repos = "https://ianjonsen.r-universe.dev", 
-                 dependencies = c("Imports","LinkingTo","Suggests"))
+                 repos = "https://ianjonsen.r-universe.dev")
 ```
 
-The `dependencies` argument ensures that all packages used directly by
-`{foieGras}` are installed for full functionality, otherwise Suggested
-packages will not be installed and some `{foieGras}` features, such as
-path rerouting, will not be available.
+However, this will not install any of `{foieGras}`’s Suggested packages,
+which add extra functionality such as path re-routing around land. To
+ensure all Suggested packages, either from R-Universe or CRAN are also
+installed:
 
-You can add my R-Universe repo to your local list of repositories for
-package download in your `.Rprofile` to ensure `install.packages`
+``` r
+install.packages("foieGras", 
+                 repos = c("https://cloud.r-project.org",
+                           "https://ianjonsen.r-universe.dev"),
+                 dependencies = "Suggests")
+```
+
+`install.packages` will tell you that both a binary (CRAN, v0.7-6) and a
+source (R-Universe, v1.0-5) version exist but the source version is
+newer. Answer `Yes` to install the source version, provided you have the
+appropriate compiler tools available (See **From GitHub (source)**,
+below). Eventually, R-Universe will provide binary versions of the
+latest `{foieGras}` for your platform and compiling from source won’t be
+required.
+
+To avoid doing the above every time you want to re-install `{foieGras}`,
+you can add my R-Universe repo to your local list of repositories for
+package download in your `.Rprofile`. This ensure `install.packages`
 automatically grabs the latest version of `{foieGras}`
 
 ``` r
@@ -72,7 +86,7 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
                   CRAN = 'https://cloud.r-project.org'))
 ```
 
-#### From CRAN
+### From CRAN
 
 `{foieGras}` `v0.7-6` is on
 [CRAN](https://cran.r-project.org/package=foieGras/) and can be
@@ -81,7 +95,7 @@ or, more completely:
 `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`.
 {foieGras} `v1.0-5` might become available on CRAN.
 
-#### From GitHub (source)
+### From GitHub (source)
 
 To get the very latest but likely unstable `{foieGras}` version, you can
 install from GitHub.
@@ -107,8 +121,8 @@ Line Tools and/or Fortran compiler. If you encounter install and compile
 issues, you may find a solution in the excellent documentation here
 [glmmTMB](https://github.com/glmmTMB/glmmTMB). Alternatively, if you
 don’t care to have the very latest version then installing from
-R-Universe is the preferred apporach. R-Universe automatically builds
-binariy package versions for all common platforms, so you won’t have to
+R-Universe is the preferred approach. R-Universe automatically builds
+binary package versions for all common platforms, so you won’t have to
 worry about compiler software or issues!
 
 ## Usage
