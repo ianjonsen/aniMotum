@@ -59,6 +59,6 @@ s <- sticker(
   l_x = 0.94,
   l_y = 1.08,
   l_width = 2,
-  filename = "inst/logo/foieGras_logo.png"
+  filename = "man/figures/logo.png"
 )
 
