@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# foieGras <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='inst/logo/foieGras_logo.png' align="right" height="300" /></a>
+# foieGras <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
 
 #### fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 

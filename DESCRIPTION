@@ -69,5 +69,5 @@ VignetteBuilder: knitr
 Additional_repositories: https://jmlondon.r-universe.dev, https://ropensci.r-universe.dev
 Roxygen: list(markdown = TRUE)
 Remotes: 
-    jmlondon/pathroutr,
-    ropensci/rnaturalearthhires
+  jmlondon/pathroutr,
+  ropensci/rnaturalearthhires
