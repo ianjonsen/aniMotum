@@ -179,7 +179,8 @@
 <h3 id="simulate-tracks-from-an-ssm-fit-and-plot">Simulate tracks from an SSM fit and plot:<a class="anchor" aria-label="anchor" href="#simulate-tracks-from-an-ssm-fit-and-plot"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, 
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span>
+<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, 
                model<span class="op">=</span><span class="st">"crw"</span>, 
                time.step<span class="op">=</span><span class="fl">24</span>, 
                control<span class="op">=</span><span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
@@ -187,7 +188,7 @@
 <span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what<span class="op">=</span><span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="Track_simulation_files/figure-html/simfit%201-1.png" width="672"></p>
+<p><img src="images/track_simulation/st_1.jpg" style="width:95.0%"></p>
 <p>In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast Asia. We can further constrain the tracks to avoid land by adding a potential function (Brillinger et al. 2012) to the simulation that down-weights movements that cross onto land.</p>
 </div>
 <div class="section level3">
@@ -195,11 +196,11 @@
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/grad.rda"</span>, package <span class="op">=</span> <span class="st">"foieGras"</span><span class="op">)</span><span class="op">)</span>
-
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span>
 <span class="va">st.pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, grad<span class="op">=</span><span class="va">grad</span>, beta<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">350</span>,<span class="op">-</span><span class="fl">350</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.pf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="images/track_simulation/st_2.jpg" style="width:98.0%"> Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with <code>beta = c(-300,-300)</code>, the tracks do not all entirely avoid crossing land. One track (at upper right, crosses part of Indonesia); narrow penninsulas pose a particular difficulty for this method.</p>
+<p><img src="images/track_simulation/st_2.jpg" style="width:95.0%"> Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with <code>beta = c(-300,-300)</code>, the tracks do not all entirely avoid crossing land. Features such as narrow islands or peninsulas pose a particular difficulty for this method, and tracks are not always guaranteed to remain off land.</p>
 </div>
 <div class="section level3">
 <h3 id="simulate-central-place-foraging-tracks">Simulate central place foraging tracks<a class="anchor" aria-label="anchor" href="#simulate-central-place-foraging-tracks"></a>
@@ -210,7 +211,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="images/track_simulation/st_3.jpg" style="width:98.0%"></p>
-<p>Now the simulated tracks better approximate the SSM-estimated track in terms of total space used. The <code>cpf</code> argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the <code>cpf</code> argument.</p>
+<p>The <code>cpf</code> argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the <code>cpf</code> argument.</p>
 </div>
 </div>
 <div class="section level2">
@@ -257,10 +258,10 @@
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10. <a href="https://www.nature.com/articles/srep26677" class="external-link uri">https://www.nature.com/articles/srep26677</a></p>
-<p>Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. <a href="https://link.springer.com/chapter/10.1007/978-1-4614-1344-8_22" class="external-link uri">https://link.springer.com/chapter/10.1007/978-1-4614-1344-8_22</a></p>
-<p>Hazen et al. (2017) WhaleWatch: a dynamic management tool for predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428 <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2664.12820" class="external-link uri">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2664.12820</a></p>
-<p>Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of marine predators to protect Southern Ocean ecosystems. Nature. 580:87–92. <a href="https://www.nature.com/articles/s41586-020-2126-y" class="external-link uri">https://www.nature.com/articles/s41586-020-2126-y</a></p>
+<p>Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10.</p>
+<p>Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409.</p>
+<p>Hazen et al. (2017) WhaleWatch: a dynamic management tool for predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428.</p>
+<p>Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of marine predators to protect Southern Ocean ecosystems. Nature. 580:87–92.</p>
 </div>
   </div>
 

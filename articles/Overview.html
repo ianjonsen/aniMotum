@@ -126,8 +126,8 @@
 <li>a <em>Move Persistence</em> model, <code>mp</code>
 </li>
 </ul>
-<p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see <a href="https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7" class="external-link">Jonsen et al. 2020</a> for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
-<p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see <a href="https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566" class="external-link">Jonsen et al. 2019</a> for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See <a href="https://www.int-res.com/abstracts/meps/v565/p237-249/" class="external-link">Auger-Méthé et al. 2017</a> for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
+<p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see Jonsen et al. 2020 for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
+<p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see Jonsen et al. 2019 for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See (Auger-Méthé et al. 2017) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -180,20 +180,20 @@
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-05-17 15:42:23 GL 100.0 -55 0.30558025 1.1585277</span>
-<span class="co">#&gt; 2 54632 2022-05-18 03:42:23 GL 100.5 -54 0.08379575 2.2579898</span>
-<span class="co">#&gt; 3 54632 2022-05-18 15:42:23 GL 101.0 -53 0.03638664 0.2027386</span>
-<span class="co">#&gt; 4 54632 2022-05-19 03:42:23 GL 101.5 -52 0.01371568 1.8258454</span>
-<span class="co">#&gt; 5 54632 2022-05-19 15:42:23 GL 102.0 -51 0.51669924 0.2719852</span></code></pre>
+<span class="co">#&gt; 1 54632 2022-05-17 17:21:29 GL 100.0 -55 0.15537360 1.1543057</span>
+<span class="co">#&gt; 2 54632 2022-05-18 05:21:29 GL 100.5 -54 0.74751505 3.5964043</span>
+<span class="co">#&gt; 3 54632 2022-05-18 17:21:29 GL 101.0 -53 0.06912755 0.7019589</span>
+<span class="co">#&gt; 4 54632 2022-05-19 05:21:29 GL 101.5 -52 0.47163300 1.3137060</span>
+<span class="co">#&gt; 5 54632 2022-05-19 17:21:29 GL 102.0 -51 0.02623822 0.2911973</span></code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
 </ol>
 <pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-05-17 15:42:23  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-05-17 16:42:23  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-05-17 17:42:23  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-05-17 18:42:23  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-05-17 19:42:23  G 72.1 -45.2</span></code></pre>
+<span class="co">#&gt; 1 F02-B-17 2022-05-17 17:21:29  G 70.1 -49.2</span>
+<span class="co">#&gt; 2 F02-B-17 2022-05-17 18:21:29  G 70.6 -48.2</span>
+<span class="co">#&gt; 3 F02-B-17 2022-05-17 19:21:29  G 71.1 -47.2</span>
+<span class="co">#&gt; 4 F02-B-17 2022-05-17 20:21:29  G 71.6 -46.2</span>
+<span class="co">#&gt; 5 F02-B-17 2022-05-17 21:21:29  G 72.1 -45.2</span></code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
 </ol>
@@ -317,6 +317,13 @@
 <p><img src="Overview_files/figure-html/fit%20plot-4.png" width="672"></p>
 <p>The predicted values (red points) are the state estimates predicted at regular time intervals, specified by <code>time.step</code> (here a 24 h interval). These estimates are plotted on top of 2 x SE intervals (red-filled ribbon), and the observations that passed the <code>prefilter</code> stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - <code>plot(fit)</code>. A 2-D time series plot of the track is invoked by the argument <code>type = 2</code>, and includes the 95 % confidence ellipses (red-filled ellipses) around the predicted locations.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Auger-Méthé M, Albertsen CM, Jonsen ID, Derocher AE, Lidgard DC, Studholme KR, Bowen WD, Crossin GT, Flemming JM (2017) Spatiotemporal modelling of marine movement data using Template Model Builder (TMB). Marine Ecology Progress Series 565:237-249.</p>
+<p>Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M. Harcourt R, Hindel MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effect model. Ecoloogy 100:e02566.</p>
+<p>Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindel MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. Movement Ecology 8:31.</p>
 </div>
   </div>
 
