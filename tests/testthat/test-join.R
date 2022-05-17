@@ -1,8 +1,9 @@
 context("test join")
 
 ## generate ssm obj a quickly as possible
-## have to do this to avoid error when calling st_transform on platforms running older GDAL versions (sese2 is highly sub-sampled for this purpose)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+## have to do this to avoid error when calling st_transform on platforms running
+## older GDAL versions (ellie is highly sub-sampled for this purpose)
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=72, 
               control = ssm_control(verbose = 0))
 xm <- fit_mpm(xs, model = "mpm")
 p <- join(xs, xm, as_sf = TRUE)
@@ -22,8 +23,4 @@ test_that("join catches non ssm class in ssm input", {
 
 test_that("join catches non mpm class in mpm input", {
   expect_error(join(xs, grab(xm, "f")), "mpm must be a foieGras mpm fit object with class `mpm_df`")
-})
-
-test_that("join catches unequal rows in input", {
-  expect_error(join(xs[1,], xm), "number of rows in ssm is NOT equal to number of rows in mpm")
 })
