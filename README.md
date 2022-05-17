@@ -7,6 +7,8 @@
 
 <!-- badges: start -->
 
+[![foieGras status
+badge](https://ianjonsen.r-universe.dev/badges/foieGras)](https://ianjonsen.r-universe.dev)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/foieGras)](https://cran.r-project.org/package=foieGras/)
 [![CRAN_Downloads](https://cranlogs.r-pkg.org/badges/grand-total/foieGras?color=brightgreen)](https://cran.r-project.org/package=foieGras/)
 [![Coverage
@@ -15,10 +17,10 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
 
-`foieGras` is an R package that fits continuous-time models in
+{foieGras} is an R package that fits continuous-time models in
 state-space form to filter error-prone animal movement data obtained via
 the Argos satellite system, and to estimate changes in movement
-behaviour. Template Model Builder (`TMB`) is used for fast estimation.
+behaviour. Template Model Builder {TMB} is used for fast estimation.
 Argos data can be either (older) Least Squares-based locations, (newer)
 Kalman Filter-based locations with error ellipse information, or a
 mixture of the two. The state-space models estimate two sets of location
@@ -39,14 +41,50 @@ or higher):
 R.Version()
 ```
 
+#### From R-Universe
+
+As of `v1.0-5`, `{foieGras}` is available via R-Universe. Moving
+forward, this is where the latest stable version can be found.
+Installation is simple:
+
+``` r
+# install from my R-universe repository
+install.packages("foieGras", 
+                 repos = "https://ianjonsen.r-universe.dev", 
+                 dependencies = c("Imports","LinkingTo","Suggests"))
+```
+
+The `dependencies` argument ensures that all packages used directly by
+`{foieGras}` are installed for full functionality, otherwise Suggested
+packages will not be installed and some `{foieGras}` features, such as
+path rerouting, will not be available.
+
+You can add my R-Universe repo to your local list of repositories for
+package download in your `.Rprofile` to ensure `install.packages`
+automatically grabs the latest version of `{foieGras}`
+
+``` r
+#install.packages("usethis")
+usethis::edit_r_profile()
+
+# add the following text or replace existing repos option
+options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
+                  CRAN = 'https://cloud.r-project.org'))
+```
+
 #### From CRAN
 
-`foieGras` is on [CRAN](https://cran.r-project.org/package=foieGras/)
-and can be downloaded within `R`, in the usual way
-`install.packages("foieGras")` or, more completely:
-`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`
+`{foieGras}` `v0.7-6` is on
+[CRAN](https://cran.r-project.org/package=foieGras/) and can be
+downloaded within `R`, in the usual way `install.packages("foieGras")`
+or, more completely:
+`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`.
+{foieGras} `v1.0-5` might become available on CRAN.
 
 #### From GitHub (source)
+
+To get the very latest but likely unstable `{foieGras}` version, you can
+install from GitHub.
 
 On PC’s running Windows, ensure you have installed
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
@@ -59,29 +97,25 @@ full Xcode install uses up a lot of disk space and is not required.
 Also, ensure you have a suitable Gnu Fortran compiler installed (e.g.,
 <https://github.com/fxcoudert/gfortran-for-macOS/releases>).
 
-To get the very latest `foieGras` version, you can install from GitHub:
-
 ``` r
 remotes::install_github("ianjonsen/foieGras@staging")
-```
-
-Or, for a more stable version:
-
-``` r
-remotes::install_github("ianjonsen/foieGras")
 ```
 
 Note: there can be issues getting compilers to work properly, especially
 on M1 Macs. Often, this is due to missing or incorrect Xcode Command
 Line Tools and/or Fortran compiler. If you encounter install and compile
 issues, you may find a solution in the excellent documentation here
-[glmmTMB](https://github.com/glmmTMB/glmmTMB).
+[glmmTMB](https://github.com/glmmTMB/glmmTMB). Alternatively, if you
+don’t care to have the very latest version then installing from
+R-Universe is the preferred apporach. R-Universe automatically builds
+binariy package versions for all common platforms, so you won’t have to
+worry about compiler software or issues!
 
 ## Usage
 
-`foieGras` is intended to be as easy to use as possible. Here’s a simple
-example showing how to fit a move persistence model to Argos tracking
-data and visualise the result:
+`{foieGras}` is intended to be as easy to use as possible. Here’s a
+simple example showing how to fit a move persistence model to Argos
+tracking data and visualise the result:
 
 ``` r
 library(foieGras)
@@ -116,16 +150,16 @@ Bruxelles)
 ## What to do if you encounter a problem
 
 If you are convinced you have encountered a bug or
-unexpected/inconsistent behaviour when using foieGras, you can post an
-issue [here](https://github.com/ianjonsen/foieGras/issues). First, have
-a read through the posted issues to see if others have encountered the
-same problem and whether a solution has been offered. You can reply to
-an existing issue if you have the same problem and have more details to
-share or you can submit a new issue. To submit an issue, you will need
-to *clearly* describe the unexpected behaviour, include a reproducible
-example with a small dataset, clearly describe what you expected to
-happen (but didn’t), and (ideally) post a few screenshots/images that
-nicely illustrate the problem.
+unexpected/inconsistent behaviour when using `{foieGras}`, you can post
+an issue [here](https://github.com/ianjonsen/foieGras/issues). First,
+have a read through the posted issues to see if others have encountered
+the same problem and whether a solution has been offered. You can reply
+to an existing issue if you have the same problem and have more details
+to share or you can submit a new issue. To submit an issue, you will
+need to *clearly* describe the unexpected behaviour, include a
+reproducible example with a small dataset, clearly describe what you
+expected to happen (but didn’t), and (ideally) post a few
+screenshots/images that nicely illustrate the problem.
 
 ## How to Contribute
 
