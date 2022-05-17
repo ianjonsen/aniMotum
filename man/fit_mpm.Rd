@@ -59,8 +59,7 @@ temporally regular or irregular location data
 }
 \examples{
 ## fit jmpm to two southern elephant seal tracks
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(verbose = 0))
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 
 fmpm <- fit_mpm(xs, model = "jmpm")
 

@@ -142,12 +142,6 @@ ellp.par <- function(lc) {
 ##' tr <- sim(N = 200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 ##' plot(tr, error = TRUE)
 ##' 
-##' tr <- sim(N = 200, model = "rw", sigma = c(4,4,0.5,0.5), error = "ls", tdist = "reg")
-##' plot(tr)
-##' 
-##' tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
-##' plot(tr)
-##' 
 ##' tr <- sim(N = 200, model = "mp", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
 ##' tdist = "gamma", tpar = 1.5)
 ##' plot(tr, error = TRUE, pal = "Cividis")

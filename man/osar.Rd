@@ -32,11 +32,9 @@ processor cores available.
 }
 \examples{
 # generate a ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(verbose = 0))
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, control = ssm_control(verbose = 0))
 
-# just use one individual to save time
-dres <- osar(xs[2,])
+res <- osar(xs)
 
 }
 \references{

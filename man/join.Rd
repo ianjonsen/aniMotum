@@ -40,8 +40,8 @@ a single tbl with all individuals
 \examples{
 ## load example foieGras fit objects (to save time)
 ## generate a ssm fit object
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72)
-xm <- fit_mpm(xs, what = "p", model = "jmpm")
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, control = ssm_control(verbose = 0))
+xm <- fit_mpm(xs, what = "p", model = "mpm")
 
 ## join predicted values as an un-projected tibble
 xsm <- join(xs, xm)

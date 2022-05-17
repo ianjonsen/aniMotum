@@ -33,8 +33,7 @@
 ##'
 ##' @examples
 ##' ## generate an ssm fit object
-##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(verbose = 0))
+##' xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, control = ssm_control(verbose = 0))
 ##' 
 ##' ## grab predicted values as an un-projected tibble
 ##' preds <- grab(xs, what = "predicted")

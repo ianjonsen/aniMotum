@@ -67,16 +67,10 @@ visualize fits from an ssm object
 }
 \examples{
 ## generate a ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(verbose = 0))
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 
-# plot fitted locations as 1-D timeseries
-plot(xs, what = "f")
-
-# all on 1 page
+# plot fitted locations as 1-D timeseries on 1 page
 plot(xs, what = "f", pages = 1)
 
-# plot predicted locations as 2-D tracks
-plot(xs, what = "p", type = 2, pages = 1, ncol = 2)
 
 }
