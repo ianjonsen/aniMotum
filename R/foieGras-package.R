@@ -15,10 +15,10 @@
 ##' @seealso Useful Links:
 ##' * [https://ianjonsen.github.io/foieGras/](https://ianjonsen.github.io/foieGras/)
 ##' * [https://github.com/ianjonsen/foieGras/](https://github.com/ianjonsen/foieGras/)
-##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues](https://github.com/ianjonsen/foieGras/issues)
+##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues/](https://github.com/ianjonsen/foieGras/issues/)
 ##' 
-##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 [https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-020-00217-7)
-##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 [https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566](https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.2566)
+##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31.
+##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 ##'
 ##' @keywords foieGras
 ##' @importFrom utils data flush.console globalVariables
