@@ -129,7 +129,7 @@ fit <- fit_ssm(sese,
 plot(fit, type = 3, pages = 1, ncol = 2)
 ```
 
-![](man/figures/README-example1-1.png)<!-- -->
+<img src="man/figures/README-example1-1.png" width="100%" />
 
 ``` r
 map(fit, 

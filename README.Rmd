@@ -79,7 +79,7 @@ Note: there can be issues getting compilers to work properly, especially on M1 M
 
 ## Usage
 `{foieGras}` is intended to be as easy to use as possible. Here's a simple example showing how to fit a move persistence model to Argos tracking data and visualise the result:
-```{r example1, message=FALSE}
+```{r example1, message=FALSE, fig.dim=c(9,4), out.width="100%"}
 library(foieGras)
 
 fit <- fit_ssm(sese, 
