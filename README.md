@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# foieGras <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
+# {foieGras} <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
 
 #### fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
@@ -17,7 +17,7 @@ status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)]
 ![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
 
-{foieGras} is an R package that fits continuous-time models in
+`{foieGras}` is an R package that fits continuous-time models in
 state-space form to filter error-prone animal movement data obtained via
 the Argos satellite system, and to estimate changes in movement
 behaviour. Template Model Builder {TMB} is used for fast estimation.
@@ -152,8 +152,9 @@ map(fit,
     crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
 
-<img src="man/figures/README-explots2-1.png" width="100%" /> Southern
-elephant seal silhouettes kindly provided by:  
+<img src="man/figures/README-explots2-1.png" width="100%" />
+
+Southern elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke
 ([@SophiaVolzke](https://twitter.com/SophiaVolzke), University of
 Tasmania)  

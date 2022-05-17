@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 
 
-# foieGras <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
+# {foieGras} <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
 
 ####  fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 
 
-{foieGras} is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS. 
+`{foieGras}` is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS. 
 
 ## Installation 
 First, ensure you have R version >= 3.6.0 installed (preferably R 4.1.0 or higher):
@@ -119,6 +119,7 @@ ggdraw() +
   draw_image("inst/logo/img/sese_female_orig.png",  x=0.172, y=0.87, scale=0.175, hjust=0.5, vjust=0.5) +
   draw_image("inst/logo/img/sese_male_orig.png",  x=0.85, y=0.35, scale=0.25, hjust=0.5, vjust=0.5)
 ```
+
 Southern elephant seal silhouettes kindly provided by:  
 - female southern elephant seal, Sophia Volzke ([@SophiaVolzke](https://twitter.com/SophiaVolzke), University of Tasmania)  
 - male southern elephant seal, Anton Van de Putte ([@AntonArctica](https://twitter.com/Antonarctica), Université Libre de Bruxelles)  
