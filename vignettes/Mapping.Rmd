@@ -42,11 +42,12 @@ map(fit, what = "predicted", map_type = "cartodark", zoom = 4, progress = "none"
 
 #### Control track components
 We can add and remove certain track components by using the `aes` argument and `aes_lst()` function. Here, the observed locations (orange triangles) and track lines have been turned on and the move persistence index has been turned off.
-```{r map 2, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
+```{r map 2, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=4}
 my.aes <- aes_lst(obs=TRUE, line=TRUE, mp=FALSE)
 
 map(fit, what = "p", aes = my.aes)
 ```
+![](images/mapping/map_2.jpg){width=95%}
 
 Note that when turning off the move persistence index, tracks are automatically given unique colours. This can be turned off by using `by.id = FALSE`. 
 
