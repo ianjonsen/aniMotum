@@ -100,14 +100,14 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="foiegras-">foieGras <a href="https://ianjonsen.github.io/foieGras/index.html"><img src="reference/figures/logo.png" align="right" height="250"></a>
+<div class="page-header"><h1 id="foiegras-">{foieGras} <a href="https://ianjonsen.github.io/foieGras/index.html"><img src="reference/figures/logo.png" align="right" height="250"></a>
 <a class="anchor" aria-label="anchor" href="#foiegras-"></a>
 </h1></div>
 <div class="section level4">
 <h4 id="fit-latent-variable-movement-models-to-animal-tracking-data-for-location-quality-control-and-behavioural-inference">fit latent variable movement models to animal tracking data for location quality control and behavioural inference<a class="anchor" aria-label="anchor" href="#fit-latent-variable-movement-models-to-animal-tracking-data-for-location-quality-control-and-behavioural-inference"></a>
 </h4>
 <!-- badges: start -->
-<p>{foieGras} is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS.</p>
+<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -175,7 +175,8 @@
     what <span class="op">=</span> <span class="st">"predicted"</span>, 
     normalise <span class="op">=</span> <span class="cn">TRUE</span>,
     crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=68 +units=km +datum=WGS84"</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-explots2-1.png" width="100%"> Southern elephant seal silhouettes kindly provided by:<br>
+<p><img src="reference/figures/README-explots2-1.png" width="100%"></p>
+<p>Southern elephant seal silhouettes kindly provided by:<br>
 - female southern elephant seal, Sophia Volzke (<a href="https://twitter.com/SophiaVolzke" class="external-link">@SophiaVolzke</a>, University of Tasmania)<br>
 - male southern elephant seal, Anton Van de Putte (<a href="https://twitter.com/Antonarctica" class="external-link">@AntonArctica</a>, Université Libre de Bruxelles)</p>
 </div>
