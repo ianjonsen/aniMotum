@@ -134,9 +134,8 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>obs<span class="op">=</span><span class="cn">TRUE</span>, line<span class="op">=</span><span class="cn">TRUE</span>, mp<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, aes <span class="op">=</span> <span class="va">my.aes</span><span class="op">)</span>
-<span class="co">#&gt; using map scale: 10</span></code></pre></div>
-<p><img src="Mapping_files/figure-html/map%202-1.png" width="672"></p>
+<span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, aes <span class="op">=</span> <span class="va">my.aes</span><span class="op">)</span></code></pre></div>
+<p><img src="images/mapping/map_2.jpg" style="width:95.0%"></p>
 <p>Note that when turning off the move persistence index, tracks are automatically given unique colours. This can be turned off by using <code>by.id = FALSE</code>.</p>
 <p>Additional control over mapping aesthetics can be gained by viewing and editing the <code>my.aes$df</code> data.frame created by <code><a href="../reference/aes_lst.html">aes_lst()</a></code>. We can subset components and assign new values as needed, here we change the observation colour and shape from orange triangles to firebrick diamonds. We also set <code>by.id = FALSE</code> so all tracks are displayed in a unique colour (default is “dodgerblue”).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
