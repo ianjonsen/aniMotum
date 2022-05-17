@@ -1,7 +1,8 @@
 ## Submission  
-This is a 3rd resubmission, addressing issues identified by CRAN automated checks:  
-1. examples and tests have been streamlined to speed up pkg checks
-2. I have changed my email address in DESCRIPTION to avoid apparent enterprise email security corruption of urls linked to my work address
+This is a 4th resubmission, addressing issues identified by CRAN automated checks:  
+1. examples and tests have been further streamlined to speed up pkg checks.
+2. I have dropped all urls (incorrectly) indicated as possibly invalid by your checks.
+3. package tarball size has been reduced to 4.6 Mb.
 
 ## Test environments  
 * local macOS arm-64 (12.3.1), R 4.2.0, R 4.1.3

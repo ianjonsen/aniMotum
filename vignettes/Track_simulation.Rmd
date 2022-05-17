@@ -76,7 +76,8 @@ The `rw` (red) and `crw` (orange) SSM's yield similar, reasonable fits to the RW
 The `simfit` function is rather different, taking a `foieGras` SSM fit object (class `ssm_df`) and simulating replicate tracks by using the movement parameter estimates from the fitted model. Currently, tracks can be simulated from `rw` and `crw` SSM model fits. Tracks can be simulated from either the observation times (`what = "fitted"`) or the prediction times (`what = "predicted"`) and, thus, are constrained to have the same number of locations. The simulated tracks are otherwise unconstrained and should *not* be considered as resampled tracks suitable for exploring uncertainty in the SSM-estimated track. They are useful for habitat usage modelling, to represent habitat that is potentially available to a collection of tracked individuals (e.g., Hindell et al. 2020). 
 
 ### Simulate tracks from an SSM fit and plot:
-```{r simfit 1, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+```{r simfit 1b, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+set.seed(pi)
 fit <- fit_ssm(sese2, 
                model="crw", 
                time.step=24, 
@@ -86,19 +87,20 @@ st <- simfit(fit[2,], what="predicted", reps=5)
 
 plot(st, zoom=TRUE)
 ```
+![](images/track_simulation/st_1.jpg){width=95%}
 
 In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast Asia. We can further constrain the tracks to avoid land by adding a potential function (Brillinger et al. 2012) to the simulation that down-weights movements that cross onto land. 
 
 ### Simulate tracks with a potential function to help avoid land:
 ```{r simfit potential fn, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 load(system.file("extdata/grad.rda", package = "foieGras"))
-
+set.seed(pi)
 st.pf <- simfit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-350,-350))
 
 plot(st.pf, zoom=TRUE)
 ```
-![](images/track_simulation/st_2.jpg){width=98%}
-Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with `beta = c(-300,-300)`, the tracks do not all entirely avoid crossing land. One track (at upper right, crosses part of Indonesia); narrow penninsulas pose a particular difficulty for this method.
+![](images/track_simulation/st_2.jpg){width=95%}
+Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with `beta = c(-300,-300)`, the tracks do not all entirely avoid crossing land. Features such as narrow islands or peninsulas pose a particular difficulty for this method, and tracks are not always guaranteed to remain off land.
 
 ### Simulate central place foraging tracks
 The SSM-estimated track in the above example implies a central place foraging strategy, where the southern elephant seal departs from its breeding colony on Iles Kerguelen for an extended period of time and eventually returns. The simulated tracks do not reflect this strategy because the `crw` SSM fitted to the data does not have long-term memory or any other mechanism that could mimic the return portion of the foraging trip. We can, however, constrain the simulated tracks to return to their origin by applying a simple Brownian Bridge using the `cpf` argument:
@@ -109,7 +111,7 @@ plot(st.cpf, zoom=TRUE)
 ```
 ![](images/track_simulation/st_3.jpg){width=98%}
 
-Now the simulated tracks better approximate the SSM-estimated track in terms of total space used. The `cpf` argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the `cpf` argument.
+The `cpf` argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the `cpf` argument.
 
 ## `sim_filter()`
 When simulating a large number of replicate tracks using `simfit`, some portion of the simulations may reflect unrealistic movement patterns due to the relatively unconstrained nature of the simulation. A simple approach for identifying and removing less realistic simulated tracks is to use a similarity filter (e.g., Hazen et al. 2017). The `sim_filter` function can calculate two related similarity functions, based on a comparison of the geodesic distances and bearings from the start and end locations of the SSM fitted track and each of the simulated tracks. Simulated tracks can be discarded by defining a threshold quantile via the `keep` argument.
@@ -165,10 +167,10 @@ if(requireNamespace("pathroutr", quietly = TRUE)) {
 In more severe cases, tracks first could be simulated using potential functions, filtered, and then any remaining segments re-routed from land.
 
 ## References
-Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10. https://www.nature.com/articles/srep26677
+Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10.
 
-Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409. https://link.springer.com/chapter/10.1007/978-1-4614-1344-8_22
+Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409.
 
-Hazen et al. (2017) WhaleWatch: a dynamic management tool for predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428 https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2664.12820
+Hazen et al. (2017) WhaleWatch: a dynamic management tool for predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428.
 
-Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of marine predators to protect Southern Ocean ecosystems. Nature. 580:87–92. https://www.nature.com/articles/s41586-020-2126-y
+Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of marine predators to protect Southern Ocean ecosystems. Nature. 580:87–92.

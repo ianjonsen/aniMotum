@@ -103,7 +103,3 @@ map(fit,
     crs = "+proj=stere +lon_0=68 +datum=WGS84 +units=km")
 ```
 ![](images/mapping/map_7.jpg){width=95%}
-
-
-
-
