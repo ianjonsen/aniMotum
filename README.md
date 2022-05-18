@@ -68,13 +68,11 @@ install.packages("foieGras",
 source (R-Universe, v1.0-5) version exist but the source version is
 newer. Answer `Yes` to install the source version, provided you have the
 appropriate compiler tools available (See **From GitHub (source)**,
-below). Eventually, R-Universe will provide binary versions of the
-latest `{foieGras}` for your platform and compiling from source won’t be
-required.
+below).
 
 To avoid doing the above every time you want to re-install `{foieGras}`,
 you can add my R-Universe repo to your local list of repositories for
-package download in your `.Rprofile`. This ensure `install.packages`
+package download in your `.Rprofile`. This ensures `install.packages`
 automatically grabs the latest version of `{foieGras}`
 
 ``` r
@@ -86,6 +84,26 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
                   CRAN = 'https://cloud.r-project.org'))
 ```
 
+If you don’t want to install compiler tools or have trouble getting them
+to work then you can manually download a binary version of the
+`{foieGras}` package for Windows or Mac from here
+<https://ianjonsen.r-universe.dev/ui#builds> - click the Windows/Mac
+icons (either R 4.2 or 4.1) on the table line corresponding to
+`{foieGras}`, and choose the appropriate `-release` version from the
+bottom of the page. In R, use the following command to install from the
+file you’ve just downloaded (where `path_to_file` is wherever you saved
+the download:
+
+``` r
+# for Windows
+install.packages("path_to_file\package-windows-release\foieGras_1.0-5.zip", 
+                 repos=NULL, type="binary")
+
+# for Mac
+install.packages("path_to_file/package-macos-release/foieGras_1.0-5.tgz", 
+                 repos=NULL, type="binary")
+```
+
 ### From CRAN
 
 `{foieGras}` `v0.7-6` is on
@@ -93,7 +111,7 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 downloaded within `R`, in the usual way `install.packages("foieGras")`
 or, more completely:
 `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`.
-{foieGras} `v1.0-5` might become available on CRAN.
+{foieGras} `v1.0-5` probably won’t become available on CRAN.
 
 ### From GitHub (source)
 
