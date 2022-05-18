@@ -22,7 +22,7 @@
 ^foieGras\_logo\.png$
 ^rosm\.cache$
 ^for_remotes\.R$
-
+^misc$
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
