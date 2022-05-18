@@ -4,11 +4,12 @@ context("test osar")
 ## have to do this to avoid error when calling st_transform on platforms running
 ## older GDAL versions (ellie is highly sub-sampled for this purpose)
 
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=72, 
+              control = ssm_control(se = FALSE, verbose = 0))
+res <- osar(xs)
+
 test_that("r has s3 classes `osar`, `tbl_df`, `tbl`, `data.frame`", {
   skip_on_cran()
-  xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=72, 
-                control = ssm_control(se = FALSE, verbose = 0))
-  res <- osar(xs)
   expect_s3_class(res, c("osar","tbl_df","tbl","data.frame"))
 })
 
