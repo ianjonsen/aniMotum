@@ -30,20 +30,22 @@ a user specified quantile.
 }
 \examples{
 ## fit crw model to Argos LS data
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
+fit <- fit_ssm(ellie, model = "crw", time.step = 72)
 
-## generate 10 simulated paths from ssm fit
-trs <- simfit(fit, what = "predicted", reps = 10)
+set.seed(pi)
+## generate 5 simulated paths from ssm fit
+trs <- simfit(fit, what = "predicted", reps = 5)
 
-## filter simulations and keep paths in top 25\% of flag values
-trs_f <- sim_filter(trs, keep = .33, flag = 2)
+## filter simulations and keep paths in top 40\% of flag values
+trs_f <- sim_filter(trs, keep = 0.4, flag = 2)
 
 ## compare unfiltered and filtered simulated paths
+\donttest{
 plot(trs) | plot(trs_f)
+}
 
 }
 \references{
 Hazen et al. (2017) WhaleWatch: a dynamic management tool for
 predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
-\url{https://doi.org/10.1111/1365-2664.12820}
 }

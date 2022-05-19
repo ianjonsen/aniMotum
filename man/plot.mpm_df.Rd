@@ -55,8 +55,7 @@ visualize fits from an mpm object
 \examples{
 
 # generate a ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-control = ssm_control(verbose = 0))
+xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 
 # fit mpm to ssm fits
 xm <- fit_mpm(xs, model = "jmpm")
@@ -64,7 +63,5 @@ xm <- fit_mpm(xs, model = "jmpm")
 # plot 1-D mp timeseries on 1 page
 plot(xm, pages = 1)
 
-# plot 2-D track plots coloured by mp estimates
-plot(xm, xs, pages = 1, ncol = 2) 
 
 }

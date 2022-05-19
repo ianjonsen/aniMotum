@@ -35,7 +35,7 @@ distance is a constant 50000 m.}
 \item{append}{should re-routed locations be appended to the \code{ssm}
 (ssm fit) object (default = TRUE), or returned as a tibble.}
 
-\item{...}{additional arguments passed to \link[pathroutr:prt_visgraph]{pathroutr::prt_visgraph}}
+\item{...}{additional arguments passed to pathroutr::prt_visgraph}
 }
 \description{
 A wrapper function that uses the \code{pathroutr} package
@@ -70,15 +70,15 @@ package directly by first exctracting foieGras-estimated locations with
 obtained independently.
 }
 \examples{
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
-fit <- route_path(fit, what = "predicted")
-grab(fit, what = "rerouted")
-
-trs <- simfit(fit, what = "predicted", reps = 5)
-rrt_sims <- route_path(trs)
+# if 'pathroutr' is installed then ok to use route_path()
+if(requireNamespace("pathroutr", quietly = TRUE)) {
+  fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+  fit <- route_path(fit, what = "predicted")
+  grab(fit, what = "rerouted")
+}
 
 }
 \references{
 Josh M. London. (2020) pathroutr: An R Package for (Re-)Routing Paths Around
-Barriers (Version v0.2.1) \url{https://doi.org/10.5281/zenodo.4321827}
+Barriers (Version v0.2.1) \url{https://zenodo.org/record/5522909#.YnPxEy_b1qs}
 }

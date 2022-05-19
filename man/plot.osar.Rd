@@ -40,10 +40,11 @@ plot \strong{One-Step-Ahead (prediction) residuals} from a
 }
 \examples{
 ## generate a fG_ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, 
 control = ssm_control(se = FALSE, verbose = 0))
 
-dres <- osar(xs[2, ]) # only use one seal to save time
-plot(dres, type = "qq")
+res <- osar(xs) 
+
+plot(res, type = "qq")
 
 }

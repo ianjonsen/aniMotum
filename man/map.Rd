@@ -15,7 +15,7 @@ map(
   ext.rng = c(0.05, 0.05),
   buffer = 10000,
   map_type = "default",
-  normalise = FALSE,
+  normalise = TRUE,
   group = FALSE,
   silent = FALSE,
   ...
@@ -54,8 +54,8 @@ polygons (default = 10000). If map extents are expanded by many factors then
 the buffer distance may need to be increased, otherwise this should not be
 used. Ignored if \code{map_type != "default"}.}
 
-\item{map_type}{background map type ("default" uses \link{rnaturalearth}
-to add land masses). If the \code{rnaturalearthdata} package is installed then
+\item{map_type}{background map type ("default" uses \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries}
+to add land polygons). If the \code{rnaturalearthdata} package is installed then
 high-resolution land polygons will be used. If the \code{ggspatial}
 and \code{rosm} packages are installed then any tile map type returned by
 \link[rosm:osm.types]{rosm::osm.types} can be used for a potentially more detailed coastline at
@@ -64,7 +64,7 @@ fine spatial scales, given appropriate zoom settings
 
 \item{normalise}{logical; if output includes a move persistence estimate,
 should g (the move persistence index) be normalised to have minimum = 0 and
-maximum = 1 (default = FALSE).}
+maximum = 1 (default = TRUE).}
 
 \item{group}{logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move
@@ -84,17 +84,10 @@ coastline and projection options
 \examples{
 # create an ssm fit object
 
-fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
+fit <- fit_ssm(ellie, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 
 # render default map
 
 map(fit, what = "p")
-
-# map with estimated track line & observed Argos locations via aes_lst(),
-#   using a polar stereographic projection centered
-#   on approximate track midpoint, extend x,y limits by 10\%
-
-map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
-crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 
 }

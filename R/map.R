@@ -26,8 +26,8 @@
 ##' polygons (default = 10000). If map extents are expanded by many factors then
 ##' the buffer distance may need to be increased, otherwise this should not be
 ##' used. Ignored if `map_type != "default"`.
-##' @param map_type background map type ("default" uses [rnaturalearth] 
-##' to add land masses). If the `rnaturalearthdata` package is installed then 
+##' @param map_type background map type ("default" uses [rnaturalearth::ne_countries] 
+##' to add land polygons). If the `rnaturalearthdata` package is installed then 
 ##' high-resolution land polygons will be used. If the `ggspatial`
 ##' and `rosm` packages are installed then any tile map type returned by 
 ##' [rosm::osm.types] can be used for a potentially more detailed coastline at 
@@ -35,7 +35,7 @@
 ##' (see [ggspatial::annotation_map_tile] for details).
 ##' @param normalise logical; if output includes a move persistence estimate, 
 ##' should g (the move persistence index) be normalised to have minimum = 0 and 
-##' maximum = 1 (default = FALSE). 
+##' maximum = 1 (default = TRUE). 
 ##' @param group logical; should g be normalised among individuals as a group, 
 ##' a 'relative g', or separately to highlight regions of lowest and highest move
 ##' persistence along a track (default = FALSE).
@@ -48,7 +48,7 @@
 ##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom ggplot2 element_line coord_sf
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer 
+##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer st_make_valid
 ##' @importFrom sf st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
 ##' @importFrom utils data
 ##' @importFrom grDevices extendrange grey
@@ -58,18 +58,11 @@
 ##' @examples 
 ##' # create an ssm fit object
 ##' 
-##' fit <- fit_ssm(sese1, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
+##' fit <- fit_ssm(ellie, model = "rw", time.step = 24, control = ssm_control(verbose = 0))
 ##' 
 ##' # render default map
 ##' 
 ##' map(fit, what = "p")
-##' 
-##' # map with estimated track line & observed Argos locations via aes_lst(),
-##' #   using a polar stereographic projection centered
-##' #   on approximate track midpoint, extend x,y limits by 10%
-##' 
-##' map(fit, what = "p", aes = aes_lst(line=TRUE, obs=TRUE), 
-##' crs = "+proj=stere +lon_0=90 +units=km +datum=WGS84", ext.rng = c(0.1,0.1))
 ##' 
 ##' @export
 ##' @md
@@ -84,7 +77,7 @@ map <- function(x,
                 ext.rng = c(0.05, 0.05),
                 buffer = 10000, 
                 map_type = "default",
-                normalise = FALSE,
+                normalise = TRUE,
                 group = FALSE,
                 silent = FALSE,
                 ...) {
@@ -157,6 +150,7 @@ map <- function(x,
     conf_sf$id <- unique(loc_sf$id)
     ## dissolve individual polygons where they overlap one another
     conf_sf <- st_union(conf_sf, by_feature = TRUE)
+    conf_sf <- st_make_valid(conf_sf)
   } else {
     conf_sf <- NULL
   }

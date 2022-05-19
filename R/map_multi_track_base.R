@@ -61,16 +61,18 @@ map_multi_track_base <- function(map_type,
       with(loc_sf, pretty(seq(min(date), max(date), l = 10), n = 5)) %>% as.Date()
   }
   
+  prj <- st_crs(loc_sf)
+  
   ## get worldmap
   if (map_type == "default") {
     if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
       wm <- ne_countries(scale = 10, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf)) %>%
+        st_transform(crs = prj) %>%
         st_make_valid()
       if(!silent) cat("using map scale: 10\n")
     } else {
       wm <- ne_countries(scale = 50, returnclass = "sf") %>%
-        st_transform(crs = st_crs(loc_sf)) %>%
+        st_transform(crs = prj) %>%
         st_make_valid()
       if(!silent) cat("using map scale: 50\n")
     }
@@ -158,7 +160,8 @@ map_multi_track_base <- function(map_type,
       p <- p +
         geom_sf(
           data = line_sf,
-          aes(colour = as.numeric(as.Date(date))),
+          colour = aes$df$col[3],
+#          aes(colour = as.numeric(as.Date(date))), can't colour line by date when cast as MULTILINESTRING
           size = aes$df$size[3]
         )
       
@@ -226,7 +229,8 @@ map_multi_track_base <- function(map_type,
   ## enforce map extents
   p <- p +  coord_sf(xlim = c(extents["xmin"], extents["xmax"]),
               ylim = c(extents["ymin"], extents["ymax"]), 
-              default_crs = st_crs(loc_sf),
+              crs = prj, # req'd for rosm baselayers
+              default_crs = prj,
               expand = FALSE)
   
   ## set plot theme stuff

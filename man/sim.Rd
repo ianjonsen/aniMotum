@@ -7,7 +7,7 @@
 sim(
   N = 100,
   start = list(c(0, 0), as.POSIXct(format(Sys.time(), tz = "UTC", usetz = TRUE))),
-  model = c("rw", "crw", "mpm"),
+  model = c("rw", "crw", "mp"),
   vmax = 4,
   sigma = c(4, 4),
   rho_p = 0,
@@ -27,7 +27,7 @@ sim(
 
 \item{start}{coordinates and datetime of start location for simulated track}
 
-\item{model}{simulate from the \code{rw}, \code{crw} or \code{mpm} process models}
+\item{model}{simulate from the \code{rw}, \code{crw} or \code{mp} process models}
 
 \item{vmax}{maximum travel rate (m/s) of simulated animal}
 
@@ -41,7 +41,7 @@ sim(
 (ignored if \code{model != "crw"})}
 
 \item{sigma_g}{random walk sd for time-varying move persistence parameter
-(ignored if \code{model != "mpm"})}
+(ignored if \code{model != "mp"})}
 
 \item{error}{indicates whether measurement error should mimic Argos
 Least-Squares (\code{ls}) or Argos Kalman Filter (\code{kf})}
@@ -80,14 +80,14 @@ following, depending on the arguments used
 \item \code{smaj} Argos error ellipse semi-major axis in m (if \code{error = "kf"})
 \item \code{smin} Argos error ellipse semi-minor axis in m (if \code{error = "kf"})
 \item \code{eor} Argos error ellipse orientation in degrees (if \code{error = "kf"})
-\item \code{u} velocity in x direction (if \code{model = "crw"})
-\item \code{v} velocity in y direction (if \code{model = "crw"})
+\item \code{u} velocity in x direction (if \code{model = "crw"}), unit = km/h
+\item \code{v} velocity in y direction (if \code{model = "crw"}), unit = km/h
 \item \code{b} behavioural state (if \code{model = "rw"} or \code{model = "crw"} and multiple process variances given, see examples)
-\item \code{g} movement persistence - the autocorrelation between successive movements on the interval 0,1 (if \code{model = "mpm"})
+\item \code{g} movement persistence - the autocorrelation between successive movements on the interval 0,1 (if \code{model = "mp"})
 }
 }
 \description{
-simulate from the \code{rw}, \code{crw}, or \code{mpm} process models
+simulate from the \code{rw}, \code{crw}, or \code{mp} process models
 to generate a set of \verb{x,y} (or \verb{lon,lat}) coordinates with or without error
 from supplied input parameters.
 }
@@ -95,13 +95,7 @@ from supplied input parameters.
 tr <- sim(N = 200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 plot(tr, error = TRUE)
 
-tr <- sim(N = 200, model = "rw", sigma = c(4,4,0.5,0.5), error = "ls", tdist = "reg")
-plot(tr)
-
-tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
-plot(tr)
-
-tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
+tr <- sim(N = 200, model = "mp", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
 tdist = "gamma", tpar = 1.5)
 plot(tr, error = TRUE, pal = "Cividis")
 

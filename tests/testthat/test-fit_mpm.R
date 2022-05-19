@@ -6,6 +6,7 @@ context("test fit_mpm")
 
 ## generate ssm obj as quickly as possible
 test_that("fit_mpm returns mpm list w 8 elements", {
+  skip_on_cran()
   xs <- fit_ssm(sese2, spdf=FALSE, model = "crw", time.step=72, 
                 control = ssm_control(verbose = 0))
   dmp <- grab(xs, "predicted")
@@ -16,6 +17,7 @@ test_that("fit_mpm returns mpm list w 8 elements", {
 
 
 test_that("fit_mpm fits directly to an ssm object", {
+  skip_on_cran()
   xs <- fit_ssm(sese2, spdf=FALSE, model = "crw", time.step=72, 
                 control = ssm_control(verbose = 0))
   fmp <- fit_mpm(xs, model = "jmpm", control = 

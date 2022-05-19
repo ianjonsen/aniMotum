@@ -32,12 +32,10 @@
 ##' Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to 
 ##' environment: fast inference of variation among southern elephant seals with 
 ##' a mixed effects model. Ecology. 100(1):e02566 
-##' [https://doi.org/10.1002/ecy.2566](https://doi.org/10.1002/ecy.2566)
 ##' 
 ##' @examples
 ##' ## fit jmpm to two southern elephant seal tracks
-##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
-##' control = ssm_control(verbose = 0))
+##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 ##' 
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
 ##' 

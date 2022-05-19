@@ -9,16 +9,16 @@
 fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
 }
 \references{
-Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 \url{https://doi.org/10.1186/s40462-020-00217-7}
+Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31.
 
-Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 \url{https://doi.org/10.1002/ecy.2566}
+Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 }
 \seealso{
 Useful Links:
 \itemize{
 \item \url{https://ianjonsen.github.io/foieGras/}
-\item \url{https://github.com/ianjonsen/foieGras}
-\item Report bugs/issues at \url{https://github.com/ianjonsen/foieGras/issues}
+\item \url{https://github.com/ianjonsen/foieGras/}
+\item Report bugs/issues at \url{https://github.com/ianjonsen/foieGras/issues/}
 }
 }
 \author{

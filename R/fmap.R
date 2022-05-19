@@ -74,7 +74,7 @@ fmap <- function(x,
   
   cat(.Deprecated("map", 
               package = "foieGras", 
-              msg = "As of foieGras 1.0.0, 'fmap' is deprecated. \nUse 'map' instead."))
+              msg = "As of foieGras 1.0-5, 'fmap' is deprecated. \nUse 'map' instead."))
   
   if(FALSE) {
     what <- match.arg(what)

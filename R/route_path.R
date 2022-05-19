@@ -22,7 +22,7 @@
 ##' distance is a constant 50000 m.
 ##' @param append should re-routed locations be appended to the `ssm` 
 ##' (ssm fit) object (default = TRUE), or returned as a tibble.
-##' @param ... additional arguments passed to [pathroutr::prt_visgraph]
+##' @param ... additional arguments passed to pathroutr::prt_visgraph
 ##' 
 ##' @details
 ##' `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
@@ -51,17 +51,16 @@
 ##' 
 ##' @references
 ##' Josh M. London. (2020) pathroutr: An R Package for (Re-)Routing Paths Around 
-##' Barriers (Version v0.2.1) \url{https://doi.org/10.5281/zenodo.4321827}
+##' Barriers (Version v0.2.1) [https://zenodo.org/record/5522909#.YnPxEy_b1qs](https://zenodo.org/record/5522909#.YnPxEy_b1qs)
 ##' 
 ##' @examples 
-##' fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 24)
-##' fit <- route_path(fit, what = "predicted")
-##' grab(fit, what = "rerouted")
+##' # if 'pathroutr' is installed then ok to use route_path()
+##' if(requireNamespace("pathroutr", quietly = TRUE)) {
+##'   fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24)
+##'   fit <- route_path(fit, what = "predicted")
+##'   grab(fit, what = "rerouted")
+##' }
 ##' 
-##' trs <- simfit(fit, what = "predicted", reps = 5)
-##' rrt_sims <- route_path(trs)
-##' 
-##' @importFrom purrr map_df
 ##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
@@ -80,16 +79,16 @@ route_path <-
            append = TRUE,
            ...){
     
-    stopifnot("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\") to use this function\n" =
-                requireNamespace("pathroutr", quietly = TRUE)
-              )
+    if(requireNamespace("pathroutr", quietly = TRUE)) {
+    
     stopifnot("x must be either a foieGras ssm fit object with class `ssm_df`
          or a `simfit` object containing the paths simulated from a `ssm` fit object" = 
                 inherits(x, c("ssm_df", "simfit"))
     )
-    if(map_scale == 10) {
-      stopifnot("map_scale = 10 not available because rnaturalearthhires package not installed" = 
-                requireNamespace("rnaturalearthhires", quietly = TRUE))
+    if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+      map_scale <- 50
+      cat("resetting map_scale = 50 because rnaturalearthhires is not installed, 
+          use remotes::install_github(\"ropensci/rnaturalearthhires\") to install\n")
     }
     
     ## required for pathroutr fn's
@@ -111,15 +110,9 @@ route_path <-
     what <- match.arg(what)
     
     # pathroutr needs a land shapefile to create a visibility graph from
-    if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
-    } else {
-      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
-    }
+    world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+      st_transform(crs = 3857) %>%
+      st_make_valid()
     
     if (inherits(x, "ssm_df")) {
       # unnest foieGras ssm object
@@ -260,6 +253,10 @@ route_path <-
     if(detach.sf.on.end) detach(package:sf)
 
     return(out)
+    } else {
+      cat("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
+          or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")
+    }
   }
 
 

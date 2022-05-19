@@ -1,4 +1,4 @@
-# foieGras 1.0-5 (coming soon)
+# foieGras 1.0-5 (15/05/2022)
 
 * adds `route_path()` a wrapper function calling [`pathroutr`](https://github.com/jmlondon/pathroutr) to re-route `fit_ssm` estimated or `simfit` simulated tracks around land barriers
 * adds a move persistence model via `fit_ssm(model = "mp")` to allow simultaneous estimation of locations and move persistence. This approach may be preferable to using `fit_mpm()` on a `fit_ssm` model object. `fit_mpm()` is retained for less error-prone (GPS) location data

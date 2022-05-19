@@ -10,7 +10,7 @@
   zoom = FALSE,
   or = NULL,
   ncol = 1,
-  pal = "Viridis",
+  hires = FALSE,
   ...
 )
 }
@@ -27,8 +27,11 @@ start of fitted track (ignored if \code{mapproj} package is not installed).}
 
 \item{ncol}{number of columns to arrange multiple plots}
 
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Viridis"; see
-\code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
+\item{hires}{logical; use high-resolution coastline data. Attempts to use
+high-res coastline data via \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 10},
+if the \code{rnaturalearthhires} data package is installed. This extends the
+plot rendering time so is set to FALSE by default, in which case
+\link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 50} data are used.}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -39,7 +42,7 @@ Plots of simulated tracks.
 visualize tracks simulated from a \code{foieGras} model fit
 }
 \examples{
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 72)
+fit <- fit_ssm(ellie, model = "crw", time.step = 24)
 trs <- simfit(fit, what = "p", reps = 2)
 plot(trs, type = "b")
 

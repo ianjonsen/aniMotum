@@ -14,11 +14,11 @@
 ##'
 ##' @seealso Useful Links:
 ##' * [https://ianjonsen.github.io/foieGras/](https://ianjonsen.github.io/foieGras/)
-##' * [https://github.com/ianjonsen/foieGras](https://github.com/ianjonsen/foieGras)
-##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues](https://github.com/ianjonsen/foieGras/issues)
+##' * [https://github.com/ianjonsen/foieGras/](https://github.com/ianjonsen/foieGras/)
+##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues/](https://github.com/ianjonsen/foieGras/issues/)
 ##' 
-##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31 [https://doi.org/10.1186/s40462-020-00217-7](https://doi.org/10.1186/s40462-020-00217-7)
-##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566 [https://doi.org/10.1002/ecy.2566](https://doi.org/10.1002/ecy.2566)
+##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31.
+##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 ##'
 ##' @keywords foieGras
 ##' @importFrom utils data flush.console globalVariables
@@ -56,21 +56,7 @@ NULL
 
 ##' @name sese
 ##' @docType data
-##' @title Southern elephant seal Argos satellite data (5 individuals)
-##' @format .RData
-##' @keywords data
-##' @description Example elephant seal Argos tracking data. Data were sourced from
-##' the Integrated Marine Observing System (IMOS) Sourced 
-##' from the Australian Integrated Marine Observing System (IMOS) in collaboration
-##' with the French IPEV and SNO-MEMO project deployments at Iles Kerguelen and 
-##' are publicly available (http:// imos.aodn.org.au). IMOS is supported by the
-##' Australian Government through the National Collaborative Research Infrastructure
-##' Strategy and the Super Science Initiative. 
-NULL
-
-##' @name sese1
-##' @docType data
-##' @title Southern elephant seal Argos satellite data (1 individual)
+##' @title Southern elephant seal Argos satellite data (3 individuals)
 ##' @format .RData
 ##' @keywords data
 ##' @description Example elephant seal Argos tracking data. Data were sourced from
@@ -112,17 +98,6 @@ NULL
 ##' Research Infrastructure Strategy and the Super Science Initiative. 
 NULL
 
-
-##' @name xm
-##' @docType data
-##' @title foieGras example mpm fit object
-##' @format .RData
-##' @keywords data
-##' @description Example foieGras mpm fit object. This example fit 
-##' is included purely to speed up examples where a fit object is required
-##' but fitting to data is not the focus of the example.
-NULL
-
 ##' @name res
 ##' @docType data
 ##' @title foieGras example osar residuals object
@@ -140,4 +115,4 @@ globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se"
                   "lonerr", "laterr", "coord", "value", "resid", "long", "cluster",
                   "se", "g", "logit_g", "logit_g.se", "id1", "mpm", "residual", "group", "availableCores",
                   "s", "s.se", "ci", "b", "x.err", "y.err", "xy", "ellps.tab", "sims", "flg",
-                  "pts", "rrt_pts", "pts_rrt", "pts_fix", "model"))
+                  "pts", "rrt_pts", "pts_rrt", "pts_fix", "model", "dist", "bear"))

@@ -88,12 +88,12 @@ ellp.par <- function(lc) {
 
 ##' @title simulate animal tracks
 ##'
-##' @description simulate from the `rw`, `crw`, or `mpm` process models 
+##' @description simulate from the `rw`, `crw`, or `mp` process models 
 ##' to generate a set of `x,y` (or `lon,lat`) coordinates with or without error 
 ##' from supplied input parameters. 
 ##' @param N number of time steps to simulate
 ##' @param start coordinates and datetime of start location for simulated track
-##' @param model simulate from the `rw`, `crw` or `mpm` process models
+##' @param model simulate from the `rw`, `crw` or `mp` process models
 ##' @param vmax maximum travel rate (m/s) of simulated animal
 ##' @param sigma a vector of process error sd's for the `rw` model 
 ##' (ignored if `model != "rw"`)
@@ -102,7 +102,7 @@ ellp.par <- function(lc) {
 ##' @param D diffusion coefficient for `crw` model process covariance matrix 
 ##' (ignored if `model != "crw"`)
 ##' @param sigma_g random walk sd for time-varying move persistence parameter 
-##' (ignored if `model != "mpm"`)
+##' (ignored if `model != "mp"`)
 ##' @param error indicates whether measurement error should mimic Argos 
 ##' Least-Squares (`ls`) or Argos Kalman Filter (`kf`)
 ##' @param tau vector of LS measurement error sd's (ignored if `error = "kf"`)
@@ -132,23 +132,17 @@ ellp.par <- function(lc) {
 ##'  * `smaj` Argos error ellipse semi-major axis in m (if `error = "kf"`)
 ##'  * `smin` Argos error ellipse semi-minor axis in m (if `error = "kf"`)
 ##'  * `eor` Argos error ellipse orientation in degrees (if `error = "kf"`)
-##'  * `u` velocity in x direction (if `model = "crw"`)
-##'  * `v` velocity in y direction (if `model = "crw"`)
+##'  * `u` velocity in x direction (if `model = "crw"`), unit = km/h 
+##'  * `v` velocity in y direction (if `model = "crw"`), unit = km/h
 ##'  * `b` behavioural state (if `model = "rw"` or `model = "crw"` and multiple process variances given, see examples)
-##'  * `g` movement persistence - the autocorrelation between successive movements on the interval 0,1 (if `model = "mpm"`)
+##'  * `g` movement persistence - the autocorrelation between successive movements on the interval 0,1 (if `model = "mp"`)
 ##' 
 ##' 
 ##' @examples 
 ##' tr <- sim(N = 200, model = "crw", D = 0.1, error = "kf", tdist = "reg", ts=12)
 ##' plot(tr, error = TRUE)
 ##' 
-##' tr <- sim(N = 200, model = "rw", sigma = c(4,4,0.5,0.5), error = "ls", tdist = "reg")
-##' plot(tr)
-##' 
-##' tr <- sim(N = 200, model = "crw", D = c(0.1, 0.05), error = "kf", tdist="reg")
-##' plot(tr)
-##' 
-##' tr <- sim(N = 200, model = "mpm", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
+##' tr <- sim(N = 200, model = "mp", sigma_g = 1.2, error = "ls", tau = c(2, 1.5), ts=12,
 ##' tdist = "gamma", tpar = 1.5)
 ##' plot(tr, error = TRUE, pal = "Cividis")
 ##' 
@@ -166,7 +160,7 @@ sim <- function(N = 100,
                 start = list(c(0, 0), 
                              as.POSIXct(format(Sys.time(), tz = "UTC", usetz = TRUE))
                              ),
-                model = c("rw", "crw", "mpm"),
+                model = c("rw", "crw", "mp"),
                 vmax = 4,
                 sigma = c(4, 4),
                 rho_p = 0,
@@ -189,7 +183,7 @@ sim <- function(N = 100,
   error <- match.arg(error)
   tdist <- match.arg(tdist)
 
-  if(!model %in% c("rw","crw","mpm")) stop("model can only be 1 of `rw`, `crw`, or `mpm`")
+  if(!model %in% c("rw","crw","mp")) stop("model can only be 1 of `rw`, `crw`, or `mp`")
   if(!error %in% c("ls","kf")) stop("error can only be 1 of `ls` or `kf`")
   if(!tdist %in% c("gamma","reg")) stop("tdist can only be 1 of `gamma` or `reg`")
   if(!all(inherits(start, "list"), length(start) == 2, inherits(start[[2]], "POSIXct")))
@@ -291,7 +285,7 @@ sim <- function(N = 100,
                mu[i, ] <- mu[i - 1, ] + dxy
              }
            },
-           mpm = {
+           mp = {
              #dt.g <- dt / median(dt)
              
              lg <- rep(NA, N)
@@ -361,7 +355,7 @@ sim <- function(N = 100,
     if(error == "ls") {
       d <- d[, c("date", "lc", "lon", "lat", "x", "y", "x.err", "y.err")]
     } else if(error == "kf") {
-      d <- d[, c("date", "lc", "lon", "lat", "x", "y", "x.err", "y.err","smaj","smin","eor")]
+      d <- d[, c("date", "lc", "lon", "lat", "x", "y", "x.err", "y.err", "smaj", "smin", "eor")]
     }
     d$lc <- as.character(d$lc)
     
@@ -370,7 +364,7 @@ sim <- function(N = 100,
              d$u <- v[, 1]
              d$v <- v[, 2]
            },
-           mpm = {
+           mp = {
              d$g <- g
            })
     
@@ -385,8 +379,8 @@ sim <- function(N = 100,
            crw = {
              class(d) <- append("crws", class(d))
            },
-           mpm = {
-             class(d) <- append("mpms", class(d))
+           mp = {
+             class(d) <- append("mps", class(d))
            })
     
     class(d) <- append("sim", class(d))

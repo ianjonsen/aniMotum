@@ -9,6 +9,10 @@
 ##' @param sim_track a dataframe containing the longitude and latitude of a single 
 ##' simulated path from simfit
 ##' @param flag set to either 1 or 2 to define similarity index (see details)
+##' @param cpf logical; are tracks simulated as central place foraging trips. If
+##' cpf = TRUE then distance & bearing are calculated from the first location to
+##' the most distant location, otherwise distance & bearing are calculated from
+##' the first to the last location on each track.
 ##' 
 ##' @details
 ##' \code{flag = 1} will use an index based on Hazen (2017)\cr
@@ -18,31 +22,21 @@
 ##' 
 ##' @keywords internal
 ##' 
-##' @importFrom sp spDistsN1
-##' @importFrom geosphere bearing
-##' @importFrom dplyr first last
-##' 
 ##' @export
-similarity_flag <- function(track, sim_track, flag = 2){
+similarity_flag <- function(track, sim_track, flag = 2, cpf){
   
-  dist_track <- spDistsN1(pts = cbind(first(track$lon), first(track$lat)),
-                              pt = cbind(last(track$lon), last(track$lat)),
-                              longlat = T)
-  
-  dist_sim <- spDistsN1(pts = cbind(first(sim_track$lon), first(sim_track$lat)),
-                            pt = cbind(last(sim_track$lon), last(sim_track$lat)),
-                            longlat = T)
-  
-  bear_track <- bearing(p1 = cbind(first(track$lon), first(track$lat)),
-                                   p2 = cbind(last(track$lon), last(track$lat)))
-  
-  bear_sim <- bearing(p1 = cbind(first(sim_track$lon), first(sim_track$lat)),
-                                 p2 = cbind(last(sim_track$lon), last(sim_track$lat)))
+  if(cpf) {
+    n <- which(track$dist == max(track$dist, na.rm = TRUE))
+  } else {
+    n <- nrow(track)
+  }
   
   if(flag == 1) {
-    return(2 * (dist_track - dist_sim) / dist_track + (bear_track - bear_sim) / 90)
+    return(2 * (track$dist[n] - sim_track$dist[n]) / track$dist[n] + 
+             (track$bear[n] - sim_track$bear[n]) / 90)
   } else {
-    return(((dist_track - dist_sim) / dist_track) + ((bear_track - bear_sim) / bear_track))
+    return(((track$dist[n] - sim_track$dist[n]) / track$dist[n]) + 
+             ((track$bear[n] - sim_track$bear[n]) / track$bear[n]))
   }
 
 }

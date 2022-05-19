@@ -148,8 +148,7 @@ a geom, of \verb{lon,lat} and \verb{x,y} location estimates can be obtained by u
 }
 \examples{
 ## fit crw model to Argos LS data
-## se = FALSE to speed up ex
-fit <- fit_ssm(sese1, vmax = 4, model = "crw", time.step = 48) 
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0)) 
 
 ## time series plots of fitted values and observations
 plot(fit, what = "fitted", type = 1, ask = FALSE)
@@ -163,10 +162,8 @@ plot(fit, what = "predicted", type = 2, ask = FALSE)
 Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space
 model for rapid quality-control of Argos locations from animal-borne tags.
 Movement Ecology 8:31
-\url{https://doi.org/10.1186/s40462-020-00217-7}
 
 Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to
 environment: fast inference of variation among southern elephant seals with
 a mixed effects model. Ecology. 100(1):e02566
-\url{https://doi.org/10.1002/ecy.2566}
 }

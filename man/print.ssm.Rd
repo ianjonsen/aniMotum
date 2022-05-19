@@ -18,7 +18,7 @@ print \code{foieGras} fit object summary information
 \examples{
 ## see summary fit output
 ## generate a ssm fit object (call is for speed only)
-xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, 
+xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, 
 control = ssm_control(se = FALSE, verbose = 0))
 
 xs$ssm[[1]]
