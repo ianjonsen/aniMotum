@@ -68,9 +68,18 @@ plot.mpm_df <-
   
   cpal <- hcl.colors(n = 5, pal)
   
-  
   if(inherits(x, "mpm_df") & (inherits(y, "ssm_df") | is.null(y))) {
     d <- grab(x)
+    ## deal with old "fG_mpm" class
+    if(all(c("g","g.se") %in% names(d))) {
+      d$logit_g <- with(d, 
+                        qlogis(ifelse(g < 0.001, 0.001, 
+                                      ifelse(g > 0.999, 0.999, g))))
+      d$logit_g.se <- d$g.se
+      gse.pos <- which(names(d) == "g.se")
+      d <- d[, -gse.pos]
+      d <- d[, c("id", "date", "logit_g", "logit_g.se", "g")]
+    }
     d <- split(d, d$id)
     
     if(is.null(y)) {
