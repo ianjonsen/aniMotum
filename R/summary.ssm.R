@@ -26,10 +26,18 @@ summary.ssm_df <- function(object, ...) {
       else NA
     })
     conv <- sapply(object$ssm, function(x) ifelse(x$opt$conv == 0, TRUE, FALSE))
-    AICc <- round(sapply(object$ssm, function(x) x$AICc), 1)
-
-    Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, AICc)
-    colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "AICc")
+    
+    ## req'd to handle old fG_ssm format
+    if ("AICc" %in% names(object$ssm[[1]])) {
+      AICc <- round(sapply(object$ssm, function(x) x$AICc), 1)
+      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, AICc)
+      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "AICc")
+      
+    } else if ("aic" %in% names(object$ssm[[1]])) {
+      AIC <- round(sapply(object$ssm, function(x) x$aic), 1)
+      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, AIC)
+      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "AIC")
+    }
     row.names(Stattab) <- rep("", dim(Stattab)[1])
     Stattab
   }

@@ -111,6 +111,7 @@ plot.ssm_df <-
     }
     
     if (inherits(x, "ssm_df")) {
+      
       switch(what,
              fitted = {
                ssm <- grab(x, "fitted", as_sf = FALSE, normalise = normalise, group = group)

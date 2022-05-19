@@ -17,6 +17,7 @@
 ##' @return a single tbl with all individuals
 ##'
 ##' @importFrom tibble as_tibble
+##' @importFrom dplyr rename select mutate
 ##' @examples
 ##' ## load example foieGras fit objects (to save time)
 ##' ## generate a ssm fit object
@@ -40,7 +41,18 @@ join <- function(ssm,
   if(!inherits(mpm, "mpm_df")) stop("mpm must be a foieGras mpm fit object with class `mpm_df`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
-  y <- grab(mpm, what = "fitted", normalise = normalise, group = group)[, c("logit_g","logit_g.se","g")] 
+  y <- grab(mpm, what = "fitted", normalise = normalise, group = group)
+  
+  ## deal w old `fG_mpm` & new `mpm_df` classes
+  if(all(c("logit_g","logit_g.se") %in% names(y))) {
+    y <- y[, c("logit_g","logit_g.se","g")]
+  } else {
+    y <- y[, c("g","g.se")]
+    y$logit_g <- qlogis(ifelse(y$g < 0.001, 0.001, 
+                               ifelse(y$g > 0.999, 0.999, y$g)))
+    names(y) <- c("g", "logit_g.se", "logit_g")
+    y <- y[, c("logit_g", "logit_g.se", "g")]
+  }
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
   
