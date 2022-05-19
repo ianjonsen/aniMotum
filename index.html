@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-51</span>
       </span>
     </div>
 
@@ -129,8 +129,8 @@
                  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://cloud.r-project.org"</span>,
                            <span class="st">"https://ianjonsen.r-universe.dev"</span><span class="op">)</span>,
                  dependencies <span class="op">=</span> <span class="st">"Suggests"</span><span class="op">)</span></code></pre></div>
-<p><code>install.packages</code> will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, v1.0-5) version exist but the source version is newer. Answer <code>Yes</code> to install the source version, provided you have the appropriate compiler tools available (See <strong>From GitHub (source)</strong>, below). Eventually, R-Universe will provide binary versions of the latest <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> for your platform and compiling from source won’t be required.</p>
-<p>To avoid doing the above every time you want to re-install <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>, you can add my R-Universe repo to your local list of repositories for package download in your <code>.Rprofile</code>. This ensure <code>install.packages</code> automatically grabs the latest version of <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></p>
+<p><code>install.packages</code> will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, v1.0-5) version exist but the source version is newer. Answer <code>Yes</code> to install the source version, provided you have the appropriate compiler tools available (See <strong>From GitHub (source)</strong>, below).</p>
+<p>To avoid doing the above every time you want to re-install <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>, you can add my R-Universe repo to your local list of repositories for package download in your <code>.Rprofile</code>. This ensures <code>install.packages</code> automatically grabs the latest version of <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#install.packages("usethis")</span>
 <span class="fu">usethis</span><span class="fu">::</span><span class="fu">edit_r_profile</span><span class="op">(</span><span class="op">)</span>
@@ -138,11 +138,19 @@
 <span class="co"># add the following text or replace existing repos option</span>
 <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ianjonsen <span class="op">=</span> <span class="st">'https://ianjonsen.r-universe.dev'</span>,
                   CRAN <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>If you don’t want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> package for Windows or Mac from here <a href="https://ianjonsen.r-universe.dev/ui#builds" class="external-link uri">https://ianjonsen.r-universe.dev/ui#builds</a> - click the Windows/Mac icons (either R 4.2 or 4.1) on the table line corresponding to <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>, and choose the appropriate <code>-release</code> version from the bottom of the page. In R, use the following command to install from the file you’ve just downloaded (where <code>path_to_file</code> is wherever you saved the download:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># for Windows</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">install.packages</span>(<span class="st">"path_to_file\package-windows-release</span><span class="ch">\f</span><span class="st">oieGras_1.0-5.zip"</span>, </span>
+<span id="cb5-3"><a href="#cb5-3"></a>                 <span class="dt">repos=</span><span class="ot">NULL</span>, <span class="dt">type=</span><span class="st">"binary"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># for Mac</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="kw">install.packages</span>(<span class="st">"path_to_file/package-macos-release/foieGras_1.0-5.tgz"</span>, </span>
+<span id="cb5-7"><a href="#cb5-7"></a>                 <span class="dt">repos=</span><span class="ot">NULL</span>, <span class="dt">type=</span><span class="st">"binary"</span>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="from-cran">From CRAN<a class="anchor" aria-label="anchor" href="#from-cran"></a>
 </h3>
-<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> <code>v0.7-6</code> is on <a href="https://cran.r-project.org/package=foieGras/" class="external-link">CRAN</a> and can be downloaded within <code>R</code>, in the usual way <code>install.packages("foieGras")</code> or, more completely: <code>install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))</code>. {foieGras} <code>v1.0-5</code> might become available on CRAN.</p>
+<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> <code>v0.7-6</code> is on <a href="https://cran.r-project.org/package=foieGras/" class="external-link">CRAN</a> and can be downloaded within <code>R</code>, in the usual way <code>install.packages("foieGras")</code> or, more completely: <code>install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))</code>. {foieGras} <code>v1.0-5</code> probably won’t become available on CRAN.</p>
 </div>
 <div class="section level3">
 <h3 id="from-github-source">From GitHub (source)<a class="anchor" aria-label="anchor" href="#from-github-source"></a>
@@ -150,7 +158,7 @@
 <p>To get the very latest but likely unstable <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> version, you can install from GitHub.</p>
 <p>On PC’s running Windows, ensure you have installed <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a></p>
 <p>On Mac’s, ensure you have installed the Command Line Tools for Xcode by executing <code>xcode-select --install</code> in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed (e.g., <a href="https://github.com/fxcoudert/gfortran-for-macOS/releases" class="external-link uri">https://github.com/fxcoudert/gfortran-for-macOS/releases</a>).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ianjonsen/foieGras@staging"</span><span class="op">)</span></code></pre></div>
 <p>Note: there can be issues getting compilers to work properly, especially on M1 Macs. Often, this is due to missing or incorrect Xcode Command Line Tools and/or Fortran compiler. If you encounter install and compile issues, you may find a solution in the excellent documentation here <a href="https://github.com/glmmTMB/glmmTMB" class="external-link">glmmTMB</a>. Alternatively, if you don’t care to have the very latest version then installing from R-Universe is the preferred approach. R-Universe automatically builds binary package versions for all common platforms, so you won’t have to worry about compiler software or issues!</p>
 </div>
@@ -159,7 +167,7 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> is intended to be as easy to use as possible. Here’s a simple example showing how to fit a move persistence model to Argos tracking data and visualise the result:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></span><span class="op">)</span>
 
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese</span>, 
@@ -170,7 +178,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="fl">3</span>, pages <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-ex1-1.png" width="100%"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
     what <span class="op">=</span> <span class="st">"predicted"</span>, 
     normalise <span class="op">=</span> <span class="cn">TRUE</span>,
