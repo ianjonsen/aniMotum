@@ -201,7 +201,7 @@ sfilter <-
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
     p.obst <- table(d$obs.type) / nrow(d)
     # favours KF when mix of few LS + many KF
-    obst <- round(which(table(d$obs.type) > 0) * p.obst)
+    obst <- round(which(table(d$obs.type) * p.obst > 0))
     
     automap <- switch(model, 
                      rw = {
@@ -250,7 +250,14 @@ sfilter <-
       names(map) <- paste0("l_", names(map))
       map <- append(automap, map, after = 0)
     } else {
-      map <- automap
+      ## ensure psi is always turned on if KF obs present in data
+      ## handles cases when % LS > % KF (may be rare or non-existent)
+      if(all(length(table(d.all$obs.type)) > 1, 
+             "KF" %in% names(table(d.all$obs.type)))) {
+        map <- automap[-which(names(automap)  == "l_psi")]
+      } else {
+        map <- automap
+      }
     }
 
     ## TMB - data list
