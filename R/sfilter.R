@@ -92,29 +92,28 @@ sfilter <-
         ## time.step >= 1 h
         ## trunc so predictions start on the hour immediately prior to 1st obs
         ts <-
-          data.frame(date = seq(
-            trunc(d$date[1], "hour"),
-            by = tsp,
-            length.out = max(index) + 2
-          ))
+          data.frame(id = d$id[1],
+                     date = seq(
+                       trunc(d$date[1], "hour"),
+                       by = tsp,
+                       length.out = max(index) + 2
+                     ))
       } else {
         ## time.step < 1 h
         ## trunc so predictions start on the time.step immediately prior to 1st obs
         ts1 <- trunc(d$date[1] - tsp, "mins") + tsp
         if(ts1 <= d$date[1]) {
-          ts <- 
-            data.frame(date = seq(
-              ts1,
-              by = tsp,
-              length.out = max(index) + 2
-            ))
+          ts <-
+            data.frame(id = d$id[1],
+                       date = seq(ts1,
+                                  by = tsp,
+                                  length.out = max(index) + 2))
         } else {
-          ts <- 
-            data.frame(date = seq(
-              ts1 - tsp,
-              by = tsp,
-              length.out = max(index) + 2
-            ))
+          ts <-
+            data.frame(id = d$id[1],
+                       date = seq(ts1 - tsp,
+                                  by = tsp,
+                                  length.out = max(index) + 2))
         }
       }
       
