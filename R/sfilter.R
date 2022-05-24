@@ -119,7 +119,7 @@ sfilter <-
       }
       
     } else if (inherits(time.step, "data.frame") & all(!is.na(time.step))) {
-      ts <- subset(time.step, id %in% unique(d$id))$date
+      ts <- subset(time.step, id %in% unique(d$id))
       
     } else if (inherits(time.step, "data.frame") & any(is.na(time.step))) {
       stop("NA's detected in user-supplied prediction times data.frame")
@@ -134,14 +134,14 @@ sfilter <-
 
     ## merge data and prediction times
     ## add is.data flag (distinguish obs from reg states)
-    d.all <- full_join(d, ts, by = "date")
+    d.all <- full_join(d, ts, by = c("id", "date"))
     d.all <- d.all[order(d.all$date), ]
     d.all$isd <- with(d.all, ifelse(is.na(isd), FALSE, isd))
     d.all$id <- with(d.all, ifelse(is.na(id), na.omit(unique(id))[1], id))
     } else {
       d.all <- d
     }
-
+    
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- as.numeric(difftime(d.all$date, c(as.POSIXct(NA),d.all$date[-nrow(d.all)]), 
                               units = "hours"))
