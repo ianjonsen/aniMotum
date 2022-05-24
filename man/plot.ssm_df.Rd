@@ -9,7 +9,7 @@
   what = c("fitted", "predicted", "rerouted"),
   type = 1,
   outlier = TRUE,
-  alpha = 0.05,
+  alpha = 0.6,
   pages = 0,
   ncol = 1,
   ask = TRUE,
