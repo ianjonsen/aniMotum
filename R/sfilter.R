@@ -87,12 +87,36 @@ sfilter <-
       tsp <- time.step * 3600
       tms <- (as.numeric(d$date) - as.numeric(d$date[1])) / tsp
       index <- floor(tms)
-      ts <-
-        data.frame(date = seq(
-          trunc(d$date[1], "hour"),
-          by = tsp,
-          length.out = max(index) + 2
-        ))
+      
+      if (time.step > 1) {
+        ## time.step >= 1 h
+        ## trunc so predictions start on the hour immediately prior to 1st obs
+        ts <-
+          data.frame(date = seq(
+            trunc(d$date[1], "hour"),
+            by = tsp,
+            length.out = max(index) + 2
+          ))
+      } else {
+        ## time.step < 1 h
+        ## trunc so predictions start on the time.step immediately prior to 1st obs
+        ts1 <- trunc(d$date[1] - tsp, "mins") + tsp
+        if(ts1 <= d$date[1]) {
+          ts <- 
+            data.frame(date = seq(
+              ts1,
+              by = tsp,
+              length.out = max(index) + 2
+            ))
+        } else {
+          ts <- 
+            data.frame(date = seq(
+              ts1 - tsp,
+              by = tsp,
+              length.out = max(index) + 2
+            ))
+        }
+      }
       
     } else if (inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ts <- subset(time.step, id %in% unique(d$id))$date
