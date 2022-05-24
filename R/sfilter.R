@@ -199,7 +199,9 @@ sfilter <-
 
     ## start to work out which obs_mod to use for each observation
     d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
-    obst <- which(table(d$obs.type) > 0)
+    p.obst <- table(d$obs.type) / nrow(d)
+    # favours KF when mix of few LS + many KF
+    obst <- round(which(table(d$obs.type) > 0) * p.obst)
     
     automap <- switch(model, 
                      rw = {
@@ -258,7 +260,7 @@ sfilter <-
                       )
     ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0) so
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
-    ##  as isd makes likelihood contribution goes to 0 in C++ code
+    ##  as isd makes likelihood contribution go to 0 in C++ code
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
     
     ## calculate fitted & predicted indices + delta t for proper speed estimates
