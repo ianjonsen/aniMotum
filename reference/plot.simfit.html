@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -95,28 +95,43 @@
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> simulation data.frame with class <code>simfit</code></p></dd>
+
+
 <dt>type</dt>
 <dd><p>plots tracks as "line", "points" or "both" (default).</p></dd>
+
+
 <dt>zoom</dt>
 <dd><p>logical; should map extent be defined by track extent (TRUE) or
 should global map be drawn (FALSE; default).</p></dd>
+
+
 <dt>or</dt>
 <dd><p>orientation of projected map, default is to centre on
 start of fitted track (ignored if <code>mapproj</code> package is not installed).</p></dd>
+
+
 <dt>ncol</dt>
 <dd><p>number of columns to arrange multiple plots</p></dd>
+
+
 <dt>hires</dt>
 <dd><p>logical; use high-resolution coastline data. Attempts to use
-high-res coastline data via <a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 10</code>,
+high-res coastline data via <a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 10</code>,
 if the <code>rnaturalearthhires</code> data package is installed. This extends the
 plot rendering time so is set to FALSE by default, in which case
-<a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 50</code> data are used.</p></dd>
+<a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a> with <code>scale = 50</code> data are used.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments to be ignored</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Plots of simulated tracks.</p>
+    
+
+<p>Plots of simulated tracks.</p>
     </div>
 
     <div id="ref-examples">
@@ -142,7 +157,7 @@ plot rendering time so is set to FALSE by default, in which case
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

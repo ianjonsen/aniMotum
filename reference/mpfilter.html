@@ -21,7 +21,7 @@ object to fit_ssm"><meta property="og:image" content="https://ianjonsen.github.i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -103,32 +103,53 @@ object to <code>fit_ssm</code></p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>Argos data passed through prefilter()</p></dd>
+
+
 <dt>time.step</dt>
 <dd><p>the regular time interval, in hours, to predict to.
 Alternatively, a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates.</p></dd>
+
+
 <dt>parameters</dt>
 <dd><p>a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specify these. Only play with
 this if you know what you are doing...</p></dd>
+
+
 <dt>map</dt>
 <dd><p>a named list of parameters as factors that are to be fixed during estimation, e.g., list(psi = factor(NA))</p></dd>
+
+
 <dt>fit.to.subset</dt>
 <dd><p>fit the SSM to the data subset determined by prefilter
 (default is TRUE)</p></dd>
+
+
 <dt>control</dt>
 <dd><p>list of control parameters for the outer optimization (see <code>ssm_control</code> for details)</p></dd>
+
+
 <dt>inner.control</dt>
 <dd><p>list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>is deprecated, use ssm_control(verbose = 1) instead, see <code>ssm_control</code> for details</p></dd>
+
+
 <dt>optim</dt>
 <dd><p>is deprecated, use ssm_control(optim = "optim") instead, see <code>ssm_control</code> for details</p></dd>
+
+
 <dt>optMeth</dt>
 <dd><p>is deprecated, use ssm_control(method = "L-BFGS-B") instead, see <code>ssm_control</code> for details</p></dd>
+
+
 <dt>lpsi</dt>
 <dd><p>is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see <code>ssm_control</code> for details</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -148,7 +169,7 @@ individual track, use <code>fit_mpssm</code> to fit to multiple tracks (see ?fit
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

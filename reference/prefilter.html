@@ -27,7 +27,7 @@ see ?argosfilter::sdafilter for details on implementation"><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -114,32 +114,52 @@ see <code>?argosfilter::sdafilter</code> for details on implementation</p>
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>input data, must have 5 (LS), or 8 (KF) columns (see details)</p></dd>
+
+
 <dt>vmax</dt>
 <dd><p>max travel rate (m/s)</p></dd>
+
+
 <dt>ang</dt>
 <dd><p>angles of outlier location "spikes" (default is <code>c(15,25)</code> deg); <code>ang = NA</code> turns off <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter in favour of <code><a href="https://rdrr.io/pkg/trip/man/speedfilter.html" class="external-link">trip::speedfilter</a></code></p></dd>
+
+
 <dt>distlim</dt>
 <dd><p>lengths of outlier location "spikes" in km (default is <code>c(2.5, 5)</code> m); <code>distlim = NA</code> turns off <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter in favour of <code><a href="https://rdrr.io/pkg/trip/man/speedfilter.html" class="external-link">trip::speedfilter</a></code>. Either <code>ang = NA</code> or <code>distlim = NA</code> are sufficient.</p></dd>
+
+
 <dt>spdf</dt>
 <dd><p>turn speed filter on/off (logical; default is TRUE)</p></dd>
+
+
 <dt>min.dt</dt>
 <dd><p>minimum allowable time difference in s between observations; <code>dt &lt; min.dt</code> will be ignored by the SSM</p></dd>
+
+
 <dt>emf</dt>
 <dd><p>optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>an sf object with all observations passed from <code>data</code> and the following appended columns</p>
+    
+
+<p>an sf object with all observations passed from <code>data</code> and the following appended columns</p>
 <dl><dt><code>keep</code></dt>
 <dd><p>logical indicating whether observation should be ignored by <code>sfilter</code> (FALSE)</p></dd>
+
 <dt><code>obs.type</code></dt>
 <dd><p>flag indicating whether KF or LS measurement model applies</p></dd>
+
 <dt><code>emf_x</code></dt>
 <dd><p>error multiplication factors for <code>x</code> direction</p></dd>
+
 <dt><code>emf_y</code></dt>
 <dd><p>error multiplication factors for <code>y</code> direction</p></dd>
+
 <dt><code>geometry</code></dt>
 <dd><p>sf POINT object giving <code>x,y</code> coordinates in km</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -158,7 +178,7 @@ see <code>?argosfilter::sdafilter</code> for details on implementation</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

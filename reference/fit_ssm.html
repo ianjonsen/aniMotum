@@ -25,7 +25,7 @@ Location data of different types can combined in a single data frame
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -122,65 +122,104 @@ Location data of different types can combined in a single data frame
     <dl><dt>x</dt>
 <dd><p>a data frame of observations including Argos KF error ellipse info
 (when present)</p></dd>
+
+
 <dt>vmax</dt>
 <dd><p>max travel rate (m/s) passed to <a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a> to identify
 outlier locations</p></dd>
+
+
 <dt>ang</dt>
 <dd><p>angles (deg) of outlier location "spikes"</p></dd>
+
+
 <dt>distlim</dt>
 <dd><p>lengths (m) of outlier location "spikes"</p></dd>
+
+
 <dt>spdf</dt>
 <dd><p>(logical) turn <a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a> pre-filtering on (default; TRUE) or off</p></dd>
+
+
 <dt>min.dt</dt>
 <dd><p>minimum allowable time difference between observations;
 <code>dt &lt;= min.dt</code> will be ignored by the SSM</p></dd>
+
+
 <dt>pf</dt>
 <dd><p>just pre-filter the data, do not fit the SSM (default is FALSE)</p></dd>
+
+
 <dt>model</dt>
 <dd><p>fit a simple random walk (<code>rw</code>), correlated random walk
 (<code>crw</code>), or a time-varying move persistence model (<code>mp</code>), all as
 continuous-time process models</p></dd>
+
+
 <dt>time.step</dt>
 <dd><p>options: 1) the regular time interval, in hours, to predict to;
 2) a vector of prediction times, possibly not regular, must be
 specified as a data.frame with id and POSIXt dates; 3) NA - turns off
 prediction and locations are only estimated at observation times.</p></dd>
+
+
 <dt>emf</dt>
 <dd><p>optionally supplied data.frame of error multiplication factors for
 Argos location quality classes. Default behaviour is to use the factors
 supplied by <a href="emf.html">emf</a></p></dd>
+
+
 <dt>map</dt>
 <dd><p>a named list of parameters as factors that are to be fixed during
 estimation, e.g., <code>list(psi = factor(NA))</code></p></dd>
+
+
 <dt>parameters</dt>
 <dd><p>a list of initial values for all model parameters and
 unobserved states, default is to let sfilter specify these. Only play with
 this if you know what you are doing</p></dd>
+
+
 <dt>fit.to.subset</dt>
 <dd><p>fit the SSM to the data subset determined by
 <a href="prefilter.html">prefilter</a> (default is TRUE)</p></dd>
+
+
 <dt>control</dt>
 <dd><p>list of control settings for the outer optimizer
 (see <a href="ssm_control.html">ssm_control</a> for details)</p></dd>
+
+
 <dt>inner.control</dt>
 <dd><p>list of control settings for the inner optimizer
 (see <a href="https://rdrr.io/pkg/TMB/man/MakeADFun.html" class="external-link">TMB::MakeADFun</a> for additional details)</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>is deprecated, use ssm_control(verbose = 1) instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
+
 <dt>optim</dt>
 <dd><p>is deprecated, use <code>ssm_control(optim = "optim")</code> instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
+
 <dt>optMeth</dt>
 <dd><p>is deprecated, use <code>ssm_control(method = "L-BFGS-B")</code> instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
+
 <dt>lpsi</dt>
 <dd><p>is deprecated, use <code>ssm_control(lower = list(lpsi = -Inf))</code> instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a list with components</p><ul><li><p><code>call</code> the matched call</p></li>
+    
+
+<p>a list with components</p><ul><li><p><code>call</code> the matched call</p></li>
 <li><p><code>predicted</code> an sf tbl of predicted location states</p></li>
 <li><p><code>fitted</code> an sf tbl of fitted locations</p></li>
 <li><p><code>par</code> model parameter summary</p></li>
@@ -266,7 +305,7 @@ a mixed effects model. Ecology. 100(1):e02566</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

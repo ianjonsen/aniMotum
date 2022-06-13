@@ -18,7 +18,7 @@ temporally regular or irregular location data"><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -98,34 +98,53 @@ temporally regular or irregular location data</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>ssm_df</code> fit object or a data frame of observations (see details)</p></dd>
+
+
 <dt>what</dt>
 <dd><p>if a <code>ssm_df</code> fit object is supplied then <code>what</code> determines
 whether fitted, predicted (default), or rerouted values are mapped; ignored if
 <code>x</code> is a data frame</p></dd>
+
+
 <dt>model</dt>
 <dd><p>mpm model to fit; either <code>mpm</code> with unpooled random walk
 variance parameters (<code>sigma_(g,i)</code>) or <code>jmpm</code> with a single,
 pooled random variance parameter (<code>sigma_g</code>)</p></dd>
+
+
 <dt>coords</dt>
 <dd><p>column numbers of the location coordinates (default = 3:4)</p></dd>
+
+
 <dt>control</dt>
 <dd><p>list of control settings for the outer optimizer
 (see <a href="mpm_control.html">mpm_control</a> for details)</p></dd>
+
+
 <dt>inner.control</dt>
 <dd><p>list of control parameters for the inner optimization</p></dd>
+
+
 <dt>optim</dt>
 <dd><p>is deprecated, use ssm_control(optim = "optim") instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
+
 <dt>optMeth</dt>
 <dd><p>is deprecated, use ssm_control(method = "L-BFGS-B") instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>is deprecated, use ssm_control(verbose = 1) instead,
 see <a href="ssm_control.html">ssm_control</a> for details</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a list with components</p><ul><li><p><code>fitted</code> a dataframe of fitted locations</p></li>
+    
+
+<p>a list with components</p><ul><li><p><code>fitted</code> a dataframe of fitted locations</p></li>
 <li><p><code>par</code> model parameter summary</p></li>
 <li><p><code>data</code> input data.frame</p></li>
 <li><p><code>tmb</code> the <code>TMB</code> object</p></li>
@@ -163,7 +182,7 @@ a mixed effects model. Ecology. 100(1):e02566</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

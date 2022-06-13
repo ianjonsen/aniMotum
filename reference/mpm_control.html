@@ -18,7 +18,7 @@ control parameters, and parameter bounds used by fit_mpm."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -95,41 +95,60 @@ control parameters, and parameter bounds used by <code>fit_mpm</code>.</p>
     <h2>Arguments</h2>
     <dl><dt>optim</dt>
 <dd><p>the numerical optimizer used in the fit</p></dd>
+
+
 <dt>method</dt>
 <dd><p>if optim = "optim" then the optimization method to be used
 can be one of "BFGS", "L-BFGS-B", "Nelder-Mead", "CG", "SANN", or "Brent"
 see <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></code> for details</p></dd>
+
+
 <dt>lower</dt>
 <dd><p>a list named parameter lower bounds, if NULL then built in
 defaults are used when <code>method = "L-BFGS-B"</code>. Possible parameter names are:
 <code>l_sigma</code> a vector of length 2, log scale; <code>l_rho_p</code> a scalar, logit scale;
 <code>l_D</code> a scalar, log scale; <code>l_psi</code> a scalar, log scale;
 <code>l_tau</code> a vector of length 2, log scale; <code>l_rho_o</code> a scalar, logit scale</p></dd>
+
+
 <dt>upper</dt>
 <dd><p>a list of named parameter upper bounds, if NULL then built in
 defaults are used when <code>method = "L-BFGS-B"</code>. Possible parameter names are same as <code>lower</code></p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>integer; report progress during minimization: 0 = silent;
 1 = optimizer trace; 2 = parameter trace (default))</p></dd>
+
+
 <dt>...</dt>
 <dd><p>control parameters for the chosen optimizer</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns a list with components</p>
+    
+
+<p>Returns a list with components</p>
 <dl><dt><code>optim</code></dt>
 <dd><p>the name of the numerical optimizer as a
 string, "nlminb" or "optim"</p></dd>
+
 <dt><code>method</code></dt>
 <dd><p>optimization method to be used</p></dd>
+
 <dt><code>lower</code></dt>
 <dd><p>named list of lower parameter bounds</p></dd>
+
 <dt><code>upper</code></dt>
 <dd><p>named list of upper parameter bounds</p></dd>
+
 <dt><code>verbose</code></dt>
 <dd><p>level of tracing information to be reported</p></dd>
+
 <dt><code>control</code></dt>
 <dd><p>list of control parameters for the optimizer</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -157,7 +176,7 @@ for available options. Adapted from S. Wotherspoon
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@ tibble."><meta property="og:image" content="https://ianjonsen.github.io/foieGras
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -92,27 +92,38 @@ individual data sets. The specified <code>tibble</code>'s are appended to a sing
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> <code>ssm_df</code> or <code>mpm_df</code> model object</p></dd>
+
+
 <dt>what</dt>
 <dd><p>the tibble to be grabbed; either <code>fitted</code>, <code>predicted</code>,
 <code>rerouted</code> (<code>ssm_df</code> only), or <code>data</code> (single letters can be used).</p></dd>
+
+
 <dt>as_sf</dt>
 <dd><p>logical; if FALSE (default) then return a <code>tibble</code> with
 un-projected longlat coordinates, otherwise return an <code>sf tibble</code>. Ignored
 if x is an <code>mpm</code> model object.</p></dd>
+
+
 <dt>normalise</dt>
 <dd><p>logical; if output includes a move persistence estimate,
 should <code>g</code> (the move persistence index) be normalised to have minimum = 0 and
 maximum = 1 (default = FALSE). Note, this normalisation is not applied to the
 standard errors of the logit-scale move persistence estimates (<code>logit_g</code>,
 <code>logit_g.se</code>).</p></dd>
+
+
 <dt>group</dt>
 <dd><p>logical; should <code>g</code> be normalised among individuals as a group,
 a 'relative g', or to individuals separately to highlight regions of lowest
 and highest move persistence along single tracks (default = FALSE).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a <code>tibble</code> with all individual <code>tibble</code>'s appended</p>
+    
+
+<p>a <code>tibble</code> with all individual <code>tibble</code>'s appended</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -145,7 +156,7 @@ will be re-projected to that <code>crs</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

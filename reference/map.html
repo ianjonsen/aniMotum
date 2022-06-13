@@ -18,7 +18,7 @@ coastline and projection options"><meta property="og:image" content="https://ian
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -103,60 +103,89 @@ coastline and projection options</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> ssm fit object with class <code>ssm_df</code> or (old) <code>fG_ssm</code></p></dd>
+
+
 <dt>y</dt>
 <dd><p>optionally, a <code>foieGras</code> mpm fit object with class <code>mpm_df</code> or (old)
 <code>fG_mpm</code></p></dd>
+
+
 <dt>what</dt>
 <dd><p>specify which location estimates to map: fitted, predicted or
 rerouted</p></dd>
+
+
 <dt>aes</dt>
 <dd><p>a list of map controls and aesthetics (shape, size, col, fill, alpha)
 for each map feature (estimated locations, confidence ellipses, track lines,
 observed locations, land masses, water bodies). Constructed by <code><a href="aes_lst.html">aes_lst()</a></code> and
 can be modified for custom maps (see examples)</p></dd>
+
+
 <dt>by.id</dt>
 <dd><p>when mapping multiple tracks, should locations be coloured by
 id (logical; default = TRUE if <code>nrow(x) &gt; 1</code> else FALSE; ignored if behavioural
 index provided)</p></dd>
+
+
 <dt>by.date</dt>
 <dd><p>when mapping single tracks, should locations be coloured by
 date (logical; default = FALSE; ignored if behavioural
 index provided)</p></dd>
+
+
 <dt>crs</dt>
 <dd><p><code>proj4string</code> for re-projecting locations, if NULL the
 default projection (Mercator) for the fitting the SSM will be used</p></dd>
+
+
 <dt>ext.rng</dt>
 <dd><p>proportion (can exceed 1) to extend the plot range in x and y
 dimensions</p></dd>
+
+
 <dt>buffer</dt>
 <dd><p>distance (in km) to buffer locations for subsetting land
 polygons (default = 10000). If map extents are expanded by many factors then
 the buffer distance may need to be increased, otherwise this should not be
 used. Ignored if <code>map_type != "default"</code>.</p></dd>
+
+
 <dt>map_type</dt>
-<dd><p>background map type ("default" uses <a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a>
+<dd><p>background map type ("default" uses <a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a>
 to add land polygons). If the <code>rnaturalearthdata</code> package is installed then
 high-resolution land polygons will be used. If the <code>ggspatial</code>
 and <code>rosm</code> packages are installed then any tile map type returned by
 <a href="https://rdrr.io/pkg/rosm/man/osm.types.html" class="external-link">rosm::osm.types</a> can be used for a potentially more detailed coastline at
 fine spatial scales, given appropriate zoom settings
 (see <a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a> for details).</p></dd>
+
+
 <dt>normalise</dt>
 <dd><p>logical; if output includes a move persistence estimate,
 should g (the move persistence index) be normalised to have minimum = 0 and
 maximum = 1 (default = TRUE).</p></dd>
+
+
 <dt>group</dt>
 <dd><p>logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move
 persistence along a track (default = FALSE).</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>logical; generate maps silently (default = FALSE).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments passed to <a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a map as a ggplot2 object</p>
+    
+
+<p>a map as a ggplot2 object</p>
     </div>
 
     <div id="ref-examples">
@@ -186,7 +215,7 @@ persistence along a track (default = FALSE).</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

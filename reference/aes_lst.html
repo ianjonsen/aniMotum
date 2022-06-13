@@ -20,7 +20,7 @@ palettes for i) behavioural indices or ii) individual animal tracks"><meta prope
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -106,40 +106,67 @@ palettes for i) behavioural indices or ii) individual animal tracks</p>
     <h2>Arguments</h2>
     <dl><dt>est</dt>
 <dd><p>logical; turns on estimated locations (default = TRUE)</p></dd>
+
+
 <dt>conf</dt>
 <dd><p>logical; turns on estimated confidence ellipses. Default varies
 depending on whether behavioural index is being mapped &amp;/or if single versus
 multiple tracks are being mapped.</p></dd>
+
+
 <dt>line</dt>
 <dd><p>logical; turns on estimated track line(s) (default varies)</p></dd>
+
+
 <dt>mp</dt>
 <dd><p>logical; turns on move persistence index (default = TRUE, if present in model fit)</p></dd>
+
+
 <dt>obs</dt>
 <dd><p>logical; turns on observed locations (default = FALSE)</p></dd>
+
+
 <dt>shape</dt>
 <dd><p>gpplot2 shape value (integer: 0, 25) for estimated &amp; observed
 locations</p></dd>
+
+
 <dt>size</dt>
 <dd><p>ggplot2 size value for estimated locations &amp; track lines, and
 observed locations</p></dd>
+
+
 <dt>col</dt>
 <dd><p>colour for estimated locations and track lines, and observed
 locations</p></dd>
+
+
 <dt>fill</dt>
 <dd><p>fill colour for estimated locations &amp; confidence ellipses,
 observed locations, land polygons, and water</p></dd>
+
+
 <dt>alpha</dt>
 <dd><p>transparency for specified fills/colours</p></dd>
+
+
 <dt>mp_pal</dt>
 <dd><p>continuous colour palette for move persistence values</p></dd>
+
+
 <dt>id_pal</dt>
 <dd><p>discrete colour palette for track id's</p></dd>
+
+
 <dt>date_pal</dt>
 <dd><p>continuous colour palette for displaying date along track</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a named list, with 9 elements, of map components and aesthetics</p><ol><li><p>elements 1-5 - map components: <code>est</code>, <code>conf</code>, <code>line</code>, <code>mp</code>, <code>obs</code></p></li>
+    
+
+<p>a named list, with 9 elements, of map components and aesthetics</p><ol><li><p>elements 1-5 - map components: <code>est</code>, <code>conf</code>, <code>line</code>, <code>mp</code>, <code>obs</code></p></li>
 <li><p>element 6: a data.frame named <code>df</code> containing ggplot2 aesthetics: <code>shape</code>,
 <code>size</code>, <code>col</code>, <code>fill</code>, and <code>alpha</code>. <code>df</code> has 6 rows, corresponding to the map
 features:  estimated locations, confidence ellipses, track lines, observed
@@ -172,7 +199,7 @@ locations, land polygons, and water</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

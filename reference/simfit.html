@@ -19,7 +19,7 @@ equal to the number of observations used in the SSM fit."><meta property="og:ima
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -98,28 +98,43 @@ equal to the number of observations used in the SSM fit.</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>ssm</code> fit object with class <code>ssm_df</code></p></dd>
+
+
 <dt>what</dt>
 <dd><p>simulate fitted (typically irregular in time) or predicted
 (typically regular in time) locations</p></dd>
+
+
 <dt>reps</dt>
 <dd><p>number of replicate tracks to simulate from an <code>ssm</code> model
 fit object</p></dd>
+
+
 <dt>grad</dt>
 <dd><p>a rasterStack of x- and y-gradients as separate layers (see details)</p></dd>
+
+
 <dt>beta</dt>
 <dd><p>a 2-element vector of parameters defining the potential function
 magnitude in x- and y-directions (ignored if <code>is.null(grad)</code>,
 ie. no potential function; see details).</p></dd>
+
+
 <dt>cpf</dt>
 <dd><p>logical; should simulated tracks return to their start point
 (ie. a central-place forager)</p></dd>
+
+
 <dt>sim_only</dt>
 <dd><p>logical, do not include <code>ssm</code> estimated location in output
 (default is FALSE)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a <code>fG_simfit</code> object containing the paths simulated from a
+    
+
+<p>a <code>fG_simfit</code> object containing the paths simulated from a
 <code>ssm</code> fit object</p>
     </div>
     <div id="details">
@@ -164,7 +179,7 @@ to work, especially if <code>cpf = TRUE</code>!</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

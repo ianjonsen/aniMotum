@@ -21,7 +21,7 @@ object to fit_mpm"><meta property="og:image" content="https://ianjonsen.github.i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -99,19 +99,32 @@ object to <code>fit_mpm</code></p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>temporally regularized location data, eg. output from <code>fit_ssm</code></p></dd>
+
+
 <dt>model</dt>
 <dd><p>specify whether MPM is to be fit with unpooled ("mpm") or pooled ("jmpm") RW variance(s).</p></dd>
+
+
 <dt>control</dt>
 <dd><p>list of control settings for the outer optimizer (see <code>mpm_control</code> for details)</p></dd>
+
+
 <dt>inner.control</dt>
 <dd><p>list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>is deprecated, use ssm_control(verbose = 1) instead, see <code>ssm_control</code> for details</p></dd>
+
+
 <dt>optim</dt>
 <dd><p>is deprecated, use ssm_control(optim = "optim") instead, see <code>ssm_control</code> for details</p></dd>
+
+
 <dt>optMeth</dt>
 <dd><p>is deprecated, use ssm_control(method = "L-BFGS-B") instead, see <code>ssm_control</code> for details</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -130,7 +143,7 @@ object to <code>fit_mpm</code></p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

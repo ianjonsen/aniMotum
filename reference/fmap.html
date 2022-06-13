@@ -18,7 +18,7 @@ Argos observations, optionally apply a different projection"><meta property="og:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
       </span>
     </div>
 
@@ -109,58 +109,97 @@ Argos observations, optionally apply a different projection</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>foieGras</code> ssm fit object with class <code>ssm_df</code></p></dd>
+
+
 <dt>y</dt>
 <dd><p>optionally, a <code>foieGras</code> mpm fit object with class <code>mpm_df</code>;
 default is NULL</p></dd>
+
+
 <dt>what</dt>
 <dd><p>specify which location estimates to map: fitted, predicted or
 rerouted</p></dd>
+
+
 <dt>conf</dt>
 <dd><p>include confidence regions around estimated location (logical;
 default = TRUE, unless y is an mpm fit object then conf is FALSE)</p></dd>
+
+
 <dt>obs</dt>
 <dd><p>include Argos observations on map (logical; default = FALSE)</p></dd>
+
+
 <dt>obs.shp</dt>
 <dd><p>point shape for observations (default = 17)</p></dd>
+
+
 <dt>by.id</dt>
 <dd><p>when mapping multiple tracks, should locations be coloured by
 id (logical; default = TRUE if nrow(x) &gt; 1 else FALSE)</p></dd>
+
+
 <dt>by.date</dt>
 <dd><p>when mapping single tracks, should locations be coloured by
 date (logical; default = TRUE if nrow(x) == 1 else FALSE)</p></dd>
+
+
 <dt>crs</dt>
 <dd><p><code>proj4string</code> for re-projecting locations, if NULL the
 default projection ("+proj=merc") for the fitting the SSM will be used</p></dd>
+
+
 <dt>ext.rng</dt>
 <dd><p>factors to extend the plot range in x and y dimensions
 (can exceed 1)</p></dd>
+
+
 <dt>size</dt>
 <dd><p>size of estimated location points (size = NA will draw no points).
 Optionally, a vector of length 2 with size of observed locations given by 2nd
 value (ignored if obs = FALSE)</p></dd>
+
+
 <dt>col.ssm</dt>
 <dd><p>colour of ssm-fitted or ssm-predicted locations (ignored if by.id = TRUE)</p></dd>
+
+
 <dt>col.obs</dt>
 <dd><p>colour of observed locations (ignored if obs = FALSE)</p></dd>
+
+
 <dt>lines</dt>
 <dd><p>logical indicating if lines are added to connect estimated
 locations (default = FALSE)</p></dd>
+
+
 <dt>landfill</dt>
 <dd><p>colour to use for land (default = grey(0.6))</p></dd>
+
+
 <dt>map_type</dt>
 <dd><p>background map type (default = NULL, which uses rnaturalearth
 to add landmasses); if packages <code>ggspatial</code> &amp; <code>rosm</code> are installed
 then any map type returned by <a href="https://rdrr.io/pkg/rosm/man/osm.types.html" class="external-link">rosm::osm.types</a> can be used for a more
 detailed map background.</p></dd>
+
+
 <dt>pal</dt>
 <dd><p><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a> palette to use (default: "Cividis"; type
 <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.pals()</a></code> for options)</p></dd>
+
+
 <dt>rev</dt>
 <dd><p>reverse colour palette (logical)</p></dd>
+
+
 <dt>last_loc</dt>
 <dd><p>colour to render last location of each track (default = NULL)</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments passed to <a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile</a></p></dd>
+
 </dl></div>
 
   </div>
@@ -175,7 +214,7 @@ detailed map background.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>
