@@ -92,7 +92,7 @@ plot.mpm_df <-
           ),
           fill = grey(0.5),
           alpha = 0.25) +
-          geom_point(aes(date, g, colour = g)) + 
+          geom_point(aes(date, g, colour = g), size = 1.25) + 
           scale_colour_gradientn(colours = hcl.colors(n=100, palette = pal, rev = rev),
                                  limits = c(0,1),
                                  name = expression(gamma[t])

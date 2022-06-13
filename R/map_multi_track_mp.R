@@ -132,14 +132,14 @@ map_multi_track_mp <- function(map_type,
   if (all(aes$est, aes$mp)) {
     p <- p +
       geom_sf(
-        data = loc_sf %>% filter(g > 0.3),
+        data = loc_sf %>% filter(g > 0.5),
         aes_string(colour = "g"),
         size = aes$df$size[1],
         stroke = 0.1,
         shape = aes$df$shape[1]
       ) +
       geom_sf(
-        data = loc_sf %>% filter(g <= 0.3),
+        data = loc_sf %>% filter(g <= 0.5),
         aes_string(colour = "g"),
         size = aes$df$size[1],
         stroke = 0.1,

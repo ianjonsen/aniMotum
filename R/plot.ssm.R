@@ -391,7 +391,7 @@ plot.ssm_df <-
               data = ssm.lst[[i]],
               aes(date, g, col = g),
               shape = 20,
-              size = 3
+              size = 1.25
             ) +
             scale_colour_gradientn(
               colours = hcl.colors(n = 100, palette = pal),
@@ -400,9 +400,10 @@ plot.ssm_df <-
             ) +
             labs(title = paste("id:", x[i, "id"]))
           
+          
           m <- m +
             xlab(element_blank()) +
-            ylab(element_blank()) +
+            ylab(expression(gamma[t])) +
             theme_minimal()
           m
         })
