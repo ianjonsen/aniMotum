@@ -34,7 +34,7 @@ geolocations and GPS.
 
 ## Installation
 
-First, ensure you have R version \>= 3.6.0 installed (preferably R 4.1.0
+First, ensure you have R version \>= 4.0.0 installed (preferably R 4.1.0
 or higher):
 
 ``` r
@@ -65,7 +65,7 @@ install.packages("foieGras",
 ```
 
 `install.packages` will tell you that both a binary (CRAN, v0.7-6) and a
-source (R-Universe, v1.0-5) version exist but the source version is
+source (R-Universe, \>= v1.0-5) version exist but the source version is
 newer. Answer `Yes` to install the source version, provided you have the
 appropriate compiler tools available (See **From GitHub (source)**,
 below).
@@ -87,12 +87,9 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 If you don’t want to install compiler tools or have trouble getting them
 to work then you can manually download a binary version of the
 `{foieGras}` package for Windows or Mac from here
-<https://ianjonsen.r-universe.dev/ui#builds> - click the Windows/Mac
-icons (either R 4.2 or 4.1) on the table line corresponding to
-`{foieGras}`, and choose the appropriate `-release` version from the
-bottom of the page. In R, use the following command to install from the
-file you’ve just downloaded (where `path_to_file` is wherever you saved
-the download:
+<https://ianjonsen.r-universe.dev/ui#package:foieGras>. In R, use the
+following command to install from the file you’ve just downloaded (where
+`path_to_file` is wherever you saved the download:
 
 ``` r
 # for Windows
@@ -111,7 +108,8 @@ install.packages("path_to_file/package-macos-release/foieGras_1.0-5.tgz",
 downloaded within `R`, in the usual way `install.packages("foieGras")`
 or, more completely:
 `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`.
-{foieGras} `v1.0-5` probably won’t become available on CRAN.
+{foieGras} `v1.0-5` and later versions probably won’t become available
+on CRAN.
 
 ### From GitHub (source)
 
@@ -166,7 +164,6 @@ plot(fit, type = 3, pages = 1, ncol = 2)
 ``` r
 map(fit, 
     what = "predicted", 
-    normalise = TRUE,
     crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
 

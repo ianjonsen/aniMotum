@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 `{foieGras}` is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS. 
 
 ## Installation 
-First, ensure you have R version >= 3.6.0 installed (preferably R 4.1.0 or higher):
+First, ensure you have R version >= 4.0.0 installed (preferably R 4.1.0 or higher):
 
 ```{r get-version, eval = FALSE}
 R.Version()
@@ -54,7 +54,7 @@ install.packages("foieGras",
                            "https://ianjonsen.r-universe.dev"),
                  dependencies = "Suggests")
 ```
-`install.packages` will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, v1.0-5) version exist but the source version is newer. Answer `Yes` to install the source version, provided you have the appropriate compiler tools available (See **From GitHub (source)**, below). 
+`install.packages` will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, >= v1.0-5) version exist but the source version is newer. Answer `Yes` to install the source version, provided you have the appropriate compiler tools available (See **From GitHub (source)**, below). 
 
 To avoid doing the above every time you want to re-install `{foieGras}`, you can add my R-Universe repo to your local list of repositories for package download in your `.Rprofile`. This ensures `install.packages` automatically grabs the latest version of `{foieGras}`
 ```{r, eval=FALSE}
@@ -66,7 +66,7 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
                   CRAN = 'https://cloud.r-project.org'))
 ```
 
-If you don't want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the `{foieGras}` package for Windows or Mac from here https://ianjonsen.r-universe.dev/ui#builds - click the Windows/Mac icons (either R 4.2 or 4.1) on the table line corresponding to `{foieGras}`, and choose the appropriate `-release` version from the bottom of the page. In R, use the following command to install from the file you've just downloaded (where `path_to_file` is wherever you saved the download:
+If you don't want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the `{foieGras}` package for Windows or Mac from here https://ianjonsen.r-universe.dev/ui#package:foieGras. In R, use the following command to install from the file you've just downloaded (where `path_to_file` is wherever you saved the download:
 
 ```{r, eval=FALSE}
 # for Windows
@@ -81,7 +81,7 @@ install.packages("path_to_file/package-macos-release/foieGras_1.0-5.tgz",
 
 
 ### From CRAN  
-`{foieGras}` `v0.7-6` is on [CRAN](https://cran.r-project.org/package=foieGras/) and can be downloaded within `R`, in the usual way `install.packages("foieGras")` or, more completely: `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`. {foieGras} `v1.0-5` probably won't become available on CRAN.
+`{foieGras}` `v0.7-6` is on [CRAN](https://cran.r-project.org/package=foieGras/) and can be downloaded within `R`, in the usual way `install.packages("foieGras")` or, more completely: `install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`. {foieGras} `v1.0-5` and later versions probably won't become available on CRAN.
 
 
 ### From GitHub (source)  
@@ -115,14 +115,13 @@ plot(fit, type = 3, pages = 1, ncol = 2)
 ```{r ex1, echo=FALSE, message=FALSE, fig.dim=c(9,4), out.width="100%"}
 library(foieGras)
 load("misc/fit.rda")
-plot(fit, type = 3, pages = 1, ncol = 2)
+plot(fit, type = 3, pages = 1, ncol = 2, pal = "Plasma")
 ```
 
 
 ```{r example2, eval=FALSE, message=FALSE}
 map(fit, 
     what = "predicted", 
-    normalise = TRUE,
     crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
 
