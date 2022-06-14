@@ -30,12 +30,13 @@ sim.mp <- sim(N = 200, model = "mp", sigma_g = 0.3)
 ```
 
 ### Plot simulated tracks
-```{r plot.sim, fig.width=7, fig.height=6}
+```{r plot.sim, eval=FALSE, fig.width=7, fig.height=6}
 (plot(sim.rw, type=2) + labs(title="'rw'") | plot(sim.crw, type=2) + labs(title="'crw'")) / 
   (plot(sim.mp, type = 2) + labs(title="'mp'") | plot(sim.mp, type = 1)) + 
   plot_layout(guides = 'collect') & 
   theme(legend.position = 'bottom')
 ```
+![](images/track_simulation/plot_sim1.jpg){width=95%}
 
 #### Fit SSM to simulated lon,lat locations (with Argos error)
 ```{r SSM, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
@@ -61,7 +62,7 @@ loc.rw <- grab(fit.rw, "fitted")
 loc.crw <- grab(fit.crw, "fitted")
 ```
 
-```{r plots, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
+```{r plots, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 # compare estimated to true values in y-direction
 ggplot() +
   geom_point(data = sim.rw, aes(date, I(y+y.err)), col = "grey60") +       # y-values observed with Argos error
@@ -69,6 +70,7 @@ ggplot() +
   geom_point(data = loc.rw, aes(date, y), cex = 0.7, col = "firebrick") +  # RW SSM fitted y
   geom_point(data = loc.crw, aes(date, y), cex = 0.4, col = "orange")      # CRW SSM fitted y
 ```
+![](images/track_simulation/plot_sim2.jpg){width=95%}
 
 The `rw` (red) and `crw` (orange) SSM's yield similar, reasonable fits to the RW simulated track, although both tend to smooth through some of the natural variability in the simulated true y-values (blue). This reflects a common inability of SSM's to fully separate process and measurement variability in an unbiased manner, especially when measurement error is greater than natural variability (Auger-Méthé et al. 2016).
 

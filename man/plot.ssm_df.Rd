@@ -45,8 +45,8 @@ a single page (ignored if pages = 0)}
 \item{ask}{logical; if TRUE (default) user is asked for input before each plot
 is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Zissou1";
-see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}}
+for options)}
 
 \item{normalise}{logical; if plotting move persistence estimates from an \code{mp}
 model fit, should estimates be normalised to 0,1 (default = TRUE).}

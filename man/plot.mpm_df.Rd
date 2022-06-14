@@ -11,7 +11,7 @@
   pages = 0,
   ncol = 1,
   ask = TRUE,
-  pal = "Cividis",
+  pal = "Plasma",
   rev = FALSE,
   ...
 )
@@ -35,7 +35,7 @@ this may be increased for multi-individual objects. Ignored if pages = 0}
 \item{ask}{logical; if TRUE (default) user is asked for input before each
 plot is rendered. set to FALSE to return ggplot objects}
 
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Cividis";
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Plasma";
 see \link[grDevices:palettes]{grDevices::hcl.pals} for options)}
 
 \item{rev}{reverse colour palette (logical)}
