@@ -4,7 +4,7 @@
 \alias{plot.sim}
 \title{plot}
 \usage{
-\method{plot}{sim}(x, type = 2, error = FALSE, pal = "Cividis", rev = FALSE, ...)
+\method{plot}{sim}(x, type = 2, error = FALSE, pal = "Plasma", rev = FALSE, ...)
 }
 \arguments{
 \item{x}{a \code{foieGras} simulation data.frame with class \code{sim}}
@@ -17,7 +17,7 @@ model = "mp")}
 \item{error}{logical, plot locations with error (TRUE) or without. Ignored
 in 1-D time-series plots}
 
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Cividis");
+\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Plasma");
 see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options}
 
 \item{rev}{reverse direction of colour palette; logical (default = FALSE)}

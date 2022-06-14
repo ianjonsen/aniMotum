@@ -9,7 +9,7 @@
 ##' model = "mp")
 ##' @param error logical, plot locations with error (TRUE) or without. Ignored 
 ##' in 1-D time-series plots
-##' @param pal [grDevices::hcl.colors] palette to use (default: "Cividis"); 
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Plasma"); 
 ##' see [grDevices::hcl.pals()] for options
 ##' @param rev reverse direction of colour palette; logical (default = FALSE)
 ##' @param ... additional arguments to be ignored
@@ -33,7 +33,7 @@
 plot.sim <- function(x, 
                      type = 2,
                      error = FALSE,
-                     pal = "Cividis",
+                     pal = "Plasma",
                      rev = FALSE,
                      ...)
 {

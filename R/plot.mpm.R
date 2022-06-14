@@ -14,7 +14,7 @@
 ##' this may be increased for multi-individual objects. Ignored if pages = 0
 ##' @param ask logical; if TRUE (default) user is asked for input before each 
 ##' plot is rendered. set to FALSE to return ggplot objects
-##' @param pal [grDevices::hcl.colors] palette to use (default: "Cividis"; 
+##' @param pal [grDevices::hcl.colors] palette to use (default: "Plasma"; 
 ##' see [grDevices::hcl.pals] for options)
 ##' @param rev reverse colour palette (logical)
 ##' @param ... additional arguments to be ignored
@@ -54,7 +54,7 @@ plot.mpm_df <-
            pages = 0,
            ncol = 1,
            ask = TRUE,
-           pal = "Cividis",
+           pal = "Plasma",
            rev = FALSE,
            ...
   )

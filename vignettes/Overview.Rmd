@@ -175,13 +175,18 @@ Here, the fitted location data.frame includes individual id, date-time, longitud
 
 A generic `plot` (see `?plot.ssm_df`) method allows a quick visual of the SSM fit to the data:
 
-```{r fit plot, fig.width=7, fig.height=5}
+```{r fit plot1, eval=FALSE, fig.width=7, fig.height=5}
 # plot time-series of the fitted values
-plot(fit, what = "fitted", type = 1)
-
-# plot fitted values as a 2-d track
-plot(fit, what = "predicted", type = 2, alpha = 0.05)
+plot(fit, what = "fitted", type = 1, pages = 1)
 ```
+![](images/overview/fit_plot1.jpg){width=95%}
+
+```{r fit plot2, eval=FALSE, fig.width=7, fig.height=5}
+# plot fitted values as a 2-d track
+plot(fit, what = "predicted", type = 2, alpha = 0.05, pages = 1)
+```
+![](images/overview/fit_plot2.jpg){width=95%}
+
 
 The predicted values (red points) are the state estimates predicted at regular time intervals, specified by `time.step` (here a 24 h interval). These estimates are plotted on top of 2 x SE intervals (red-filled ribbon), and the observations that passed the `prefilter` stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - `plot(fit)`. A 2-D time series plot of the track is invoked by the argument `type = 2`, and includes the 95 % confidence ellipses (red-filled ellipses) around the predicted locations.
 

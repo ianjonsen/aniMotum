@@ -41,8 +41,8 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' a single page (ignored if pages = 0)
 ##' @param ask logical; if TRUE (default) user is asked for input before each plot 
 ##' is rendered. set to FALSE to return ggplot objects
-##' @param pal [grDevices::hcl.colors] palette to use (default: "Zissou1"; 
-##' see [grDevices::hcl.pals()] for options)
+##' @param pal [grDevices::hcl.colors] palette to use (see [grDevices::hcl.pals()]
+##' for options)
 ##' @param normalise logical; if plotting move persistence estimates from an `mp`
 ##' model fit, should estimates be normalised to 0,1 (default = TRUE).
 ##' @param group logical; should `g` be normalised among individuals as a group, 
@@ -107,7 +107,7 @@ plot.ssm_df <-
                 "#ffa500", # orange
                 "#000000") # black
       
-      pal <- "Cividis"
+      pal <- "Plasma"
     }
     
     if (inherits(x, "ssm_df")) {

@@ -13,9 +13,9 @@ aes_lst(
   shape = c(19, NA, NA, 17, NA, NA),
   size = c(1.25, NA, 0.2, 0.8, NA, NA),
   col = c("dodgerblue", NA, "grey50", "orange", NA, NA),
-  fill = c("dodgerblue", "dodgerblue", NA, "orange", "grey60", "grey95"),
+  fill = c("dodgerblue", "dodgerblue", NA, "orange", "grey60", "grey85"),
   alpha = c(1, 0.4, 1, 1, 1, NA),
-  mp_pal = hcl.colors(100, palette = "Cividis", rev = FALSE),
+  mp_pal = hcl.colors(100, palette = "Plasma", rev = FALSE),
   id_pal = "Harmonic",
   date_pal = hcl.colors(100, palette = "Viridis", rev = FALSE)
 )
