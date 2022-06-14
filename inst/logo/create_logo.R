@@ -45,7 +45,7 @@ m1 <- ggdraw() +
 s <- sticker(
   m1,
   package = "foieGras",
-  p_size = 18,
+  p_size = 6,
   p_y = 1.6,
   p_family = "sans",
   p_color = "#C4B56CFF",
