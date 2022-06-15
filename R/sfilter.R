@@ -197,7 +197,10 @@ sfilter <-
     }
 
     ## start to work out which obs_mod to use for each observation
-    d <- d %>% mutate(obs.type = factor(obs.type, levels = c("LS","KF","GLS","GPS"), labels = c("LS","KF","GLS","GPS")))
+    d <- d %>% mutate(obs.type = factor(obs.type, 
+                                        levels = c("LS","KF","GLS","GPS"), 
+                                        labels = c("LS","KF","GLS","GPS"))
+                      )
     p.obst <- table(d$obs.type) / nrow(d)
     # favours KF when mix of few LS + many KF
     obst <- round(which(table(d$obs.type) * p.obst > 0))
