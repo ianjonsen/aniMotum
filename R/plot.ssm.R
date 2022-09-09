@@ -102,10 +102,11 @@ plot.ssm_df <-
     if(pal != "default") {
       cpal <- hcl.colors(n = 5, palette = pal)
     } else {
-      cpal <- c("#1e90ff", # dodgerblue
-                "#b22222", # firebrick
-                "#ffa500", # orange
-                "#000000") # black
+      cpal <- c("#3B99B1", # Zissou 1 n=5, colour 1
+                "#E78F0A", # Zissou 1 n=5, colour 4
+                "#000000", # black 
+                "#F5191C") # Zissou 1 n=5, colour 5
+ 
       
       pal <- "Plasma"
     }
@@ -206,13 +207,15 @@ plot.ssm_df <-
                 data = subset(dd.lst[[i]], !keep),
                 aes(date),
                 colour = cpal[3],
-                sides = "b"
+                sides = "b",
+                alpha = 0.5
               ) +
               geom_rug(
                 data = subset(dd.lst[[i]], keep),
                 aes(date),
                 colour = cpal[1],
-                sides = "b"
+                sides = "b",
+                alpha = 0.5
               )
           } else {
             px <- px +
@@ -227,7 +230,8 @@ plot.ssm_df <-
                 data = subset(dd.lst[[i]], keep),
                 aes(date),
                 colour = cpal[1],
-                sides = "b"
+                sides = "b",
+                alpha = 0.5
               )
           }
           px <- px +
@@ -380,7 +384,7 @@ plot.ssm_df <-
               aes(date,
               ymin = ymin,
               ymax = ymax),
-              fill = grey(0.5),
+              fill = grey(0.35),
               alpha = 0.25) +
             geom_line(
               data = ssm.lst[[i]],
@@ -391,7 +395,7 @@ plot.ssm_df <-
               data = ssm.lst[[i]],
               aes(date, g, col = g),
               shape = 20,
-              size = 1.25
+              size = 1.5
             ) +
             scale_colour_gradientn(
               colours = hcl.colors(n = 100, palette = pal),

@@ -26,8 +26,8 @@
 ##' \code{vignette("momentuHMM", package = "momentuHMM")} for more details on the
 ##' use of potential functions for simulating constrained animal movements. 
 ##' WARNING: This application of potential functions to constrain simulated 
-##' paths is experimental, likely to change in future release, and NOT guaranteed 
-##' to work, especially if \code{cpf = TRUE}!
+##' paths is experimental, likely to change in future releases, and NOT guaranteed 
+##' to work enitrely as intended, especially if \code{cpf = TRUE}!
 ##' 
 ##' @return a \code{fG_simfit} object containing the paths simulated from a 
 ##' \code{ssm} fit object
@@ -63,6 +63,7 @@ simfit <-
   ## Check args ##
   ################
   what <- match.arg(what)
+  
   if(!is.null(grad)) {
     if(!inherits(grad, "RasterStack")) 
       stop("grad must be NULL or a RasterStack with 2 layers")
@@ -217,6 +218,7 @@ simfit <-
                df
              })
     }) 
+    
     tmp <- do.call(rbind, tmp)
     tmp <- as_tibble(tmp)
 

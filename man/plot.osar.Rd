@@ -17,8 +17,8 @@
 \arguments{
 \item{x}{a \code{foieGras} \code{osar} object with class \code{osar}}
 
-\item{type}{type of residual plot to generate; time-series (ts), qqnorm
-(qq; default) or acf (note: hist is deprecated)}
+\item{type}{type of residual plot to generate: time-series (ts; default), qqnorm
+(qq), or acf}
 
 \item{pages}{plots of all individuals on a single page (pages = 1; default)
 or each individual on a separate page (pages = 0)}

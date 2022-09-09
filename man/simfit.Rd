@@ -54,8 +54,8 @@ land (water) avoidance but may also introduce undesirable/unrealistic artefacts
 \code{vignette("momentuHMM", package = "momentuHMM")} for more details on the
 use of potential functions for simulating constrained animal movements.
 WARNING: This application of potential functions to constrain simulated
-paths is experimental, likely to change in future release, and NOT guaranteed
-to work, especially if \code{cpf = TRUE}!
+paths is experimental, likely to change in future releases, and NOT guaranteed
+to work enitrely as intended, especially if \code{cpf = TRUE}!
 }
 \examples{
 fit <- fit_ssm(ellie, model = "crw", time.step = 24)

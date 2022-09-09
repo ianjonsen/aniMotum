@@ -4,8 +4,8 @@
 ##' `foieGras` `osar` object
 ##'
 ##' @param x a `foieGras` `osar` object with class `osar`
-##' @param type type of residual plot to generate; time-series (ts), qqnorm 
-##' (qq; default) or acf (note: hist is deprecated)
+##' @param type type of residual plot to generate: time-series (ts; default), qqnorm 
+##' (qq), or acf
 ##' @param pages plots of all individuals on a single page (pages = 1; default) 
 ##' or each individual on a separate page (pages = 0) 
 ##' @param ncol number of columns to use for faceting. Default is ncol = 2 but 
