@@ -1,4 +1,7 @@
 # compile tmb models
+TMBver <- as.character(packageVersion("TMB"))
+write(TMBver, file = "../../inst/TMB-version")
+
 invisible(sapply(Sys.glob("*.cpp"),
                  TMB::compile,
                  safebounds = FALSE, safeunload = FALSE))
