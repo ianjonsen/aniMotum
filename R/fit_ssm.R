@@ -11,6 +11,26 @@
 ##'
 ##' @param x a data frame of observations including Argos KF error ellipse info 
 ##' (when present)
+##' @param id the name (as a quoted character string) of id variable: a unique 
+##' identifier for individual (animal) track data sets.
+##' @param date the name (as a quoted character string)of the date/time variable:
+##' date and time (as YYYY-MM-DD HH:MM:SS) of each observation.
+##' @param lc the name (as a quoted character string) of the location quality class
+##' variable: Argos location quality class (values in the set: 3,2,1,0,"A","B","Z").
+##' Can also include "G" for GPS data and/or "GL" for light-level geolocation (GLS)
+##' and other data types.
+##' @param coord the names (as quoted character strings) of the location coordinate
+##' variables: defaults are c("lon","lat"), but could also be c("x","y") for planar
+##'  coordinates; or if input data is an \code{sf} object then "geometry". If input
+##'  data is an \code{sf} object then \code{coord} is set to "geometry" by default.
+##' @param epar the names (as quoted character strings) of the Argos error ellipse
+##' parameters: defaults are "smaj" (ellipse semi-major axis), 
+##' "smin" (ellipse semi-minor axis), and "eor" (ellipse orientation). Ignored if
+##' these variables are missing from the input data.
+##' @param sderr the names (as quoted character strings) of provided standard 
+##' errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
+##' these are only provided for processed light-level geolocation data. Ignored if
+##' these variables are missing from the input data.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -120,6 +140,12 @@
 ##' @md
 
 fit_ssm <- function(x,
+                    id = "id",
+                    date = "date",
+                    lc = "lc",
+                    coord = c("lon","lat"),
+                    epar = c("smaj","smin","eor"),
+                    sderr = c("lonerr","laterr"),
                     vmax = 5,
                     ang = c(15,25),
                     distlim = c(2500,5000),
@@ -173,19 +199,13 @@ fit_ssm <- function(x,
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = lpsi)
   }
-
-  ## add id if missing
-  if(! "id" %in% names(x)) {
-    x$id <- 1 
-    x <- x[, c("id", names(x)[names(x) != "id"])]
-  }
   
-  ## in cases where user supplies id as a factor, make sure to drop any unused factor levels
-  if(is.factor(x$id)) x$id <- droplevels(x$id)
+  ## ensure data is in expected format
+  x <- format_data(x, id, date, lc, coord, epar, sderr)
   
   fit <- lapply(split(x, x$id),
                 function(xx) {
-                  prefilter(data = xx,
+                  prefilter(x = xx,
                             vmax = vmax,
                             ang = ang,
                             distlim = distlim,
