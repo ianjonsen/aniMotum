@@ -52,4 +52,4 @@ a data.frame or sf-tibble of input data in expected foieGras format
 \details{
 called by \code{fit_ssm}.
 }
-\keyword{export}
+\keyword{internal}
