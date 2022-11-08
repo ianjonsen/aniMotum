@@ -4,8 +4,8 @@
 ##'
 ##' @param x a `foieGras` simulation data.frame with class `simfit`
 ##' @param type plots tracks as "line", "points" or "both" (default). 
-##' @param zoom logical; should map extent be defined by track extent (TRUE) or 
-##' should global map be drawn (FALSE; default).  
+##' @param zoom logical; should map extent be defined by track extent (TRUE; default) or 
+##' should global map be drawn (FALSE).  
 ##' @param or orientation of projected map, default is to centre on 
 ##' start of fitted track (ignored if `mapproj` package is not installed).
 ##' @param ncol number of columns to arrange multiple plots
@@ -37,7 +37,7 @@
 
 plot.simfit <- function(x, 
                         type = c("lines","points","both"),
-                        zoom = FALSE,
+                        zoom = TRUE,
                         or = NULL,
                         ncol = 1,
                         hires = FALSE,

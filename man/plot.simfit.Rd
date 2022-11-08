@@ -7,7 +7,7 @@
 \method{plot}{simfit}(
   x,
   type = c("lines", "points", "both"),
-  zoom = FALSE,
+  zoom = TRUE,
   or = NULL,
   ncol = 1,
   hires = FALSE,
@@ -19,8 +19,8 @@
 
 \item{type}{plots tracks as "line", "points" or "both" (default).}
 
-\item{zoom}{logical; should map extent be defined by track extent (TRUE) or
-should global map be drawn (FALSE; default).}
+\item{zoom}{logical; should map extent be defined by track extent (TRUE; default) or
+should global map be drawn (FALSE).}
 
 \item{or}{orientation of projected map, default is to centre on
 start of fitted track (ignored if \code{mapproj} package is not installed).}
