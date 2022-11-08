@@ -18,7 +18,7 @@
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
 ##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom ggplot2 element_rect coord_sf
@@ -133,14 +133,14 @@ map_multi_track_mp <- function(map_type,
     p <- p +
       geom_sf(
         data = loc_sf %>% filter(g > 0.5),
-        aes_string(colour = "g"),
+        aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.1,
         shape = aes$df$shape[1]
       ) +
       geom_sf(
         data = loc_sf %>% filter(g <= 0.5),
-        aes_string(colour = "g"),
+        aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.1,
         shape = aes$df$shape[1]
@@ -167,7 +167,7 @@ map_multi_track_mp <- function(map_type,
           legend.text = element_text(size = 8, vjust = 0),
           panel.background = element_rect(fill = aes$df$fill[6], 
                                           colour = NA),
-          panel.grid = element_line(size = 0.1, colour = grey(0.6)))
+          panel.grid = element_line(linewidth = 0.1, colour = grey(0.6)))
   
   return(p)
 }

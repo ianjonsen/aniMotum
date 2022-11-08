@@ -1,4 +1,4 @@
-context("test simfit")
+context("test sim_fit")
 
 ## generate ssm obj a quickly as possible
 ## have to do this to avoid error when calling st_transform on platforms running
@@ -8,27 +8,27 @@ xs <- fit_ssm(ellie,
               model = "crw", 
               time.step=72, 
               control = ssm_control(verbose = 0))
-trs <- simfit(xs, what = "fitted", reps = 2)
+trs <- sim_fit(xs, what = "fitted", reps = 2)
 
-test_that("simfit returns simfit nested tibble with 2 rows", {
-  expect_s3_class(trs, "simfit")
+test_that("sim_fit returns sim_fit nested tibble with 2 rows", {
+  expect_s3_class(trs, "sim_fit")
   expect_s3_class(trs, "crws")
   expect_equal(nrow(trs), 1)
 })
 
-test_that("simfit returns a tibble including estimated track, rep = 0", {
+test_that("sim_fit returns a tibble including estimated track, rep = 0", {
   expect_equal(trs$sims[[1]]$rep[1], 0)
 })
 
-test_that("simfit returns simfit nested tibble with 2 rows", {
-  trs <- simfit(xs, what = "predicted", reps = 2)
-  expect_s3_class(trs, "simfit")
+test_that("sim_fit returns sim_fit nested tibble with 2 rows", {
+  trs <- sim_fit(xs, what = "predicted", reps = 2)
+  expect_s3_class(trs, "sim_fit")
   expect_s3_class(trs, "crws")
   expect_equal(nrow(trs), 1)
 })
 
-test_that("simfit returns a tibble excluding estimated track, rep = 0", {
-  trs <- simfit(xs, what = "p", reps = 2, sim_only = TRUE)
+test_that("sim_fit returns a tibble excluding estimated track, rep = 0", {
+  trs <- sim_fit(xs, what = "p", reps = 2, sim_only = TRUE)
   expect_equal(trs$sims[[1]]$rep[1], 1)
 })
 

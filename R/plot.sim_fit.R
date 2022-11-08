@@ -2,7 +2,7 @@
 ##'
 ##' @description visualize tracks simulated from a `foieGras` model fit
 ##'
-##' @param x a `foieGras` simulation data.frame with class `simfit`
+##' @param x a `foieGras` simulation data.frame with class `sim_fit`
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param zoom logical; should map extent be defined by track extent (TRUE; default) or 
 ##' should global map be drawn (FALSE).  
@@ -25,17 +25,17 @@
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices extendrange
 ##' @importFrom rnaturalearth ne_countries
-##' @method plot simfit
+##' @method plot sim_fit
 ##'
 ##' @examples
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 24)
-##' trs <- simfit(fit, what = "p", reps = 2)
+##' trs <- sim_fit(fit, what = "p", reps = 2)
 ##' plot(trs, type = "b")
 ##'
 ##' @export
 ##' @md
 
-plot.simfit <- function(x, 
+plot.sim_fit <- function(x, 
                         type = c("lines","points","both"),
                         zoom = TRUE,
                         or = NULL,
@@ -47,7 +47,7 @@ plot.simfit <- function(x,
     warning("additional arguments ignored")
   }
   
-  stopifnot("x must be a simfit object with class `simfit`" = inherits(x, "simfit"))
+  stopifnot("x must be a sim_fit object with class `sim_fit`" = inherits(x, "sim_fit"))
   
   type <- match.arg(type)
   
@@ -98,7 +98,7 @@ plot.simfit <- function(x,
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
                          colour = "dodgerblue",
-                         size = 0.5,
+                         linewidth = 0.5,
                          alpha = 0.6
                          )
            },
@@ -115,7 +115,7 @@ plot.simfit <- function(x,
                geom_path(data = subset(x, rep != 0),
                          aes(lon, lat, group = rep),
                          colour = "dodgerblue",
-                         size = 0.5,
+                         linewidth = 0.5,
                          alpha = 0.6
                ) +
                geom_point(data = subset(x, rep != 0),

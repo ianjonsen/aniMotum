@@ -20,7 +20,7 @@
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
 ##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom ggplot2 element_rect coord_sf 
@@ -124,7 +124,7 @@ map_multi_track_base <- function(map_type,
       p <- p +
         geom_sf(
           data = conf_sf,
-          aes_string(fill = "id"),
+          aes(fill = id),
           colour = NA,
           stroke = 0,
           lwd = 0,
@@ -152,7 +152,7 @@ map_multi_track_base <- function(map_type,
       p <- p +
         geom_sf(
           data = line_sf,
-          aes_string(colour = "id"),
+          aes(colour = id),
           size = aes$df$size[3],
           show.legend = "line"
         )
@@ -182,7 +182,7 @@ map_multi_track_base <- function(map_type,
       p <- p +
         geom_sf(
           data = loc_sf,
-          aes_string(colour = "id"),
+          aes(colour = id),
           size = aes$df$size[1],
           stroke = 0.1,
           shape = aes$df$shape[1],
@@ -241,7 +241,7 @@ map_multi_track_base <- function(map_type,
           legend.key.width = unit(0.1, "npc"),
           legend.key.height = unit(0.02, "npc"),
           panel.background = element_rect(fill = aes$df$fill[6], colour = NA),
-          panel.grid = element_line(size = 0.1, colour = grey(0.6))
+          panel.grid = element_line(linewidth = 0.1, colour = grey(0.6))
     )
   
   return(p)

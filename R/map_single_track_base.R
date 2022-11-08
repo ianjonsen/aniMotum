@@ -19,7 +19,7 @@
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
 ##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom ggplot2 element_rect coord_sf
@@ -190,7 +190,7 @@ map_single_track_base <- function(map_type,
           legend.key.width = unit(0.1, "npc"),
           legend.key.height = unit(0.02, "npc"),
           panel.background = element_rect(fill = aes$df$fill[6], colour = NA),
-          panel.grid = element_line(size = 0.1, colour = grey(0.6))
+          panel.grid = element_line(linewidth = 0.1, colour = grey(0.6))
           )
   
   return(p)
