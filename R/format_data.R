@@ -30,7 +30,7 @@
 ##'
 ##' @return a data.frame or sf-tibble of input data in expected foieGras format
 ##' 
-##' @keywords export
+##' @keywords internal
 
 format_data <- function(x,
                         id = "id",
