@@ -59,7 +59,7 @@ variable names must be declared as arguments to \code{fit_ssm()}; see examples, 
 ## as a data pre-processing step
 data(sese2_n)
 d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
-fit <- fit_ssm(d, model = "crw"), time.step = 24)
+fit <- fit_ssm(d, model = "crw", time.step = 24)
 
 ## called automatically within fit_ssm()
 fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"),
