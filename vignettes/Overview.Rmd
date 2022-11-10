@@ -35,7 +35,7 @@ Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating
 
 ### Data
 
-`foieGras` expects input data to be provided in one of several possible formats. Here, we outline the default formats but users are not restricted to using the default variable names or column ordering. Custom variable names can be specified via variable name arguments in the `fit_ssm` function (see "Custom names", below). 
+`foieGras` expects input data to be provided in one of several possible formats. Here, we outline the default formats but users are not restricted to using the default variable names or column ordering. Custom variable names can be specified via variable name arguments in the `fit_ssm` function (see "Custom variable names", below). 
 
 #### Argos Least-Squares (LS) location data
 We'll start out with the original Argos data, CLS Argos' Least-Squares-based (LS) locations. These data contain the minimum information required by `foieGras`'s SSM's: (i) a unique track identifier; (ii) the date & time of each observation; (iii) the Argos location quality class of each observation; (iv) the longitude and latitude of each observation. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
@@ -147,7 +147,8 @@ fit <-
 
 These are the minimum arguments required: the input data, the model (`rw`, `crw`, or `mp`) and the time.step (in h) to which locations are predicted. Additional control can be exerted over the data formatting and prefiltering steps, via the `id`, `date`, `lc`, `coord`, `epar` and `sderr` variable name arguments, and via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` prefiltering arguments. see `?fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the `control = ssm_control()` argument, see `?ssm_control` for details.
 
-Here is an example using a custom formatted `data.frame` as input:
+#### Custom variable names in data
+Users do not need to adhere to the default `foieGras` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` as input:
 
 ```{r fit_ssm2, echo=FALSE, message=FALSE}
 require(dplyr)
@@ -164,6 +165,7 @@ ellie2 <- ellie %>%
 ellie2
 ```
 
+The data are linked to the expected names via the following arguments to `fit_ssm`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we ignore the `sderr` argument because this information is not contained in the input data:
 ```{r fit_ssm4, eval=FALSE, message=FALSE}
 fit <- fit_ssm(ellie2,
                id = "animal",
