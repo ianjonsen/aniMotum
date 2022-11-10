@@ -72,19 +72,7 @@ this if you know what you are doing}
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
 
 \item{...}{variable name arguments passed to format_data, see
-\code{?format_data} for details}
-
-\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
-see \link{ssm_control} for details}
-
-\item{optim}{is deprecated, use \code{ssm_control(optim = "optim")} instead,
-see \link{ssm_control} for details}
-
-\item{optMeth}{is deprecated, use \code{ssm_control(method = "L-BFGS-B")} instead,
-see \link{ssm_control} for details}
-
-\item{lpsi}{is deprecated, use \code{ssm_control(lower = list(lpsi = -Inf))} instead,
-see \link{ssm_control} for details}
+\link{format_data} for details}
 }
 \value{
 a list with components
@@ -149,7 +137,8 @@ can be obtained by using \link{grab} with the argument \code{as_sf = FALSE}.
 }
 \examples{
 ## fit crw model to Argos LS data
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0)) 
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, 
+control = ssm_control(verbose = 0)) 
 
 ## time series plots of fitted values and observations
 plot(fit, what = "fitted", type = 1, ask = FALSE)

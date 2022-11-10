@@ -40,16 +40,8 @@
 ##' (see [foieGras::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
-##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
-##' see [foieGras::ssm_control] for details
-##' @param optim is deprecated, use `ssm_control(optim = "optim")` instead, 
-##' see [foieGras::ssm_control] for details
-##' @param optMeth is deprecated, use `ssm_control(method = "L-BFGS-B")` instead,
-##'  see [foieGras::ssm_control] for details
-##' @param lpsi is deprecated, use `ssm_control(lower = list(lpsi = -Inf))` instead,
-##'  see [foieGras::ssm_control] for details
 ##' @param ... variable name arguments passed to format_data, see 
-##' \code{?format_data} for details 
+##' [foieGras::format_data] for details 
 ##'
 ##' @details `x` is a `data.frame`, `tibble`, or `sf-tibble` with 5, 7 or 8 
 ##' columns, depending on the tracking data type. Argos Least-Squares and GPS 
@@ -110,7 +102,8 @@
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
-##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0)) 
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, 
+##' control = ssm_control(verbose = 0)) 
 ##' 
 ##' ## time series plots of fitted values and observations
 ##' plot(fit, what = "fitted", type = 1, ask = FALSE)
