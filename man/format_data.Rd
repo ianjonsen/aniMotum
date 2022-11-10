@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_data.R
 \name{format_data}
 \alias{format_data}
-\title{Coerce input data into expected foieGras format}
+\title{Coerce input data into expected \code{foieGras} format}
 \usage{
 format_data(
   x,
@@ -44,18 +44,24 @@ these are only provided for processed light-level geolocation data. Ignored if
 these variables are missing from the input data.}
 }
 \value{
-a data.frame or sf-tibble of input data in expected foieGras format
+a data.frame or sf-tibble of input data in expected foieGras format.
+Additional columns required by \code{fit_ssm()}, if missing, will be added to the
+formatted tibble: \code{smaj}, \code{smin}, \code{eor}, \code{lonerr}, and \code{laterr}.
 }
 \description{
 format data by mapping supplied variable names to those expected by
 \code{fit_ssm()}, and ensuring variables are put into the expected order. Can be
-run manually by user as a data pre-processing step prior to calling \code{fit_ssm}
-or can be called automatically by \code{fit_ssm}. In the latter case, any custom
-variable names must be declared as arguments to \code{fit_ssm} (see examples, below).
+run manually by user as a data pre-processing step prior to calling \code{fit_ssm()}
+or can be called automatically by \code{fit_ssm()}. In the latter case, any custom
+variable names must be declared as arguments to \code{fit_ssm()}; see examples, below.
 }
 \examples{
 ## as a data pre-processing step
 data(sese2_n)
 d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
 fit <- fit_ssm(d, model = "crw"), time.step = 24)
+
+## called automatically within fit_ssm()
+fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"),
+model = "crw", time.step = 24)
 }

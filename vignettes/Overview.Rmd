@@ -151,28 +151,30 @@ These are the minimum arguments required: the input data, the model (`rw`, `crw`
 Users do not need to adhere to the default `foieGras` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` as input:
 
 ```{r fit_ssm2, echo=FALSE, message=FALSE}
-require(dplyr)
-ellie2 <- ellie %>%
-  rename(animal = id, time = date, longitude = lon, latitude = lat,
-         location_class = lc,
-         semi_major_axis = smaj, 
-         semi_minor_axis = smin,
-         ellipse_orientation = eor) %>%
-  select(latitude, longitude, animal, time, location_class, semi_major_axis, semi_minor_axis, ellipse_orientation)
+sese2_n
 ```
 
-```{r fit_ssm3, eval=TRUE, message=FALSE}
-ellie2
+Note the columns are in a different order the the default `foieGras` order, and the first three variables have different names: `longitude`, `latitude` and `time`. There are two approaches to format these data. The first, is to call `format_data` as a data pre-processing step prior to fitting an SSM. The data are linked to the expected names via the following arguments to `format_data`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we only need to use the `date` and `coord` arguments:
+
+```{r format_data1, message=FALSE}
+d <- format_data(sese2_n, date = "time", coord = c("longitude", "latitude"))
+d
 ```
 
-The data are linked to the expected names via the following arguments to `fit_ssm`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we ignore the `sderr` argument because this information is not contained in the input data:
+We then fit the SSM to the formatted data `d` via `fit_ssm`:
+
+```{r fit_ssm3, eval=FALSE, message=FALSE}
+fit <- fit_ssm(d,
+               model = "crw",
+               time.step = 24)
+```
+
+Alternatively, we can dispense with the data pre-processing step and rely on `fit_ssm`
+to format the data by adding the variable name arguments to the call:
 ```{r fit_ssm4, eval=FALSE, message=FALSE}
-fit <- fit_ssm(ellie2,
-               id = "animal",
+fit <- fit_ssm(sese2_n,
                date = "time",
-               lc = "location_class",
-               coord = c("latitude", "longitude"),
-               epar = c("semi_major_axis", "semi_minor_axis", "ellipse_orientation"),
+               coord = c("longitude","latitude"),
                model = "crw",
                time.step = 24)
 ```
