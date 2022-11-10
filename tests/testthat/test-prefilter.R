@@ -2,6 +2,21 @@ context("test format_data & prefilter")
 
 data(ellie)
 ellie_sf <- sf::st_as_sf(ellie, coords = c("lon","lat"), crs = 4326)
+ellie_n <- ellie
+names(ellie_n)[1:4] <- c("ind", "time", "lq", "long")
+
+## test that format_data catches incorrect names
+test_that("format_data catches incorrect names", {
+  expect_error(format_data(ellie_n, id = "id", date = "time", lc = "lq", 
+                           coord = c("long","lat")))
+})
+
+ellie_n <- ellie_n[, sample(1:ncol(ellie_n))]
+test_that("format_data orders variables properly", {
+  f <- format_data(ellie_n, id = "ind", date = "time", lc = "lq", 
+                   coord = c("long","lat"))
+  expect_equal(names(f), c("id","date","lc","lon","lat","smaj","smin","eor","lonerr","laterr"))
+})
 
 ## test run prefilter on sf version of data
 test_that("prefilter handles incoming sf data", {
