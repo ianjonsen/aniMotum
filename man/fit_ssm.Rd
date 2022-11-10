@@ -173,10 +173,11 @@ Multiple location data types can be combined in a single data frame
 (see the vignette for examples).
 
 When data are provided as an \code{sf-tibble}, the user-specified projection is
-respected. Otherwise, longlat data are re-projected internally to a global
-Mercator grid and provided as the default output. A simple \code{tibble}, without
-a geom, of \verb{lon,lat} and \verb{x,y} location estimates can be obtained by using
-\link{grab} with the argument \code{as_sf = FALSE}.
+respected, although projected units are always transformed to km to improve
+SSM convergence efficiency. Otherwise, longlat data are re-projected
+internally to a global Mercator grid and provided as the default output.
+A simple \code{tibble}, without a geom, of \verb{lon,lat} and \verb{x,y} location estimates
+can be obtained by using \link{grab} with the argument \code{as_sf = FALSE}.
 }
 \examples{
 ## fit crw model to Argos LS data
