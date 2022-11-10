@@ -98,6 +98,16 @@ format_data <- function(x,
   
   ## determine if there are extra variables in x
   xt.vars <- names(x)[!names(x) %in% c(id, date, lc, coord, epar, sderr)]
+
+  if(all(!c("lon","lat") %in% coord, coord != "geometry")) {
+    pos1 <- grepl("lon", coord, ignore.case = TRUE)
+    pos2 <- grepl("lat", coord, ignore.case = TRUE)
+    if(!any(pos1)) {
+      pos1 <- grepl("x", coord, ignore.case = TRUE)
+      pos2 <- grepl("y", coord, ignore.case = TRUE)
+    }
+    coord <- coord[c(which(pos1), which(pos2))]
+  }
   
   if(all(!epar %in% names(x), !sderr %in% names(x))) {
     ## Argos LS or GPS data
@@ -109,6 +119,7 @@ format_data <- function(x,
     
     if(all(!inherits(x, "sf"), all(coord %in% c("lon","lat")))) {
       names(xx)[1:5] <- c("id","date","lc",coord)
+      names(xx)[4:5] <- c("lon","lat")
     } else if(all(!inherits(x, "sf"), any(!coord %in% c("lon","lat")))) {
       names(xx)[1:5] <- c("id","date","lc","lon","lat")
     } else if(inherits(x, "sf")) {
@@ -122,6 +133,7 @@ format_data <- function(x,
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
     if(!inherits(x, "sf")) {
       names(xx)[1:8] <- c("id","date","lc",coord,"smaj","smin","eor")
+      names(xx)[4:5] <- c("lon","lat")
     } else if (inherits(x, "sf")) {
       names(xx)[1:7] <- c("id","date","lc",coord,"smaj","smin","eor")
     }
@@ -133,6 +145,7 @@ format_data <- function(x,
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
     if(!inherits(x, "sf")) {
       names(xx)[c(1:5, 9:10)] <- c("id","date","lc",coord,"lonerr","laterr")
+      names(xx)[4:5] <- c("lon","lat")
     } else if (inherits(x, "sf")) {
       names(xx)[c(1:4, 8:9)] <- c("id","date","lc",coord,"lonerr","laterr")
     }
