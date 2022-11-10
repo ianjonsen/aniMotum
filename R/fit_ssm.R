@@ -96,10 +96,11 @@
 ##' (see the vignette for examples). 
 ##' 
 ##' When data are provided as an `sf-tibble`, the user-specified projection is 
-##' respected. Otherwise, longlat data are re-projected internally to a global 
-##' Mercator grid and provided as the default output. A simple `tibble`, without
-##' a geom, of `lon,lat` and `x,y` location estimates can be obtained by using 
-##' [grab] with the argument `as_sf = FALSE`.
+##' respected, although projected units are always transformed to km to improve 
+##' SSM convergence efficiency. Otherwise, longlat data are re-projected 
+##' internally to a global Mercator grid and provided as the default output. 
+##' A simple `tibble`, without a geom, of `lon,lat` and `x,y` location estimates
+##'  can be obtained by using [grab] with the argument `as_sf = FALSE`.
 ##' 
 ##' @return a list with components
 ##' * `call` the matched call
