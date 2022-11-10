@@ -11,26 +11,6 @@
 ##'
 ##' @param x a data frame of observations including Argos KF error ellipse info 
 ##' (when present)
-##' @param id the name (as a quoted character string) of id variable: a unique 
-##' identifier for individual (animal) track data sets.
-##' @param date the name (as a quoted character string)of the date/time variable:
-##' date and time (as YYYY-MM-DD HH:MM:SS) of each observation.
-##' @param lc the name (as a quoted character string) of the location quality class
-##' variable: Argos location quality class (values in the set: 3,2,1,0,"A","B","Z").
-##' Can also include "G" for GPS data and/or "GL" for light-level geolocation (GLS)
-##' and other data types.
-##' @param coord the names (as quoted character strings) of the location coordinate
-##' variables: defaults are c("lon","lat"), but could also be c("x","y") for planar
-##'  coordinates; or if input data is an \code{sf} object then "geometry". If input
-##'  data is an \code{sf} object then \code{coord} is set to "geometry" by default.
-##' @param epar the names (as quoted character strings) of the Argos error ellipse
-##' parameters: defaults are "smaj" (ellipse semi-major axis), 
-##' "smin" (ellipse semi-minor axis), and "eor" (ellipse orientation). Ignored if
-##' these variables are missing from the input data.
-##' @param sderr the names (as quoted character strings) of provided standard 
-##' errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
-##' these are only provided for processed light-level geolocation data. Ignored if
-##' these variables are missing from the input data.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -68,6 +48,8 @@
 ##'  see [foieGras::ssm_control] for details
 ##' @param lpsi is deprecated, use `ssm_control(lower = list(lpsi = -Inf))` instead,
 ##'  see [foieGras::ssm_control] for details
+##' @param ... variable name arguments passed to format_data, see 
+##' \code{?format_data} for details 
 ##'
 ##' @details `x` is a `data.frame`, `tibble`, or `sf-tibble` with 5, 7 or 8 
 ##' columns, depending on the tracking data type. Argos Least-Squares and GPS 
@@ -141,12 +123,6 @@
 ##' @md
 
 fit_ssm <- function(x,
-                    id = "id",
-                    date = "date",
-                    lc = "lc",
-                    coord = c("lon","lat"),
-                    epar = c("smaj","smin","eor"),
-                    sderr = c("lonerr","laterr"),
                     vmax = 5,
                     ang = c(15,25),
                     distlim = c(2500,5000),
@@ -161,13 +137,12 @@ fit_ssm <- function(x,
                     fit.to.subset = TRUE,
                     control = ssm_control(),
                     inner.control = NULL,
-                    verbose = NULL,
-                    optim = NULL,
-                    optMeth = NULL,
-                    lpsi = NULL
+                    ...
                     )
 {
 
+  dots <- list(...)
+  
   stopifnot("model can only be 1 of `rw`, `crw`, or `mp`" = model %in% c("rw","crw","mp"))
   
 ## check args - most args handled by prefilter() & sfilter()
@@ -175,34 +150,34 @@ fit_ssm <- function(x,
     stop("x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
   if(!is.logical(pf)) 
     stop("pf must be either FALSE (fit model) or TRUE (only run prefilter)")
-
+  
 ## warnings for deprecated arguments
-  if(!is.null(verbose)) {
-    warning("the `verbose` arg is deprecated as of 0.7-5, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
+  if(all("verbose" %in% names(dots), !is.null(dots$verbose))) {
+    warning("the `verbose` arg is deprecated & will be removed in the next version, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    control$verbose <- verbose
+    control$verbose <- dots$verbose
   }
-  if(!is.null(optim)) {
-    warning("the `optim` arg is deprecated as of 0.7-5, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
+  if(all("optim" %in% names(dots), !is.null(dots$optim))) {
+    warning("the `optim` arg is deprecated & will be removed in the next version, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    if(optim %in% c("nlminb", "optim")) control$optim <- optim
+    if(dots$optim %in% c("nlminb", "optim")) control$optim <- dots$optim
     else stop("invalid optimiser specified, see ?ssm_control for options")
   }
-  if(!is.null(optMeth)) {
-    warning("the `optMeth` arg is deprecated as of 0.7-5, use `control = ssm_control(method)` instead. See `?ssm_control for details",
+  if(all("optMeth" %in% names(dots), !is.null(dots$optMeth))) {
+    warning("the `optMeth` arg is deprecated & will be removed in the next version, use `control = ssm_control(method)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    if(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
-      control$method <- optMeth
+    if(dots$optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
+      control$method <- dots$optMeth
     else stop("invalid optimisation method specified, see ?ssm_control for options")
   }
-  if(!is.null(lpsi)) {
-    warning("the `lpsi` arg is deprecated as of 0.7-5, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
+  if(all("lpsi" %in% names(dots), !is.null(dots$lpsi))) {
+    warning("the `lpsi` arg is deprecated & will be removed in the next version, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    control$lower <- list(l_psi = lpsi)
+    control$lower <- list(l_psi = dots$lpsi)
   }
   
   ## ensure data is in expected format
-  x <- format_data(x, id, date, lc, coord, epar, sderr)
+  if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
   fit <- lapply(split(x, x$id),
                 function(xx) {

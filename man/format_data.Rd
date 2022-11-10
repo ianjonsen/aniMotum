@@ -47,9 +47,15 @@ these variables are missing from the input data.}
 a data.frame or sf-tibble of input data in expected foieGras format
 }
 \description{
-\code{format_data}
+format data by mapping supplied variable names to those expected by
+\code{fit_ssm()}, and ensuring variables are put into the expected order. Can be
+run manually by user as a data pre-processing step prior to calling \code{fit_ssm}
+or can be called automatically by \code{fit_ssm}. In the latter case, any custom
+variable names must be declared as arguments to \code{fit_ssm} (see examples, below).
 }
-\details{
-called by \code{fit_ssm}.
+\examples{
+## as a data pre-processing step
+data(sese2_n)
+d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
+fit <- fit_ssm(d, model = "crw"), time.step = 24)
 }
-\keyword{internal}

@@ -1,8 +1,10 @@
-##' @title Coerce input data into expected foieGras format
+##' @title Coerce input data into expected `foieGras` format
 ##'
-##' @description \code{format_data} 
-##'
-##' @details called by \code{fit_ssm}.
+##' @description format data by mapping supplied variable names to those expected by
+##' `fit_ssm()`, and ensuring variables are put into the expected order. Can be 
+##' run manually by user as a data pre-processing step prior to calling `fit_ssm()`
+##' or can be called automatically by `fit_ssm()`. In the latter case, any custom 
+##' variable names must be declared as arguments to `fit_ssm()`; see examples, below.
 ##'
 ##' @param x input data
 ##' @param id the name (as a quoted character string) of id variable: a unique 
@@ -15,8 +17,8 @@
 ##' and other data types.
 ##' @param coord the names (as quoted character strings) of the location coordinate
 ##' variables: defaults are c("lon","lat"), but could also be c("x","y") for planar
-##'  coordinates; or if input data is an \code{sf} object then "geometry". If input
-##'  data is an \code{sf} object then \code{coord} is set to "geometry" by default.
+##'  coordinates; or if input data is an `sf` object then "geometry". If input
+##'  data is an `sf` object then `coord` is set to "geometry" by default.
 ##' @param epar the names (as quoted character strings) of the Argos error ellipse
 ##' parameters: defaults are "smaj" (ellipse semi-major axis), 
 ##' "smin" (ellipse semi-minor axis), and "eor" (ellipse orientation). Ignored if
@@ -25,12 +27,25 @@
 ##' errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
 ##' these are only provided for processed light-level geolocation data. Ignored if
 ##' these variables are missing from the input data.
+##' 
+##' @return a data.frame or sf-tibble of input data in expected foieGras format. 
+##' Additional columns required by `fit_ssm()`, if missing, will be added to the 
+##' formatted tibble: `smaj`, `smin`, `eor`, `lonerr`, and `laterr`.
+##' 
 ##' @importFrom sf st_crs
 ##' @importFrom dplyr tibble select everything
 ##'
-##' @return a data.frame or sf-tibble of input data in expected foieGras format
+##' @examples
+##' ## as a data pre-processing step
+##' data(sese2_n)
+##' d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
+##' fit <- fit_ssm(d, model = "crw"), time.step = 24)
 ##' 
-##' @keywords internal
+##' ## called automatically within fit_ssm()
+##' fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"),
+##' model = "crw", time.step = 24)
+##' @export
+##' @md
 
 format_data <- function(x,
                         id = "id",
@@ -163,6 +178,8 @@ format_data <- function(x,
   }
   ## order records by date
   xx <- xx[order(xx$date), ]
+  
+  class(xx) <- append("fG_format", class(xx))
   
   return(xx)
   

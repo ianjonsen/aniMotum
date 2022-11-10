@@ -7,12 +7,6 @@ geolocation data}
 \usage{
 fit_ssm(
   x,
-  id = "id",
-  date = "date",
-  lc = "lc",
-  coord = c("lon", "lat"),
-  epar = c("smaj", "smin", "eor"),
-  sderr = c("lonerr", "laterr"),
   vmax = 5,
   ang = c(15, 25),
   distlim = c(2500, 5000),
@@ -27,41 +21,12 @@ fit_ssm(
   fit.to.subset = TRUE,
   control = ssm_control(),
   inner.control = NULL,
-  verbose = NULL,
-  optim = NULL,
-  optMeth = NULL,
-  lpsi = NULL
+  ...
 )
 }
 \arguments{
 \item{x}{a data frame of observations including Argos KF error ellipse info
 (when present)}
-
-\item{id}{the name (as a quoted character string) of id variable: a unique
-identifier for individual (animal) track data sets.}
-
-\item{date}{the name (as a quoted character string)of the date/time variable:
-date and time (as YYYY-MM-DD HH:MM:SS) of each observation.}
-
-\item{lc}{the name (as a quoted character string) of the location quality class
-variable: Argos location quality class (values in the set: 3,2,1,0,"A","B","Z").
-Can also include "G" for GPS data and/or "GL" for light-level geolocation (GLS)
-and other data types.}
-
-\item{coord}{the names (as quoted character strings) of the location coordinate
-variables: defaults are c("lon","lat"), but could also be c("x","y") for planar
-coordinates; or if input data is an \code{sf} object then "geometry". If input
-data is an \code{sf} object then \code{coord} is set to "geometry" by default.}
-
-\item{epar}{the names (as quoted character strings) of the Argos error ellipse
-parameters: defaults are "smaj" (ellipse semi-major axis),
-"smin" (ellipse semi-minor axis), and "eor" (ellipse orientation). Ignored if
-these variables are missing from the input data.}
-
-\item{sderr}{the names (as quoted character strings) of provided standard
-errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
-these are only provided for processed light-level geolocation data. Ignored if
-these variables are missing from the input data.}
 
 \item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
 outlier locations}
@@ -105,6 +70,9 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
+
+\item{...}{variable name arguments passed to format_data, see
+\code{?format_data} for details}
 
 \item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
 see \link{ssm_control} for details}
