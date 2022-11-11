@@ -35,19 +35,22 @@ Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating
 
 ### Data
 
-`foieGras` expects input data to be provided in one of several possible formats. Here, we outline the default formats but users are not restricted to using the default variable names or column ordering. Custom variable names can be specified via variable name arguments in the `fit_ssm` function (see "Custom variable names", below). 
+`foieGras` expects input data to be provided in one of several possible formats. Here, we outline the default formats but users are not restricted to using these. Input data with variable names and/or column ordering that differs from the defaults can be used, provided the essential minimum data elements are present to allow the SSM's to be fitted: a unique animal/track identifier, date and time of each observation, location quality class, and longitude and latitude (or projected x and y) coordinates. We expand on these and additional variables in the following sections. 
+
+The pre-processing function `format_data()` can be used to correctly structure the input data. This function checks for the presence of the essential variables, converts date-time to `POSIX` format, maps custom variable names onto the default names, and puts the variables into the default column order expected by `foieGras`. Users may choose to call `format_data()` themselves, prior to fitting an SSM with `fit_ssm()`, or they can allow `fit_ssm()` to format the data automatically. We illustrate these approaches in the "Fitting a model" section, below.
+
 
 #### Argos Least-Squares (LS) location data
-We'll start out with the original Argos data, CLS Argos' Least-Squares-based (LS) locations. These data contain the minimum information required by `foieGras`'s SSM's: (i) a unique track identifier; (ii) the date & time of each observation; (iii) the Argos location quality class of each observation; (iv) the longitude and latitude of each observation. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
+We'll start out with the original Argos data, CLS Argos' Least-Squares-based (LS) locations. These data contain the minimum information required by `foieGras`'s SSM's. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
 
 ```{r data 1, echo = FALSE}
 data(sese, package = "foieGras")
 head(data.frame(sese))
 ```
 
-The column names represent the following:
+The column names represent the following:  
 - `id` a unique animal (or track) identifier  
-- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS`. These can be text strings, in which case `foieGras` converts date-times to `POSIXt` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then ensure this is encoded in the input data by using, for example, appropriate functions from the `lubridate` R package or `as.POSIXct()`.   
+- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS`. These can be text strings, in which case `foieGras` converts them to `POSIX` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then you must specify this via the `tz` argument to `format_data()` or `fit_ssm()`. If you are unsure about the proper timezone name(s), you can obtain a list of valid timezone names via `OlsonNames()`.
 - `lc` the location class variable common to Argos data, with classes in the set: 3, 2, 1, 0, A, B, Z. 
 - `lon` the longitude variable  
 - `lat` the latitude variable  

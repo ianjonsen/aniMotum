@@ -81,7 +81,7 @@ a list with components
 \item \code{predicted} an sf tbl of predicted location states
 \item \code{fitted} an sf tbl of fitted locations
 \item \code{par} model parameter summary
-\item \code{data} an augmented sf tbl of the input data
+\item \code{data} an augmented sf tbl of the formatted input data
 \item \code{inits} a list of initial values
 \item \code{pm} the process model fit, either "rw" or "crw"
 \item \code{ts} time time.step in h used
@@ -126,7 +126,7 @@ have 7 columns, including the above 5 plus \code{lonerr}, \code{laterr} (in degr
 In this case, all lc values should be set to \code{GL}.
 
 Multiple location data types can be combined in a single data frame
-(see the vignette for examples).
+(see the Overview vignette for examples).
 
 When data are provided as an \code{sf-tibble}, the user-specified projection is
 respected, although projected units are always transformed to km to improve

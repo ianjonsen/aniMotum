@@ -48,17 +48,17 @@ applies}
 \item{\code{geometry}}{sf POINT object giving \code{x,y} coordinates in km}
 }
 \description{
-\code{prefilter} (1) determines Argos data type (LS or KF);
-(2) converts dates to POSIXt & identifies observations with duplicate dates;
-(3) orders observations in time; (4) removes duplicate observations;
-(5) removes observations occurring within 60 s of one another (keeps first);
-(6) shifts longitudes that straddle -180,180 to 0,360 and vice-versa;
-(7) projects lonlat coords to mercator x,y coords (in km);
-(8) adds location error multiplication factors based on Argos location
+\code{prefilter} does the following:
+(1) flags (\code{keep = FALSE}) observations with duplicate
+dates & removes subsequent observations occurring within min.dt s of one another
+(2) determines Argos data type (LS, KF, G, or GL);
+(3) uses \code{trip::sda} filter to identify extreme locations. \code{trip::sda} is a
+fast, vectorized version of the now CRAN-archived \code{argosfilter::sdafilter}
+see \code{?trip::sda} for additional details
+(4) projects lonlat coords to mercator x,y coords (in km) & shifts longitudes
+that straddle -180,180 to 0,360 and vice-versa;
+(5) adds location error multiplication factors based on Argos location
 class (for type LS);
-(9) uses a \code{trip::sda} to identify potential outlier locations.
-\code{trip::sda} is a fast, vectorized version of \code{argosfilter::sdafilter}
-see \code{?argosfilter::sdafilter} for details on implementation
 }
 \details{
 called by \code{fit_ssm}.

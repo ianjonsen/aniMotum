@@ -67,7 +67,7 @@
 ##' In this case, all lc values should be set to `GL`. 
 ##' 
 ##' Multiple location data types can be combined in a single data frame 
-##' (see the vignette for examples). 
+##' (see the Overview vignette for examples). 
 ##' 
 ##' When data are provided as an `sf-tibble`, the user-specified projection is 
 ##' respected, although projected units are always transformed to km to improve 
@@ -81,7 +81,7 @@
 ##' * `predicted` an sf tbl of predicted location states
 ##' * `fitted` an sf tbl of fitted locations
 ##' * `par` model parameter summary
-##' * `data` an augmented sf tbl of the input data
+##' * `data` an augmented sf tbl of the formatted input data
 ##' * `inits` a list of initial values
 ##' * `pm` the process model fit, either "rw" or "crw"
 ##' * `ts` time time.step in h used

@@ -11,7 +11,8 @@ format_data(
   lc = "lc",
   coord = c("lon", "lat"),
   epar = c("smaj", "smin", "eor"),
-  sderr = c("lonerr", "laterr")
+  sderr = c("lonerr", "laterr"),
+  tz = "UTC"
 )
 }
 \arguments{
@@ -42,6 +43,9 @@ these variables are missing from the input data.}
 errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
 these are only provided for processed light-level geolocation data. Ignored if
 these variables are missing from the input data.}
+
+\item{tz}{the timezone the applies to the data/time variable if they are not
+in \code{tz = 'UTC'}.}
 }
 \value{
 a data.frame or sf-tibble of input data in expected foieGras format.
@@ -58,10 +62,11 @@ variable names must be declared as arguments to \code{fit_ssm()}; see examples, 
 \examples{
 ## as a data pre-processing step
 data(sese2_n)
-d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
+d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"), 
+tz = "America/Halifax")
 fit <- fit_ssm(d, model = "crw", time.step = 24)
 
 ## called automatically within fit_ssm()
-fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"),
-model = "crw", time.step = 24)
+fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"), 
+tz = "America/Halifax", model = "crw", time.step = 24)
 }

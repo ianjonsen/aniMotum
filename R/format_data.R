@@ -27,6 +27,8 @@
 ##' errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
 ##' these are only provided for processed light-level geolocation data. Ignored if
 ##' these variables are missing from the input data.
+##' @param tz the timezone the applies to the data/time variable if they are not 
+##' in `tz = 'UTC'`.
 ##' 
 ##' @return a data.frame or sf-tibble of input data in expected foieGras format. 
 ##' Additional columns required by `fit_ssm()`, if missing, will be added to the 
@@ -38,12 +40,13 @@
 ##' @examples
 ##' ## as a data pre-processing step
 ##' data(sese2_n)
-##' d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"))
+##' d <- format_data(sese2_n, date = "time", coord = c("longitude","latitude"), 
+##' tz = "America/Halifax")
 ##' fit <- fit_ssm(d, model = "crw", time.step = 24)
 ##' 
 ##' ## called automatically within fit_ssm()
-##' fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"),
-##' model = "crw", time.step = 24)
+##' fit <- fit_ssm(sese2_n, date = "time", coord = c("longitude", "latitude"), 
+##' tz = "America/Halifax", model = "crw", time.step = 24)
 ##' @export
 ##' @md
 
@@ -53,7 +56,8 @@ format_data <- function(x,
                         lc = "lc",
                         coord = c("lon","lat"),
                         epar = c("smaj","smin","eor"),
-                        sderr = c("lonerr","laterr")) {
+                        sderr = c("lonerr","laterr"),
+                        tz = "UTC") {
   
   ## check that all variable names are character strings
   if(id %in% names(x)) 
@@ -171,10 +175,9 @@ format_data <- function(x,
   if(is.factor(xx$id)) xx$id <- droplevels(xx$id)
   xx$id <- as.character(xx$id)
   
-  ## convert dates to POSIXt if not already, assume tz = 'UTC'
+  ## convert dates to POSIXt if not already
   if(!inherits(xx$date, "POSIXt")) {
-    message("converting date variable to POSIX with timezone = 'UTC', if this timezone is incorrect then convert dates to POSIX format prior to using this function")
-    xx$date <- as.POSIXct(xx$date, tz = "UTC")
+    xx$date <- as.POSIXct(xx$date, tz = tz)
   }
   ## order records by date
   xx <- xx[order(xx$date), ]
