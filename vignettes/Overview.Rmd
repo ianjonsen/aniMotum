@@ -35,9 +35,9 @@ Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating
 
 ### Data
 
-`foieGras` expects input data to be provided in one of several possible formats. Here, we outline the default formats but users are not restricted to using these. Input data with variable names and/or column ordering that differs from the defaults can be used, provided the essential minimum data elements are present to allow the SSM's to be fitted: a unique animal/track identifier, date and time of each observation, location quality class, and longitude and latitude (or projected x and y) coordinates. We expand on these and additional variables in the following sections. 
+`foieGras` can accept input data in several possible formats. Here, we outline the default formats but users are not restricted to using these. Input data with variable names and/or column ordering that differs from the defaults can be used, provided the essential minimum data elements are present to allow the SSM's to be fitted: a unique animal/track identifier, date-time of each observation, location quality class, and longitude and latitude (or projected x and y) coordinates. We expand on these and additional variables in the following sections. 
 
-The pre-processing function `format_data()` can be used to correctly structure the input data. This function checks for the presence of the essential variables, converts date-time to `POSIX` format, maps custom variable names onto the default names, and puts the variables into the default column order expected by `foieGras`. Users may choose to call `format_data()` themselves, prior to fitting an SSM with `fit_ssm()`, or they can allow `fit_ssm()` to format the data automatically. We illustrate these approaches in the "Fitting a model" section, below.
+A pre-processing function `format_data()` can be used to correctly structure the input data for use in `foieGras`. This function checks for the presence of the essential variables, converts date-time to `POSIX` format, maps custom variable names onto the default names, and puts the variables into the default column order expected by `foieGras`. Users may choose to call `format_data()` themselves, prior to fitting an SSM with `fit_ssm()`, or they can allow `fit_ssm()` to format the data automatically. We illustrate these approaches in the "Fitting a model" section, below.
 
 
 #### Argos Least-Squares (LS) location data
@@ -48,17 +48,17 @@ data(sese, package = "foieGras")
 head(data.frame(sese))
 ```
 
-The column names represent the following:  
-- `id` a unique animal (or track) identifier  
-- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS`. These can be text strings, in which case `foieGras` converts them to `POSIX` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then you must specify this via the `tz` argument to `format_data()` or `fit_ssm()`. If you are unsure about the proper timezone name(s), you can obtain a list of valid timezone names via `OlsonNames()`.
-- `lc` the location class variable common to Argos data, with classes in the set: 3, 2, 1, 0, A, B, Z. 
+The (default) column names represent the following:  
+- `id` a unique identifier for each animal (or track) in the `data.frame`  
+- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS` (or `YYYY/mm/dd HH:MM:SS`). These can be text strings, in which case `foieGras` converts them to `POSIX` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then you must specify this via the `tz` argument to `format_data()`. A list of valid timezone names can be viewed via `OlsonNames()`.  
+- `lc` the location class variable common to Argos data, with classes in the set: 3, 2, 1, 0, A, B, Z.  
 - `lon` the longitude variable  
 - `lat` the latitude variable  
 The `lc` values determine the measurement error variances (based on independent data, see Jonsen et al. 2020) used in the SSM's for each observation.
 
 
 #### Argos Kalman Filter (KF) location data
-Since 2011, the default Argos location data uses CLS Argos' Kalman Filter (KF) algorithm. These data include error ellipse information for each observed location in the form of 3 variables: ellipse semi-major axis length, ellipse semi-minor axis length, and ellipse orientation. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
+Since 2011, the default Argos location data uses CLS Argos' Kalman Filter (KF) algorithm. These data include error ellipse information for each observed location in the form of 3 variables: ellipse semi-major axis length, ellipse semi-minor axis length, and ellipse orientation. A minimal input `data.frame` or `tibble` for Argos KF data looks like this:
 
 ```{r data 2, echo = FALSE}
 data(ellie, package = "foieGras")
@@ -70,11 +70,11 @@ The column names follow those for Argos LS data, with the following additions:
 - `smin` the Argos error ellipse semi-minor axis length (m)  
 - `eor` the Argos error ellipse ellipse orientation (degrees from N)  
 
-Here, the error ellipse parameters for each observation define the measurement error variances using the the SSM's (Jonsen et al. 2020). Missing error ellipse values are allowed, in which case, those observations are treated as Argos Least-Squares data. 
+Here, the error ellipse parameters for each observation define the measurement error variances used in the SSM's (Jonsen et al. 2020). Missing error ellipse values are allowed, in which case, those observations are treated as Argos LS data. 
 
 
 #### GPS location data
-The `foieGras` SSM's can be fit to GPS location data, for example to deal with occasional extreme locations and to time-regularise locations. The input data format is the same as for Argos LS data, but the `lc` class is set to `G` for all GPS locations:
+The `foieGras` SSM's can be fit to GPS location data, for example to deal with (rare) extreme locations and/or to time-regularise locations. The input data format is the same as for Argos LS data, but the `lc` class is set to `G` for all GPS locations:
 
 ```{r data 3, echo = FALSE}
   data.frame(
@@ -102,11 +102,11 @@ The `foieGras` SSM's can be fit to processed light-level geolocation data, when 
   )
 ```
 
-We caution users, that light-level geolocation errors can be non-Gaussian, depending on the species, tag technology, and algorithm used to estimate location from the light-level data. For example, we have observed strongly non-Gaussian location uncertainty in tracks of highly migratory tunas that traverse very different water masses in both the vertical and horizontal directions. Because `foieGras`'s SSM's assume bi-variate Normal location errors, fitting to this sort geolocation data would not be appropriate. Geolocation data collected from birds may be less prone to this issue, but we urge users to explore both the uncertainty in their tracking data and the algorithm used to estimate locations from light-level data.
+We caution users, that light-level geolocation errors can be (highly) non-Gaussian, depending on the species, tag technology, and algorithm used to estimate location from the light-level data. For example, we have observed strongly non-Gaussian location uncertainty in tracks of highly migratory tunas that traverse very different water masses in both the vertical and horizontal directions. Because `foieGras`'s SSM's assume bi-variate Normal location errors, fitting to geolocations with non-Gaussian errors would not be appropriate and likely result in highly biased location estimates. Geolocation data collected from birds may be less prone to this issue, but we urge users to explore both the uncertainty in their tracking data and the algorithm used to estimate locations from light-level data.
 
 
 #### Projected location data
-Users can provide projected location data as an `sf-tibble` or `sf data.frame`. By default, `foieGras`'s SSM's fit to locations transformed to the Mercator projection and estimated locations are back-transformed to spherical coordinates (long, lat). When an `sf` projected data set is supplied, the `foieGras` SSM's are fit to locations on the supplied projection (`foieGras` ensures that distance units are set to km). Here is an example `sf-tibble` Argos data set:
+Users can provide projected location data as an `sf-tibble` or `sf data.frame`. By default, `foieGras`'s SSM's fit to locations that are transformed to the Mercator projection (EPSG 3395) and estimated locations are back-transformed to spherical coordinates (lon, lat). When an `sf`-projected data set is supplied, the `foieGras` SSM's are fit to locations on the supplied projection (`foieGras` ensures that distance units are set to km). Here is an example `sf-tibble` Argos data set in a polar stereographic projection:
 
 ```{r data 5, echo = FALSE, message=FALSE}
 data(ellie, package = "foieGras")
@@ -131,33 +131,34 @@ Users can fit SSM's to data where a combination of Argos, GPS or light-level geo
   )
 ```
 
-These mixtures are possible because the `foieGras` SSM's apply the most appropriate measurement error model for each observation, based it's supplied location class and error ellipse information (i.e., numeric values vs NA's).
+These mixtures are possible because the `foieGras` SSM's apply the most appropriate measurement error model for each observation, based on its location class and error information (i.e., numeric values vs NA's).
 
 
 ### Fitting a model
 
-Model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see `?foieGras::fit_ssm` for details), including applying the `trip::sda` filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an `sf` object, the prefilter uses the World Mercator projection, EPSG 3395. The SSM is then fit to this projected version of the data. The prefilter step is fully automated and invoked via the `fit_ssm` function:
+Model fitting for quality control of locations is comprised of 3 steps: a data formatting step, a pre-filtering step, and the actual model fitting step. A number of checks are made on the input data during the formatting and pre-filtering steps, including applying the `trip::sda` filter to identify extreme observations (see `?fit_ssm` for details). The pre-filter step is fully automated, although various arguments can be used to modify it's actions, and called via the `fit_ssm` function:
 
 ```{r fit_ssm, eval=FALSE, message=FALSE}
-## prefilter and fit Random Walk SSM using a 24 h time step
+## format, prefilter and fit Random Walk SSM using a 24 h time step
 fit <-
   fit_ssm(
-    ellie,
+    x = ellie,
     model = "rw",
     time.step = 24
   )
 ```
 
-These are the minimum arguments required: the input data, the model (`rw`, `crw`, or `mp`) and the time.step (in h) to which locations are predicted. Additional control can be exerted over the data formatting and prefiltering steps, via the `id`, `date`, `lc`, `coord`, `epar` and `sderr` variable name arguments, and via the `vmax`, `ang`, `distlim`, `spdf` and `min.dt` prefiltering arguments. see `?fit_ssm` for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the `control = ssm_control()` argument, see `?ssm_control` for details.
+These are the minimum arguments required: the input data, the model (`rw`, `crw`, or `mp`) and the time.step (in h) to which locations are predicted. Additional control can be exerted over the data formatting and pre-filtering steps, via the `id`, `date`, `lc`, `coord`, `epar` and `sderr` variable name arguments, and via the `vmax`, `ang`, `distlim`, `min.dt`, and `spdf` pre-filtering arguments (see `?fit_ssm` for details). The defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the `control = ssm_control()` argument, see see `vignette('SSM_fitting')` and `?ssm_control` for more details.
 
-#### Custom variable names in data
-Users do not need to adhere to the default `foieGras` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` as input:
+#### Custom data formats
+Users do not need to adhere to the default `foieGras` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` of Argos LS data as input:
 
-```{r fit_ssm2, echo=FALSE, message=FALSE}
+```{r fit_ssm2, message=FALSE}
+data(sese2_n)
 sese2_n
 ```
 
-Note the columns are in a different order the the default `foieGras` order, and the first three variables have different names: `longitude`, `latitude` and `time`. There are two approaches to format these data. The first, is to call `format_data` as a data pre-processing step prior to fitting an SSM. The data are linked to the expected names via the following arguments to `format_data`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we only need to use the `date` and `coord` arguments:
+Note the columns are in a different order than the default expected by `foieGras`, and the first three variables have different names: `longitude`, `latitude` and `time`. There are two approaches to format these data. The first, is to call `format_data` as a data pre-processing step prior to fitting an SSM. The data are linked to the expected names via the following arguments to `format_data`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we only need to use the `date` and `coord` arguments:
 
 ```{r format_data1, message=FALSE}
 d <- format_data(sese2_n, date = "time", coord = c("longitude", "latitude"))
@@ -172,8 +173,7 @@ fit <- fit_ssm(d,
                time.step = 24)
 ```
 
-Alternatively, we can dispense with the data pre-processing step and rely on `fit_ssm`
-to format the data by adding the variable name arguments to the call:
+Alternatively, we can use a shortcut and have `fit_ssm` format the `sese2_n` data by adding the variable name arguments to the call:
 ```{r fit_ssm4, eval=FALSE, message=FALSE}
 fit <- fit_ssm(sese2_n,
                date = "time",
@@ -182,7 +182,7 @@ fit <- fit_ssm(sese2_n,
                time.step = 24)
 ```
 
-Original variable names are not preserved in the output object `fit` but rather transformed to the default expected names. The `grab` function can be used to access data and SSM estimates (see Access Results, below).
+Original variable names are not preserved in the output object `fit` but rather transformed to the default expected names. The `grab` function can be used to access the data and the SSM estimates (see Access Results, below).
 
 `fit_ssm` can be applied to single or multiple tracks, without modification. The specified SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `ssm_df` fit object. The `converged` column indicates whether each model fit converged successfully.
 
@@ -210,7 +210,7 @@ summary(fit)
 
 The summary table lists information about the fit, including the number of observations in the input data (`n.obs`), the number of observation flagged to be ignored by the SSM (`n.filt`), the number of fitted location estimates (`n.fit`), the number of predicted location estimates (`n.pred`), the number of rerouted location estimates (if present, `n.rr`), model convergence status, and AICc. When fitting to multiple individuals, these statistics are repeated on separate lines for each individual. Separate tables of SSM parameter estimates and their SE's are also printed for each individual. The parameter estimates displayed vary depending on the SSM process model selected by the user (`rw`, `crw`, or `mp`) and the automatically chosen measurement model(s). Here, `sigma_x` and `sigma_y` are the process error standard deviations in the x and y directions, `rho_p` is the correlation parameter in the covariance term. The `Std. Error` column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.
 
-`fit_ssm` usually returns two sets of estimated locations in the model fit object: fitted values and predicted values. The fitted values occur at the times of the observations (that passed the prefilter step) to which the SSM was fit. The predicted values occur at the regular time intervals specified by the `time.step` argument. If `time.step = NA`, then no predicted values are estimated or returned in the model fit object.
+`fit_ssm` usually returns two sets of estimated locations in the model fit object: fitted values and predicted values. The fitted values occur at the times of the observations to which the SSM was fit (i.e., the observations that passed the pre-filter step). The predicted values occur at the regular time intervals specified by the `time.step` argument. If `time.step = NA`, then no predicted values are estimated or returned in the model fit object.
 
 Users can obtain the fitted or predicted locations as a data.frame by using `grab()`:
 
@@ -235,7 +235,7 @@ fp.data <- grab(fit, what = "data")
 fp.data[1:5,]
 ```
 
-Here, `fp.data` is in the form that is passed to the `crw` SSM. The first 5 columns (`id`, `date`, `lc`, `lon`, `lat`) are preserved from the formatted input data, and the error ellipse parameter columns (`smaj`, `smin`, `eor`) are appended and filled with NA's, if missing from the input data. The observation type, `obs.type`, is determined for each observation during the prefiltering stage based on the combination of `lc` value and the presence of error ellipse parameters with non-NA values. The `keep` column indicates whether each record passed the prefiltering stage (see ?prefilter for details), observations with `keep = FALSE` are ignored by the SSM. The `x`,`y` columns are the Mercator-projected coordinates (in km) that fitted to by the SSM. The `emf.x` and `emf.y` columns are the error multiplication factors used to scale the measurement error variances, used by the SSM, for each Argos Least-Squares location class - these are relevant only for `obs.type = 'LS'` and for GPS observations.
+Here, `fp.data` is in the form that is passed to the `crw` SSM. The first 5 columns (`id`, `date`, `lc`, `lon`, `lat`) are preserved from the formatted input data, and the error ellipse parameter columns (`smaj`, `smin`, `eor`) are appended and filled with NA's, if missing from the input data. The observation type, `obs.type`, is determined for each observation during the prefiltering stage based on the combination of `lc` value and the presence of error ellipse parameters with non-NA values. The `keep` column indicates whether each record passed the pre-filtering stage (see `?prefilter` for details), observations with `keep = FALSE` are ignored by the SSM. The `x`,`y` columns are the Mercator-projected coordinates (in km) that fitted to by the SSM. The `emf.x` and `emf.y` columns are the error multiplication factors used to scale the measurement error variances, used by the SSM, for each Argos Least-Squares location class - these are relevant only for `obs.type = 'LS'` and for GPS observations.
 
 
 ### Visualising a model fit

@@ -28,7 +28,7 @@
 ##' these are only provided for processed light-level geolocation data. Ignored if
 ##' these variables are missing from the input data.
 ##' @param tz the timezone the applies to the data/time variable if they are not 
-##' in `tz = 'UTC'`.
+##' in `tz = 'UTC'`. A list of valid timezone names can be viewed via `OlsonNames()`
 ##' 
 ##' @return a data.frame or sf-tibble of input data in expected foieGras format. 
 ##' Additional columns required by `fit_ssm()`, if missing, will be added to the 
