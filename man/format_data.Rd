@@ -45,7 +45,7 @@ these are only provided for processed light-level geolocation data. Ignored if
 these variables are missing from the input data.}
 
 \item{tz}{the timezone the applies to the data/time variable if they are not
-in \code{tz = 'UTC'}.}
+in \code{tz = 'UTC'}. A list of valid timezone names can be viewed via \code{OlsonNames()}}
 }
 \value{
 a data.frame or sf-tibble of input data in expected foieGras format.
