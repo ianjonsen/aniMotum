@@ -172,6 +172,7 @@ fit_ssm <- function(x,
   ## ensure data is in expected format
   if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
+  ## apply prefilter
   fit <- lapply(split(x, x$id),
                 function(xx) {
                   prefilter(x = xx,
@@ -183,16 +184,17 @@ fit_ssm <- function(x,
                             emf = emf)
                 })
   
+  ## if pf = TRUE then just prefilter & return result
   if(pf){
     fit <- try(do.call(rbind, fit))
     
+    ## this shouldn't happen as invalid data should error at format_data() step
     if(inherits(fit, "try-error")) 
-    stop("\n Cannot bind tibbles with multiple guessed projections in pre-filtered output. \n
-            Supply data as an `sf` object with a common projection across individuals.\n")
+    stop("something went wrong trying to put prefilter-ed tracks back together")
     
   } else {
     if(control$verbose == 1)
-      cat(paste0("fitting ", model, "...\n"))
+      cat(paste0("fitting ", model, " SSM to ", length(fit), " tracks...\n"))
     if(model %in% c("crw", "rw")) {
       fit <- lapply(fit,
                     function(x) {
