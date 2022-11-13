@@ -71,8 +71,18 @@ format_data <- function(x,
   stopifnot("epar must be a character vector with 3 elements" = all(is.character(epar)))
   stopifnot("sderr must be a character vector with 2 elements" = all(is.character(sderr)))
   
+  ## if input is an sf data.frame (ie. a data.frame with a geometry list object) then
+  ##  coerce to an sf-tibble
+  if(all(!inherits(x, "sf"), "geometry" %in% names(x))) {
+    if(inherits(x$geometry, "sfc")) {
+      x <- st_as_sf(x)
+    }
+  }
+  
   ## set coord = "geometry" if input data is an "sf" object
-  if(inherits(x, "sf") & any(coord != "geometry")) coord <- "geometry" 
+  if(inherits(x, "sf")) {
+    coord <- "geometry" 
+  }
   
   ## check that specified mandatory variable names are in the input data
   stopifnot("An id variable must be included in the input data; 
@@ -150,7 +160,7 @@ format_data <- function(x,
     ## add expected sderr variables
     x$lonerr <- x$laterr <- as.double(NA)
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
-    if(!inherits(x, "sf")) {
+    if(all(!inherits(x, "sf"), coord != "geometry")) {
       names(xx)[1:8] <- c("id","date","lc",coord,"smaj","smin","eor")
       names(xx)[4:5] <- c("lon","lat")
     } else if (inherits(x, "sf")) {
