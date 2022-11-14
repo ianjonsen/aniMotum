@@ -12,6 +12,20 @@ test_that("format_data catches incorrect names", {
                            coord = c("long","lat")))
 })
 
+## test that format_data accepts timezone when character dates input
+ellie.dt <- ellie %>% mutate(date = as.character(date))
+test_that("format_data accepts timezone", {
+  expect_no_error(format_data(ellie.dt, tz = "GMT"))
+})
+
+test_that("format_data accepts timezone", {
+  expect_no_error(format_data(ellie.dt, tz = "America/Halifax"))
+})
+
+test_that("format_data accepts timezone", {
+  expect_warning(format_data(ellie.dt, tz = "ADT"))
+})
+
 ellie_n <- ellie_n[, sample(1:ncol(ellie_n))]
 test_that("format_data orders variables properly", {
   f <- format_data(ellie_n, id = "ind", date = "time", lc = "lq", 
