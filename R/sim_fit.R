@@ -96,6 +96,7 @@ sim_fit <-
     dt <- as.numeric(difftime(dts, c(as.POSIXct(NA), dts[-length(dts)]), units = "hours"))
     dt[1] <- 0
     
+    ## get parameters from model fit object
     switch(model,
            crw = {
              Sigma <- diag(2) * 2 * x$ssm[[k]]$par["D", 1]
