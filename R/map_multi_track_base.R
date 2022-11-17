@@ -127,7 +127,7 @@ map_multi_track_base <- function(map_type,
           aes(fill = id),
           colour = NA,
           stroke = 0,
-          lwd = 0,
+          linewidth = 0,
           alpha = aes$df$alpha[2],
           show.legend = ifelse(is.null(line_sf), TRUE, FALSE)
         )
@@ -138,7 +138,7 @@ map_multi_track_base <- function(map_type,
           fill = aes$df$fill[2],
           colour = NA,
           stroke = 0,
-          lwd = 0,
+          linewidth = 0,
           alpha = aes$df$alpha[2],
           show.legend = ifelse(is.null(line_sf), TRUE, FALSE)
         )
@@ -153,7 +153,7 @@ map_multi_track_base <- function(map_type,
         geom_sf(
           data = line_sf,
           aes(colour = id),
-          size = aes$df$size[3],
+          linewidth = aes$df$size[3],
           show.legend = "line"
         )
     } else if (by.date) {
@@ -162,7 +162,7 @@ map_multi_track_base <- function(map_type,
           data = line_sf,
           colour = aes$df$col[3],
 #          aes(colour = as.numeric(as.Date(date))), can't colour line by date when cast as MULTILINESTRING
-          size = aes$df$size[3]
+          linewidth = aes$df$size[3]
         )
       
     } else if (!all(by.id, by.date)) {
@@ -170,7 +170,7 @@ map_multi_track_base <- function(map_type,
         geom_sf(
           data = line_sf,
           colour = aes$df$col[3],
-          size = aes$df$size[3],
+          linewidth = aes$df$size[3],
           show.legend = "line"
         )
     }

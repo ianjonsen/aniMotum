@@ -124,7 +124,7 @@ map_multi_track_mp <- function(map_type,
         geom_sf(
           data = line_sf,
           colour = aes$df$col[3],
-          size = aes$df$size[3]
+          linewidth = aes$df$size[3]
         )
   }
   

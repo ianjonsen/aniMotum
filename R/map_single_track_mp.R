@@ -108,7 +108,7 @@ map_single_track_mp <- function(map_type,
         data = conf_sf,
         fill = aes$df$fill[2],
         stroke = 0,
-        lwd = 0,
+        linewidth = 0,
         alpha = aes$df$alpha[2]
       )
   }
@@ -119,7 +119,7 @@ map_single_track_mp <- function(map_type,
       geom_sf(
         data = line_sf,
         colour = aes$df$col[3],
-        size = aes$df$size[3]
+        linewidth = aes$df$size[3]
       )
   }
   

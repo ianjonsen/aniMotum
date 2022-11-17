@@ -23,7 +23,7 @@ test_that("format_data accepts timezone", {
 })
 
 test_that("format_data accepts timezone", {
-  expect_warning(format_data(ellie.dt, tz = "America/Wolfville"))
+  expect_warning(format_data(ellie.dt, tz = "Merica/Wolfville"))
 })
 
 ellie_n <- ellie_n[, sample(1:ncol(ellie_n))]
