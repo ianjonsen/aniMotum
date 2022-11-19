@@ -22,10 +22,6 @@ test_that("format_data accepts timezone", {
   expect_no_error(format_data(ellie.dt, tz = "America/Halifax"))
 })
 
-test_that("format_data accepts timezone", {
-  expect_warning(format_data(ellie.dt, tz = "Merica/Wolfville"))
-})
-
 ellie_n <- ellie_n[, sample(1:ncol(ellie_n))]
 test_that("format_data orders variables properly", {
   f <- format_data(ellie_n, id = "ind", date = "time", lc = "lq", 
