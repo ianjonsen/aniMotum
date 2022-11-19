@@ -47,7 +47,9 @@
 
 sim_filter <- function(trs, keep = .25, flag = 2){
 
-  stopifnot("trs must be a `sim_fit` object" = inherits(trs, "sim_fit"))
+  ## include `simfit` class for backwards compatibility
+  stopifnot("trs must be a `sim_fit` object" = any(inherits(trs, "sim_fit"),
+                                                   inherits(trs, "simfit")))
   
   # filter based on similarity to original path
   # apply the similarity flag function to each simulated track
