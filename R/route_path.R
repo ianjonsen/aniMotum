@@ -83,7 +83,7 @@ route_path <-
     
     stopifnot("x must be either a foieGras ssm fit object with class `ssm_df`
          or a `sim_fit` object containing the paths simulated from a `ssm` fit object" = 
-                all(inherits(x, "ssm_df"), any(inherits(x, "sim_fit"), inherits(x, "simfit"))))
+                any(inherits(x, "ssm_df"), inherits(x, "sim_fit"), inherits(x, "simfit")))
       
     if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
       map_scale <- 50
