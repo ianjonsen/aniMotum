@@ -79,7 +79,7 @@ prefilter <-
     ##       ensure that longitudes straddling -180,180 or 0,360 are shifted 
     ##       appropriately
     x <- pf_sf_project(x)
-    
+
     ##  5. add location error multiplication factors and finalise data structure
     ##      for use by sfilter()
     x <- pf_add_emf(x, emf)

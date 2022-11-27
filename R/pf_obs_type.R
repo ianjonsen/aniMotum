@@ -26,10 +26,10 @@ pf_obs_type <- function(x) {
   ##  convert error ellipse smaj & smin from m to km and eor from deg to rad
   x$smaj <- with(x, ifelse(smaj == 0 | smin == 0, NA, smaj)) / 1000
   x$smin <- with(x, ifelse(smin == 0 | is.na(smaj), NA, smin)) / 1000
-  x$eor <- with(x, ifelse(is.na(smaj) & is.na(smin), NA, eor)) / 180 *pi
+  x$eor <- with(x, ifelse(is.na(smaj) & is.na(smin), NA, eor)) / 180 * pi
   
-  x$obs.type <- with(x, ifelse(any(is.na(smaj), is.na(smin), is.na(eor)) & 
-                                 all(obs.type != "GLS", obs.type != "GPS"), 
+  x$obs.type <- with(x, ifelse(is.na(smaj) & is.na(smin) & is.na(eor) & 
+                                 (obs.type != "GLS" & obs.type != "GPS"), 
                                "LS", obs.type))
   
   ## convert GLS errors from degrees lon/lat to km
