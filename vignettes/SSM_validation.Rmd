@@ -95,3 +95,9 @@ c(fit.rw$ssm[[1]]$AICc, fit.crw$ssm[[1]]$AICc)
 
 
 As calculation of prediction residuals can be computationally demanding, typically requiring more time than fitting the model, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 
+
+Users wishing to explore residual diagnostics for hierarchical models (including state-space models) should refer to the `DHARMa` R package, which has more details on diagnostics for hierarchical models. Although `foieGras` is not able to make use of the `DHARMa` package, its vignette and references therein can be a useful guide for diagnosing model fits (Hartig, 2022).
+
+
+## References
+Hartig, F (2022) DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed) Regression Models. R package version 0.4.6. http://florianhartig.github.io/DHARMa/
