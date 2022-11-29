@@ -187,7 +187,8 @@ format_data <- function(x,
   
   ## convert dates to POSIXt if not already
   if(!inherits(xx$date, "POSIXt")) {
-    xx$date <- as.POSIXct(xx$date, tz = tz)
+    xx$date <- try(as.POSIXct(xx$date, tz = tz), silent = TRUE)
+    if(inherits(xx$date, "try-error")) stop("dates must be in a standard format: YYYY-MM-DD HH:MM:SS")
   }
   ## order records by date
   xx <- xx[order(xx$date), ]
