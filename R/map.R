@@ -132,19 +132,27 @@ map <- function(x,
   } else {
     line_sf <- NULL
   }
-  
+
   ## calc confidence ellipses around estimated locations & dissolve overlapping segments
   if(aes$conf) {
     locs <- st_coordinates(loc_sf)
     locs <- data.frame(id = loc_sf$id, x = locs[,1], y = locs[,2], x.se = loc_sf$x.se, y.se = loc_sf$y.se)
+    ## check for NA's in se estimates
+    if(any(is.na(locs$x.se),is.na(locs$y.se))) {
+      aes$conf <- FALSE
+      message("NA's detected in location standard errors, can not render confidence ellipses")
+    }
+  }
+  if(aes$conf) {
     locs.lst <- split(locs, locs$id)
     conf_poly <- lapply(locs.lst, function(x) {
-      conf <- lapply(1:nrow(x), function(i)
-        with(x, elps(x[i], y[i], x.se[i], y.se[i], 90)))
+      conf <- lapply(x, function(j)
+        with(x, elps(x[j], y[j], x.se[j], y.se[j], 90)))
       lapply(conf, function(x)
         st_polygon(list(x))) %>%
         st_multipolygon()
     })
+
     conf_sf <- st_as_sfc(conf_poly)
     conf_sf <- st_as_sf(conf_sf, crs = st_crs(loc_sf))
     conf_sf$id <- unique(loc_sf$id)
@@ -164,7 +172,7 @@ map <- function(x,
     obs_sf <- NULL
     extents <- st_bbox(loc_sf)
   }
-  
+
   extents[c("xmin", "xmax")] <- extendrange(extents[c("xmin", "xmax")], 
                                            f = ext.rng[1])
   extents[c("ymin", "ymax")] <- extendrange(extents[c("ymin", "ymax")], 
