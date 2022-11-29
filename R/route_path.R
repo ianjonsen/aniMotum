@@ -152,38 +152,64 @@ route_path <-
       df_rrt <- df_sf %>% 
         nest_by(id) %>%
         rowwise() %>%
-        mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
-               rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
-               pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
+        mutate(pts = suppressWarnings(list(try(data %>% pathroutr::prt_trim(land_region), silent = TRUE))))
       
+      ## check for errors due to entire track on land & return message
+      idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
+      if(length(idx) > 0) {
+        message("The following track(s) are entirely on land:")
+        cat(as.character(df_rrt[idx,]$id))
+        message("\nIgnoring these and rerouting all others")
+      }
+
+      df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
+        if(!inherits(x, "try-error")) pathroutr::prt_reroute(x, land_region, vis_graph)
+      })
+
+      df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
+        if(!inherits(df_rrt$pts[[i]], "try-error")) {
+          pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
+        }
+      })
+        
       # pull the corrected points from the object and reformat for foieGras
-      df_rrt <- df_rrt %>%
-        select(id, pts_fix) %>%
-        mutate(pts_rrt = 
-          list(pts_fix %>%
-            st_transform(crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
-              select(date,x.se,y.se))) %>%
-        select(id, pts_rrt) %>%
-        ungroup()
+      df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
+        if(!is.null(x)) {
+          st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
+            select(date, x.se, y.se)
+        }
+      }) 
+      df_rrt <- df_rrt %>% select(id, pts_rrt) %>% ungroup()
+      
       ## append id to each sf tibble
       df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
-        df_rrt$pts_rrt[[i]] %>% 
-          mutate(id = df_rrt$id[i]) %>%
-          select(id, everything())
+        if(!is.null(df_rrt$pts_rrt[[i]])) {
+          df_rrt$pts_rrt[[i]] %>% 
+            mutate(id = df_rrt$id[i]) %>%
+            select(id, everything())
+        }
       })
+      
+      ## create empty sf_tibble to populate NULL list elements
+      st <- min(which(!1:nrow(df_rrt) %in% idx))
+      null.tibble <- df_rrt$pts_rrt[[st]]
+      null.tibble <- null.tibble[-c(1:nrow(null.tibble)),]
       
       ## append rerouted sf tibble to fit_ssm objects - ensure any mp estimates get appended
       if(append) {
         x$ssm <- lapply(1:nrow(x), function(i) {
-          if("g" %in% names(x$ssm[[i]]$predicted)) {
-            x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
-                                               select(date, logit_g, logit_g.se, g),
-                                             by = "date") %>%
-              select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
+          if(!is.null(df_rrt$pts_rrt[[i]])) {
+            if("g" %in% names(x$ssm[[i]]$predicted)) {
+              x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
+                                                 select(date, logit_g, logit_g.se, g),
+                                               by = "date") %>%
+                select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
+            } else {
+              x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+            }
           } else {
-            x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+            x$ssm[[i]]$rerouted <- null.tibble
           }
-          
           x$ssm[[i]]
         })
         out <- x

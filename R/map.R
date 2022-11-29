@@ -146,7 +146,7 @@ map <- function(x,
   if(aes$conf) {
     locs.lst <- split(locs, locs$id)
     conf_poly <- lapply(locs.lst, function(x) {
-      conf <- lapply(x, function(j)
+      conf <- lapply(1:nrow(x), function(j)
         with(x, elps(x[j], y[j], x.se[j], y.se[j], 90)))
       lapply(conf, function(x)
         st_polygon(list(x))) %>%

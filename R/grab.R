@@ -28,7 +28,7 @@
 ##' @return a `tibble` with all individual `tibble`'s appended
 ##'
 ##' @importFrom sf st_crs st_coordinates st_transform st_geometry st_as_sf st_set_crs
-##' @importFrom dplyr group_by mutate ungroup "%>%"
+##' @importFrom dplyr group_by mutate ungroup "%>%" bind_rows
 ##' @importFrom tibble as_tibble
 ##'
 ##' @examples
@@ -127,9 +127,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  
                } else if (any(test)) {
                  out <- lapply(1:length(out_lst), function(i) {
-                   st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
-                     st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
-                     st_transform(prj[[1]])
+                   if(nrow(out_lst[[i]]) >= 1){
+                    st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+                      st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                       st_transform(prj[[1]])
+                   }
                  })
                  out <- bind_rows(out)
                  
@@ -193,7 +195,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              }
              
             } else if (!as_sf) {
-             out <- do.call(rbind, out_lst)
+             out <- bind_rows(out_lst)
              if (what %in% c("fitted","predicted")) {
                out <- switch(
                  x$ssm[[1]]$pm,
@@ -270,7 +272,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            out <- lapply(x$mpm, function(.) {
              x <- switch(what, fitted = .$fitted, data = .$data)
              }) 
-           out <- do.call(rbind, out)
+           out <- bind_rows(out)
            out <- as_tibble(out)
            if(normalise & !group) {
              out <- out %>% 
