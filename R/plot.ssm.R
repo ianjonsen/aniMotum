@@ -80,7 +80,7 @@ plot.ssm_df <-
            what = c("fitted", "predicted", "rerouted"),
            type = 1,
            outlier = TRUE,
-           alpha = 0.6,
+           alpha = 0.3,
            pages = 0,
            ncol = 1,
            ask = TRUE,
@@ -185,7 +185,7 @@ plot.ssm_df <-
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
               fill = cpal[2],
-              alpha = alpha + 0.15
+              alpha = alpha
             )
           
           if (outlier) {
