@@ -1,6 +1,7 @@
-# foieGras 1.0-8 (15/11/2022)
+# foieGras 1.1 (01/12/2022)
 
-* adds greater flexibility for input data formats (via new arguments to `fit_ssm`)
+* adds `format_data()` to pre-process non-default data formats into that expected by `fit_ssm`
+* adds greater flexibility for input data formats (via new arguments to `fit_ssm`), related to `format_data`
 * fixes an issue with input data as an `sf-tibble` or `sf-data.frame` that caused an error when fitting SSM's via `fit_ssm`
 * when installing package from source, C++ code is automatically compiled against the existing TMB package version. This should eliminate the warning message on installation and package load that some users may have experienced previously
 * updated `Overview` vignette, describing input data structures in greater detail
