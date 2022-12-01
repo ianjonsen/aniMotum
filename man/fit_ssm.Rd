@@ -25,8 +25,9 @@ fit_ssm(
 )
 }
 \arguments{
-\item{x}{a data frame of observations including Argos KF error ellipse info
-(when present)}
+\item{x}{a \code{data.frame}, \code{tibble} or \code{sf-tibble} of observations, depending
+on the tracking data type. See more in the Details section, below, and the
+Overview vignette \code{vignette("Overive", package = "foieGras")}.}
 
 \item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
 outlier locations}
@@ -103,8 +104,8 @@ Location data of different types can combined in a single data frame
 }
 \details{
 \code{x} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8
-columns, depending on the tracking data type. Argos Least-Squares and GPS
-data should have 5 columns in the following order:
+columns (the default format), depending on the tracking data type. Argos
+Least-Squares and GPS data should have 5 columns in the following order:
 \strong{\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}}. Where \code{date} can be a POSIX object or text
 string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the
 time zone is assumed to be \code{UTC}. lc (location class) can include the
@@ -113,6 +114,13 @@ and GLS locations, respectively. Class Z values are assumed to have the same
 error variances as class B. By default, class \code{G} (GPS) locations are assumed
 to have error variances 10x smaller than Argos class 3 variances, but unlike
 Argos error variances the GPS variances are the same for longitude and latitude.
+
+The \link{format_data} function can be used as a data pre-processing
+step or called automatically within \code{fit_ssm} to restructure data that is
+not in one of the above default formats. The minimum essential variables:
+\strong{\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}} must exist in the input data but they can
+have different names and exist in a different column order. See
+\link{format_data} for details.
 
 See \link{emf} for details on how to modify these assumptions.
 

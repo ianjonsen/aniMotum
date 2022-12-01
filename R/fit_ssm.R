@@ -9,8 +9,9 @@
 ##' (see details). Predicts locations at user-specified time intervals 
 ##' (regular or irregular).
 ##'
-##' @param x a data frame of observations including Argos KF error ellipse info 
-##' (when present)
+##' @param x a `data.frame`, `tibble` or `sf-tibble` of observations, depending 
+##' on the tracking data type. See more in the Details section, below, and the 
+##' Overview vignette \code{vignette("Overive", package = "foieGras")}.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -44,8 +45,8 @@
 ##' [foieGras::format_data] for details 
 ##'
 ##' @details `x` is a `data.frame`, `tibble`, or `sf-tibble` with 5, 7 or 8 
-##' columns, depending on the tracking data type. Argos Least-Squares and GPS 
-##' data should have 5 columns in the following order: 
+##' columns (the default format), depending on the tracking data type. Argos 
+##' Least-Squares and GPS data should have 5 columns in the following order: 
 ##' **`id`, `date`, `lc`, `lon`, `lat`**. Where `date` can be a POSIX object or text
 ##' string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the
 ##' time zone is assumed to be `UTC`. lc (location class) can include the 
@@ -54,6 +55,13 @@
 ##' error variances as class B. By default, class `G` (GPS) locations are assumed 
 ##' to have error variances 10x smaller than Argos class 3 variances, but unlike 
 ##' Argos error variances the GPS variances are the same for longitude and latitude. 
+##' 
+##' The [foieGras::format_data] function can be used as a data pre-processing 
+##' step or called automatically within `fit_ssm` to restructure data that is 
+##' not in one of the above default formats. The minimum essential variables: 
+##' **`id`, `date`, `lc`, `lon`, `lat`** must exist in the input data but they can
+##' have different names and exist in a different column order. See 
+##' [foieGras::format_data] for details.
 ##' 
 ##' See [emf] for details on how to modify these assumptions. 
 ##' 
