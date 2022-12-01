@@ -54,7 +54,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##' data, separated into x and y components (units = km) with prediction 
 ##' uncertainty ribbons (2 x SE); or (type = 2) 2-d fits to data (units = km)
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path aes_string ggtitle geom_rug 
+##' @importFrom ggplot2 ggplot geom_point geom_path ggtitle geom_rug 
 ##' @importFrom ggplot2 theme_minimal vars labs coord_fixed label_value geom_ribbon 
 ##' @importFrom ggplot2 element_text element_blank xlab ylab labeller label_both 
 ##' @importFrom ggplot2 facet_wrap scale_colour_viridis_c
@@ -80,7 +80,7 @@ plot.ssm_df <-
            what = c("fitted", "predicted", "rerouted"),
            type = 1,
            outlier = TRUE,
-           alpha = 0.6,
+           alpha = 0.3,
            pages = 0,
            ncol = 1,
            ask = TRUE,
@@ -185,7 +185,7 @@ plot.ssm_df <-
               aes(date, ymin = value - 2 * se,
                   ymax = value + 2 * se),
               fill = cpal[2],
-              alpha = alpha + 0.15
+              alpha = alpha
             )
           
           if (outlier) {
@@ -326,7 +326,7 @@ plot.ssm_df <-
               aes(x, y),
               col = cpal[4],
               alpha = 0.5,
-              lwd = 0.2
+              linewidth = 0.2
             ) +
             geom_point(
               data = subset(ssm, id == unique(id)[i]),
@@ -389,7 +389,7 @@ plot.ssm_df <-
             geom_line(
               data = ssm.lst[[i]],
               aes(date, g, col = g),
-              size = 0.3
+              linewidth = 0.3
             ) +
             geom_point(
               data = ssm.lst[[i]],
@@ -435,7 +435,7 @@ plot.ssm_df <-
               data = ssm.lst[[i]],
               aes(x, y), 
               col = grey(0.7),
-              lwd = 0.2
+              linewidth = 0.2
             ) +
             geom_point(
               data = ssm.lst[[i]],

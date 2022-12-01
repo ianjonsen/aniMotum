@@ -131,7 +131,7 @@ plot.mpm_df <-
       p <- lapply(xy, function(x) {
         px <- ggplot(x) +
           geom_path(aes(lon, lat),
-                    size = 0.25,
+                    linewidth = 0.25,
                     col = cpal[1],
                     alpha = 0.75)
         if(se) {

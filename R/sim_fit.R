@@ -29,7 +29,7 @@
 ##' paths is experimental, likely to change in future releases, and NOT guaranteed 
 ##' to work enitrely as intended, especially if \code{cpf = TRUE}!
 ##' 
-##' @return a \code{fG_simfit} object containing the paths simulated from a 
+##' @return a \code{fG_sim_fit} object containing the paths simulated from a 
 ##' \code{ssm} fit object
 ##' 
 ##' @references 
@@ -37,7 +37,7 @@
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 24)
-##' trs <- simfit(fit, what = "predicted", reps = 3)
+##' trs <- sim_fit(fit, what = "predicted", reps = 3)
 ##' plot(trs)
 ##' 
 ##' @importFrom tmvtnorm rtmvnorm
@@ -49,7 +49,7 @@
 ##' @importFrom CircStats rvm
 ##' @export
 
-simfit <-
+sim_fit <-
   function(x,
            what = c("fitted", "predicted"),
            reps = 1,
@@ -96,6 +96,7 @@ simfit <-
     dt <- as.numeric(difftime(dts, c(as.POSIXct(NA), dts[-length(dts)]), units = "hours"))
     dt[1] <- 0
     
+    ## get parameters from model fit object
     switch(model,
            crw = {
              Sigma <- diag(2) * 2 * x$ssm[[k]]$par["D", 1]
@@ -257,6 +258,6 @@ simfit <-
            class(d) <- append("crws", class(d))
          })
 
-  class(d) <- append("simfit", class(d))
+  class(d) <- append("sim_fit", class(d))
   return(d)
 }

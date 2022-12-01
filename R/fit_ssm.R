@@ -9,8 +9,9 @@
 ##' (see details). Predicts locations at user-specified time intervals 
 ##' (regular or irregular).
 ##'
-##' @param x a data frame of observations including Argos KF error ellipse info 
-##' (when present)
+##' @param x a `data.frame`, `tibble` or `sf-tibble` of observations, depending 
+##' on the tracking data type. See more in the Details section, below, and the 
+##' Overview vignette \code{vignette("Overive", package = "foieGras")}.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -40,18 +41,12 @@
 ##' (see [foieGras::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
-##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
-##' see [foieGras::ssm_control] for details
-##' @param optim is deprecated, use `ssm_control(optim = "optim")` instead, 
-##' see [foieGras::ssm_control] for details
-##' @param optMeth is deprecated, use `ssm_control(method = "L-BFGS-B")` instead,
-##'  see [foieGras::ssm_control] for details
-##' @param lpsi is deprecated, use `ssm_control(lower = list(lpsi = -Inf))` instead,
-##'  see [foieGras::ssm_control] for details
+##' @param ... variable name arguments passed to format_data, see 
+##' [foieGras::format_data] for details 
 ##'
 ##' @details `x` is a `data.frame`, `tibble`, or `sf-tibble` with 5, 7 or 8 
-##' columns, depending on the tracking data type. Argos Least-Squares and GPS 
-##' data should have 5 columns in the following order: 
+##' columns (the default format), depending on the tracking data type. Argos 
+##' Least-Squares and GPS data should have 5 columns in the following order: 
 ##' **`id`, `date`, `lc`, `lon`, `lat`**. Where `date` can be a POSIX object or text
 ##' string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the
 ##' time zone is assumed to be `UTC`. lc (location class) can include the 
@@ -60,6 +55,13 @@
 ##' error variances as class B. By default, class `G` (GPS) locations are assumed 
 ##' to have error variances 10x smaller than Argos class 3 variances, but unlike 
 ##' Argos error variances the GPS variances are the same for longitude and latitude. 
+##' 
+##' The [foieGras::format_data] function can be used as a data pre-processing 
+##' step or called automatically within `fit_ssm` to restructure data that is 
+##' not in one of the above default formats. The minimum essential variables: 
+##' **`id`, `date`, `lc`, `lon`, `lat`** must exist in the input data but they can
+##' have different names and exist in a different column order. See 
+##' [foieGras::format_data] for details.
 ##' 
 ##' See [emf] for details on how to modify these assumptions. 
 ##' 
@@ -73,20 +75,21 @@
 ##' In this case, all lc values should be set to `GL`. 
 ##' 
 ##' Multiple location data types can be combined in a single data frame 
-##' (see the vignette for examples). 
+##' (see the Overview vignette for examples). 
 ##' 
 ##' When data are provided as an `sf-tibble`, the user-specified projection is 
-##' respected. Otherwise, longlat data are re-projected internally to a global 
-##' Mercator grid and provided as the default output. A simple `tibble`, without
-##' a geom, of `lon,lat` and `x,y` location estimates can be obtained by using 
-##' [grab] with the argument `as_sf = FALSE`.
+##' respected, although projected units are always transformed to km to improve 
+##' SSM convergence efficiency. Otherwise, longlat data are re-projected 
+##' internally to a global Mercator grid and provided as the default output. 
+##' A simple `tibble`, without a geom, of `lon,lat` and `x,y` location estimates
+##'  can be obtained by using [grab] with the argument `as_sf = FALSE`.
 ##' 
 ##' @return a list with components
 ##' * `call` the matched call
 ##' * `predicted` an sf tbl of predicted location states
 ##' * `fitted` an sf tbl of fitted locations
 ##' * `par` model parameter summary
-##' * `data` an augmented sf tbl of the input data
+##' * `data` an augmented sf tbl of the formatted input data
 ##' * `inits` a list of initial values
 ##' * `pm` the process model fit, either "rw" or "crw"
 ##' * `ts` time time.step in h used
@@ -107,7 +110,8 @@
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
-##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0)) 
+##' fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, 
+##' control = ssm_control(verbose = 0)) 
 ##' 
 ##' ## time series plots of fitted values and observations
 ##' plot(fit, what = "fitted", type = 1, ask = FALSE)
@@ -134,13 +138,12 @@ fit_ssm <- function(x,
                     fit.to.subset = TRUE,
                     control = ssm_control(),
                     inner.control = NULL,
-                    verbose = NULL,
-                    optim = NULL,
-                    optMeth = NULL,
-                    lpsi = NULL
+                    ...
                     )
 {
 
+  dots <- list(...)
+  
   stopifnot("model can only be 1 of `rw`, `crw`, or `mp`" = model %in% c("rw","crw","mp"))
   
 ## check args - most args handled by prefilter() & sfilter()
@@ -148,44 +151,39 @@ fit_ssm <- function(x,
     stop("x must be a data.frame, tibble or sf-tibble, see `?fit_ssm for details`")
   if(!is.logical(pf)) 
     stop("pf must be either FALSE (fit model) or TRUE (only run prefilter)")
-
+  
 ## warnings for deprecated arguments
-  if(!is.null(verbose)) {
-    warning("the `verbose` arg is deprecated as of 0.7-5, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
+  if(all("verbose" %in% names(dots), !is.null(dots$verbose))) {
+    warning("the `verbose` arg is deprecated & will be removed in the next version, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    control$verbose <- verbose
+    control$verbose <- dots$verbose
   }
-  if(!is.null(optim)) {
-    warning("the `optim` arg is deprecated as of 0.7-5, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
+  if(all("optim" %in% names(dots), !is.null(dots$optim))) {
+    warning("the `optim` arg is deprecated & will be removed in the next version, use `control = ssm_control(optim)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    if(optim %in% c("nlminb", "optim")) control$optim <- optim
+    if(dots$optim %in% c("nlminb", "optim")) control$optim <- dots$optim
     else stop("invalid optimiser specified, see ?ssm_control for options")
   }
-  if(!is.null(optMeth)) {
-    warning("the `optMeth` arg is deprecated as of 0.7-5, use `control = ssm_control(method)` instead. See `?ssm_control for details",
+  if(all("optMeth" %in% names(dots), !is.null(dots$optMeth))) {
+    warning("the `optMeth` arg is deprecated & will be removed in the next version, use `control = ssm_control(method)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    if(optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
-      control$method <- optMeth
+    if(dots$optMeth %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent"))
+      control$method <- dots$optMeth
     else stop("invalid optimisation method specified, see ?ssm_control for options")
   }
-  if(!is.null(lpsi)) {
-    warning("the `lpsi` arg is deprecated as of 0.7-5, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
+  if(all("lpsi" %in% names(dots), !is.null(dots$lpsi))) {
+    warning("the `lpsi` arg is deprecated & will be removed in the next version, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
-    control$lower <- list(l_psi = lpsi)
-  }
-
-  ## add id if missing
-  if(! "id" %in% names(x)) {
-    x$id <- 1 
-    x <- x[, c("id", names(x)[names(x) != "id"])]
+    control$lower <- list(l_psi = dots$lpsi)
   }
   
-  ## in cases where user supplies id as a factor, make sure to drop any unused factor levels
-  if(is.factor(x$id)) x$id <- droplevels(x$id)
+  ## ensure data is in expected format
+  if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
+  ## apply prefilter
   fit <- lapply(split(x, x$id),
                 function(xx) {
-                  prefilter(data = xx,
+                  prefilter(x = xx,
                             vmax = vmax,
                             ang = ang,
                             distlim = distlim,
@@ -194,16 +192,17 @@ fit_ssm <- function(x,
                             emf = emf)
                 })
   
+  ## if pf = TRUE then just prefilter & return result
   if(pf){
     fit <- try(do.call(rbind, fit))
     
+    ## this shouldn't happen as invalid data should error at format_data() step
     if(inherits(fit, "try-error")) 
-    stop("\n Cannot bind tibbles with multiple guessed projections in pre-filtered output. \n
-            Supply data as an `sf` object with a common projection across individuals.\n")
+    stop("something went wrong trying to put prefilter-ed tracks back together")
     
   } else {
     if(control$verbose == 1)
-      cat(paste0("fitting ", model, "...\n"))
+      cat(paste0("fitting ", model, " SSM to ", length(fit), " tracks...\n"))
     if(model %in% c("crw", "rw")) {
       fit <- lapply(fit,
                     function(x) {

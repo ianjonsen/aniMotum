@@ -5,7 +5,7 @@
 \title{Prepare Argos data for fitting state-space model}
 \usage{
 prefilter(
-  data,
+  x,
   vmax = 5,
   ang = c(15, 25),
   distlim = c(2500, 5000),
@@ -15,40 +15,50 @@ prefilter(
 )
 }
 \arguments{
-\item{data}{input data, must have 5 (LS), or 8 (KF) columns (see details)}
+\item{x}{input data, must have 5 (LS), or 8 (KF) columns (see details)}
 
 \item{vmax}{max travel rate (m/s)}
 
-\item{ang}{angles of outlier location "spikes" (default is \code{c(15,25)} deg); \code{ang = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}}
+\item{ang}{angles of outlier location "spikes" (default is \code{c(15,25)} deg);
+\code{ang = NA} turns off \code{trip::sda} filter in favour of
+\code{trip::speedfilter}}
 
-\item{distlim}{lengths of outlier location "spikes" in km (default is \code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter in favour of \code{trip::speedfilter}. Either \code{ang = NA} or \code{distlim = NA} are sufficient.}
+\item{distlim}{lengths of outlier location "spikes" in km (default is
+\code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter
+in favour of \code{trip::speedfilter}. Either \code{ang = NA} or
+\code{distlim = NA} are sufficient.}
 
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
-\item{min.dt}{minimum allowable time difference in s between observations; \code{dt < min.dt} will be ignored by the SSM}
+\item{min.dt}{minimum allowable time difference in s between observations;
+\code{dt < min.dt} will be ignored by the SSM}
 
-\item{emf}{optionally supplied data.frame of error multiplication factors for Argos location quality classes. see Details}
+\item{emf}{optionally supplied data.frame of error multiplication factors
+for Argos location quality classes. see Details}
 }
 \value{
-an sf object with all observations passed from \code{data} and the following appended columns
-\item{\code{keep}}{logical indicating whether observation should be ignored by \code{sfilter} (FALSE)}
-\item{\code{obs.type}}{flag indicating whether KF or LS measurement model applies}
+an sf object with all observations passed from \code{data} and the
+following appended columns
+\item{\code{keep}}{logical indicating whether observation should be ignored
+by \code{sfilter} (FALSE)}
+\item{\code{obs.type}}{flag indicating whether KF or LS measurement model
+applies}
 \item{\code{emf_x}}{error multiplication factors for \code{x} direction}
 \item{\code{emf_y}}{error multiplication factors for \code{y} direction}
 \item{\code{geometry}}{sf POINT object giving \code{x,y} coordinates in km}
 }
 \description{
-\code{prefilter} (1) determines Argos data type (LS or KF);
-(2) converts dates to POSIXt & identifies observations with duplicate dates;
-(3) orders observations in time; (4) removes duplicate observations;
-(5) removes observations occurring within 60 s of one another (keeps first);
-(6) shifts longitudes that straddle -180,180 to 0,360 and vice-versa;
-(7) projects lonlat coords to mercator x,y coords (in km);
-(8) adds location error multiplication factors based on Argos location
+\code{prefilter} does the following:
+(1) flags (\code{keep = FALSE}) observations with duplicate
+dates & removes subsequent observations occurring within min.dt s of one another
+(2) determines Argos data type (LS, KF, G, or GL);
+(3) uses \code{trip::sda} filter to identify extreme locations. \code{trip::sda} is a
+fast, vectorized version of the now CRAN-archived \code{argosfilter::sdafilter}
+see \code{?trip::sda} for additional details
+(4) projects lonlat coords to mercator x,y coords (in km) & shifts longitudes
+that straddle -180,180 to 0,360 and vice-versa;
+(5) adds location error multiplication factors based on Argos location
 class (for type LS);
-(9) uses a \code{trip::sda} to identify potential outlier locations.
-\code{trip::sda} is a fast, vectorized version of \code{argosfilter::sdafilter}
-see \code{?argosfilter::sdafilter} for details on implementation
 }
 \details{
 called by \code{fit_ssm}.

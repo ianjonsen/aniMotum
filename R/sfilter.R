@@ -66,9 +66,6 @@ sfilter <-
     } else if(length(time.step) > 1 & is.data.frame(time.step)) {
         if(sum(!names(time.step) %in% c("id","date")) > 0) stop("\n time.step names must be `id` and `date`")
     }
-
-    ## unlist x
-   # x <- x[[1]]
     
     ## drop any records flagged to be ignored, if fit.to.subset is TRUE
     if(fit.to.subset) xx <- subset(x, keep)
@@ -81,7 +78,7 @@ sfilter <-
     d <- cbind(xx, loc)
     d$isd <- TRUE
       
-
+    ## generate prediction intervals
     if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ## prediction times - assume on time.step-multiple of the hour
       tsp <- time.step * 3600
@@ -121,7 +118,7 @@ sfilter <-
       ts <- subset(time.step, id %in% unique(d$id))
       
     } else if (inherits(time.step, "data.frame") & any(is.na(time.step))) {
-      stop("NA's detected in user-supplied prediction times data.frame")
+      stop("NA's are not allowed in user-supplied prediction times data.frame")
     }
     
     if (all(!is.na(time.step))) {

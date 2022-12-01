@@ -21,15 +21,13 @@ fit_ssm(
   fit.to.subset = TRUE,
   control = ssm_control(),
   inner.control = NULL,
-  verbose = NULL,
-  optim = NULL,
-  optMeth = NULL,
-  lpsi = NULL
+  ...
 )
 }
 \arguments{
-\item{x}{a data frame of observations including Argos KF error ellipse info
-(when present)}
+\item{x}{a \code{data.frame}, \code{tibble} or \code{sf-tibble} of observations, depending
+on the tracking data type. See more in the Details section, below, and the
+Overview vignette \code{vignette("Overive", package = "foieGras")}.}
 
 \item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
 outlier locations}
@@ -74,17 +72,8 @@ this if you know what you are doing}
 \item{inner.control}{list of control settings for the inner optimizer
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
 
-\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
-see \link{ssm_control} for details}
-
-\item{optim}{is deprecated, use \code{ssm_control(optim = "optim")} instead,
-see \link{ssm_control} for details}
-
-\item{optMeth}{is deprecated, use \code{ssm_control(method = "L-BFGS-B")} instead,
-see \link{ssm_control} for details}
-
-\item{lpsi}{is deprecated, use \code{ssm_control(lower = list(lpsi = -Inf))} instead,
-see \link{ssm_control} for details}
+\item{...}{variable name arguments passed to format_data, see
+\link{format_data} for details}
 }
 \value{
 a list with components
@@ -93,7 +82,7 @@ a list with components
 \item \code{predicted} an sf tbl of predicted location states
 \item \code{fitted} an sf tbl of fitted locations
 \item \code{par} model parameter summary
-\item \code{data} an augmented sf tbl of the input data
+\item \code{data} an augmented sf tbl of the formatted input data
 \item \code{inits} a list of initial values
 \item \code{pm} the process model fit, either "rw" or "crw"
 \item \code{ts} time time.step in h used
@@ -115,8 +104,8 @@ Location data of different types can combined in a single data frame
 }
 \details{
 \code{x} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8
-columns, depending on the tracking data type. Argos Least-Squares and GPS
-data should have 5 columns in the following order:
+columns (the default format), depending on the tracking data type. Argos
+Least-Squares and GPS data should have 5 columns in the following order:
 \strong{\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}}. Where \code{date} can be a POSIX object or text
 string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the
 time zone is assumed to be \code{UTC}. lc (location class) can include the
@@ -125,6 +114,13 @@ and GLS locations, respectively. Class Z values are assumed to have the same
 error variances as class B. By default, class \code{G} (GPS) locations are assumed
 to have error variances 10x smaller than Argos class 3 variances, but unlike
 Argos error variances the GPS variances are the same for longitude and latitude.
+
+The \link{format_data} function can be used as a data pre-processing
+step or called automatically within \code{fit_ssm} to restructure data that is
+not in one of the above default formats. The minimum essential variables:
+\strong{\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}} must exist in the input data but they can
+have different names and exist in a different column order. See
+\link{format_data} for details.
 
 See \link{emf} for details on how to modify these assumptions.
 
@@ -138,17 +134,19 @@ have 7 columns, including the above 5 plus \code{lonerr}, \code{laterr} (in degr
 In this case, all lc values should be set to \code{GL}.
 
 Multiple location data types can be combined in a single data frame
-(see the vignette for examples).
+(see the Overview vignette for examples).
 
 When data are provided as an \code{sf-tibble}, the user-specified projection is
-respected. Otherwise, longlat data are re-projected internally to a global
-Mercator grid and provided as the default output. A simple \code{tibble}, without
-a geom, of \verb{lon,lat} and \verb{x,y} location estimates can be obtained by using
-\link{grab} with the argument \code{as_sf = FALSE}.
+respected, although projected units are always transformed to km to improve
+SSM convergence efficiency. Otherwise, longlat data are re-projected
+internally to a global Mercator grid and provided as the default output.
+A simple \code{tibble}, without a geom, of \verb{lon,lat} and \verb{x,y} location estimates
+can be obtained by using \link{grab} with the argument \code{as_sf = FALSE}.
 }
 \examples{
 ## fit crw model to Argos LS data
-fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, control = ssm_control(verbose = 0)) 
+fit <- fit_ssm(ellie, vmax = 4, model = "crw", time.step = 24, 
+control = ssm_control(verbose = 0)) 
 
 ## time series plots of fitted values and observations
 plot(fit, what = "fitted", type = 1, ask = FALSE)

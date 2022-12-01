@@ -19,7 +19,7 @@
 ##' 3) track lines; 4) observed locations; 5) land regions; 6) water regions
 ##' @param silent logical; map silently (default = FALSE)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
+##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
 ##' @importFrom ggplot2 element_rect coord_sf
@@ -115,7 +115,7 @@ map_single_track_base <- function(map_type,
         data = conf_sf,
         fill = aes$df$fill[2],
         stroke = 0,
-        lwd = 0,
+        linewidth = 0,
         alpha = aes$df$alpha[2]
       )
   }
@@ -126,7 +126,7 @@ map_single_track_base <- function(map_type,
       geom_sf(
         data = line_sf,
         colour = aes$df$col[3],
-        size = aes$df$size[3]
+        linewidth = aes$df$size[3]
       )
   } else if(aes$line & by.date) {
     browser()
@@ -135,7 +135,7 @@ map_single_track_base <- function(map_type,
         data = line_sf,
         colour = aes$df$col[3],
 #        aes(colour = as.numeric(as.Date(date))), can't colour by date when cast as MULTILINESTRING
-        size = aes$df$size[3]
+        linewidth = aes$df$size[3]
       )
     if(!aes$est) {
       p <- p +
@@ -190,7 +190,7 @@ map_single_track_base <- function(map_type,
           legend.key.width = unit(0.1, "npc"),
           legend.key.height = unit(0.02, "npc"),
           panel.background = element_rect(fill = aes$df$fill[6], colour = NA),
-          panel.grid = element_line(size = 0.1, colour = grey(0.6))
+          panel.grid = element_line(linewidth = 0.1, colour = grey(0.6))
           )
   
   return(p)

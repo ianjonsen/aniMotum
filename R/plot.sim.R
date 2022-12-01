@@ -53,7 +53,7 @@ plot.sim <- function(x,
         geom_path(
           data = x,
           aes(x, y),
-          size = 0.2,
+          linewidth = 0.2,
           colour = grey(0.5),
           alpha = 0.5
         )
@@ -162,7 +162,7 @@ plot.sim <- function(x,
                x$s <- with(x, sqrt(u^2 + v^2))
                x$b <- factor(x$b)
                p <- p +
-                 geom_line(data = x, aes(date, s), size = 0.3, colour = grey(0.6)) +
+                 geom_line(data = x, aes(date, s), linewidth = 0.3, colour = grey(0.6)) +
                  geom_point(data = x, aes(date, s, colour = b)) +
                  scale_colour_manual(values = 
                                        hcl.colors(n = 2, pal), 
@@ -176,7 +176,7 @@ plot.sim <- function(x,
              },
              g = {
                p <- p +
-                 geom_line(data = x, aes(date, g), size = 0.3, colour = grey(0.6)) +
+                 geom_line(data = x, aes(date, g), linewidth = 0.3, colour = grey(0.6)) +
                  geom_point(data = x, aes(date, g, colour = g)) +
                  scale_colour_gradientn(colours = hcl.colors(n = 100, pal, rev = rev),
                                           name = expression(gamma[t])) +
