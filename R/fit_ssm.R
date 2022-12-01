@@ -11,7 +11,7 @@
 ##'
 ##' @param x a `data.frame`, `tibble` or `sf-tibble` of observations, depending 
 ##' on the tracking data type. See more in the Details section, below, and the 
-##' Overview vignette \code{vignette("Overive", package = "foieGras")}.
+##' Overview vignette \code{vignette("Overview", package = "foieGras")}.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
