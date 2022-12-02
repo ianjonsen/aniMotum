@@ -20,7 +20,7 @@ tibble."><meta property="og:image" content="https://ianjonsen.github.io/foieGras
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@ individual data sets. The specified <code>tibble</code>'s are appended to a sing
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">grab</span><span class="op">(</span><span class="va">x</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, as_sf <span class="op">=</span> <span class="cn">FALSE</span>, normalise <span class="op">=</span> <span class="cn">FALSE</span>, group <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">grab</span><span class="op">(</span><span class="va">x</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, as_sf <span class="op">=</span> <span class="cn">FALSE</span>, normalise <span class="op">=</span> <span class="cn">FALSE</span>, group <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -135,13 +135,13 @@ will be re-projected to that <code>crs</code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## generate an ssm fit object</span></span>
-<span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">24</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## generate an ssm fit object</span></span></span>
+<span class="r-in"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">24</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## grab predicted values as an un-projected tibble</span></span>
-<span class="r-in"><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu">grab</span><span class="op">(</span><span class="va">xs</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## grab predicted values as an un-projected tibble</span></span></span>
+<span class="r-in"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu">grab</span><span class="op">(</span><span class="va">xs</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -156,7 +156,7 @@ will be re-projected to that <code>crs</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

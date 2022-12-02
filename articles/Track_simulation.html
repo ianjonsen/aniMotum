@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="Track_simulation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Track_simulation</h1>
@@ -110,158 +110,244 @@
 
     
     
-<p><code>foieGras</code> provides 2 track simulation functions for simulating random tracks from a few different movement process models, <code><a href="../reference/sim.html">sim()</a></code>, and for simulating random tracks from fitted SSM models, <code><a href="../reference/simfit.html">simfit()</a></code>.</p>
+<p><code>foieGras</code> provides 2 track simulation functions for
+simulating random tracks from a few different movement process models,
+<code><a href="../reference/sim.html">sim()</a></code>, and for simulating random tracks from fitted SSM
+models, <code><a href="../reference/sim_fit.html">sim_fit()</a></code>.</p>
 <div class="section level2">
 <h2 id="sim">
 <code>sim()</code><a class="anchor" aria-label="anchor" href="#sim"></a>
 </h2>
-<p>The <code>sim</code> function is useful for situations where simulated random tracks are required, such as understanding how observed animal tracks deviate from the expectations of the <code>rw</code>, <code>crw</code> or <code>mp</code> movement process models, or for exploring potential bias in SSM fits to data. Tracks can be simulated with regular or random time intervals between locations via the <code>tdist</code>, <code>ts</code> and <code>tpar</code> arguments, and with Argos Least-Squares- or Kalman filter-based location errors via the <code>error</code>, <code>tau</code> and <code>rho_o</code> arguments. Multiple behavioural states with stochastic switching can be implemented for the <code>rw</code> and <code>crw</code> models via the <code>alpha</code> argument.</p>
+<p>The <code>sim</code> function is useful for situations where
+simulated random tracks are required, such as understanding how observed
+animal tracks deviate from the expectations of the <code>rw</code>,
+<code>crw</code> or <code>mp</code> movement process models, or for
+exploring potential bias in SSM fits to data. Tracks can be simulated
+with regular or random time intervals between locations via the
+<code>tdist</code>, <code>ts</code> and <code>tpar</code> arguments, and
+with Argos Least-Squares- or Kalman filter-based location errors via the
+<code>error</code>, <code>tau</code> and <code>rho_o</code> arguments.
+Multiple behavioural states with stochastic switching can be implemented
+for the <code>rw</code> and <code>crw</code> models via the
+<code>alpha</code> argument.</p>
 <div class="section level4">
 <h4 id="simulate-tracks-from-each-of-the-3-process-models">Simulate tracks from each of the 3 process models<a class="anchor" aria-label="anchor" href="#simulate-tracks-from-each-of-the-3-process-models"></a>
 </h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span> 
-<span class="va">sim.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"rw"</span><span class="op">)</span>
-<span class="va">sim.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"crw"</span>, D <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
-<span class="va">sim.mp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"mp"</span>, sigma_g <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span> </span>
+<span><span class="va">sim.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"rw"</span><span class="op">)</span></span>
+<span><span class="va">sim.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"crw"</span>, D <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="va">sim.mp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.html">sim</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">200</span>, model <span class="op">=</span> <span class="st">"mp"</span>, sigma_g <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="plot-simulated-tracks">Plot simulated tracks<a class="anchor" aria-label="anchor" href="#plot-simulated-tracks"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.rw</span>, type<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'rw'"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.crw</span>, type<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'crw'"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> 
-  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.mp</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'mp'"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.mp</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">'collect'</span><span class="op">)</span> <span class="op">&amp;</span> 
-  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">'bottom'</span><span class="op">)</span></code></pre></div>
-<p><img src="Track_simulation_files/figure-html/plot.sim-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.rw</span>, type<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'rw'"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.crw</span>, type<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'crw'"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> </span>
+<span>  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.mp</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title<span class="op">=</span><span class="st">"'mp'"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim.mp</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">'collect'</span><span class="op">)</span> <span class="op">&amp;</span> </span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">'bottom'</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/plot_sim1.jpg" style="width:95.0%"></p>
 <div class="section level4">
 <h4 id="fit-ssm-to-simulated-lonlat-locations-with-argos-error">Fit SSM to simulated lon,lat locations (with Argos error)<a class="anchor" aria-label="anchor" href="#fit-ssm-to-simulated-lonlat-locations-with-argos-error"></a>
 </h4>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># coerce simulated RW data to format expected by fit_ssm</span>
-<span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">sim.rw</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span>, <span class="va">date</span>, <span class="va">lc</span>, <span class="va">lon</span>, <span class="va">lat</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># fit SSM `rw` model without any speed filtering</span>
-<span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
-                  spdf <span class="op">=</span> <span class="cn">FALSE</span>, 
-                  model <span class="op">=</span> <span class="st">"rw"</span>, 
-                  time.step <span class="op">=</span> <span class="fl">12</span>, 
-                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># fit SSM `crw` model</span>
-<span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
-                   spdf <span class="op">=</span> <span class="cn">FALSE</span>, 
-                   model <span class="op">=</span> <span class="st">"crw"</span>, 
-                   time.step <span class="op">=</span> <span class="fl">12</span>, 
-                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># extract SSM fitted locations</span>
-<span class="va">loc.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"fitted"</span><span class="op">)</span>
-<span class="va">loc.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit.crw</span>, <span class="st">"fitted"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># coerce simulated RW data to format expected by fit_ssm</span></span>
+<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">sim.rw</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span>, <span class="va">date</span>, <span class="va">lc</span>, <span class="va">lon</span>, <span class="va">lat</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit SSM `rw` model without any speed filtering</span></span>
+<span><span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, </span>
+<span>                  spdf <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                  model <span class="op">=</span> <span class="st">"rw"</span>, </span>
+<span>                  time.step <span class="op">=</span> <span class="fl">12</span>, </span>
+<span>                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit SSM `crw` model</span></span>
+<span><span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, </span>
+<span>                   spdf <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                   model <span class="op">=</span> <span class="st">"crw"</span>, </span>
+<span>                   time.step <span class="op">=</span> <span class="fl">12</span>, </span>
+<span>                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># extract SSM fitted locations</span></span>
+<span><span class="va">loc.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"fitted"</span><span class="op">)</span></span>
+<span><span class="va">loc.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit.crw</span>, <span class="st">"fitted"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># compare estimated to true values in y-direction</span>
-<span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">y</span><span class="op">+</span><span class="va">y.err</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span>       <span class="co"># y-values observed with Argos error</span>
-  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span> <span class="op">+</span>            <span class="co"># true y-values</span>
-  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">loc.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.7</span>, col <span class="op">=</span> <span class="st">"firebrick"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># RW SSM fitted y</span>
-  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">loc.crw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.4</span>, col <span class="op">=</span> <span class="st">"orange"</span><span class="op">)</span>      <span class="co"># CRW SSM fitted y</span></code></pre></div>
-<p><img src="Track_simulation_files/figure-html/plots-1.png" width="672"></p>
-<p>The <code>rw</code> (red) and <code>crw</code> (orange) SSM’s yield similar, reasonable fits to the RW simulated track, although both tend to smooth through some of the natural variability in the simulated true y-values (blue). This reflects a common inability of SSM’s to fully separate process and measurement variability in an unbiased manner, especially when measurement error is greater than natural variability (Auger-Méthé et al. 2016).</p>
+<code class="sourceCode R"><span><span class="co"># compare estimated to true values in y-direction</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">y</span><span class="op">+</span><span class="va">y.err</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span>       <span class="co"># y-values observed with Argos error</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span> <span class="op">+</span>            <span class="co"># true y-values</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">loc.rw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.7</span>, col <span class="op">=</span> <span class="st">"firebrick"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># RW SSM fitted y</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>data <span class="op">=</span> <span class="va">loc.crw</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">date</span>, <span class="va">y</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.4</span>, col <span class="op">=</span> <span class="st">"orange"</span><span class="op">)</span>      <span class="co"># CRW SSM fitted y</span></span></code></pre></div>
+<p><img src="images/track_simulation/plot_sim2.jpg" style="width:95.0%"></p>
+<p>The <code>rw</code> (red) and <code>crw</code> (orange) SSM’s yield
+similar, reasonable fits to the RW simulated track, although both tend
+to smooth through some of the natural variability in the simulated true
+y-values (blue). This reflects a common inability of SSM’s to fully
+separate process and measurement variability in an unbiased manner,
+especially when measurement error is greater than natural variability
+(Auger-Méthé et al. 2016).</p>
 </div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="simfit">
-<code>simfit()</code><a class="anchor" aria-label="anchor" href="#simfit"></a>
+<h2 id="sim_fit">
+<code>sim_fit()</code><a class="anchor" aria-label="anchor" href="#sim_fit"></a>
 </h2>
-<p>The <code>simfit</code> function is rather different, taking a <code>foieGras</code> SSM fit object (class <code>ssm_df</code>) and simulating replicate tracks by using the movement parameter estimates from the fitted model. Currently, tracks can be simulated from <code>rw</code> and <code>crw</code> SSM model fits. Tracks can be simulated from either the observation times (<code>what = "fitted"</code>) or the prediction times (<code>what = "predicted"</code>) and, thus, are constrained to have the same number of locations. The simulated tracks are otherwise unconstrained and should <em>not</em> be considered as resampled tracks suitable for exploring uncertainty in the SSM-estimated track. They are useful for habitat usage modelling, to represent habitat that is potentially available to a collection of tracked individuals (e.g., Hindell et al. 2020).</p>
+<p>The <code>sim_fit</code> function is rather different, taking a
+<code>foieGras</code> SSM fit object (class <code>ssm_df</code>) and
+simulating replicate tracks by using the movement parameter estimates
+from the fitted model. Currently, tracks can be simulated from
+<code>rw</code> and <code>crw</code> SSM model fits. Tracks can be
+simulated from either the observation times
+(<code>what = "fitted"</code>) or the prediction times
+(<code>what = "predicted"</code>) and, thus, are constrained to have the
+same number of locations. The simulated tracks are otherwise
+unconstrained and should <em>not</em> be considered as resampled tracks
+suitable for exploring uncertainty in the SSM-estimated track. They are
+useful for habitat usage modelling, to represent habitat that is
+potentially available to a collection of tracked individuals (e.g.,
+Hindell et al. 2020).</p>
 <div class="section level3">
 <h3 id="simulate-tracks-from-an-ssm-fit-and-plot">Simulate tracks from an SSM fit and plot:<a class="anchor" aria-label="anchor" href="#simulate-tracks-from-an-ssm-fit-and-plot"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span>
-<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, 
-               model<span class="op">=</span><span class="st">"crw"</span>, 
-               time.step<span class="op">=</span><span class="fl">24</span>, 
-               control<span class="op">=</span><span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what<span class="op">=</span><span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, </span>
+<span>               model<span class="op">=</span><span class="st">"crw"</span>, </span>
+<span>               time.step<span class="op">=</span><span class="fl">24</span>, </span>
+<span>               control<span class="op">=</span><span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what<span class="op">=</span><span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_1.jpg" style="width:95.0%"></p>
-<p>In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast Asia. We can further constrain the tracks to avoid land by adding a potential function (Brillinger et al. 2012) to the simulation that down-weights movements that cross onto land.</p>
+<p>In this case, 3 of the 5 replicate tracks (purple) cross onto land in
+southeast Asia. We can further constrain the tracks to avoid land by
+adding a potential function (Brillinger et al. 2012) to the simulation
+that down-weights movements that cross onto land.</p>
 </div>
 <div class="section level3">
 <h3 id="simulate-tracks-with-a-potential-function-to-help-avoid-land">Simulate tracks with a potential function to help avoid land:<a class="anchor" aria-label="anchor" href="#simulate-tracks-with-a-potential-function-to-help-avoid-land"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/grad.rda"</span>, package <span class="op">=</span> <span class="st">"foieGras"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span>
-<span class="va">st.pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, grad<span class="op">=</span><span class="va">grad</span>, beta<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">350</span>,<span class="op">-</span><span class="fl">350</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.pf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="images/track_simulation/st_2.jpg" style="width:95.0%"> Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with <code>beta = c(-300,-300)</code>, the tracks do not all entirely avoid crossing land. Features such as narrow islands or peninsulas pose a particular difficulty for this method, and tracks are not always guaranteed to remain off land.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/grad.rda"</span>, package <span class="op">=</span> <span class="st">"foieGras"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span></span>
+<span><span class="va">st.pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, grad<span class="op">=</span><span class="va">grad</span>, beta<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">350</span>,<span class="op">-</span><span class="fl">350</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.pf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_2.jpg" style="width:95.0%">
+Here, we use built in gradient rasters based on distance from ocean and
+strongly negative beta parameters (for the x and y directions,
+respectively) to down-weight movements onto land. Custom gradients can
+be supplied, e.g., for finer-scale tracks or for other kinds of barriers
+to movement. The strength of the potential function can be varied by
+altering the magnitude of the beta parameters, although extremely strong
+values can yield implausible artefacts in the resulting tracks. Note
+that with <code>beta = c(-300,-300)</code>, the tracks do not all
+entirely avoid crossing land. Features such as narrow islands or
+peninsulas pose a particular difficulty for this method, and tracks are
+not always guaranteed to remain off land.</p>
 </div>
 <div class="section level3">
 <h3 id="simulate-central-place-foraging-tracks">Simulate central place foraging tracks<a class="anchor" aria-label="anchor" href="#simulate-central-place-foraging-tracks"></a>
 </h3>
-<p>The SSM-estimated track in the above example implies a central place foraging strategy, where the southern elephant seal departs from its breeding colony on Iles Kerguelen for an extended period of time and eventually returns. The simulated tracks do not reflect this strategy because the <code>crw</code> SSM fitted to the data does not have long-term memory or any other mechanism that could mimic the return portion of the foraging trip. We can, however, constrain the simulated tracks to return to their origin by applying a simple Brownian Bridge using the <code>cpf</code> argument:</p>
+<p>The SSM-estimated track in the above example implies a central place
+foraging strategy, where the southern elephant seal departs from its
+breeding colony on Iles Kerguelen for an extended period of time and
+eventually returns. The simulated tracks do not reflect this strategy
+because the <code>crw</code> SSM fitted to the data does not have
+long-term memory or any other mechanism that could mimic the return
+portion of the foraging trip. We can, however, constrain the simulated
+tracks to return to their origin by applying a simple Brownian Bridge
+using the <code>cpf</code> argument:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">st.cpf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, cpf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">st.cpf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, cpf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_3.jpg" style="width:98.0%"></p>
-<p>The <code>cpf</code> argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the <code>cpf</code> argument.</p>
+<p>The <code>cpf</code> argument can be used in conjunction with the
+potential function, however, care should be taken as their
+implementations are independent with the potential function applied
+first. This means tracks that successfully avoid crossing land due to
+the potential function are not guaranteed to remain so after applying
+the <code>cpf</code> argument.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="sim_filter">
 <code>sim_filter()</code><a class="anchor" aria-label="anchor" href="#sim_filter"></a>
 </h2>
-<p>When simulating a large number of replicate tracks using <code>simfit</code>, some portion of the simulations may reflect unrealistic movement patterns due to the relatively unconstrained nature of the simulation. A simple approach for identifying and removing less realistic simulated tracks is to use a similarity filter (e.g., Hazen et al. 2017). The <code>sim_filter</code> function can calculate two related similarity functions, based on a comparison of the geodesic distances and bearings from the start and end locations of the SSM fitted track and each of the simulated tracks. Simulated tracks can be discarded by defining a threshold quantile via the <code>keep</code> argument.</p>
+<p>When simulating a large number of replicate tracks using
+<code>sim_fit</code>, some portion of the simulations may reflect
+unrealistic movement patterns due to the relatively unconstrained nature
+of the simulation. A simple approach for identifying and removing less
+realistic simulated tracks is to use a similarity filter (e.g., Hazen et
+al. 2017). The <code>sim_filter</code> function can calculate two
+related similarity functions, based on a comparison of the geodesic
+distances and bearings from the start and end locations of the SSM
+fitted track and each of the simulated tracks. Simulated tracks can be
+discarded by defining a threshold quantile via the <code>keep</code>
+argument.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># simulate 50 tracks</span>
-<span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
-
-<span class="co"># filter, keep only top 20 %</span>
-<span class="va">st_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st</span>, keep <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
-
-<span class="co"># compare unfiltered vs. filtered tracks</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st_f</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># simulate 50 tracks</span></span>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># filter, keep only top 20 %</span></span>
+<span><span class="va">st_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st</span>, keep <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># compare unfiltered vs. filtered tracks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st_f</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_4ab.jpg" style="width:98.0%"></p>
-<p><code>sim_filter</code> handles central place foraging tracks automatically by comparing distances and bearings from the start location to the most distant location.</p>
+<p><code>sim_filter</code> handles central place foraging tracks
+automatically by comparing distances and bearings from the start
+location to the most distant location.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># simulate 50 cpf tracks</span>
-<span class="va">st.cpf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simfit.html">simfit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">50</span>, cpf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># filter, keep only top 20 %</span>
-<span class="va">st.cpf_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st.cpf</span>, keep <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
-
-<span class="co"># compare unfiltered vs. filtered tracks</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># simulate 50 cpf tracks</span></span>
+<span><span class="va">st.cpf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">50</span>, cpf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># filter, keep only top 20 %</span></span>
+<span><span class="va">st.cpf_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st.cpf</span>, keep <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># compare unfiltered vs. filtered tracks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_5ab.jpg" style="width:98.0%"></p>
 </div>
 <div class="section level2">
 <h2 id="route_path">
 <code>route_path()</code><a class="anchor" aria-label="anchor" href="#route_path"></a>
 </h2>
-<p>We can use <code><a href="../reference/route_path.html">route_path()</a></code> (see <code><a href="../articles/Path_rerouting.html">vignette('Path_rerouting')</a></code> for more details) to re-route the few simulated track segments that cross land.</p>
+<p>We can use <code><a href="../reference/route_path.html">route_path()</a></code> (see
+<code><a href="../articles/Path_rerouting.html">vignette('Path_rerouting')</a></code> for more details) to re-route
+the few simulated track segments that cross land.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># reroute simulated tracks</span>
-<span class="va">st.cpf_frr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, centroids <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># compare</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_frr</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># reroute simulated tracks</span></span>
+<span><span class="va">st.cpf_frr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, centroids <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># compare</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_frr</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_6ab.jpg" style="width:98.0%"></p>
-<p>In more severe cases, tracks first could be simulated using potential functions, filtered, and then any remaining segments re-routed from land.</p>
+<p>In more severe cases, tracks first could be simulated using potential
+functions, filtered, and then any remaining segments re-routed from
+land.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen ID, Mills Flemming J (2016) State-space models’ dirty little secrets: even simple linear Gaussian models can have estimation problems. Scientific reports. 6(1):1-10.</p>
-<p>Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409.</p>
-<p>Hazen et al. (2017) WhaleWatch: a dynamic management tool for predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428.</p>
-<p>Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of marine predators to protect Southern Ocean ecosystems. Nature. 580:87–92.</p>
+<p>Auger-Méthé M, Field C, Albertsen CM, Derocher AE, Lewis MA, Jonsen
+ID, Mills Flemming J (2016) State-space models’ dirty little secrets:
+even simple linear Gaussian models can have estimation problems.
+Scientific reports. 6(1):1-10.</p>
+<p>Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of
+potential functions in modelling animal movement. In: Guttorp P.,
+Brillinger D. (eds) Selected Works of David Brillinger. Selected Works
+in Probability and Statistics. Springer, New York. pp. 385-409.</p>
+<p>Hazen et al. (2017) WhaleWatch: a dynamic management tool for
+predicting blue whale density in the California Current J. Appl. Ecol.
+54: 1415-1428.</p>
+<p>Hindell MA, Reisinger RR, Ropert-Coudert Y, et al. (2020) Tracking of
+marine predators to protect Southern Ocean ecosystems. Nature.
+580:87–92.</p>
 </div>
   </div>
 
@@ -282,7 +368,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

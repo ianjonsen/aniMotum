@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -79,18 +79,18 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for mpm_df</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>
-  <span class="va">x</span>,
-  y <span class="op">=</span> <span class="cn">NULL</span>,
-  se <span class="op">=</span> <span class="cn">FALSE</span>,
-  pages <span class="op">=</span> <span class="fl">0</span>,
-  ncol <span class="op">=</span> <span class="fl">1</span>,
-  ask <span class="op">=</span> <span class="cn">TRUE</span>,
-  pal <span class="op">=</span> <span class="st">"Cividis"</span>,
-  rev <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for mpm_df</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  se <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  pages <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ask <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pal <span class="op">=</span> <span class="st">"Plasma"</span>,</span>
+<span>  rev <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -126,7 +126,7 @@ plot is rendered. set to FALSE to return ggplot objects</p></dd>
 
 
 <dt>pal</dt>
-<dd><p>grDevices::hcl.colors palette to use (default: "Cividis";
+<dd><p>grDevices::hcl.colors palette to use (default: "Plasma";
 see grDevices::hcl.pals for options)</p></dd>
 
 
@@ -151,22 +151,22 @@ Plots can be rendered all on a single page (pages = 1) or on separate pages.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># generate a ssm fit object (call is for speed only)</span></span>
-<span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># generate a ssm fit object (call is for speed only)</span></span></span>
+<span class="r-in"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># fit mpm to ssm fits</span></span>
-<span class="r-in"><span class="va">xm</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">xs</span>, model <span class="op">=</span> <span class="st">"jmpm"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># fit mpm to ssm fits</span></span></span>
+<span class="r-in"><span><span class="va">xm</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">xs</span>, model <span class="op">=</span> <span class="st">"jmpm"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting jmpm...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0       pars:   -0.63038 -0.77416 0.05745       pars:   -0.21961 -0.90381 0.95993       pars:   0.1024 -0.34798 0.19353       pars:   -0.12912 -0.74761 0.74455       pars:   -0.17853 -0.8329 0.86216       pars:   -0.23363 -0.801 0.86597       pars:   -0.27635 -0.61987 0.76146       pars:   -0.40458 -0.79384 0.62587       pars:   -0.36412 -0.6719 0.40545       pars:   -0.38583 -0.70377 0.60569       pars:   -0.43697 -0.67572 0.577       pars:   -0.38583 -0.70377 0.60569      </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot 1-D mp timeseries on 1 page</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xm</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot 1-D mp timeseries on 1 page</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xm</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.mpm_df-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -181,7 +181,7 @@ Plots can be rendered all on a single page (pages = 1) or on separate pages.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="Path_rerouting_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Path_rerouting</h1>
@@ -110,79 +110,95 @@
 
     
     
-<p>When fitting SSM’s to error-prone tracking data, estimated locations can occur in places where animals are known to not travel. Marine animal tracks traversing land masses, while not impossible for animals that haulout periodically or depart from and return to a breeding colony, are an obvious issue that is computationally difficult to address within the SSM optimization. In this case, a pragmatic solution would apply a post-hoc adjustment of locations occurring on land.</p>
+<p>When fitting SSM’s to error-prone tracking data, estimated locations
+can occur in places where animals are known to not travel. Marine animal
+tracks traversing land masses, while not impossible for animals that
+haulout periodically or depart from and return to a breeding colony, are
+an obvious issue that is computationally difficult to address within the
+SSM optimization. In this case, a pragmatic solution would apply a
+post-hoc adjustment of locations occurring on land.</p>
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h3>
-<p>Here’s an example using a Weddell seal track from Scott Base, Antarctica. Note the numerous Argos locations (red) and SSM_predicted locations (blue) on land/fast-ice.</p>
+<p>Here’s an example using a Weddell seal track from Scott Base,
+Antarctica. Note the numerous Argos locations (red) and SSM_predicted
+locations (blue) on land/fast-ice.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># fit SSM to Weddell seal Argos data</span>
-<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">wese_sb</span>, 
-               vmax <span class="op">=</span> <span class="fl">3</span>,
-               model <span class="op">=</span> <span class="st">"mp"</span>,
-               time.step <span class="op">=</span> <span class="fl">2</span>,
-               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># map the Argos locations</span>
-<span class="va">aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>est<span class="op">=</span><span class="cn">FALSE</span>, obs<span class="op">=</span><span class="cn">TRUE</span>, conf<span class="op">=</span><span class="cn">FALSE</span>, mp<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">aes</span><span class="op">$</span><span class="va">df</span><span class="op">$</span><span class="va">col</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"firebrick"</span>
-<span class="va">aes</span><span class="op">$</span><span class="va">df</span><span class="op">$</span><span class="va">size</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1.25</span>
-
-<span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
-    what <span class="op">=</span> <span class="st">"p"</span>, 
-    aes <span class="op">=</span> <span class="va">aes</span>, 
-    silent<span class="op">=</span><span class="cn">TRUE</span>, 
-    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>, 
-    ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># map the SSM-predicted locations</span>
-<span class="va">aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>obs<span class="op">=</span><span class="cn">FALSE</span>, conf<span class="op">=</span><span class="cn">FALSE</span>, mp<span class="op">=</span><span class="cn">FALSE</span>, line<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
-    what <span class="op">=</span> <span class="st">"p"</span>, 
-    aes <span class="op">=</span> <span class="va">aes</span>, 
-    silent<span class="op">=</span><span class="cn">TRUE</span>, 
-    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>, 
-    ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>
-<span class="op">(</span><span class="va">m1</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Argos locations"</span><span class="op">)</span> <span class="op">|</span> <span class="va">m2</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"SSM-predicted locations"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span>
-    <span class="fu">theme</span><span class="op">(</span>panel.grid<span class="op">=</span> <span class="fu">element_line</span> <span class="op">(</span>size<span class="op">=</span><span class="fl">0.1</span>, colour<span class="op">=</span><span class="st">"grey60"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># fit SSM to Weddell seal Argos data</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">wese_sb</span>, </span>
+<span>               vmax <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>               model <span class="op">=</span> <span class="st">"mp"</span>,</span>
+<span>               time.step <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># map the Argos locations</span></span>
+<span><span class="va">aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>est<span class="op">=</span><span class="cn">FALSE</span>, obs<span class="op">=</span><span class="cn">TRUE</span>, conf<span class="op">=</span><span class="cn">FALSE</span>, mp<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">aes</span><span class="op">$</span><span class="va">df</span><span class="op">$</span><span class="va">col</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"firebrick"</span></span>
+<span><span class="va">aes</span><span class="op">$</span><span class="va">df</span><span class="op">$</span><span class="va">size</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1.25</span></span>
+<span></span>
+<span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
+<span>    what <span class="op">=</span> <span class="st">"p"</span>, </span>
+<span>    aes <span class="op">=</span> <span class="va">aes</span>, </span>
+<span>    silent<span class="op">=</span><span class="cn">TRUE</span>, </span>
+<span>    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>, </span>
+<span>    ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># map the SSM-predicted locations</span></span>
+<span><span class="va">aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>obs<span class="op">=</span><span class="cn">FALSE</span>, conf<span class="op">=</span><span class="cn">FALSE</span>, mp<span class="op">=</span><span class="cn">FALSE</span>, line<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
+<span>    what <span class="op">=</span> <span class="st">"p"</span>, </span>
+<span>    aes <span class="op">=</span> <span class="va">aes</span>, </span>
+<span>    silent<span class="op">=</span><span class="cn">TRUE</span>, </span>
+<span>    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>, </span>
+<span>    ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">m1</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Argos locations"</span><span class="op">)</span> <span class="op">|</span> <span class="va">m2</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"SSM-predicted locations"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>panel.grid<span class="op">=</span> <span class="fu">element_line</span> <span class="op">(</span>size<span class="op">=</span><span class="fl">0.1</span>, colour<span class="op">=</span><span class="st">"grey60"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/path_rerouting/map_1ab.jpg" style="width:95.0%"></p>
 </div>
 <div class="section level3">
 <h3 id="route_path">
 <code>route_path()</code><a class="anchor" aria-label="anchor" href="#route_path"></a>
 </h3>
-<p>Thanks to the <code>pathroutr</code> R package (<a href="https://jmlondon.github.io/pathroutr/" class="external-link uri">https://jmlondon.github.io/pathroutr/</a>), we can quickly and objectively re-route estimated tracks off of land. <code><a href="../reference/route_path.html">route_path()</a></code> is a wrapper function for the <code>pathroutr</code> package, which must be installed separately (via <code>install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")</code>). Our implementation is intended to be easy to use and integrate into a <code>foieGras</code> workflow, but for complicated re-routing problems we recommend using the <code>pathroutr</code> functions directly.</p>
+<p>Thanks to the <code>pathroutr</code> R package (<a href="https://jmlondon.github.io/pathroutr/" class="external-link uri">https://jmlondon.github.io/pathroutr/</a>), we can quickly
+and objectively re-route estimated tracks off of land.
+<code><a href="../reference/route_path.html">route_path()</a></code> is a wrapper function for the
+<code>pathroutr</code> package, which must be installed separately (via
+<code>install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")</code>).
+Our implementation is intended to be easy to use and integrate into a
+<code>foieGras</code> workflow, but for complicated re-routing problems
+we recommend using the <code>pathroutr</code> functions directly.</p>
 <div class="section level4">
 <h4 id="re-route-weddell-seal-ssm-predicted-locations">re-route Weddell seal SSM-predicted locations<a class="anchor" aria-label="anchor" href="#re-route-weddell-seal-ssm-predicted-locations"></a>
 </h4>
-<p>Here we take the SSM fit object and pass the re-routed locations back to it.</p>
+<p>Here we take the SSM fit object and pass the re-routed locations back
+to it.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">fit</span>,
-                    what <span class="op">=</span> <span class="st">"predicted"</span>,
-                    map_scale <span class="op">=</span> <span class="fl">10</span>,
-                    buffer <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">fit</span>,</span>
+<span>                    what <span class="op">=</span> <span class="st">"predicted"</span>,</span>
+<span>                    map_scale <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                    buffer <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <p>We can then map these locations to see the improvement.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>line <span class="op">=</span> <span class="cn">TRUE</span>,
-               conf <span class="op">=</span> <span class="cn">FALSE</span>,
-               mp <span class="op">=</span> <span class="cn">FALSE</span>,
-               obs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
-          what <span class="op">=</span> <span class="st">"predicted"</span>, 
-          aes <span class="op">=</span> <span class="va">my.aes</span>, 
-          crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,
-          ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,
-          silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, 
-          what <span class="op">=</span> <span class="st">"rerouted"</span>, 
-          aes <span class="op">=</span> <span class="va">my.aes</span>, 
-          crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,
-          ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,
-          silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="op">(</span><span class="va">m1</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"SSM-predicted locations"</span><span class="op">)</span> <span class="op">|</span> <span class="va">m2</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Re-routed locations"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span>
-  <span class="fu">theme</span><span class="op">(</span>panel.grid<span class="op">=</span> <span class="fu">element_line</span> <span class="op">(</span>size<span class="op">=</span><span class="fl">0.1</span>, colour<span class="op">=</span><span class="st">"grey60"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>line <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>               conf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>               mp <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>               obs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
+<span>          what <span class="op">=</span> <span class="st">"predicted"</span>, </span>
+<span>          aes <span class="op">=</span> <span class="va">my.aes</span>, </span>
+<span>          crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,</span>
+<span>          ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>          silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
+<span>          what <span class="op">=</span> <span class="st">"rerouted"</span>, </span>
+<span>          aes <span class="op">=</span> <span class="va">my.aes</span>, </span>
+<span>          crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=166 +datum=WGS84 +units=km"</span>,</span>
+<span>          ext.rng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>          silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">m1</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"SSM-predicted locations"</span><span class="op">)</span> <span class="op">|</span> <span class="va">m2</span> <span class="op">+</span> <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Re-routed locations"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>panel.grid<span class="op">=</span> <span class="fu">element_line</span> <span class="op">(</span>size<span class="op">=</span><span class="fl">0.1</span>, colour<span class="op">=</span><span class="st">"grey60"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/path_rerouting/map_2ab.jpg" style="width:95.0%"></p>
 </div>
 </div>
@@ -203,7 +219,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -18,7 +18,7 @@ control parameters, and parameter bounds used by fit_ssm."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -81,15 +81,15 @@ control parameters, and parameter bounds used by <code>fit_ssm</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ssm_control</span><span class="op">(</span>
-  optim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nlminb"</span>, <span class="st">"optim"</span><span class="op">)</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"L-BFGS-B"</span>, <span class="st">"BFGS"</span>, <span class="st">"Nelder-Mead"</span>, <span class="st">"CG"</span>, <span class="st">"SANN"</span>, <span class="st">"Brent"</span><span class="op">)</span>,
-  lower <span class="op">=</span> <span class="cn">NULL</span>,
-  upper <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="fl">1</span>,
-  se <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ssm_control</span><span class="op">(</span></span>
+<span>  optim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nlminb"</span>, <span class="st">"optim"</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"L-BFGS-B"</span>, <span class="st">"BFGS"</span>, <span class="st">"Nelder-Mead"</span>, <span class="st">"CG"</span>, <span class="st">"SANN"</span>, <span class="st">"Brent"</span><span class="op">)</span>,</span>
+<span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  se <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -172,15 +172,15 @@ for available options. Adapted from S. Wotherspoon
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>,</span>
-<span class="r-in">vmax <span class="op">=</span> <span class="fl">4</span>,</span>
-<span class="r-in">model <span class="op">=</span> <span class="st">"crw"</span>,</span>
-<span class="r-in">time.step <span class="op">=</span> <span class="fl">72</span>,</span>
-<span class="r-in">control <span class="op">=</span> <span class="fu">ssm_control</span><span class="op">(</span></span>
-<span class="r-in">    optim <span class="op">=</span> <span class="st">"nlminb"</span>,</span>
-<span class="r-in">    eval.max <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw...</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>,</span></span>
+<span class="r-in"><span>vmax <span class="op">=</span> <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>model <span class="op">=</span> <span class="st">"crw"</span>,</span></span>
+<span class="r-in"><span>time.step <span class="op">=</span> <span class="fl">72</span>,</span></span>
+<span class="r-in"><span>control <span class="op">=</span> <span class="fu">ssm_control</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    optim <span class="op">=</span> <span class="st">"nlminb"</span>,</span></span>
+<span class="r-in"><span>    eval.max <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw SSM to 1 tracks...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0       pars:   -0.99985 -0.01712       pars:   -3.99941 -0.06849       pars:   -2.23053 -0.94822       pars:   -3.08498 -0.08792       pars:   -3.23225 -0.99063       pars:   -3.39923 -3.28097       pars:   -3.35868 -3.70886       pars:   -3.35868 -3.70886      </span>
 </code></pre></div>
     </div>
@@ -196,7 +196,7 @@ for available options. Adapted from S. Wotherspoon
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

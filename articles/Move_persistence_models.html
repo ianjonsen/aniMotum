@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="Move_persistence_models_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Move_persistence_models</h1>
@@ -110,46 +110,83 @@
 
     
     
-<p><code>foieGras</code> provides a few different ways to fit a move persistence model to obtain estimates of a continuous-valued behavioural index along individual tracks (Auger-Méthé et al. 2017; Jonsen et al. 2019). In <code>foieGras</code> versions prior to 1.0, move persistence was estimated via <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and, when fitting to Argos or other location error-prone data types, required a two-stage approach of first calling <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> and then calling <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code>. The first step fits a state-space model to account for location error in the data:</p>
+<p><code>foieGras</code> provides a few different ways to fit a move
+persistence model to obtain estimates of a continuous-valued behavioural
+index along individual tracks (Auger-Méthé et al. 2017; Jonsen et
+al. 2019). In <code>foieGras</code> versions prior to 1.0-5, move
+persistence was estimated via <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and, when fitting
+to Argos or other location error-prone data types, required a two-stage
+approach of first calling <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> and then calling
+<code><a href="../reference/fit_mpm.html">fit_mpm()</a></code>. The first step fits a state-space model to
+account for location error in the data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">sese</span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"ct109-186-14"</span><span class="op">)</span>
-<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
-               vmax <span class="op">=</span> <span class="fl">3</span>,
-               model <span class="op">=</span> <span class="st">"crw"</span>, 
-               time.step <span class="op">=</span> <span class="fl">24</span>,
-               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>The second step estimates move persistence from the SSM-estimated locations:</p>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">sese</span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"ct109-186-14"</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, </span>
+<span>               vmax <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>               model <span class="op">=</span> <span class="st">"crw"</span>, </span>
+<span>               time.step <span class="op">=</span> <span class="fl">24</span>,</span>
+<span>               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The second step estimates move persistence from the SSM-estimated
+locations:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">fit</span>, 
-               what <span class="op">=</span> <span class="st">"predicted"</span>, 
-               model <span class="op">=</span> <span class="st">"mpm"</span>,
-               control <span class="op">=</span> <span class="fu"><a href="../reference/mpm_control.html">mpm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Using this approach, location uncertainty is not carried through to the estimation of move persistence. This can potentially result in estimates of move persistence that are biased.</p>
+<code class="sourceCode R"><span><span class="va">fmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_mpm.html">fit_mpm</a></span><span class="op">(</span><span class="va">fit</span>, </span>
+<span>               what <span class="op">=</span> <span class="st">"predicted"</span>, </span>
+<span>               model <span class="op">=</span> <span class="st">"mpm"</span>,</span>
+<span>               control <span class="op">=</span> <span class="fu"><a href="../reference/mpm_control.html">mpm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Using this approach, location uncertainty is not carried through to
+the estimation of move persistence. This can potentially result in
+estimates of move persistence that are biased.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span><span class="op">)</span>
-<span class="co">#&gt; $`ct109-186-14`</span></code></pre></div>
-<p><img src="Move_persistence_models_files/figure-html/ts1-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/move_persistence/fmp_plot.jpg" style="width:95.0%"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">fmp</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="Move_persistence_models_files/figure-html/map1-1.png" width="672"></p>
-<p><code>foieGras</code> now provides a move persistence model in state-space form to allow simultaneous estimation of move persistence and location states, and this is invoked via <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> by specifying <code>model = "mp"</code>. Currently, this model can only be fit to individuals separately.</p>
-<p>Here, we fit the move persistence SSM to the same southern elephant seal track as above:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">fmp</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/move_persistence/fmp_map.jpg" style="width:95.0%"></p>
+<p><code>foieGras</code> now provides a move persistence model in
+state-space form to allow simultaneous estimation of move persistence
+and location states, and this is invoked via <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> by
+specifying <code>model = "mp"</code>. Currently, this model can only be
+fit to individuals separately.</p>
+<p>Here, we fit the move persistence SSM to the same southern elephant
+seal track as above:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, 
-               vmax <span class="op">=</span> <span class="fl">3</span>, 
-               model <span class="op">=</span> <span class="st">"mp"</span>, 
-               time.step <span class="op">=</span> <span class="fl">24</span>,
-               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Move persistence estimates can be plotted as a time-series. Note the broadly similar time-series of move persistence estimates as above, but here considerably more variability is apparent because we have not smoothed away that variability by fitting to SSM-smoothed location estimates as in the above example.</p>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>, </span>
+<span>               vmax <span class="op">=</span> <span class="fl">3</span>, </span>
+<span>               model <span class="op">=</span> <span class="st">"mp"</span>, </span>
+<span>               time.step <span class="op">=</span> <span class="fl">24</span>,</span>
+<span>               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Move persistence estimates can be plotted as a time-series. Note the
+broadly similar time-series of move persistence estimates as above, but
+here considerably more variability is apparent because we have not
+smoothed away that variability by fitting to SSM-smoothed location
+estimates as in the above example.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">3</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; $`ct109-186-14`</span></code></pre></div>
-<p><img src="Move_persistence_models_files/figure-html/ts2-1.png" width="672"></p>
-<p>Here, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> extracts move persistence estimates as either fitted (corresponding to observation times) or predicted (corresponding to regular time intervals) values using <code><a href="../reference/grab.html">grab()</a></code> internally. The <code>normalise</code> argument rescales the estimates to span the interval 0,1. Move persistence estimates from <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> tend to be smoothed more extremely compared those obtained from <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and can lack contrast. Normalising the estimates provides a clearer view of changes in movement behaviour along tracks, highlighting regions where animals spend disproportionately more or less time. When fitting to a collection of individuals, the normalisation can be applied separately to each individual or collectively via <code>normalise = TRUE, group = TRUE</code>. In the latter case, the relative magnitudes of move persistence are preserved across individuals.</p>
-<p>When mapping these move persistence estimates along the 2-D track, we can see that segments of low (dark blue) and high (bright yellow) move persistence correspond to areas where the seal spends disproportionately more or less time, respectively. The pattern is overall quite similar to the map using <code>fit_mpm</code> estimates, but there are subtle differences apparent.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">3</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/move_persistence/mp_plot.jpg" style="width:95.0%"></p>
+<p>Here, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> extracts move persistence estimates as
+either fitted (corresponding to observation times) or predicted
+(corresponding to regular time intervals) values using
+<code><a href="../reference/grab.html">grab()</a></code> internally. The <code>normalise</code> argument
+rescales the estimates to span the interval 0,1. Move persistence
+estimates from <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> tend to be smoothed more extremely
+compared those obtained from <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> and can lack
+contrast. Normalising the estimates provides a clearer view of changes
+in movement behaviour along tracks, highlighting regions where animals
+spend disproportionately more or less time. When fitting to a collection
+of individuals, the normalisation can be applied separately to each
+individual or collectively via
+<code>normalise = TRUE, group = TRUE</code>. In the latter case, the
+relative magnitudes of move persistence are preserved across
+individuals.</p>
+<p>When mapping these move persistence estimates along the 2-D track, we
+can see that segments of low (dark blue) and high (bright yellow) move
+persistence correspond to areas where the seal spends disproportionately
+more or less time, respectively. The pattern is overall quite similar to
+the map using <code>fit_mpm</code> estimates, but there are subtle
+differences apparent.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="Move_persistence_models_files/figure-html/map2-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/move_persistence/mp_map.jpg" style="width:95.0%"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -167,7 +204,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

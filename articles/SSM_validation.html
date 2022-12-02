@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="SSM_validation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SSM_validation</h1>
@@ -110,61 +110,116 @@
 
     
     
-<p>Just like any other statistical model fitting exercise, validating SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic <code>plot</code> function on model fit objects:</p>
+<p>Just like any other statistical model fitting exercise, validating
+SSM fits to tracking data is an essential part of any analysis. SSM fits
+can be visualized quickly using the generic <code>plot</code> function
+on model fit objects:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
-                  model <span class="op">=</span> <span class="st">"rw"</span>, 
-                  time.step <span class="op">=</span> <span class="fl">24</span>, 
-                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span>
-<span class="co">#&gt; $`54591`</span></code></pre></div>
-<p><img src="SSM_validation_files/figure-html/visualise%20SSM%20fit-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="va">fit.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, </span>
+<span>                  model <span class="op">=</span> <span class="st">"rw"</span>, </span>
+<span>                  time.step <span class="op">=</span> <span class="fl">24</span>, </span>
+<span>                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`54591`</span></span></code></pre></div>
+<p><img src="SSM_validation_files/figure-html/visualise%20SSM%20fit1-1.png" width="672"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span>
-<span class="co">#&gt; $`54591`</span></code></pre></div>
-<p><img src="SSM_validation_files/figure-html/visualise%20SSM%20fit-2.png" width="672"></p>
-<p>Both fitted and predicted locations (red) can be plotted as 1-D time-series on top of the observations (blue) to visually detect any lack of fit. Observations that failed to pass the <code>prefilter</code> stage prior to SSM fitting (orange x’s) can be included (default) or omitted with the <code>outlier</code> argument. A rug plot along the x-axis aids detection of data gaps in the time-series. Note, in second plot, the larger standard errors for predicted locations through small data gaps.</p>
-<p>The SSM fits can also be visualised as 2-D tracks via the <code>type</code> argument:</p>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`54591`</span></span></code></pre></div>
+<p><img src="SSM_validation_files/figure-html/visualise%20SSM%20fit1-2.png" width="672"></p>
+<p>Both fitted and predicted locations (gold) can be plotted as 1-D
+time-series on top of the observations (blue) to visually detect any
+lack of fit. Observations that failed to pass the <code>prefilter</code>
+stage prior to SSM fitting (black x’s) can be included (default) or
+omitted with the <code>outlier</code> argument. Uncertainty is displayed
+as a <span class="math inline">\(\pm\)</span> 2 SE envelope (pale gold)
+around estimates. A rug plot along the x-axis aids detection of data
+gaps in the time-series. Note, in second plot, the larger standard
+errors for predicted locations through small data gaps.</p>
+<p>The SSM fits can also be visualised as 2-D tracks via the
+<code>type</code> argument:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"p"</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; $`54591`</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"p"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`54591`</span></span></code></pre></div>
 <p><img src="SSM_validation_files/figure-html/visualise%20as%20track-1.png" width="672"></p>
-<p>This option can provides an intuitive view of the estimated track (red) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (red ellipses).</p>
-<p>Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a one-step-ahead prediction residual, provides a useful if computationally demanding alternative. In <code>foieGras</code>, prediction residuals from state-space model fits are calculated using the <code>osar</code> function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:</p>
+<p>This option provides an intuitive view of the estimated track (gold)
+through the observations (blue), along with a 2-dimensional
+representation of the location uncertainty (pale gold 95% confidence
+ellipses). Here, we use the <code>alpha</code> argument to increase the
+transparency of the confidence ellipses to aid visualization in regions
+where many overlay one another (upper left and lower right in
+figure).</p>
+<p>Residual plots are important for validating models, but classical
+Pearson residuals, for example, are not appropriate for state-space
+models. Instead, a one-step-ahead prediction residual, provides a useful
+if computationally demanding alternative. In <code>foieGras</code>,
+prediction residuals from state-space model fits are calculated using
+the <code>osar</code> function and can be visualized as time-series
+plots, Q-Q plots, or autocorrelation functions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># use patchwork package to arrange plot.osar options</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
-<span class="co"># calculate &amp; plot residuals</span>
-<span class="va">res.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.rw</span><span class="op">)</span>
-
-<span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> 
-  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="SSM_validation_files/figure-html/osar%20plots-1.png" width="672"></p>
-<p>Here, the 3 residual plots highlight a poor fit of the <code>rw</code> SSM to the x-coordinate. The time-series residual plot implies a bias in the <code>rw</code> SSM fit over the latter half of the track, the Q-Q plot highlights a distinct departure from normality in the x residuals, and the x residuals are positively autocorrelated.</p>
-<p>Fitting the <code>crw</code> SSM to the same data, we can see the prediction residual plots imply a less biased fit with approximately normal residuals that have little autocorrelation in both coordinates. Additionally, the <code>crw</code> model fit has a lower AIC<sub>c</sub> than the <code>rw</code>. Although note that AIC statistics can be misleading for time-series models and should not be used as the sole criterion for preferring one model fit over another. Here, at least, the AIC<sub>c</sub> values are in agreement with the prediction residual diagnostics.</p>
+<code class="sourceCode R"><span><span class="co"># use patchwork package to arrange plot.osar options</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="co"># calculate &amp; plot residuals</span></span>
+<span><span class="va">res.rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.rw</span><span class="op">)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> </span>
+<span>  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="SSM_validation_files/figure-html/osar%20plots1-1.png" width="672"></p>
+<p>Here, the 3 residual plots highlight a poor fit of the
+<code>rw</code> SSM to the x-coordinate. The time-series residual plot
+implies a bias in the <code>rw</code> SSM fit over the latter half of
+the track, the Q-Q plot highlights a distinct departure from normality
+in the x residuals, and the x residuals are positively autocorrelated up
+to about lag 5.</p>
+<p>Fitting the <code>crw</code> SSM to the same data, we can see the
+prediction residual plots imply a less biased fit with approximately
+normal residuals that have little autocorrelation in both coordinates.
+Additionally, the <code>crw</code> model fit has a lower AIC<sub>c</sub>
+than the <code>rw</code>. Note that AIC statistics can be misleading for
+time-series models and should not be used as the sole criterion for
+preferring one model fit over another. Here, at least, the
+AIC<sub>c</sub> values are in agreement with the prediction residual
+diagnostics.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, 
-                   model <span class="op">=</span> <span class="st">"crw"</span>, 
-                   time.step <span class="op">=</span> <span class="fl">24</span>, 
-                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">res.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.crw</span><span class="op">)</span>
-
-<span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> 
-  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="SSM_validation_files/figure-html/fit%20crw%20and%20plot%20osar-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="va">fit.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, </span>
+<span>                   model <span class="op">=</span> <span class="st">"crw"</span>, </span>
+<span>                   time.step <span class="op">=</span> <span class="fl">24</span>, </span>
+<span>                   control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res.crw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osar.html">osar</a></span><span class="op">(</span><span class="va">fit.crw</span><span class="op">)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> </span>
+<span>  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="SSM_validation_files/figure-html/fit%20crw%20and%20plot%20osar1-1.png" width="672"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit.rw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span>, <span class="va">fit.crw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span><span class="op">)</span>
-<span class="co">#&gt; [1] 1350.609 1313.279</span></code></pre></div>
-<p>As calculation of prediction residuals can be computationally demanding, typically requiring more time than fitting the model, especially for multiple individual tracks, the <code>osar</code> function is automatically implemented in parallel when calculating residuals for more than 2 tracks.</p>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit.rw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span>, <span class="va">fit.crw</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1350.609 1313.279</span></span></code></pre></div>
+<p>As calculation of prediction residuals can be computationally
+demanding, typically requiring more time than fitting the model,
+especially for multiple individual tracks, the <code>osar</code>
+function is automatically implemented in parallel when calculating
+residuals for more than 2 tracks.</p>
+<p>Users wishing to explore residual diagnostics for hierarchical models
+(including state-space models) should refer to the <code>DHARMa</code> R
+package, which has more details on diagnostics for hierarchical models.
+Although <code>foieGras</code> is not able to make use of the
+<code>DHARMa</code> package, its vignette and references therein can be
+a useful guide for diagnosing model fits (Hartig, 2022).</p>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Hartig, F (2022) DHARMa: Residual Diagnostics for Hierarchical
+(Multi-Level / Mixed) Regression Models. R package version 0.4.6. <a href="http://florianhartig.github.io/DHARMa/" class="external-link uri">http://florianhartig.github.io/DHARMa/</a></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
@@ -177,7 +232,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -1,5 +1,5 @@
-pandoc: 2.7.3
-pkgdown: 2.0.4
+pandoc: 2.19.2
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   Mapping: Mapping.html
@@ -9,7 +9,7 @@ articles:
   SSM_fitting: SSM_fitting.html
   SSM_validation: SSM_validation.html
   Track_simulation: Track_simulation.html
-last_built: 2022-06-13T20:24Z
+last_built: 2022-12-02T13:02Z
 urls:
   reference: https://ianjonsen.github.io/foieGras/reference
   article: https://ianjonsen.github.io/foieGras/articles

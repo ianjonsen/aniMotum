@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -74,6 +74,17 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="1.1" id="foiegras-11-01122022">foieGras 1.1 (01/12/2022)<a class="anchor" aria-label="anchor" href="#foiegras-11-01122022"></a></h2>
+<ul><li>adds <code><a href="../reference/format_data.html">format_data()</a></code> to pre-process non-default data formats into that expected by <code>fit_ssm</code>
+</li>
+<li>adds greater flexibility for input data formats (via new arguments to <code>fit_ssm</code>), related to <code>format_data</code>
+</li>
+<li>fixes an issue with input data as an <code>sf-tibble</code> or <code>sf-data.frame</code> that caused an error when fitting SSM’s via <code>fit_ssm</code>
+</li>
+<li>when installing package from source, C++ code is automatically compiled against the existing TMB package version. This should eliminate the warning message on installation and package load that some users may have experienced previously</li>
+<li>updated <code>Overview</code> vignette, describing input data structures in greater detail</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0-5" id="foiegras-10-5-15052022">foieGras 1.0-5 (15/05/2022)<a class="anchor" aria-label="anchor" href="#foiegras-10-5-15052022"></a></h2>
 <ul><li>adds <code><a href="../reference/route_path.html">route_path()</a></code> a wrapper function calling <a href="https://github.com/jmlondon/pathroutr" class="external-link"><code>pathroutr</code></a> to re-route <code>fit_ssm</code> estimated or <code>simfit</code> simulated tracks around land barriers</li>
 <li>adds a move persistence model via <code>fit_ssm(model = "mp")</code> to allow simultaneous estimation of locations and move persistence. This approach may be preferable to using <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> on a <code>fit_ssm</code> model object. <code><a href="../reference/fit_mpm.html">fit_mpm()</a></code> is retained for less error-prone (GPS) location data</li>
@@ -92,11 +103,12 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7-6" id="foiegras-07-6-26042021">foieGras 0.7-6 (26/04/2021)<small>2021-04-26</small><a class="anchor" aria-label="anchor" href="#foiegras-07-6-26042021"></a></h2>
-<ul><li>adds fixes to example data for testing/examples so pkg builds on solaris and various linux boxes with older GDAL/PROJ libraries</li></ul></div>
+<ul><li>adds fixes to example data for testing/examples so pkg builds on solaris and various linux boxes with older GDAL/PROJ libraries</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7-5" id="foiegras-07-5-23042021">foieGras 0.7-5 (23/04/2021)<small>2021-04-24</small><a class="anchor" aria-label="anchor" href="#foiegras-07-5-23042021"></a></h2>
 <ul><li>adds <code><a href="../reference/sim.html">sim()</a></code> to simulate animal tracks using the <code>rw</code>, <code>crw</code> or <code>mpm</code> process models. The <code>rw</code> and <code>crw</code> models can also be specified with state-switching between multiple behavioural states. Tracks can be simulated with or without Argos (LS or KF) errors, as time-regular or time-irregular</li>
-<li>adds <code><a href="../reference/simfit.html">simfit()</a></code> to simulate animal tracks from <code>fit_ssm</code> fit objects</li>
+<li>adds <code>simfit()</code> to simulate animal tracks from <code>fit_ssm</code> fit objects</li>
 <li>adds generic <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods for <code>sim</code> and <code>simfit</code> objects</li>
 <li>adds <code>fit_mpm</code> can take a <code>fit_ssm</code> object directly as input, removing need for user to manipulate data prior to calling <code>fit_mpm</code>
 </li>
@@ -146,13 +158,16 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.2" id="foiegras-022">foieGras 0.2.2<small>2019-07-03</small><a class="anchor" aria-label="anchor" href="#foiegras-022"></a></h2>
-<ul><li>patch for compatibility with latest sf version</li></ul></div>
+<ul><li>patch for compatibility with latest sf version</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.1" id="foiegras-021">foieGras 0.2.1<small>2019-04-04</small><a class="anchor" aria-label="anchor" href="#foiegras-021"></a></h2>
-<ul><li>patch to improve C++ portability</li></ul></div>
+<ul><li>patch to improve C++ portability</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="foiegras-020">foieGras 0.2.0<small>2019-04-02</small><a class="anchor" aria-label="anchor" href="#foiegras-020"></a></h2>
-<ul><li>first release, updates will follow regularly and be documented here</li></ul></div>
+<ul><li>first release, updates will follow regularly and be documented here</li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -167,7 +182,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

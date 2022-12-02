@@ -79,6 +79,9 @@
     <loc>https://ianjonsen.github.io/foieGras/reference/foieGras-package.html</loc>
   </url>
   <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/format_data.html</loc>
+  </url>
+  <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/grab.html</loc>
   </url>
   <url>
@@ -115,6 +118,21 @@
     <loc>https://ianjonsen.github.io/foieGras/reference/osar.html</loc>
   </url>
   <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/pf_add_emf.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/pf_dup_dates.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/pf_obs_type.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/pf_sda_filter.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/pf_sf_project.html</loc>
+  </url>
+  <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/plot.mpm_df.html</loc>
   </url>
   <url>
@@ -124,7 +142,7 @@
     <loc>https://ianjonsen.github.io/foieGras/reference/plot.sim.html</loc>
   </url>
   <url>
-    <loc>https://ianjonsen.github.io/foieGras/reference/plot.simfit.html</loc>
+    <loc>https://ianjonsen.github.io/foieGras/reference/plot.sim_fit.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/plot.ssm_df.html</loc>
@@ -134,9 +152,6 @@
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/print.ssm.html</loc>
-  </url>
-  <url>
-    <loc>https://ianjonsen.github.io/foieGras/reference/res.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/route_path.html</loc>
@@ -151,6 +166,9 @@
     <loc>https://ianjonsen.github.io/foieGras/reference/sese2.html</loc>
   </url>
   <url>
+    <loc>https://ianjonsen.github.io/foieGras/reference/sese2_n.html</loc>
+  </url>
+  <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/sfilter.html</loc>
   </url>
   <url>
@@ -160,7 +178,7 @@
     <loc>https://ianjonsen.github.io/foieGras/reference/sim_filter.html</loc>
   </url>
   <url>
-    <loc>https://ianjonsen.github.io/foieGras/reference/simfit.html</loc>
+    <loc>https://ianjonsen.github.io/foieGras/reference/sim_fit.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/foieGras/reference/similarity_flag.html</loc>

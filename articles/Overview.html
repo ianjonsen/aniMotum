@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="Overview_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Overview</h1>
@@ -113,11 +113,24 @@
 <div class="section level2">
 <h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
 </h2>
-<p>This vignette is an extended set of examples to highlight <code>foieGras</code>’s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of these vignettes. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!</p>
+<p>This vignette is an extended set of examples to highlight
+<code>foieGras</code>’s functionality. Please, do NOT interpret these
+examples as instructions for conducting analysis of animal movement
+data. Numerous essential steps in a proper analysis have been left out
+of these vignettes. It is your job to understand your data, ensure you
+are asking the right questions of your data, and that the analyses you
+undertake appropriately reflect those questions. We can not do this for
+you!</p>
 <div class="section level3">
 <h3 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
 </h3>
-<p>This is an overview of how to use <code>foieGras</code> to filter animal track locations obtained via the Argos satellite system or (possibly) another tracking system. <code>foieGras</code> provides three state-space models (SSM’s), two for filtering (ie. estimating “true” locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:</p>
+<p>This is an overview of how to use <code>foieGras</code> to filter
+animal track locations obtained via the Argos satellite system or
+(possibly) another tracking system. <code>foieGras</code> provides three
+state-space models (SSM’s), two for filtering (ie. estimating “true”
+locations and associated movement model parameters, while accounting for
+error-prone observations), and another for filtering and estimating move
+persistence - an index of movement behaviour:</p>
 <ul>
 <li>a simple <em>Random Walk</em> model, <code>rw</code>
 </li>
@@ -126,204 +139,563 @@
 <li>a <em>Move Persistence</em> model, <code>mp</code>
 </li>
 </ul>
-<p>the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won’t dwell on the details of the models here (see Jonsen et al. 2020 for details on the <code>crw</code> model), except to say there may be advantages to choosing one over the other in certain circumstances. The <em>Random Walk</em> model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The <em>Correlated Random Walk</em> model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement through larger data gaps, especially when animals are mostly stationary during those gaps. The <em>Move Persistence</em> model can be more robust to data gaps up to a point, and estimates time-varying move persistence <span class="math inline">\(\gamma_t\)</span> along the track, which provides an index of how an animal’s movement behaviour varies in space and time.</p>
-<p>Additionally, <code>foieGras</code> provides separate models (<code>mpm</code>, <code>jmpm</code>) for estimating a move persistence <em>after</em> fitting either the <code>rw</code> or <code>crw</code> SSM (see Jonsen et al. 2019 for details). The <code>mpm</code> is fit to individual tracks, whereas the <code>jmpm</code> is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model can often better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations (discrete-time models) or to time-irregular locations (continuous-time models). See (Auger-Méthé et al. 2017) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used.</p>
+<p>the models are continuous-time models, that is, they account for the
+time intervals between successive observations, thereby naturally
+accounting for the often irregularly-timed nature of animal tracking
+data. We won’t dwell on the details of the models here (see Jonsen et
+al. 2020 for details on the <code>crw</code> model), except to say there
+may be advantages to choosing one over the other in certain
+circumstances. The <em>Random Walk</em> model tends not to deal well
+with small to moderate gaps (relative to a specified time step) in
+observed locations and can over-fit to particularly noisy data. The
+<em>Correlated Random Walk</em> model can often deal better with these
+small to moderate data gaps and appropriately smooth through noisy data
+but tends to estimate nonsensical (i.e., ‘looping’ artefacts) movement
+through longer data gaps, especially when animals are mostly stationary
+during those gaps. The <em>Move Persistence</em> model can be more
+robust to data gaps up to a point, and estimates time-varying move
+persistence <span class="math inline">\(\gamma_t\)</span> along the
+track, which provides an index of how an animal’s movement behaviour
+varies in space and time based on the autocorrelation of successive
+movements. If you have Argos location data and your goal is to infer
+changes in movement behaviour along tracks then estimating locations and
+move persistence simultaneously within a state-space model is the
+preferred approach, as location uncertainty is accounted for in the move
+persistence estimates.</p>
+<p>Additionally, <code>foieGras</code> provides separate models
+(<code>mpm</code>, <code>jmpm</code>) for estimating move persistence
+<em>after</em> fitting either the <code>rw</code> or <code>crw</code>
+SSM (see Jonsen et al. 2019 for details). Using the <code>fit_mpm</code>
+function, the <code>mpm</code> is fit to individual tracks, whereas the
+<code>jmpm</code> is fit to multiple tracks simultaneously with a
+variance parameter that is estimated jointly across the tracks. This
+latter model may better resolve subtle changes in movement behaviour
+along tracks that lack much contrast in movements. Both models can be
+fit to time-regularized locations or to time-irregular locations. See
+Auger-Méthé et al. (2017) for an example of the latter. These models can
+be fit to animal tracks, regardless of the geolocation technology used,
+but they assume that locations are known without error.</p>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
-<p><code>foieGras</code> expects data to be provided in one of several possible formats.</p>
-<ol style="list-style-type: decimal">
-<li>a <code>data.frame</code> or <code>tibble</code> that looks like this</li>
-</ol>
-<pre><code><span class="co">#&gt;      id                date lc      lon       lat  smaj smin eor</span>
-<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42</span>
-<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90</span>
-<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266  5032  472  93</span>
-<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622  4007  286 116</span>
-<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743 13063  956  82</span>
-<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</span></code></pre>
-<p>where the Argos data are provided via CLS Argos’ Kalman filter model (KF) and include error ellipse information for each observed location.</p>
-<ol start="2" style="list-style-type: decimal">
-<li>a <code>data.frame</code> or <code>tibble</code> that looks like this</li>
-</ol>
-<pre><code><span class="co">#&gt;             id                date lc   lon    lat</span>
-<span class="co">#&gt; 1 ct109-085-14 2015-02-03 00:11:02  B 70.45 -49.93</span>
-<span class="co">#&gt; 2 ct109-085-14 2015-02-03 13:26:37  B 71.00 -50.21</span>
-<span class="co">#&gt; 3 ct109-085-14 2015-02-03 21:53:15  B 71.31 -50.37</span>
-<span class="co">#&gt; 4 ct109-085-14 2015-02-04 04:05:35  A 71.64 -50.43</span>
-<span class="co">#&gt; 5 ct109-085-14 2015-02-04 17:12:42  B 72.04 -50.46</span>
-<span class="co">#&gt; 6 ct109-085-14 2015-02-05 02:05:44  B 72.44 -50.47</span></code></pre>
-<p>where the Argos data are provided via CLS Argos’ Least-Squares model (LS) and do not include error ellipse information.</p>
-<ol start="3" style="list-style-type: decimal">
-<li>a <code>data.frame</code> or <code>tibble</code> that includes observations with missing KF error ellipse information</li>
-</ol>
-<pre><code><span class="co">#&gt;      id                date lc      lon       lat  smaj smin eor</span>
-<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42</span>
-<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90</span>
-<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266    NA   NA  NA</span>
-<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622    NA   NA  NA</span>
-<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743    NA   NA  NA</span>
-<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</span></code></pre>
-<p>in this situation, <code>foieGras</code> treats observations with missing error ellipse information as though they are LS-based observations.</p>
-<ol start="4" style="list-style-type: decimal">
-<li>an <code>sf-tibble</code> where observations have any of the previous 3 structures and also include <code>CRS</code> information</li>
-</ol>
-<pre><code><span class="co">#&gt;      id                date lc  smaj smin eor                   geometry</span>
-<span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1  2442  416  42 POINT (2430.943 -912.3109)</span>
-<span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 49660  391  90  POINT (2437.96 -903.7763)</span>
-<span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A  5032  472  93 POINT (2429.753 -907.3739)</span>
-<span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A  4007  286 116 POINT (2437.367 -905.2335)</span>
-<span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 13063  956  82 POINT (2426.138 -905.8045)</span>
-<span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A  5099  478  79 POINT (2431.234 -909.0692)</span></code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where processed GLS data are provided and include longitude and latitude error SD’s (in degrees). In this case, the <code>lc</code> class is set to <code>GL</code> for all GLS locations.</li>
-</ol>
-<pre><code><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span>
-<span class="co">#&gt; 1 54632 2022-06-13 20:26:26 GL 100.0 -55 0.7227017 0.8199549</span>
-<span class="co">#&gt; 2 54632 2022-06-14 08:26:26 GL 100.5 -54 0.1930864 0.3560714</span>
-<span class="co">#&gt; 3 54632 2022-06-14 20:26:26 GL 101.0 -53 1.2194295 6.6562404</span>
-<span class="co">#&gt; 4 54632 2022-06-15 08:26:26 GL 101.5 -52 0.5975835 1.5546329</span>
-<span class="co">#&gt; 5 54632 2022-06-15 20:26:26 GL 102.0 -51 0.4822192 0.6882638</span></code></pre>
-<ol start="6" style="list-style-type: decimal">
-<li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where GPS data are provided. In this case, the <code>lc</code> class is set to <code>G</code> for all GPS locations.</li>
-</ol>
-<pre><code><span class="co">#&gt;         id                date lc  lon   lat</span>
-<span class="co">#&gt; 1 F02-B-17 2022-06-13 20:26:26  G 70.1 -49.2</span>
-<span class="co">#&gt; 2 F02-B-17 2022-06-13 21:26:26  G 70.6 -48.2</span>
-<span class="co">#&gt; 3 F02-B-17 2022-06-13 22:26:26  G 71.1 -47.2</span>
-<span class="co">#&gt; 4 F02-B-17 2022-06-13 23:26:26  G 71.6 -46.2</span>
-<span class="co">#&gt; 5 F02-B-17 2022-06-14 00:26:26  G 72.1 -45.2</span></code></pre>
-<ol start="7" style="list-style-type: decimal">
-<li>a <code>data.frame</code>, <code>tibble</code> or <code>sf-tibble</code> where any combination of Argos, GLS or GPS locations can be intermixed - though, most typically this would be a combination of Argos and GPS locations.</li>
-</ol>
-<pre><code><span class="co">#&gt;         id                date lc  lon   lat  smaj smin eor</span>
-<span class="co">#&gt; 1 F02-B-17 2017-09-17 05:20:00  G 70.1 -49.2    NA   NA  NA</span>
-<span class="co">#&gt; 2 F02-B-17 2017-10-04 14:35:01  2 70.2 -49.1  1890   45  77</span>
-<span class="co">#&gt; 3 F02-B-17 2017-10-05 04:03:25  G 70.1 -49.3    NA   NA  NA</span>
-<span class="co">#&gt; 4 F02-B-17 2017-10-05 06:28:20  A 71.1 -48.7 28532 1723 101</span>
-<span class="co">#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</span></code></pre>
+<p><code>foieGras</code> can accept input data in several possible
+formats. Here, we outline the default formats but users are not
+restricted to using these. Input data with variable names and/or column
+ordering that differs from the defaults can be used, provided the
+essential minimum data elements are present to allow the SSM’s to be
+fitted: a unique animal/track identifier, date-time of each observation,
+location quality class, and longitude and latitude (or projected x and
+y) coordinates. We expand on these and additional variables in the
+following sections.</p>
+<p>A pre-processing function <code><a href="../reference/format_data.html">format_data()</a></code> can be used to
+correctly structure the input data for use in <code>foieGras</code>.
+This function checks for the presence of the essential variables,
+converts date-time to <code>POSIX</code> format, maps custom variable
+names onto the default names, and puts the variables into the default
+column order expected by <code>foieGras</code>. Users may choose to call
+<code><a href="../reference/format_data.html">format_data()</a></code> themselves, prior to fitting an SSM with
+<code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>, or they can allow <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> to
+format the data automatically. We illustrate these approaches in the
+“Fitting a model” section, below.</p>
+<div class="section level4">
+<h4 id="argos-least-squares-ls-location-data">Argos Least-Squares (LS) location data<a class="anchor" aria-label="anchor" href="#argos-least-squares-ls-location-data"></a>
+</h4>
+<p>We’ll start out with the original Argos data, CLS Argos’
+Least-Squares-based (LS) locations. These data contain the minimum
+information required by <code>foieGras</code>’s SSM’s. A minimal input
+<code>data.frame</code> or <code>tibble</code>, containing only the
+information required to fit the SSM, looks like this:</p>
+<pre><code><span><span class="co">#&gt;             id                date lc   lon    lat</span></span>
+<span><span class="co">#&gt; 1 ct109-085-14 2015-02-03 00:11:02  B 70.45 -49.93</span></span>
+<span><span class="co">#&gt; 2 ct109-085-14 2015-02-03 13:26:37  B 71.00 -50.21</span></span>
+<span><span class="co">#&gt; 3 ct109-085-14 2015-02-03 21:53:15  B 71.31 -50.37</span></span>
+<span><span class="co">#&gt; 4 ct109-085-14 2015-02-04 04:05:35  A 71.64 -50.43</span></span>
+<span><span class="co">#&gt; 5 ct109-085-14 2015-02-04 17:12:42  B 72.04 -50.46</span></span>
+<span><span class="co">#&gt; 6 ct109-085-14 2015-02-05 02:05:44  B 72.44 -50.47</span></span></code></pre>
+<p>The (default) column names represent the following:<br>
+- <code>id</code> a unique identifier for each animal (or track) in the
+<code>data.frame</code><br>
+- <code>date</code> a date-time variable in the form
+<code>YYYY-mm-dd HH:MM:SS</code> (or <code>YYYY/mm/dd HH:MM:SS</code>).
+These can be text strings, in which case <code>foieGras</code> converts
+them to <code>POSIX</code> format and assumes the timezone is
+<code>UTC</code>. If the date-times are from a local timezone then you
+must specify this via the <code>tz</code> argument to
+<code><a href="../reference/format_data.html">format_data()</a></code>. A list of valid timezone names can be viewed
+via <code><a href="https://rdrr.io/r/base/timezones.html" class="external-link">OlsonNames()</a></code>.<br>
+- <code>lc</code> the location class variable common to Argos data, with
+classes in the set: 3, 2, 1, 0, A, B, Z.<br>
+- <code>lon</code> the longitude variable<br>
+- <code>lat</code> the latitude variable<br>
+The <code>lc</code> values determine the measurement error variances
+(based on independent data, see Jonsen et al. 2020) used in the SSM’s
+for each observation.</p>
+</div>
+<div class="section level4">
+<h4 id="argos-kalman-filter-kf-location-data">Argos Kalman Filter (KF) location data<a class="anchor" aria-label="anchor" href="#argos-kalman-filter-kf-location-data"></a>
+</h4>
+<p>Since 2011, the default Argos location data uses CLS Argos’ Kalman
+Filter (KF) algorithm. These data include error ellipse information for
+each observed location in the form of 3 variables: ellipse semi-major
+axis length, ellipse semi-minor axis length, and ellipse orientation. A
+minimal input <code>data.frame</code> or <code>tibble</code> for Argos
+KF data looks like this:</p>
+<pre><code><span><span class="co">#&gt;      id                date lc      lon       lat  smaj smin eor</span></span>
+<span><span class="co">#&gt; 1 54591 2012-03-05 05:09:33  1 110.5707 -66.42752  2442  416  42</span></span>
+<span><span class="co">#&gt; 2 54591 2012-03-06 04:55:14  0 110.3402 -66.39579 49660  391  90</span></span>
+<span><span class="co">#&gt; 3 54591 2012-03-07 04:23:10  A 110.4778 -66.45266  5032  472  93</span></span>
+<span><span class="co">#&gt; 4 54591 2012-03-07 21:23:06  A 110.3749 -66.39622  4007  286 116</span></span>
+<span><span class="co">#&gt; 5 54591 2012-03-09 04:27:49  B 110.4732 -66.48743 13063  956  82</span></span>
+<span><span class="co">#&gt; 6 54591 2012-03-10 00:10:41  A 110.5014 -66.43516  5099  478  79</span></span></code></pre>
+<p>The column names follow those for Argos LS data, with the following
+additions:<br>
+- <code>smaj</code> the Argos error ellipse semi-major axis length
+(m)<br>
+- <code>smin</code> the Argos error ellipse semi-minor axis length
+(m)<br>
+- <code>eor</code> the Argos error ellipse ellipse orientation (degrees
+from N)</p>
+<p>Here, the error ellipse parameters for each observation define the
+measurement error variances used in the SSM’s (Jonsen et al. 2020).
+Missing error ellipse values are allowed, in which case, those
+observations are treated as Argos LS data.</p>
+</div>
+<div class="section level4">
+<h4 id="gps-location-data">GPS location data<a class="anchor" aria-label="anchor" href="#gps-location-data"></a>
+</h4>
+<p>The <code>foieGras</code> SSM’s can be fit to GPS location data, for
+example to deal with (rare) extreme locations and/or to time-regularise
+locations. The input data format is the same as for Argos LS data, but
+the <code>lc</code> class is set to <code>G</code> for all GPS
+locations:</p>
+<pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
+<span><span class="co">#&gt; 1 F02-B-17 2022-12-02 13:04:14  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2022-12-02 14:04:14  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2022-12-02 15:04:14  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2022-12-02 16:04:14  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2022-12-02 17:04:14  G 72.1 -45.2</span></span></code></pre>
+</div>
+<div class="section level4">
+<h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
+</h4>
+<p>The <code>foieGras</code> SSM’s can be fit to processed light-level
+geolocation data, when they include longitude and latitude error SD’s
+(<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
+case, the <code>lc</code> class is set to <code>GL</code> for all
+geolocation observations:</p>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2022-12-02 13:04:14 GL 100.0 -55 0.02547921 1.2756720</span></span>
+<span><span class="co">#&gt; 2 54632 2022-12-03 01:04:14 GL 100.5 -54 0.43928562 3.5586496</span></span>
+<span><span class="co">#&gt; 3 54632 2022-12-03 13:04:14 GL 101.0 -53 0.90241499 0.0372964</span></span>
+<span><span class="co">#&gt; 4 54632 2022-12-04 01:04:14 GL 101.5 -52 0.34384745 3.5333813</span></span>
+<span><span class="co">#&gt; 5 54632 2022-12-04 13:04:14 GL 102.0 -51 0.91890014 1.0340810</span></span></code></pre>
+<p>We caution users, that light-level geolocation errors can be (highly)
+non-Gaussian, depending on the species, tag technology, and algorithm
+used to estimate location from the light-level data. For example, we
+have observed strongly non-Gaussian location uncertainty in tracks of
+highly migratory tunas that traverse very different water masses in both
+the vertical and horizontal directions. Because <code>foieGras</code>’s
+SSM’s assume bi-variate Normal location errors, fitting to geolocations
+with non-Gaussian errors would not be appropriate and likely result in
+highly biased location estimates. Geolocation data collected from birds
+may be less prone to this issue, but we urge users to explore both the
+uncertainty in their tracking data and the algorithm used to estimate
+locations from light-level data.</p>
+</div>
+<div class="section level4">
+<h4 id="projected-location-data">Projected location data<a class="anchor" aria-label="anchor" href="#projected-location-data"></a>
+</h4>
+<p>Users can provide projected location data as an
+<code>sf-tibble</code> or <code>sf data.frame</code>. By default,
+<code>foieGras</code>’s SSM’s fit to locations that are transformed to
+the Mercator projection (EPSG 3395) and estimated locations are
+back-transformed to spherical coordinates (lon, lat). When an
+<code>sf</code>-projected data set is supplied, the
+<code>foieGras</code> SSM’s are fit to locations on the supplied
+projection (<code>foieGras</code> ensures that distance units are set to
+km). Here is an example <code>sf-tibble</code> Argos data set in a polar
+stereographic projection:</p>
+<pre><code><span><span class="co">#&gt; Simple feature collection with 6 features and 6 fields</span></span>
+<span><span class="co">#&gt; Geometry type: POINT</span></span>
+<span><span class="co">#&gt; Dimension:     XY</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: 1110.769 ymin: -948.5686 xmax: 1118.995 ymax: -936.6922</span></span>
+<span><span class="co">#&gt; CRS:           +proj=stere +lat_0=-60 +lon_0=85 +ellps=WGS84 +units=km +no_defs</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;   id    date                lc     smaj  smin   eor             geometry</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;POINT [km]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 54591 2012-03-05 <span style="color: #949494;">05:09:33</span> 1      <span style="text-decoration: underline;">2</span>442   416    42 (1118.995 -944.0405)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 54591 2012-03-06 <span style="color: #949494;">04:55:14</span> 0     <span style="text-decoration: underline;">49</span>660   391    90 (1110.769 -936.6922)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 54591 2012-03-07 <span style="color: #949494;">04:23:10</span> A      <span style="text-decoration: underline;">5</span>032   472    93 (1114.021 -945.0264)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 54591 2012-03-07 <span style="color: #949494;">21:23:06</span> A      <span style="text-decoration: underline;">4</span>007   286   116  (1112.198 -937.343)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 54591 2012-03-09 <span style="color: #949494;">04:27:49</span> B     <span style="text-decoration: underline;">13</span>063   956    82 (1112.307 -948.5686)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 54591 2012-03-10 <span style="color: #949494;">00:10:41</span> A      <span style="text-decoration: underline;">5</span>099   478    79 (1115.773 -943.6181)</span></span></code></pre>
+</div>
+<div class="section level4">
+<h4 id="a-mixture-of-location-data-types">A mixture of location data types<a class="anchor" aria-label="anchor" href="#a-mixture-of-location-data-types"></a>
+</h4>
+<p>Users can fit SSM’s to data where a combination of Argos, GPS or
+light-level geolocation observations are inter-mixed. Below is an
+example of mixed Argos KF and GPS observations, as one might obtain from
+a double-tagged individual:</p>
+<pre><code><span><span class="co">#&gt;         id                date lc  lon   lat  smaj smin eor</span></span>
+<span><span class="co">#&gt; 1 F02-B-17 2017-09-17 05:20:00  G 70.1 -49.2    NA   NA  NA</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2017-10-04 14:35:01  2 70.2 -49.1  1890   45  77</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2017-10-05 04:03:25  G 70.1 -49.3    NA   NA  NA</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2017-10-05 06:28:20  A 71.1 -48.7 28532 1723 101</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</span></span></code></pre>
+<p>These mixtures are possible because the <code>foieGras</code> SSM’s
+apply the most appropriate measurement error model for each observation,
+based on its location class and error information (i.e., numeric values
+vs NA’s).</p>
+</div>
 </div>
 <div class="section level3">
-<h3 id="fit-a-model">Fit a model<a class="anchor" aria-label="anchor" href="#fit-a-model"></a>
+<h3 id="fitting-a-model">Fitting a model<a class="anchor" aria-label="anchor" href="#fitting-a-model"></a>
 </h3>
-<p>Model fitting for quality control of locations is comprised of 2 steps: a prefilter step where a number of checks are made on the input data (see <code><a href="../reference/fit_ssm.html">?foieGras::fit_ssm</a></code> for details), including applying the <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme outlier observations. Additionally, if the input data are not supplied as an <code>sf</code> object, the prefilter uses the World Mercator projection, EPSG 3395. The SSM is then fit to this projected version of the data. The prefilter step is fully automated and invoked via the <code>fit_ssm</code> function:</p>
+<p>Model fitting for quality control of locations is comprised of 3
+steps: a data formatting step, a pre-filtering step, and the actual
+model fitting step. A number of checks are made on the input data during
+the formatting and pre-filtering steps, including applying the
+<code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme observations (see
+<code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details). The pre-filter step is fully
+automated, although various arguments can be used to modify it’s
+actions, and called via the <code>fit_ssm</code> function:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## format, prefilter and fit Random Walk SSM using a 24 h time step</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">ellie</span>,</span>
+<span>    model <span class="op">=</span> <span class="st">"rw"</span>,</span>
+<span>    time.step <span class="op">=</span> <span class="fl">24</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>These are the minimum arguments required: the input data, the model
+(<code>rw</code>, <code>crw</code>, or <code>mp</code>) and the
+time.step (in h) to which locations are predicted. Additional control
+can be exerted over the data formatting and pre-filtering steps, via the
+<code>id</code>, <code>date</code>, <code>lc</code>, <code>coord</code>,
+<code>epar</code> and <code>sderr</code> variable name arguments, and
+via the <code>vmax</code>, <code>ang</code>, <code>distlim</code>,
+<code>min.dt</code>, and <code>spdf</code> pre-filtering arguments (see
+<code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details). The defaults for these arguments are
+quite conservative (for non-flying species), usually leading to relative
+few observations being flagged to be ignored by the SSM. Additional
+control over the optimization can also be exerted via the
+<code>control = ssm_control()</code> argument, see see
+<code><a href="../articles/SSM_fitting.html">vignette('SSM_fitting')</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> for
+more details.</p>
+<div class="section level4">
+<h4 id="custom-data-formats">Custom data formats<a class="anchor" aria-label="anchor" href="#custom-data-formats"></a>
+</h4>
+<p>Users do not need to adhere to the default <code>foieGras</code> data
+formatting presented above, so long as their input data contain the
+essential variables. The variables can have arbitrary names and be in
+any order. Here is an example using a custom formatted
+<code>data.frame</code> of Argos LS data as input:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## prefilter and fit Random Walk SSM using a 24 h time step</span>
-<span class="va">fit</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span>
-    <span class="va">ellie</span>,
-    model <span class="op">=</span> <span class="st">"rw"</span>,
-    time.step <span class="op">=</span> <span class="fl">24</span>,
-    control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
-<p>These are the minimum arguments required: the input data, the model (<code>rw</code>, <code>crw</code>, or <code>mp</code>) and the time.step (in h) to which locations are predicted (the argument <code>control = ssm_control(verbose = 0)</code> turns off parameter optimization tracing and is included here for vignette tidiness). Additional control can be exerted over the prefiltering step, via the <code>vmax</code>, <code>ang</code>, <code>distlim</code>, <code>spdf</code> and <code>min.dt</code> arguments. see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details, the defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the <code>control = ssm_control()</code> argument, see <code><a href="../reference/ssm_control.html">?ssm_control</a></code> for details.</p>
-<p><code>fit_ssm</code> can be applied to single or multiple tracks, without modification. The specified SSM is fit to each individual separately and the resulting output is a compound <code>tibble</code> with rows corresponding to each individual <code>ssm_df</code> fit object. The <code>converged</code> column indicates whether each model fit converged successfully.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sese2_n</span><span class="op">)</span></span>
+<span><span class="va">sese2_n</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 295 × 5</span></span></span>
+<span><span class="co">#&gt;    longitude latitude time                lc    id       </span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      72.5    -<span style="color: #BB0000;">50.2</span> 2009-02-01 17:50:46 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      73.0    -<span style="color: #BB0000;">50.4</span> 2009-02-02 03:30:26 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      73.8    -<span style="color: #BB0000;">50.8</span> 2009-02-02 17:50:48 B     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      74.6    -<span style="color: #BB0000;">51.2</span> 2009-02-03 07:39:08 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      74.9    -<span style="color: #BB0000;">51.4</span> 2009-02-03 15:29:59 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      75.5    -<span style="color: #BB0000;">51.6</span> 2009-02-04 01:21:08 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      76.0    -<span style="color: #BB0000;">52.2</span> 2009-02-04 16:34:15 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      76.7    -<span style="color: #BB0000;">52.2</span> 2009-02-04 21:05:50 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      77.0    -<span style="color: #BB0000;">52.7</span> 2009-02-05 10:57:22 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      77.8    -<span style="color: #BB0000;">52.8</span> 2009-02-05 16:03:58 A     ct36-E-09</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 285 more rows</span></span></span></code></pre></div>
+<p>Note the columns are in a different order than the default expected
+by <code>foieGras</code>, and the first three variables have different
+names: <code>longitude</code>, <code>latitude</code> and
+<code>time</code>. There are two approaches to format these data. The
+first, is to call <code>format_data</code> as a data pre-processing step
+prior to fitting an SSM. The data are linked to the expected names via
+the following arguments to <code>format_data</code>: <code>id</code>,
+<code>date</code>, <code>lc</code>, <code>coord</code>,
+<code>epar</code> and <code>sderr</code>. In this example, we only need
+to use the <code>date</code> and <code>coord</code> arguments:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## fit to data with two individuals</span>
-<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>,
-               model <span class="op">=</span> <span class="st">"crw"</span>,
-               time.step<span class="op">=</span><span class="fl">24</span>,
-               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## list fit outcomes for both seals</span>
-<span class="va">fit</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span>
-<span class="co">#&gt;   id        ssm          converged pdHess pmodel</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;named list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-F-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw</span></code></pre></div>
-<p>Individual <code>id</code> is displayed in the 1st column, all fit output resides in a list (<code>ssm</code>) in the 2nd column, <code>convergence</code> status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain parameter standard errors (<code>pdHess</code>) is displayed in the 4th column, and the specified process model (<code>rw</code>, <code>crw</code>, or <code>mp</code>) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors may be calculated but not all. One possible solution is to try specifying a longer <code>time.step</code> or set <code>time.step = NA</code> to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If <code>pdHess = FALSE</code> persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by <code>prefilter</code> are present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html" class="external-link">glmmTMB troubleshooting vignette</a> may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via <code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and <code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">?optim</a></code> for details on optimization control parameters).</p>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_data.html">format_data</a></span><span class="op">(</span><span class="va">sese2_n</span>, date <span class="op">=</span> <span class="st">"time"</span>, coord <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">d</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 295 × 10</span></span></span>
+<span><span class="co">#&gt;    id      date                lc      lon   lat  smaj  smin   eor lonerr laterr</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:50:46</span> A      72.5 -<span style="color: #BB0000;">50.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ct36-E… 2009-02-02 <span style="color: #949494;">03:30:26</span> A      73.0 -<span style="color: #BB0000;">50.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:50:48</span> B      73.8 -<span style="color: #BB0000;">50.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ct36-E… 2009-02-03 <span style="color: #949494;">07:39:08</span> A      74.6 -<span style="color: #BB0000;">51.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ct36-E… 2009-02-03 <span style="color: #949494;">15:29:59</span> A      74.9 -<span style="color: #BB0000;">51.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ct36-E… 2009-02-04 <span style="color: #949494;">01:21:08</span> A      75.5 -<span style="color: #BB0000;">51.6</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ct36-E… 2009-02-04 <span style="color: #949494;">16:34:15</span> A      76.0 -<span style="color: #BB0000;">52.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ct36-E… 2009-02-04 <span style="color: #949494;">21:05:50</span> A      76.7 -<span style="color: #BB0000;">52.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ct36-E… 2009-02-05 <span style="color: #949494;">10:57:22</span> A      77.0 -<span style="color: #BB0000;">52.7</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ct36-E… 2009-02-05 <span style="color: #949494;">16:03:58</span> A      77.8 -<span style="color: #BB0000;">52.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 285 more rows</span></span></span></code></pre></div>
+<p>We then fit the SSM to the formatted data <code>d</code> via
+<code>fit_ssm</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">d</span>,</span>
+<span>               model <span class="op">=</span> <span class="st">"crw"</span>,</span>
+<span>               time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, we can use a shortcut and have <code>fit_ssm</code>
+format the <code>sese2_n</code> data by adding the variable name
+arguments to the call:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2_n</span>,</span>
+<span>               date <span class="op">=</span> <span class="st">"time"</span>,</span>
+<span>               coord <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>,<span class="st">"latitude"</span><span class="op">)</span>,</span>
+<span>               model <span class="op">=</span> <span class="st">"crw"</span>,</span>
+<span>               time.step <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span></code></pre></div>
+<p>Original variable names are not preserved in the output object
+<code>fit</code> but rather transformed to the default expected names.
+The <code>grab</code> function can be used to access the data and the
+SSM estimates (see Access Results, below).</p>
+<p><code>fit_ssm</code> can be applied to single or multiple tracks,
+without modification. The specified SSM is fit to each individual
+separately and the resulting output is a compound <code>tibble</code>
+with rows corresponding to each individual <code>ssm_df</code> fit
+object. The <code>converged</code> column indicates whether each model
+fit converged successfully.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## fit to data with two individuals</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>,</span>
+<span>               model <span class="op">=</span> <span class="st">"crw"</span>,</span>
+<span>               time.step<span class="op">=</span><span class="fl">24</span>,</span>
+<span>               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## list fit outcomes for both seals</span></span>
+<span><span class="va">fit</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
+<span><span class="co">#&gt;   id        ssm          converged pdHess pmodel</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;named list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-F-09 <span style="color: #949494;">&lt;ssm [15]&gt;</span>   TRUE      TRUE   crw</span></span></code></pre></div>
+<p>Individual <code>id</code> is displayed in the 1st column, all fit
+output resides in a list (<code>ssm</code>) in the 2nd column,
+<code>convergence</code> status (whether the optimizer found a global
+minimum) of each model fit is displayed in the 3rd column, whether the
+Hessian matrix was positive-definite and could be solved to obtain
+parameter standard errors (<code>pdHess</code>) is displayed in the 4th
+column, and the specified process model (<code>rw</code>,
+<code>crw</code>, or <code>mp</code>) in the 5th column. In some cases,
+the optimizer will converge but the Hessian matrix is not
+positive-definite, which typically indicates the optimizer converged on
+a local minimum. In this case, some standard errors may be calculated
+but not all. One possible solution is to try specifying a longer
+<code>time.step</code> or set <code>time.step = NA</code> to turn off
+predictions and return only fitted values (location estimates at the
+pre-filtered observation times). If <code>pdHess = FALSE</code> persists
+then careful inspection of the supplied data is warranted to determine
+if suspect observations not identified by <code>prefilter</code> are
+present. The excellent <a href="https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html" class="external-link">glmmTMB
+troubleshooting vignette</a> may also provide hints at solutions.
+Convergence failures should be examined for potential data issues,
+however, in some cases changes to the optimization parameters via
+<code><a href="../reference/ssm_control.html">ssm_control()</a></code> (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> and
+<code><a href="../reference/ssm_control.html">?ssm_control</a></code> on usage) may overcome mild issues (see
+<code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">?nlminb</a></code> or <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">?optim</a></code> for details on optimization
+control parameters).</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="access-results">Access results<a class="anchor" aria-label="anchor" href="#access-results"></a>
 </h3>
-<p>Summary information about the fit can be obtained via the <code>summary</code> function:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
-<span class="co">#&gt;  Animal id Model Time n.obs n.filt n.fit n.pred n.rr converged   AICc</span>
-<span class="co">#&gt;  ct36-E-09   crw   24   170     22   148     58    .      TRUE 3022.8</span>
-<span class="co">#&gt;  ct36-F-09   crw   24   125     17   108    110    .      TRUE 2531.4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; --------------</span>
-<span class="co">#&gt; ct36-E-09 </span>
-<span class="co">#&gt; --------------</span>
-<span class="co">#&gt;  Parameter Estimate Std.Err</span>
-<span class="co">#&gt;          D   0.2071  0.0356</span>
-<span class="co">#&gt;      rho_o   0.1298  0.1143</span>
-<span class="co">#&gt;      tau_x   0.9378  0.0728</span>
-<span class="co">#&gt;      tau_y   0.6794  0.0576</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; --------------</span>
-<span class="co">#&gt; ct36-F-09 </span>
-<span class="co">#&gt; --------------</span>
-<span class="co">#&gt;  Parameter Estimate Std.Err</span>
-<span class="co">#&gt;          D   0.0818  0.0145</span>
-<span class="co">#&gt;      rho_o   0.3527  0.1227</span>
-<span class="co">#&gt;      tau_x   1.3695  0.1362</span>
-<span class="co">#&gt;      tau_y   1.9665  0.1897</span></code></pre></div>
-<p>The summary table lists information about the fit, including the number of observations in the input data (<code>n.obs</code>), the number of observation flagged to be ignored by the SSM (<code>n.filt</code>), the number of fitted location estimates (<code>n.fit</code>), the number of predicted location estimates (<code>n.pred</code>), the number of rerouted location estimates (if present, <code>n.rr</code>), model convergence status, and AICc. When fitting to multiple individuals, these statistics are repeated on separate lines for each individual. Separate tables of SSM parameter estimates and their SE’s are also printed for each individual. The parameter estimates displayed vary depending on the SSM process model selected by the user (<code>rw</code>, <code>crw</code>, or <code>mp</code>) and the automatically chosen measurement model(s). Here, <code>sigma_x</code> and <code>sigma_y</code> are the process error standard deviations in the x and y directions, <code>rho_p</code> is the correlation parameter in the covariance term. The <code>Std. Error</code> column lists the standard errors, calculated via the Delta method (see TMB documentation for details), for each estimated parameter.</p>
-<p><code>fit_ssm</code> usually returns two sets of estimated locations in the model fit object: fitted values and predicted values. The fitted values occur at the times of the observations (that passed the prefilter step) to which the SSM was fit. The predicted values occur at the regular time intervals specified by the <code>time.step</code> argument. If <code>time.step = NA</code>, then no predicted values are estimated or returned in the model fit object.</p>
-<p>Users can obtain the fitted or predicted locations as a data.frame by using <code><a href="../reference/grab.html">grab()</a></code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## grab fitted locations</span>
-<span class="va">floc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span>
-<span class="va">floc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 14</span></span>
-<span class="co">#&gt;   id     date                  lon   lat     x      y   x.se   y.se     u      v</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-… 2009-02-01 <span style="color: #949494;">17:50:46</span>  72.5 -<span style="color: #BB0000;">50.2</span> <span style="text-decoration: underline;">8</span>069. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">450.</span>  0.486  0.483 0.343 -<span style="color: #BB0000;">0.232</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-… 2009-02-02 <span style="color: #949494;">03:30:26</span>  72.8 -<span style="color: #BB0000;">50.4</span> <span style="text-decoration: underline;">8</span>108. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">477.</span> 11.5    9.57  4.09  -<span style="color: #BB0000;">2.80</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>200. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 18.7   14.1   6.43  -<span style="color: #BB0000;">5.00</span> </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span>
-
-<span class="co">## grab predicted locations in projected form</span>
-<span class="va">ploc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, as_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">ploc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>
-<span class="co">#&gt; Simple feature collection with 3 features and 10 fields</span>
-<span class="co">#&gt; Geometry type: POINT</span>
-<span class="co">#&gt; Dimension:     XY</span>
-<span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6662.174 xmax: 8348.709 ymax: -6449.872</span>
-<span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 11</span></span>
-<span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:00:00</span> 9.80<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> -<span style="color: #BB0000;">6.63</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:00:00</span> 6.41<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.98</span><span style="color: #949494;">e</span>+ 0 1.11<span style="color: #949494;">e</span>+0 9.48<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.80<span style="color: #949494;">e</span>+1 1.36<span style="color: #949494;">e</span>+1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.03<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.30<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.38<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></code></pre></div>
-<p>Here, the fitted location data.frame includes individual id, date-time, longitude, latitude, x and y (typically from the default World Mercator projection) and their standard errors (in km). The predicted location data.frame is an <code>sf</code> object with geometry and Coordinate Reference System information. This <code>sf</code> output format is useful for custom mapping or calculating derived quantities from the estimated locations.</p>
+<p>Summary information about the fit can be obtained via the
+<code>summary</code> function:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  Animal id Model Time n.obs n.filt n.fit n.pred n.rr converged   AICc</span></span>
+<span><span class="co">#&gt;  ct36-E-09   crw   24   170     22   148     58    .      TRUE 3022.8</span></span>
+<span><span class="co">#&gt;  ct36-F-09   crw   24   125     17   108    110    .      TRUE 2531.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------</span></span>
+<span><span class="co">#&gt; ct36-E-09 </span></span>
+<span><span class="co">#&gt; --------------</span></span>
+<span><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
+<span><span class="co">#&gt;          D   0.2071  0.0356</span></span>
+<span><span class="co">#&gt;      rho_o   0.1298  0.1143</span></span>
+<span><span class="co">#&gt;      tau_x   0.9378  0.0728</span></span>
+<span><span class="co">#&gt;      tau_y   0.6794  0.0576</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------</span></span>
+<span><span class="co">#&gt; ct36-F-09 </span></span>
+<span><span class="co">#&gt; --------------</span></span>
+<span><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
+<span><span class="co">#&gt;          D   0.0818  0.0145</span></span>
+<span><span class="co">#&gt;      rho_o   0.3527  0.1227</span></span>
+<span><span class="co">#&gt;      tau_x   1.3695  0.1362</span></span>
+<span><span class="co">#&gt;      tau_y   1.9665  0.1897</span></span></code></pre></div>
+<p>The summary table lists information about the fit, including the
+number of observations in the input data (<code>n.obs</code>), the
+number of observation flagged to be ignored by the SSM
+(<code>n.filt</code>), the number of fitted location estimates
+(<code>n.fit</code>), the number of predicted location estimates
+(<code>n.pred</code>), the number of rerouted location estimates (if
+present, <code>n.rr</code>), model convergence status, and AICc. When
+fitting to multiple individuals, these statistics are repeated on
+separate lines for each individual. Separate tables of SSM parameter
+estimates and their SE’s are also printed for each individual. The
+parameter estimates displayed vary depending on the SSM process model
+selected by the user (<code>rw</code>, <code>crw</code>, or
+<code>mp</code>) and the automatically chosen measurement model(s).
+Here, <code>sigma_x</code> and <code>sigma_y</code> are the process
+error standard deviations in the x and y directions, <code>rho_p</code>
+is the correlation parameter in the covariance term. The
+<code>Std. Error</code> column lists the standard errors, calculated via
+the Delta method (see TMB documentation for details), for each estimated
+parameter.</p>
+<p><code>fit_ssm</code> usually returns two sets of estimated locations
+in the model fit object: fitted values and predicted values. The fitted
+values occur at the times of the observations to which the SSM was fit
+(i.e., the observations that passed the pre-filter step). The predicted
+values occur at the regular time intervals specified by the
+<code>time.step</code> argument. If <code>time.step = NA</code>, then no
+predicted values are estimated or returned in the model fit object.</p>
+<p>Users can obtain the fitted or predicted locations as a data.frame by
+using <code><a href="../reference/grab.html">grab()</a></code>:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## grab fitted locations</span></span>
+<span><span class="va">floc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span></span>
+<span><span class="va">floc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
+<span><span class="co">#&gt;   id     date                  lon   lat     x      y   x.se   y.se     u      v</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-… 2009-02-01 <span style="color: #949494;">17:50:46</span>  72.5 -<span style="color: #BB0000;">50.2</span> <span style="text-decoration: underline;">8</span>069. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">450.</span>  0.486  0.483 0.343 -<span style="color: #BB0000;">0.232</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-… 2009-02-02 <span style="color: #949494;">03:30:26</span>  72.8 -<span style="color: #BB0000;">50.4</span> <span style="text-decoration: underline;">8</span>108. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">477.</span> 11.5    9.57  4.09  -<span style="color: #BB0000;">2.80</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>200. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 18.7   14.1   6.43  -<span style="color: #BB0000;">5.00</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-… 2009-02-03 <span style="color: #949494;">07:39:08</span>  74.5 -<span style="color: #BB0000;">51.2</span> <span style="text-decoration: underline;">8</span>292. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">619.</span> 14.5   10.4   6.64  -<span style="color: #BB0000;">5.08</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-… 2009-02-03 <span style="color: #949494;">15:29:59</span>  74.9 -<span style="color: #BB0000;">51.4</span> <span style="text-decoration: underline;">8</span>340. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">655.</span> 13.4    9.66  6.10  -<span style="color: #BB0000;">4.64</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span></span>
+<span></span>
+<span><span class="co">## grab predicted locations in projected form</span></span>
+<span><span class="va">ploc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, as_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">ploc</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; Simple feature collection with 5 features and 10 fields</span></span>
+<span><span class="co">#&gt; Geometry type: POINT</span></span>
+<span><span class="co">#&gt; Dimension:     XY</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.538 xmax: 8675.265 ymax: -6449.872</span></span>
+<span><span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 11</span></span></span>
+<span><span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:00:00</span> 9.80<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> -<span style="color: #BB0000;">6.63</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:00:00</span> 6.41<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.98</span><span style="color: #949494;">e</span>+ 0 1.11<span style="color: #949494;">e</span>+0 9.48<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.80<span style="color: #949494;">e</span>+1 1.36<span style="color: #949494;">e</span>+1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.03<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.30<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.38<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E… 2009-02-04 <span style="color: #949494;">17:00:00</span> 5.71<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.36</span><span style="color: #949494;">e</span>+ 0 1.01<span style="color: #949494;">e</span>+0 8.39<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.29<span style="color: #949494;">e</span>+1 9.31<span style="color: #949494;">e</span>+0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E… 2009-02-05 <span style="color: #949494;">17:00:00</span> 9.40<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.43</span><span style="color: #949494;">e</span>+ 0 1.19<span style="color: #949494;">e</span>+0 1.09<span style="color: #949494;">e</span>+0 1.24<span style="color: #949494;">e</span>+1 9.16<span style="color: #949494;">e</span>+0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></span></code></pre></div>
+<p>Here, the output from the <code>crw</code> SSM is returned as a
+fitted location data.frame (floc) that includes individual id, date,
+longitude, latitude, x and y (typically from the default Mercator
+projection) and their standard errors (<code>x.se</code>,
+<code>y.se</code> in km), <code>u</code>, <code>v</code> (and their
+standard errors, <code>u.se</code>, <code>v.se</code> in km/h) are
+estimates of signed velocity in the x and y directions. The
+<code>u</code>, <code>v</code> velocities should generally be ignored as
+their estimation uses time intervals between consecutive locations,
+whether they are observation times or prediction times. The columns
+<code>s</code> and <code>s.se</code> provide a more reliable 2-D
+velocity estimate, although standard error estimation is turned off by
+default as this generally increases computation time for the
+<code>crw</code> SSM. Standard error estimation for <code>s</code> can
+be turned on via the <code>control</code> argument to
+<code>fit_ssm</code>
+(i.e. <code>control = ssm_control(se = TRUE)</code>, see
+<code><a href="../reference/ssm_control.html">?ssm_control</a></code> for futher details).</p>
+<p>The predicted location data.frame (ploc) is an <code>sf-tibble</code>
+with geometry and Coordinate Reference System information. This
+<code>sf</code> output format can be useful for custom mapping or
+calculating derived variables from the estimated locations.</p>
+<p>The formatted and prefiltered version of the input data can also be
+extracted from the output:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fp.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span>
+<span><span class="va">fp.data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
+<span><span class="co">#&gt;   id       date                lc      lon   lat  smaj  smin   eor obs.t…¹ keep </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-… 2009-02-01 <span style="color: #949494;">17:50:46</span> A      72.5 -<span style="color: #BB0000;">50.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E-… 2009-02-02 <span style="color: #949494;">03:30:26</span> A      73.0 -<span style="color: #BB0000;">50.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E-… 2009-02-02 <span style="color: #949494;">17:50:48</span> B      73.8 -<span style="color: #BB0000;">50.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E-… 2009-02-03 <span style="color: #949494;">07:39:08</span> A      74.6 -<span style="color: #BB0000;">51.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E-… 2009-02-03 <span style="color: #949494;">15:29:59</span> A      74.9 -<span style="color: #BB0000;">51.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: x &lt;dbl&gt;, y &lt;dbl&gt;, emf.x &lt;dbl&gt;, emf.y &lt;dbl&gt;, and</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   abbreviated variable name ¹​obs.type</span></span></span></code></pre></div>
+<p>Here, <code>fp.data</code> is in the form that is passed to the
+<code>crw</code> SSM. The first 5 columns (<code>id</code>,
+<code>date</code>, <code>lc</code>, <code>lon</code>, <code>lat</code>)
+are preserved from the formatted input data, and the error ellipse
+parameter columns (<code>smaj</code>, <code>smin</code>,
+<code>eor</code>) are appended and filled with NA’s, if missing from the
+input data. The observation type, <code>obs.type</code>, is determined
+for each observation during the prefiltering stage based on the
+combination of <code>lc</code> value and the presence of error ellipse
+parameters with non-NA values. The <code>keep</code> column indicates
+whether each record passed the pre-filtering stage (see
+<code><a href="../reference/prefilter.html">?prefilter</a></code> for details), observations with
+<code>keep = FALSE</code> are ignored by the SSM. The
+<code>x</code>,<code>y</code> columns are the Mercator-projected
+coordinates (in km) that fitted to by the SSM. The <code>emf.x</code>
+and <code>emf.y</code> columns are the error multiplication factors used
+to scale the measurement error variances, used by the SSM, for each
+Argos Least-Squares location class - these are relevant only for
+<code>obs.type = 'LS'</code> and for GPS observations.</p>
 </div>
 <div class="section level3">
-<h3 id="visualise-model-fit">Visualise model fit<a class="anchor" aria-label="anchor" href="#visualise-model-fit"></a>
+<h3 id="visualising-a-model-fit">Visualising a model fit<a class="anchor" aria-label="anchor" href="#visualising-a-model-fit"></a>
 </h3>
-<p>A generic <code>plot</code> (see <code><a href="../reference/plot.ssm_df.html">?plot.ssm_df</a></code>) method allows a quick visual of the SSM fit to the data:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># plot time-series of the fitted values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt; $`ct36-E-09`</span></code></pre></div>
-<p><img src="Overview_files/figure-html/fit%20plot-1.png" width="672"></p>
-<pre><code><span class="co">#&gt; </span>
-<span class="co">#&gt; $`ct36-F-09`</span></code></pre>
-<p><img src="Overview_files/figure-html/fit%20plot-2.png" width="672"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># plot fitted values as a 2-d track</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
-<span class="co">#&gt; $`ct36-E-09`</span></code></pre></div>
-<p><img src="Overview_files/figure-html/fit%20plot-3.png" width="672"></p>
-<pre><code><span class="co">#&gt; </span>
-<span class="co">#&gt; $`ct36-F-09`</span></code></pre>
-<p><img src="Overview_files/figure-html/fit%20plot-4.png" width="672"></p>
-<p>The predicted values (red points) are the state estimates predicted at regular time intervals, specified by <code>time.step</code> (here a 24 h interval). These estimates are plotted on top of 2 x SE intervals (red-filled ribbon), and the observations that passed the <code>prefilter</code> stage (blue points and blue rug at bottom). Fitted values are the state estimates corresponding to the time of each observation; their time series are plotted by default - <code>plot(fit)</code>. A 2-D time series plot of the track is invoked by the argument <code>type = 2</code>, and includes the 95 % confidence ellipses (red-filled ellipses) around the predicted locations.</p>
+<p>A generic <code>plot</code> (see <code><a href="../reference/plot.ssm_df.html">?plot.ssm_df</a></code>) method
+allows a quick visual of the SSM fit to the data:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># plot time-series of the fitted values</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/overview/fit_plot1.jpg" style="width:95.0%"> Here,
+the fitted values (state estimates corresponding to the time of each
+observation; orange points) are plotted on top of the observations that
+passed the <code>prefilter</code> stage (blue points and blue rug at
+bottom) and as separate time-series for the x and y coordinates by
+default. Uncertainty in the estimates is displayed as 2 x SE intervals
+(orange-filled ribbon). Observations that failed the
+<code>prefilter</code> stage are also displayed (black x’s and black rug
+at bottom).</p>
+<p>A 2-D time series plot of the track is invoked by the argument
+<code>type = 2</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># plot fitted values as a 2-d track</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/overview/fit_plot2.jpg" style="width:95.0%"> The
+predicted values (orange points) are the state estimates predicted at
+regular time intervals, specified by <code>time.step</code> (here a 24 h
+interval). 95 % confidence ellipses (orange-filled ellipses) around the
+predicted values are also displayed, but can be faded away by choosing a
+low <code>alpha</code> value (e.g.,
+<code>plot(fit, what = "predicted", type = 2, alpha = 0.05)</code>).
+Observations that failed the <code>prefilter</code> stage are displayed
+(black x’s) by default but can be turned off with the argument
+<code>outlier = FALSE</code>).</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Auger-Méthé M, Albertsen CM, Jonsen ID, Derocher AE, Lidgard DC, Studholme KR, Bowen WD, Crossin GT, Flemming JM (2017) Spatiotemporal modelling of marine movement data using Template Model Builder (TMB). Marine Ecology Progress Series 565:237-249.</p>
-<p>Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M. Harcourt R, Hindel MA, Bestley S (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effect model. Ecoloogy 100:e02566.</p>
-<p>Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindel MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. Movement Ecology 8:31.</p>
+<p>Auger-Méthé M, Albertsen CM, Jonsen ID, Derocher AE, Lidgard DC,
+Studholme KR, Bowen WD, Crossin GT, Flemming JM (2017) Spatiotemporal
+modelling of marine movement data using Template Model Builder (TMB).
+Marine Ecology Progress Series 565:237-249.</p>
+<p>Jonsen ID, McMahon CR, Patterson TA, Auger-Méthé M. Harcourt R,
+Hindel MA, Bestley S (2019) Movement responses to environment: fast
+inference of variation among southern elephant seals with a mixed effect
+model. Ecoloogy 100:e02566.</p>
+<p>Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ,
+Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt
+MJ, Hindel MA, Harcourt RG, McMahon CR (2020) A continuous-time
+state-space model for rapid quality control of Argos locations from
+animal-borne tags. Movement Ecology 8:31.</p>
 </div>
   </div>
 
@@ -344,7 +716,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

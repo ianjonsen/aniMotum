@@ -18,7 +18,7 @@ temporally regular or irregular location data"><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foieGras</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0-7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
 
@@ -81,17 +81,17 @@ temporally regular or irregular location data</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fit_mpm</span><span class="op">(</span>
-  <span class="va">x</span>,
-  what <span class="op">=</span> <span class="st">"predicted"</span>,
-  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"jmpm"</span>, <span class="st">"mpm"</span><span class="op">)</span>,
-  coords <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span>,
-  control <span class="op">=</span> <span class="fu"><a href="mpm_control.html">mpm_control</a></span><span class="op">(</span><span class="op">)</span>,
-  inner.control <span class="op">=</span> <span class="cn">NULL</span>,
-  optim <span class="op">=</span> <span class="cn">NULL</span>,
-  optMeth <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fit_mpm</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"predicted"</span>,</span>
+<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"jmpm"</span>, <span class="st">"mpm"</span><span class="op">)</span>,</span>
+<span>  coords <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span>,</span>
+<span>  control <span class="op">=</span> <span class="fu"><a href="mpm_control.html">mpm_control</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  inner.control <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  optim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  optMeth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -159,15 +159,15 @@ a mixed effects model. Ecology. 100(1):e02566</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## fit jmpm to two southern elephant seal tracks</span></span>
-<span class="r-in"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## fit jmpm to two southern elephant seal tracks</span></span></span>
+<span class="r-in"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">72</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">fmpm</span> <span class="op">&lt;-</span> <span class="fu">fit_mpm</span><span class="op">(</span><span class="va">xs</span>, model <span class="op">=</span> <span class="st">"jmpm"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fmpm</span> <span class="op">&lt;-</span> <span class="fu">fit_mpm</span><span class="op">(</span><span class="va">xs</span>, model <span class="op">=</span> <span class="st">"jmpm"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting jmpm...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   0 0 0       pars:   -0.63038 -0.77416 0.05745       pars:   -0.21961 -0.90381 0.95993       pars:   0.1024 -0.34798 0.19353       pars:   -0.12912 -0.74761 0.74455       pars:   -0.17853 -0.8329 0.86216       pars:   -0.23363 -0.801 0.86597       pars:   -0.27635 -0.61987 0.76146       pars:   -0.40458 -0.79384 0.62587       pars:   -0.36412 -0.6719 0.40545       pars:   -0.38583 -0.70377 0.60569       pars:   -0.43697 -0.67572 0.577       pars:   -0.38583 -0.70377 0.60569      </span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -182,7 +182,7 @@ a mixed effects model. Ecology. 100(1):e02566</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
