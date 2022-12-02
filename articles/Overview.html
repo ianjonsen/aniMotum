@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2022-12-02 13:04:14  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2022-12-02 14:04:14  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2022-12-02 15:04:14  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2022-12-02 16:04:14  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2022-12-02 17:04:14  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2022-12-02 16:26:50  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2022-12-02 17:26:50  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2022-12-02 18:26:50  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2022-12-02 19:26:50  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2022-12-02 20:26:50  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2022-12-02 13:04:14 GL 100.0 -55 0.02547921 1.2756720</span></span>
-<span><span class="co">#&gt; 2 54632 2022-12-03 01:04:14 GL 100.5 -54 0.43928562 3.5586496</span></span>
-<span><span class="co">#&gt; 3 54632 2022-12-03 13:04:14 GL 101.0 -53 0.90241499 0.0372964</span></span>
-<span><span class="co">#&gt; 4 54632 2022-12-04 01:04:14 GL 101.5 -52 0.34384745 3.5333813</span></span>
-<span><span class="co">#&gt; 5 54632 2022-12-04 13:04:14 GL 102.0 -51 0.91890014 1.0340810</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2022-12-02 16:26:50 GL 100.0 -55 0.2827276 1.2723261</span></span>
+<span><span class="co">#&gt; 2 54632 2022-12-03 04:26:50 GL 100.5 -54 0.6291295 1.4386332</span></span>
+<span><span class="co">#&gt; 3 54632 2022-12-03 16:26:50 GL 101.0 -53 0.3428919 1.2518628</span></span>
+<span><span class="co">#&gt; 4 54632 2022-12-04 04:26:50 GL 101.5 -52 0.4310294 1.2100488</span></span>
+<span><span class="co">#&gt; 5 54632 2022-12-04 16:26:50 GL 102.0 -51 0.6262775 0.1370058</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
