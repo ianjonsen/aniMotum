@@ -100,15 +100,15 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="foiegras-">{foieGras} <a href="https://ianjonsen.github.io/foieGras/index.html" class="external-link"><img src="reference/figures/logo.png" align="right" height="250"></a>
-<a class="anchor" aria-label="anchor" href="#foiegras-"></a>
+<div class="page-header"><h1 id="animotum-">{aniMotum} <a href="https://ianjonsen.github.io/aniMotum/index.html"><img src="reference/figures/logo.png" align="right" height="250"></a>
+<a class="anchor" aria-label="anchor" href="#animotum-"></a>
 </h1></div>
 <div class="section level4">
 <h4 id="fit-latent-variable-movement-models-to-animal-tracking-data-for-location-quality-control-and-behavioural-inference">fit latent variable movement models to animal tracking data for location quality control and behavioural inference<a class="anchor" aria-label="anchor" href="#fit-latent-variable-movement-models-to-animal-tracking-data-for-location-quality-control-and-behavioural-inference"></a>
 </h4>
 <!-- badges: start -->
 
-<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS.</p>
+<p><a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -119,19 +119,19 @@
 <div class="section level3">
 <h3 id="from-r-universe">From R-Universe<a class="anchor" aria-label="anchor" href="#from-r-universe"></a>
 </h3>
-<p>As of <code>v1.0-5</code>, <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> is available via R-Universe. This is where the latest stable version can always be found. Installation is simple:</p>
+<p>As of <code>v1.0-5</code>, <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> is available via R-Universe. This is where the latest stable version can always be found. Installation is simple:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install from my R-universe repository</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"foieGras"</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aniMotum"</span>, </span>
 <span>                 repos <span class="op">=</span> <span class="st">"https://ianjonsen.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
-<p>However, this will not install any of <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>’s Suggested packages, which add extra functionality such as path re-routing around land. To ensure all Suggested packages, either from R-Universe or CRAN are also installed:</p>
+<p>However, this will not install any of <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>’s Suggested packages, which add extra functionality such as path re-routing around land. To ensure all Suggested packages, either from R-Universe or CRAN are also installed:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"foieGras"</span>, </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aniMotum"</span>, </span>
 <span>                 repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://cloud.r-project.org"</span>,</span>
 <span>                           <span class="st">"https://ianjonsen.r-universe.dev"</span><span class="op">)</span>,</span>
 <span>                 dependencies <span class="op">=</span> <span class="st">"Suggests"</span><span class="op">)</span></span></code></pre></div>
 <p><code>install.packages</code> will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, &gt;= v1.0-5) version exist but the source version is newer. Answer <code>Yes</code> to install the source version, provided you have the appropriate compiler tools available (See <strong>From GitHub (source)</strong>, below).</p>
-<p>To avoid doing the above every time you want to re-install <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>, you can add my R-Universe repo to your local list of repositories for package download in your <code>.Rprofile</code>. This ensures <code>install.packages</code> automatically grabs the latest version of <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></p>
+<p>To avoid doing the above every time you want to re-install <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>, you can add my R-Universe repo to your local list of repositories for package download in your <code>.Rprofile</code>. This ensures <code>install.packages</code> automatically grabs the latest version of <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#install.packages("usethis")</span></span>
 <span><span class="fu">usethis</span><span class="fu">::</span><span class="fu">edit_r_profile</span><span class="op">(</span><span class="op">)</span></span>
@@ -139,37 +139,32 @@
 <span><span class="co"># add the following text or replace existing repos option</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ianjonsen <span class="op">=</span> <span class="st">'https://ianjonsen.r-universe.dev'</span>,</span>
 <span>                  CRAN <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>If you don’t want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> package for Windows or Mac from here <a href="https://ianjonsen.r-universe.dev/ui#package:foieGras" class="external-link uri">https://ianjonsen.r-universe.dev/ui#package:foieGras</a>. In R, use the following command to install from the file you’ve just downloaded (where <code>path_to_file</code> is wherever you saved the download:</p>
+<p>If you don’t want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> package for Windows or Mac from here <a href="https://ianjonsen.r-universe.dev/ui#package:aniMotum" class="external-link uri">https://ianjonsen.r-universe.dev/ui#package:aniMotum</a>. In R, use the following command to install from the file you’ve just downloaded (where <code>path_to_file</code> is wherever you saved the download:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for Windows</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file\package-windows-release</span><span class="sc">\f</span><span class="st">oieGras_1.0-5.zip"</span>, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file\package-windows-release</span><span class="sc">\a</span><span class="st">niMotum_1.0-5.zip"</span>, </span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># for Mac</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file/package-macos-release/foieGras_1.0-5.tgz"</span>, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file/package-macos-release/aniMotum_1.0-5.tgz"</span>, </span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>)</span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="from-cran">From CRAN<a class="anchor" aria-label="anchor" href="#from-cran"></a>
-</h3>
-<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> <code>v0.7-6</code> is on <a href="https://cran.r-project.org/package=foieGras/" class="external-link">CRAN</a> and can be downloaded within <code>R</code>, in the usual way <code>install.packages("foieGras")</code> or, more completely: <code>install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))</code>. {foieGras} <code>v1.0-5</code> and later versions probably won’t become available on CRAN.</p>
 </div>
 <div class="section level3">
 <h3 id="from-github-source">From GitHub (source)<a class="anchor" aria-label="anchor" href="#from-github-source"></a>
 </h3>
-<p>To get the very latest but likely unstable <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> version, you can install from GitHub.</p>
+<p>To get the very latest but likely unstable <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> version, you can install from GitHub.</p>
 <p>On PC’s running Windows, ensure you have installed <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a></p>
 <p>On Mac’s, ensure you have installed the Command Line Tools for Xcode by executing <code>xcode-select --install</code> in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed (e.g., <a href="https://github.com/fxcoudert/gfortran-for-macOS/releases" class="external-link uri">https://github.com/fxcoudert/gfortran-for-macOS/releases</a>).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ianjonsen/foieGras@staging"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ianjonsen/aniMotum@staging"</span><span class="op">)</span></span></code></pre></div>
 <p>Note: there can be issues getting compilers to work properly, especially on M1 Macs. Often, this is due to missing or incorrect Xcode Command Line Tools and/or Fortran compiler. If you encounter install and compile issues, you may find a solution in the excellent documentation here <a href="https://github.com/glmmTMB/glmmTMB" class="external-link">glmmTMB</a>. Alternatively, if you don’t care to have the very latest version then installing from R-Universe is the preferred approach. R-Universe automatically builds binary package versions for all common platforms, so you won’t have to worry about compiler software or issues!</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a> is intended to be as easy to use as possible. Here’s a simple example showing how to fit a move persistence model to Argos tracking data and visualise the result:</p>
+<p><a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> is intended to be as easy to use as possible. Here’s a simple example showing how to fit a move persistence model to Argos tracking data and visualise the result:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese</span>, </span>
 <span>               vmax<span class="op">=</span> <span class="fl">4</span>, </span>
@@ -178,8 +173,10 @@
 <span>               control <span class="op">=</span> <span class="fu"><a href="reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="fl">3</span>, pages <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: namespace 'foieGras' is not available and has been replaced</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; by .GlobalEnv when processing object 'fit'</span></span></code></pre></div>
 <p><img src="reference/figures/README-ex1-1.png" width="100%"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
 <span>    what <span class="op">=</span> <span class="st">"predicted"</span>, </span>
 <span>    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=68 +units=km +datum=WGS84"</span><span class="op">)</span></span></code></pre></div>
@@ -191,17 +188,17 @@
 <div class="section level2">
 <h2 id="what-to-do-if-you-encounter-a-problem">What to do if you encounter a problem<a class="anchor" aria-label="anchor" href="#what-to-do-if-you-encounter-a-problem"></a>
 </h2>
-<p>If you are convinced you have encountered a bug or unexpected/inconsistent behaviour when using <a href="https://github.com/ianjonsen/foieGras/" class="external-link">foieGras</a>, you can post an issue <a href="https://github.com/ianjonsen/foieGras/issues" class="external-link">here</a>. First, have a read through the posted issues to see if others have encountered the same problem and whether a solution has been offered. You can reply to an existing issue if you have the same problem and have more details to share or you can submit a new issue. To submit an issue, you will need to <em>clearly</em> describe the unexpected behaviour, include a reproducible example with a small dataset, clearly describe what you expected to happen (but didn’t), and (ideally) post a few screenshots/images that nicely illustrate the problem.</p>
+<p>If you are convinced you have encountered a bug or unexpected/inconsistent behaviour when using <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>, you can post an issue <a href="https://github.com/ianjonsen/aniMotum/issues" class="external-link">here</a>. First, have a read through the posted issues to see if others have encountered the same problem and whether a solution has been offered. You can reply to an existing issue if you have the same problem and have more details to share or you can submit a new issue. To submit an issue, you will need to <em>clearly</em> describe the unexpected behaviour, include a reproducible example with a small dataset, clearly describe what you expected to happen (but didn’t), and (ideally) post a few screenshots/images that nicely illustrate the problem.</p>
 </div>
 <div class="section level2">
 <h2 id="how-to-contribute">How to Contribute<a class="anchor" aria-label="anchor" href="#how-to-contribute"></a>
 </h2>
-<p>Contributions from anyone in the Movement Ecology/Bio-Logging communities are welcome. Consider submitting a feature request <a href="https://github.com/ianjonsen/foieGras/issues/new/choose" class="external-link">here</a> to start a discussion. Alternatively, if your idea is well-developed then you can submit a pull request for evaluation <a href="https://github.com/ianjonsen/foieGras/pulls" class="external-link">here</a>. Unsure about what all this means but still want to discuss your idea? then have a look through the GitHub pages of community-built R packages like <a href="https://github.com/tidyverse/dplyr" class="external-link">tidyverse/dplyr</a> for examples.</p>
+<p>Contributions from anyone in the Movement Ecology/Bio-Logging communities are welcome. Consider submitting a feature request <a href="https://github.com/ianjonsen/aniMotum/issues/new/choose" class="external-link">here</a> to start a discussion. Alternatively, if your idea is well-developed then you can submit a pull request for evaluation <a href="https://github.com/ianjonsen/aniMotum/pulls" class="external-link">here</a>. Unsure about what all this means but still want to discuss your idea? then have a look through the GitHub pages of community-built R packages like <a href="https://github.com/tidyverse/dplyr" class="external-link">tidyverse/dplyr</a> for examples.</p>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
 </h2>
-<p>Please note that the foieGras project is released with a <a href="https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<p>Please note that the aniMotum project is released with a <a href="https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
@@ -216,7 +213,7 @@
 - <strong>Innovasea/Vemco</strong><br>
 Additional support was provided by France’s Centre de Synthèse et d’Analyse sur la Biodiversite, part of the Fondation pour la Recherche sur la Biodiversité.</p>
 <p>Example southern elephant seal data included in the package were sourced from the IMOS Animal Tracking Facility. IMOS is a national collaborative research infrastructure, supported by the Australian Government and operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent. IMOS supported elephant seal fieldwork on Iles Kerguelen conducted as part of the IPEV program No 109 (PI H. Weimerskirch) and the SNO-MEMO program (PI C. Guinet). SMRU SRDL-CTD tags were partly funded by CNES-TOSCA and IMOS. All tagging procedures were approved and executed under University of Tasmania Animal Ethics Committee guidelines.</p>
-<p>Animal silhouettes used in the <code>foieGras</code> logo were obtained and modified from sources:<br>
+<p>Animal silhouettes used in the <code>aniMotum</code> logo were obtained and modified from sources:<br>
 - southern elephant seal, Anton Van de Putte (<a href="https://twitter.com/Antonarctica" class="external-link">@AntonArctica</a>, Université Libre de Bruxelles)<br>
 - humpback whale, Chris Huh via <a href="http://phylopic.org" class="external-link">Phylopic.org</a> Creative Commons Attribution-ShareAlike 3.0 Unported<br>
 - mallard duck, Maija Karala via <a href="http://phylopic.org" class="external-link">Phylopic.org</a> Creative Commons Attribution-ShareAlike 3.0 Unported<br>
@@ -270,8 +267,8 @@ Additional support was provided by France’s Centre de Synthèse et d’Analyse
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://ianjonsen.r-universe.dev" class="external-link"><img src="https://ianjonsen.r-universe.dev/badges/foieGras" alt="foieGras status badge"></a></li>
-<li><a href="https://codecov.io/github/ianjonsen/foieGras?branch=master" class="external-link"><img src="https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
+<li><a href="https://ianjonsen.r-universe.dev" class="external-link"><img src="https://ianjonsen.r-universe.dev/badges/aniMotum" alt="aniMotum status badge"></a></li>
+<li><a href="https://codecov.io/github/ianjonsen/aniMotum?branch=master" class="external-link"><img src="https://codecov.io/gh/ianjonsen/aniMotum/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
 <li><a href="https://doi.org/10.5281/zenodo.2628481" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg" alt="DOI"></a></li>
 </ul>
 </div>
