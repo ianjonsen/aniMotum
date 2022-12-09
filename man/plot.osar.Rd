@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} \code{osar} object with class \code{osar}}
+\item{x}{a \code{aniMotum} \code{osar} object with class \code{osar}}
 
 \item{type}{type of residual plot to generate: time-series (ts; default), qqnorm
 (qq), or acf}
@@ -36,7 +36,7 @@ see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}} for options)}
 }
 \description{
 plot \strong{One-Step-Ahead (prediction) residuals} from a
-\code{foieGras} \code{osar} object
+\code{aniMotum} \code{osar} object
 }
 \examples{
 ## generate a fG_ssm fit object (call is for speed only)

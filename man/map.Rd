@@ -22,9 +22,9 @@ map(
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df} or (old) \code{fG_ssm}}
+\item{x}{a \code{aniMotum} ssm fit object with class \code{ssm_df} or (old) \code{fG_ssm}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{mpm_df} or (old)
+\item{y}{optionally, a \code{aniMotum} mpm fit object with class \code{mpm_df} or (old)
 \code{fG_mpm}}
 
 \item{what}{specify which location estimates to map: fitted, predicted or
@@ -78,7 +78,7 @@ persistence along a track (default = FALSE).}
 a map as a ggplot2 object
 }
 \description{
-map foieGras-estimated locations and behavioural indices with
+map aniMotum-estimated locations and behavioural indices with
 coastline and projection options
 }
 \examples{

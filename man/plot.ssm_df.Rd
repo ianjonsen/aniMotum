@@ -20,7 +20,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
+\item{x}{a \code{aniMotum} ssm fit object with class \code{ssm_df}}
 
 \item{what}{specify which location estimates to display on time-series plots:
 fitted, predicted, or rerouted}

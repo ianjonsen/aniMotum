@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_data.R
 \name{format_data}
 \alias{format_data}
-\title{Coerce input data into expected \code{foieGras} format}
+\title{Coerce input data into expected \code{aniMotum} format}
 \usage{
 format_data(
   x,
@@ -48,7 +48,7 @@ these variables are missing from the input data.}
 in \code{tz = 'UTC'}. A list of valid timezone names can be viewed via \code{OlsonNames()}}
 }
 \value{
-a data.frame or sf-tibble of input data in expected foieGras format.
+a data.frame or sf-tibble of input data in expected aniMotum format.
 Additional columns required by \code{fit_ssm()}, if missing, will be added to the
 formatted tibble: \code{smaj}, \code{smin}, \code{eor}, \code{lonerr}, and \code{laterr}.
 }

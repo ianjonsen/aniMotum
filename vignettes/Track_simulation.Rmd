@@ -12,12 +12,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(foieGras)
+require(aniMotum)
 require(ggplot2)
 require(patchwork)
 ```
 
-`foieGras` provides 2 track simulation functions for simulating random tracks from a few different movement process models, `sim()`, and for simulating random tracks from fitted SSM models, `sim_fit()`.
+`aniMotum` provides 2 track simulation functions for simulating random tracks from a few different movement process models, `sim()`, and for simulating random tracks from fitted SSM models, `sim_fit()`.
 
 ## `sim()`
 
@@ -83,7 +83,7 @@ The `rw` (red) and `crw` (orange) SSM's yield similar, reasonable fits to the RW
 
 ## `sim_fit()`
 
-The `sim_fit` function is rather different, taking a `foieGras` SSM fit object (class `ssm_df`) and simulating replicate tracks by using the movement parameter estimates from the fitted model. Currently, tracks can be simulated from `rw` and `crw` SSM model fits. Tracks can be simulated from either the observation times (`what = "fitted"`) or the prediction times (`what = "predicted"`) and, thus, are constrained to have the same number of locations. The simulated tracks are otherwise unconstrained and should *not* be considered as resampled tracks suitable for exploring uncertainty in the SSM-estimated track. They are useful for habitat usage modelling, to represent habitat that is potentially available to a collection of tracked individuals (e.g., Hindell et al. 2020).
+The `sim_fit` function is rather different, taking a `aniMotum` SSM fit object (class `ssm_df`) and simulating replicate tracks by using the movement parameter estimates from the fitted model. Currently, tracks can be simulated from `rw` and `crw` SSM model fits. Tracks can be simulated from either the observation times (`what = "fitted"`) or the prediction times (`what = "predicted"`) and, thus, are constrained to have the same number of locations. The simulated tracks are otherwise unconstrained and should *not* be considered as resampled tracks suitable for exploring uncertainty in the SSM-estimated track. They are useful for habitat usage modelling, to represent habitat that is potentially available to a collection of tracked individuals (e.g., Hindell et al. 2020).
 
 ### Simulate tracks from an SSM fit and plot:
 
@@ -106,7 +106,7 @@ In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast 
 ### Simulate tracks with a potential function to help avoid land:
 
 ```{r sim_fit potential fn, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
-load(system.file("extdata/grad.rda", package = "foieGras"))
+load(system.file("extdata/grad.rda", package = "aniMotum"))
 set.seed(pi)
 st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-350,-350))
 

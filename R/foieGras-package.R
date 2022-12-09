@@ -1,9 +1,9 @@
-##' \pkg{foieGras}
+##' \pkg{aniMotum}
 ##'
 ##' fit Continuous-Time Random Walk and Correlated Random Walk state-space models to filter Argos Least Squares or Kalman Filter location data
 ##'
-##' @name foieGras-package
-##' @aliases foieGras foieGras-package
+##' @name aniMotum-package
+##' @aliases aniMotum aniMotum-package
 ##' @docType package
 ##' @author
 ##' **Maintainer:** Ian Jonsen <ian.jonsen@mq.edu.au> [ORCID](https://orcid.org/0000-0001-5423-6076)  
@@ -13,14 +13,15 @@
 ##' W. James Grecian [ORCID](https://orcid.org/0000-0002-6428-719X)  
 ##'
 ##' @seealso Useful Links:
-##' * [https://ianjonsen.github.io/foieGras/](https://ianjonsen.github.io/foieGras/)
-##' * [https://github.com/ianjonsen/foieGras/](https://github.com/ianjonsen/foieGras/)
-##' * Report bugs/issues at [https://github.com/ianjonsen/foieGras/issues/](https://github.com/ianjonsen/foieGras/issues/)
+##' * [https://ianjonsen.github.io/aniMotum/](https://ianjonsen.github.io/aniMotum/)
+##' * [https://github.com/ianjonsen/aniMotum/](https://github.com/ianjonsen/aniMotum/)
+##' * Report bugs/issues at [https://github.com/ianjonsen/aniMotum/issues/](https://github.com/ianjonsen/aniMotum/issues/)
 ##' 
+##' @references Jonsen ID, Grecian WJ, Phillips L, et al. (2023) `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Methods in Ecology and Evolution. Accepted 06/12/2022.
 ##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31.
 ##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
-##'
-##' @keywords foieGras
+##' 
+##' @keywords aniMotum
 ##' @importFrom utils data flush.console globalVariables
 ##' @importFrom dplyr %>% select mutate slice group_by
 ##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols

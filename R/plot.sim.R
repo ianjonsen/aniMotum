@@ -2,7 +2,7 @@
 ##'
 ##' @description visualize simulated tracks from a `sim` data.frame
 ##'
-##' @param x a `foieGras` simulation data.frame with class `sim`
+##' @param x a `aniMotum` simulation data.frame with class `sim`
 ##' @param type either 1, a 1-D time-series of speed (if model is `rw` or `crw` 
 ##' specified behavioural states) or move persistence (g; if model is `mp`); or 
 ##' 2 (default), a 2-D track with location coloured by move persistence (g; if 

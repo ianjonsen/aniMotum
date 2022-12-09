@@ -2,12 +2,12 @@
 % Please edit documentation in R/grab.R
 \name{grab}
 \alias{grab}
-\title{grab \code{tibble}'s by name from a \code{foieGras} model object}
+\title{grab \code{tibble}'s by name from a \code{aniMotum} model object}
 \usage{
 grab(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = FALSE)
 }
 \arguments{
-\item{x}{a \code{foieGras} \code{ssm_df} or \code{mpm_df} model object}
+\item{x}{a \code{aniMotum} \code{ssm_df} or \code{mpm_df} model object}
 
 \item{what}{the tibble to be grabbed; either \code{fitted}, \code{predicted},
 \code{rerouted} (\code{ssm_df} only), or \code{data} (single letters can be used).}

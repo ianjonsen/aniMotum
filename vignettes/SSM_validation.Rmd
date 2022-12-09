@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(foieGras)
+require(aniMotum)
 ```
 
 Just like any other statistical model fitting exercise, validating SSM fits to tracking data is an essential part of any analysis. SSM fits can be visualized quickly using the generic `plot` function on model fit objects:
@@ -39,7 +39,7 @@ plot(fit.rw, "p", type = 2, alpha = 0.1)
 
 This option provides an intuitive view of the estimated track (gold) through the observations (blue), along with a 2-dimensional representation of the location uncertainty (pale gold 95% confidence ellipses). Here, we use the `alpha` argument to increase the transparency of the confidence ellipses to aid visualization in regions where many overlay one another (upper left and lower right in figure).
 
-Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a one-step-ahead prediction residual, provides a useful if computationally demanding alternative. In `foieGras`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:
+Residual plots are important for validating models, but classical Pearson residuals, for example, are not appropriate for state-space models. Instead, a one-step-ahead prediction residual, provides a useful if computationally demanding alternative. In `aniMotum`, prediction residuals from state-space model fits are calculated using the `osar` function and can be visualized as time-series plots, Q-Q plots, or autocorrelation functions:
 ```{r osar plots1, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 # use patchwork package to arrange plot.osar options
 require(patchwork)
@@ -71,7 +71,7 @@ c(fit.rw$ssm[[1]]$AICc, fit.crw$ssm[[1]]$AICc)
 
 As calculation of prediction residuals can be computationally demanding, typically requiring more time than fitting the model, especially for multiple individual tracks, the `osar` function is automatically implemented in parallel when calculating residuals for more than 2 tracks. 
 
-Users wishing to explore residual diagnostics for hierarchical models (including state-space models) should refer to the `DHARMa` R package, which has more details on diagnostics for hierarchical models. Although `foieGras` is not able to make use of the `DHARMa` package, its vignette and references therein can be a useful guide for diagnosing model fits (Hartig, 2022).
+Users wishing to explore residual diagnostics for hierarchical models (including state-space models) should refer to the `DHARMa` R package, which has more details on diagnostics for hierarchical models. Although `aniMotum` is not able to make use of the `DHARMa` package, its vignette and references therein can be a useful guide for diagnosing model fits (Hartig, 2022).
 
 
 ## References

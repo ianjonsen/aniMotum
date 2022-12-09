@@ -1,5 +1,5 @@
 require(ggplot2, quietly = TRUE)
-require(foieGras, quietly = TRUE)
+require(aniMotum, quietly = TRUE)
 require(dplyr, quietly = TRUE)
 require(sf, quietly = TRUE)
 require(hexSticker, quietly = TRUE)
@@ -44,7 +44,7 @@ m1 <- ggdraw() +
 
 s <- sticker(
   m1,
-  package = "foieGras",
+  package = "aniMotum",
   p_size = 6,
   p_y = 1.6,
   p_family = "sans",

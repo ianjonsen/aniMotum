@@ -44,7 +44,7 @@ be applied, in order, to: 1) estimated locations,; 2) confidence ellipses;
 \item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }
 \description{
-map foieGras-estimated locations from a single track with
+map aniMotum-estimated locations from a single track with
 a behavioural index
 }
 \keyword{internal}

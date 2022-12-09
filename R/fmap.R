@@ -1,10 +1,10 @@
 ##' @title fmap
 ##'
-##' @description map foieGras fitted or predicted locations, with or without
+##' @description map aniMotum fitted or predicted locations, with or without
 ##' Argos observations, optionally apply a different projection
 ##'
-##' @param x a \code{foieGras} ssm fit object with class `ssm_df`
-##' @param y optionally, a \code{foieGras} mpm fit object with class `mpm_df`; 
+##' @param x a \code{aniMotum} ssm fit object with class `ssm_df`
+##' @param y optionally, a \code{aniMotum} mpm fit object with class `mpm_df`; 
 ##' default is NULL
 ##' @param what specify which location estimates to map: fitted, predicted or
 ##' rerouted
@@ -73,16 +73,16 @@ fmap <- function(x,
                  ...) {
   
   cat(.Deprecated("map", 
-              package = "foieGras", 
-              msg = "As of foieGras 1.0-5, 'fmap' is deprecated. \nUse 'map' instead."))
+              package = "aniMotum", 
+              msg = "As of aniMotum 1.0-5, 'fmap' is deprecated. \nUse 'map' instead."))
   
   if(FALSE) {
     what <- match.arg(what)
     
     if (!inherits(x, "ssm_df"))
-      stop("x must be a foieGras ssm fit object with class `ssm_df`")
+      stop("x must be a aniMotum ssm fit object with class `ssm_df`")
     if (!inherits(y, "mpm_df") & !is.null(y))
-      stop("y must either be NULL or a foieGras mpm fit object with class `mpm_df`")
+      stop("y must either be NULL or a aniMotum mpm fit object with class `mpm_df`")
     if (map_type != "default" &
         !(
           requireNamespace("rosm", quietly = TRUE) |
@@ -124,7 +124,7 @@ fmap <- function(x,
       } else if (length(unique(sapply(x$ssm, function(.)
         st_crs(.$predicted)$epsg))) > 1) {
         stop(
-          "individual foieGras ssm fit objects with differing projections not currently supported"
+          "individual aniMotum ssm fit objects with differing projections not currently supported"
         )
       }
       

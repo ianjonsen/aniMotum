@@ -90,7 +90,7 @@ mpmf <-
         parameters = parameters,
         random = rnd,
         method = control$method,
-        DLL = "foieGras",
+        DLL = "aniMotum",
         silent = !ifelse(control$verbose == 2, TRUE, FALSE),
         inner.control = inner.control
       )

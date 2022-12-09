@@ -45,7 +45,7 @@
 ##' 
 ##' We recommend that users working on complex rerouting problems and/or 
 ##' requiring higher resolution land barrier data work with the `pathroutr`
-##' package directly by first exctracting foieGras-estimated locations with 
+##' package directly by first exctracting aniMotum-estimated locations with 
 ##' `grab`. Higher resolution land barrier data (polygon shapefiles) must be
 ##' obtained independently.
 ##' 
@@ -81,7 +81,7 @@ route_path <-
     
     if(requireNamespace("pathroutr", quietly = TRUE)) {
     
-    stopifnot("x must be either a foieGras ssm fit object with class `ssm_df`
+    stopifnot("x must be either a aniMotum ssm fit object with class `ssm_df`
          or a `sim_fit` object containing the paths simulated from a `ssm` fit object" = 
                 any(inherits(x, "ssm_df"), inherits(x, "sim_fit"), inherits(x, "simfit")))
       
@@ -115,7 +115,7 @@ route_path <-
       st_make_valid()
     
     if (inherits(x, "ssm_df")) {
-      # unnest foieGras ssm object
+      # unnest aniMotum ssm object
       df <- x %>% grab(what)
     
       # this should be trimmed to reduce computation time
@@ -125,7 +125,7 @@ route_path <-
         st_transform(crs = 3857)
       
     } else if (inherits(x, "sim_fit")) {
-      # unnest foieGras sim_fit object
+      # unnest aniMotum sim_fit object
       df <- x %>% unnest(cols = c(sims))
       
       # this should be trimmed to reduce computation time
@@ -172,7 +172,7 @@ route_path <-
         }
       })
         
-      # pull the corrected points from the object and reformat for foieGras
+      # pull the corrected points from the object and reformat for aniMotum
       df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
         if(!is.null(x)) {
           st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
@@ -255,7 +255,7 @@ route_path <-
              rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
              pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
     
-    # pull the corrected points from the object and reformat for foieGras
+    # pull the corrected points from the object and reformat for aniMotum
     df_rrt <- df_rrt %>%
       select(id, rep, pts_fix) %>%
       mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
@@ -267,7 +267,7 @@ route_path <-
     # remove nesting by individual path
     df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
     
-    # format to foieGras object - including nesting by animal id
+    # format to aniMotum object - including nesting by animal id
     df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
     class(df_rrt) <- append("rws", class(df_rrt))
     class(df_rrt) <- append("sim_fit", class(df_rrt))

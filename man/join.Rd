@@ -14,9 +14,9 @@ join(
 )
 }
 \arguments{
-\item{ssm}{a \code{foieGras} ssm fitted model object}
+\item{ssm}{a \code{aniMotum} ssm fitted model object}
 
-\item{mpm}{a \code{foieGras} mpm fitted model object}
+\item{mpm}{a \code{aniMotum} mpm fitted model object}
 
 \item{what.ssm}{specifies whether ssm \code{predicted} or \code{fitted} values are to be extracted}
 
@@ -38,7 +38,7 @@ a single tbl with all individuals
 \code{join()} joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using \code{as_sf = FALSE}.
 }
 \examples{
-## load example foieGras fit objects (to save time)
+## load example aniMotum fit objects (to save time)
 ## generate a ssm fit object
 xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, control = ssm_control(verbose = 0))
 xm <- fit_mpm(xs, what = "p", model = "mpm")

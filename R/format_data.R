@@ -1,4 +1,4 @@
-##' @title Coerce input data into expected `foieGras` format
+##' @title Coerce input data into expected `aniMotum` format
 ##'
 ##' @description format data by mapping supplied variable names to those expected by
 ##' `fit_ssm()`, and ensuring variables are put into the expected order. Can be 
@@ -30,7 +30,7 @@
 ##' @param tz the timezone the applies to the data/time variable if they are not 
 ##' in `tz = 'UTC'`. A list of valid timezone names can be viewed via `OlsonNames()`
 ##' 
-##' @return a data.frame or sf-tibble of input data in expected foieGras format. 
+##' @return a data.frame or sf-tibble of input data in expected aniMotum format. 
 ##' Additional columns required by `fit_ssm()`, if missing, will be added to the 
 ##' formatted tibble: `smaj`, `smin`, `eor`, `lonerr`, and `laterr`.
 ##' 
@@ -87,11 +87,11 @@ format_data <- function(x,
   
   ## check that specified mandatory variable names are in the input data
   stopifnot("An id variable must be included in the input data; 
-            see vignette('Overview', package = 'foieGras')" = id %in% names(x))
+            see vignette('Overview', package = 'aniMotum')" = id %in% names(x))
   stopifnot("A date/time variable must be included in the input data; 
-            see vignette('Overview', package = 'foieGras')" = date %in% names(x))
+            see vignette('Overview', package = 'aniMotum')" = date %in% names(x))
   stopifnot("Coordinate variables must be included in the input data; 
-            see vignette('Overview', package = 'foieGras')" = all(coord %in% names(x)))
+            see vignette('Overview', package = 'aniMotum')" = all(coord %in% names(x)))
  
   ## if input data is an 'sf' object then check that a valid crs exists
   if(inherits(x, "sf") & is.na(st_crs(x))) {

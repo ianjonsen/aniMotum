@@ -28,9 +28,9 @@ fmap(
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} ssm fit object with class \code{ssm_df}}
+\item{x}{a \code{aniMotum} ssm fit object with class \code{ssm_df}}
 
-\item{y}{optionally, a \code{foieGras} mpm fit object with class \code{mpm_df};
+\item{y}{optionally, a \code{aniMotum} mpm fit object with class \code{mpm_df};
 default is NULL}
 
 \item{what}{specify which location estimates to map: fitted, predicted or
@@ -83,6 +83,6 @@ detailed map background.}
 \item{...}{additional arguments passed to \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile}}
 }
 \description{
-map foieGras fitted or predicted locations, with or without
+map aniMotum fitted or predicted locations, with or without
 Argos observations, optionally apply a different projection
 }

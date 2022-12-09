@@ -1,7 +1,7 @@
-##' @title calculate one-step-ahead (prediction) residuals from a `foieGras` 
+##' @title calculate one-step-ahead (prediction) residuals from a `aniMotum` 
 ##' `ssm` fit
 ##'
-##' @param x a `foieGras` `ssm` fit object with class `ssm_df`
+##' @param x a `aniMotum` `ssm` fit object with class `ssm_df`
 ##' @param method method to calculate prediction residuals 
 ##' (default is `oneStepGaussianOffMode`; see [TMB::oneStepPredict] for details)
 ##' @param ... other arguments to [TMB::oneStepPredict]
@@ -70,7 +70,7 @@ osar <- function(x, method = "fullGaussian", ...)
     })
     }
   } else {
-    stop("a foieGras ssm fit object with class `ssm_df` is required")
+    stop("a aniMotum ssm fit object with class `ssm_df` is required")
   }
   
   cr <- sapply(r, function(.) inherits(., "try-error"))

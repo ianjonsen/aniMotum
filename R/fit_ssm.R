@@ -11,7 +11,7 @@
 ##'
 ##' @param x a `data.frame`, `tibble` or `sf-tibble` of observations, depending 
 ##' on the tracking data type. See more in the Details section, below, and the 
-##' Overview vignette \code{vignette("Overview", package = "foieGras")}.
+##' Overview vignette \code{vignette("Overview", package = "aniMotum")}.
 ##' @param vmax max travel rate (m/s) passed to [trip::sda] to identify
 ##'  outlier locations
 ##' @param ang angles (deg) of outlier location "spikes" 
@@ -29,20 +29,20 @@
 ##' prediction and locations are only estimated at observation times. 
 ##' @param emf optionally supplied data.frame of error multiplication factors for 
 ##' Argos location quality classes. Default behaviour is to use the factors 
-##' supplied by [foieGras::emf]
+##' supplied by [aniMotum::emf]
 ##' @param map a named list of parameters as factors that are to be fixed during
 ##' estimation, e.g., `list(psi = factor(NA))`
 ##' @param parameters a list of initial values for all model parameters and
 ##' unobserved states, default is to let sfilter specify these. Only play with
 ##' this if you know what you are doing
 ##' @param fit.to.subset fit the SSM to the data subset determined by 
-##' [foieGras::prefilter] (default is TRUE)
+##' [aniMotum::prefilter] (default is TRUE)
 ##' @param control list of control settings for the outer optimizer 
-##' (see [foieGras::ssm_control] for details)
+##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
 ##' @param ... variable name arguments passed to format_data, see 
-##' [foieGras::format_data] for details 
+##' [aniMotum::format_data] for details 
 ##'
 ##' @details `x` is a `data.frame`, `tibble`, or `sf-tibble` with 5, 7 or 8 
 ##' columns (the default format), depending on the tracking data type. Argos 
@@ -56,12 +56,12 @@
 ##' to have error variances 10x smaller than Argos class 3 variances, but unlike 
 ##' Argos error variances the GPS variances are the same for longitude and latitude. 
 ##' 
-##' The [foieGras::format_data] function can be used as a data pre-processing 
+##' The [aniMotum::format_data] function can be used as a data pre-processing 
 ##' step or called automatically within `fit_ssm` to restructure data that is 
 ##' not in one of the above default formats. The minimum essential variables: 
 ##' **`id`, `date`, `lc`, `lon`, `lat`** must exist in the input data but they can
 ##' have different names and exist in a different column order. See 
-##' [foieGras::format_data] for details.
+##' [aniMotum::format_data] for details.
 ##' 
 ##' See [emf] for details on how to modify these assumptions. 
 ##' 

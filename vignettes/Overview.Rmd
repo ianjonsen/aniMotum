@@ -12,17 +12,17 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(foieGras)
+require(aniMotum)
 ```
 
 ## Disclaimer
 
-This vignette is an extended set of examples to highlight `foieGras`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of these vignettes. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
+This vignette is an extended set of examples to highlight `aniMotum`'s functionality. Please, do NOT interpret these examples as instructions for conducting analysis of animal movement data. Numerous essential steps in a proper analysis have been left out of these vignettes. It is your job to understand your data, ensure you are asking the right questions of your data, and that the analyses you undertake appropriately reflect those questions. We can not do this for you!
 
 
 ### Models
 
-This is an overview of how to use `foieGras` to filter animal track locations obtained via the Argos satellite system or (possibly) another tracking system. `foieGras` provides three state-space models (SSM's), two for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:
+This is an overview of how to use `aniMotum` to filter animal track locations obtained via the Argos satellite system or (possibly) another tracking system. `aniMotum` provides three state-space models (SSM's), two for filtering (ie. estimating "true" locations and associated movement model parameters, while accounting for error-prone observations), and another for filtering and estimating move persistence - an index of movement behaviour:
 
 -   a simple *Random Walk* model, `rw`
 -   a *Correlated Random Walk* model, `crw`
@@ -30,27 +30,27 @@ This is an overview of how to use `foieGras` to filter animal track locations ob
 
 the models are continuous-time models, that is, they account for the time intervals between successive observations, thereby naturally accounting for the often irregularly-timed nature of animal tracking data. We won't dwell on the details of the models here (see Jonsen et al. 2020 for details on the `crw` model), except to say there may be advantages to choosing one over the other in certain circumstances. The *Random Walk* model tends not to deal well with small to moderate gaps (relative to a specified time step) in observed locations and can over-fit to particularly noisy data. The *Correlated Random Walk* model can often deal better with these small to moderate data gaps and appropriately smooth through noisy data but tends to estimate nonsensical (i.e., 'looping' artefacts) movement through longer data gaps, especially when animals are mostly stationary during those gaps. The *Move Persistence* model can be more robust to data gaps up to a point, and estimates time-varying move persistence $\gamma_t$ along the track, which provides an index of how an animal's movement behaviour varies in space and time based on the autocorrelation of successive movements. If you have Argos location data and your goal is to infer changes in movement behaviour along tracks then estimating locations and move persistence simultaneously within a state-space model is the preferred approach, as location uncertainty is accounted for in the move persistence estimates.
 
-Additionally, `foieGras` provides separate models (`mpm`, `jmpm`) for estimating move persistence *after* fitting either the `rw` or `crw` SSM (see Jonsen et al. 2019 for details). Using the `fit_mpm` function, the `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model may better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations or to time-irregular locations. See Auger-Méthé et al. (2017) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used, but they assume that locations are known without error.
+Additionally, `aniMotum` provides separate models (`mpm`, `jmpm`) for estimating move persistence *after* fitting either the `rw` or `crw` SSM (see Jonsen et al. 2019 for details). Using the `fit_mpm` function, the `mpm` is fit to individual tracks, whereas the `jmpm` is fit to multiple tracks simultaneously with a variance parameter that is estimated jointly across the tracks. This latter model may better resolve subtle changes in movement behaviour along tracks that lack much contrast in movements. Both models can be fit to time-regularized locations or to time-irregular locations. See Auger-Méthé et al. (2017) for an example of the latter. These models can be fit to animal tracks, regardless of the geolocation technology used, but they assume that locations are known without error.
 
 
 ### Data
 
-`foieGras` can accept input data in several possible formats. Here, we outline the default formats but users are not restricted to using these. Input data with variable names and/or column ordering that differs from the defaults can be used, provided the essential minimum data elements are present to allow the SSM's to be fitted: a unique animal/track identifier, date-time of each observation, location quality class, and longitude and latitude (or projected x and y) coordinates. We expand on these and additional variables in the following sections. 
+`aniMotum` can accept input data in several possible formats. Here, we outline the default formats but users are not restricted to using these. Input data with variable names and/or column ordering that differs from the defaults can be used, provided the essential minimum data elements are present to allow the SSM's to be fitted: a unique animal/track identifier, date-time of each observation, location quality class, and longitude and latitude (or projected x and y) coordinates. We expand on these and additional variables in the following sections. 
 
-A pre-processing function `format_data()` can be used to correctly structure the input data for use in `foieGras`. This function checks for the presence of the essential variables, converts date-time to `POSIX` format, maps custom variable names onto the default names, and puts the variables into the default column order expected by `foieGras`. Users may choose to call `format_data()` themselves, prior to fitting an SSM with `fit_ssm()`, or they can allow `fit_ssm()` to format the data automatically. We illustrate these approaches in the "Fitting a model" section, below.
+A pre-processing function `format_data()` can be used to correctly structure the input data for use in `aniMotum`. This function checks for the presence of the essential variables, converts date-time to `POSIX` format, maps custom variable names onto the default names, and puts the variables into the default column order expected by `aniMotum`. Users may choose to call `format_data()` themselves, prior to fitting an SSM with `fit_ssm()`, or they can allow `fit_ssm()` to format the data automatically. We illustrate these approaches in the "Fitting a model" section, below.
 
 
 #### Argos Least-Squares (LS) location data
-We'll start out with the original Argos data, CLS Argos' Least-Squares-based (LS) locations. These data contain the minimum information required by `foieGras`'s SSM's. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
+We'll start out with the original Argos data, CLS Argos' Least-Squares-based (LS) locations. These data contain the minimum information required by `aniMotum`'s SSM's. A minimal input `data.frame` or `tibble`, containing only the information required to fit the SSM, looks like this:
 
 ```{r data 1, echo = FALSE}
-data(sese, package = "foieGras")
+data(sese, package = "aniMotum")
 head(data.frame(sese))
 ```
 
 The (default) column names represent the following:  
 - `id` a unique identifier for each animal (or track) in the `data.frame`  
-- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS` (or `YYYY/mm/dd HH:MM:SS`). These can be text strings, in which case `foieGras` converts them to `POSIX` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then you must specify this via the `tz` argument to `format_data()`. A list of valid timezone names can be viewed via `OlsonNames()`.  
+- `date` a date-time variable in the form `YYYY-mm-dd HH:MM:SS` (or `YYYY/mm/dd HH:MM:SS`). These can be text strings, in which case `aniMotum` converts them to `POSIX` format and assumes the timezone is `UTC`. If the date-times are from a local timezone then you must specify this via the `tz` argument to `format_data()`. A list of valid timezone names can be viewed via `OlsonNames()`.  
 - `lc` the location class variable common to Argos data, with classes in the set: 3, 2, 1, 0, A, B, Z.  
 - `lon` the longitude variable  
 - `lat` the latitude variable  
@@ -61,7 +61,7 @@ The `lc` values determine the measurement error variances (based on independent 
 Since 2011, the default Argos location data uses CLS Argos' Kalman Filter (KF) algorithm. These data include error ellipse information for each observed location in the form of 3 variables: ellipse semi-major axis length, ellipse semi-minor axis length, and ellipse orientation. A minimal input `data.frame` or `tibble` for Argos KF data looks like this:
 
 ```{r data 2, echo = FALSE}
-data(ellie, package = "foieGras")
+data(ellie, package = "aniMotum")
 head(data.frame(ellie))
 ```
 
@@ -74,7 +74,7 @@ Here, the error ellipse parameters for each observation define the measurement e
 
 
 #### GPS location data
-The `foieGras` SSM's can be fit to GPS location data, for example to deal with (rare) extreme locations and/or to time-regularise locations. The input data format is the same as for Argos LS data, but the `lc` class is set to `G` for all GPS locations:
+The `aniMotum` SSM's can be fit to GPS location data, for example to deal with (rare) extreme locations and/or to time-regularise locations. The input data format is the same as for Argos LS data, but the `lc` class is set to `G` for all GPS locations:
 
 ```{r data 3, echo = FALSE}
   data.frame(
@@ -88,7 +88,7 @@ The `foieGras` SSM's can be fit to GPS location data, for example to deal with (
 
 
 #### Light-level geolocation data
-The `foieGras` SSM's can be fit to processed light-level geolocation data, when they include longitude and latitude error SD's (`lonerr`, `laterr`; units in degrees). In this case, the `lc` class is set to `GL` for all geolocation observations:
+The `aniMotum` SSM's can be fit to processed light-level geolocation data, when they include longitude and latitude error SD's (`lonerr`, `laterr`; units in degrees). In this case, the `lc` class is set to `GL` for all geolocation observations:
 
 ```{r data 4, echo = FALSE}
   data.frame(
@@ -102,14 +102,14 @@ The `foieGras` SSM's can be fit to processed light-level geolocation data, when 
   )
 ```
 
-We caution users, that light-level geolocation errors can be (highly) non-Gaussian, depending on the species, tag technology, and algorithm used to estimate location from the light-level data. For example, we have observed strongly non-Gaussian location uncertainty in tracks of highly migratory tunas that traverse very different water masses in both the vertical and horizontal directions. Because `foieGras`'s SSM's assume bi-variate Normal location errors, fitting to geolocations with non-Gaussian errors would not be appropriate and likely result in highly biased location estimates. Geolocation data collected from birds may be less prone to this issue, but we urge users to explore both the uncertainty in their tracking data and the algorithm used to estimate locations from light-level data.
+We caution users, that light-level geolocation errors can be (highly) non-Gaussian, depending on the species, tag technology, and algorithm used to estimate location from the light-level data. For example, we have observed strongly non-Gaussian location uncertainty in tracks of highly migratory tunas that traverse very different water masses in both the vertical and horizontal directions. Because `aniMotum`'s SSM's assume bi-variate Normal location errors, fitting to geolocations with non-Gaussian errors would not be appropriate and likely result in highly biased location estimates. Geolocation data collected from birds may be less prone to this issue, but we urge users to explore both the uncertainty in their tracking data and the algorithm used to estimate locations from light-level data.
 
 
 #### Projected location data
-Users can provide projected location data as an `sf-tibble` or `sf data.frame`. By default, `foieGras`'s SSM's fit to locations that are transformed to the Mercator projection (EPSG 3395) and estimated locations are back-transformed to spherical coordinates (lon, lat). When an `sf`-projected data set is supplied, the `foieGras` SSM's are fit to locations on the supplied projection (`foieGras` ensures that distance units are set to km). Here is an example `sf-tibble` Argos data set in a polar stereographic projection:
+Users can provide projected location data as an `sf-tibble` or `sf data.frame`. By default, `aniMotum`'s SSM's fit to locations that are transformed to the Mercator projection (EPSG 3395) and estimated locations are back-transformed to spherical coordinates (lon, lat). When an `sf`-projected data set is supplied, the `aniMotum` SSM's are fit to locations on the supplied projection (`aniMotum` ensures that distance units are set to km). Here is an example `sf-tibble` Argos data set in a polar stereographic projection:
 
 ```{r data 5, echo = FALSE, message=FALSE}
-data(ellie, package = "foieGras")
+data(ellie, package = "aniMotum")
 foo <- sf::st_as_sf(ellie, coords=c("lon","lat"), crs = "+proj=longlat +ellps=WGS84 +no_defs") 
 foo <- sf::st_transform(foo, crs = "+proj=stere +lat_0=-60 +lon_0=85 +ellps=WGS84 +units=km +no_defs")
 head(foo)
@@ -131,7 +131,7 @@ Users can fit SSM's to data where a combination of Argos, GPS or light-level geo
   )
 ```
 
-These mixtures are possible because the `foieGras` SSM's apply the most appropriate measurement error model for each observation, based on its location class and error information (i.e., numeric values vs NA's).
+These mixtures are possible because the `aniMotum` SSM's apply the most appropriate measurement error model for each observation, based on its location class and error information (i.e., numeric values vs NA's).
 
 
 ### Fitting a model
@@ -151,14 +151,14 @@ fit <-
 These are the minimum arguments required: the input data, the model (`rw`, `crw`, or `mp`) and the time.step (in h) to which locations are predicted. Additional control can be exerted over the data formatting and pre-filtering steps, via the `id`, `date`, `lc`, `coord`, `epar` and `sderr` variable name arguments, and via the `vmax`, `ang`, `distlim`, `min.dt`, and `spdf` pre-filtering arguments (see `?fit_ssm` for details). The defaults for these arguments are quite conservative (for non-flying species), usually leading to relative few observations being flagged to be ignored by the SSM. Additional control over the optimization can also be exerted via the `control = ssm_control()` argument, see see `vignette('SSM_fitting')` and `?ssm_control` for more details.
 
 #### Custom data formats
-Users do not need to adhere to the default `foieGras` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` of Argos LS data as input:
+Users do not need to adhere to the default `aniMotum` data formatting presented above, so long as their input data contain the essential variables. The variables can have arbitrary names and be in any order. Here is an example using a custom formatted `data.frame` of Argos LS data as input:
 
 ```{r fit_ssm2, message=FALSE}
 data(sese2_n)
 sese2_n
 ```
 
-Note the columns are in a different order than the default expected by `foieGras`, and the first three variables have different names: `longitude`, `latitude` and `time`. There are two approaches to format these data. The first, is to call `format_data` as a data pre-processing step prior to fitting an SSM. The data are linked to the expected names via the following arguments to `format_data`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we only need to use the `date` and `coord` arguments:
+Note the columns are in a different order than the default expected by `aniMotum`, and the first three variables have different names: `longitude`, `latitude` and `time`. There are two approaches to format these data. The first, is to call `format_data` as a data pre-processing step prior to fitting an SSM. The data are linked to the expected names via the following arguments to `format_data`: `id`, `date`, `lc`, `coord`, `epar` and `sderr`. In this example, we only need to use the `date` and `coord` arguments:
 
 ```{r format_data1, message=FALSE}
 d <- format_data(sese2_n, date = "time", coord = c("longitude", "latitude"))

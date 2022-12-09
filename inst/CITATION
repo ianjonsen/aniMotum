@@ -1,4 +1,4 @@
-citHeader("To cite foieGras in publications, please, usee these references:")
+citHeader("To cite aniMotum in publications, please, usee these references:")
 
 citEntry(entry = "article",
          title        = "A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags",
@@ -58,7 +58,7 @@ citEntry(entry = "misc",
          url          = "https://zenodo.org/record/2628481#.YnUcwy_b1qs",
          
          textVersion  =
-           paste("Ian Jonsen and Toby Patterson (2020).",
-                 "foieGras: fit latent variable movement models to animal tracking data for location quality control and behavioural inference",
+           paste("Ian Jonsen, W James Grecian, and Toby Patterson (2022).",
+                 "aniMotum: fit latent variable movement models to animal tracking data for location quality control and behavioural inference",
                  "Zenodo. https://zenodo.org/record/2628481#.YnUcwy_b1qs")
 )

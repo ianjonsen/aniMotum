@@ -91,7 +91,7 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     bind_rows() %>%
     select(-dist, -bear)
   
-  # format for foieGras output
+  # format for aniMotum output
   trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y))
   class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
   

@@ -1,11 +1,11 @@
-##' @title grab `tibble`'s by name from a `foieGras` model object
+##' @title grab `tibble`'s by name from a `aniMotum` model object
 ##'
 ##' @description `grab()` lets you obtain `fitted`, `predicted`, `rerouted` or 
 ##' `data` `tibble`'s from a compound `tibble` created when fitting to multiple 
 ##' individual data sets. The specified `tibble`'s are appended to a single output
 ##' `tibble`.
 ##'
-##' @param x a `foieGras` `ssm_df` or `mpm_df` model object
+##' @param x a `aniMotum` `ssm_df` or `mpm_df` model object
 ##' @param what the tibble to be grabbed; either `fitted`, `predicted`, 
 ##' `rerouted` (`ssm_df` only), or `data` (single letters can be used).
 ##' @param as_sf logical; if FALSE (default) then return a `tibble` with 
@@ -46,7 +46,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
   what <- match.arg(what, choices = c("fitted","predicted","rerouted","data"))
 
   if(!any(inherits(x, "ssm_df"), inherits(x, "mpm_df"), inherits(x, "fG_ssm"), inherits(x, "fG_mpm"))) 
-    stop("a foieGras ssm or mpm model object must be supplied")
+    stop("a aniMotum ssm or mpm model object must be supplied")
   if(!what %in% c("fitted","predicted","rerouted","data"))
     stop("only `fitted`, `predicted`, `rerouted`, or `data` objects can be grabbed from an ssm fit object")
   if(any(inherits(x, "mpm_df"), inherits(x, "fG_mpm")) & what == "predicted")
@@ -57,7 +57,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            \n Either grab `fitted` values or re-fit with a positive integer value for `time.step`")
   }
 
-  ## coerce old foieGras classes "fG_ssm" and "fG_mpm" to new classes
+  ## coerce old aniMotum classes "fG_ssm" and "fG_mpm" to new classes
   if(inherits(x, "fG_ssm")) class(x)[1] <- "ssm_df"
   if(inherits(x, "fG_mpm")) class(x)[1] <- "mpm_df"
   

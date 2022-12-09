@@ -39,7 +39,7 @@ argos_lc <- function(N) {
 ellp.par <- function(lc) {
   
   load(system.file("extdata", "ellps_tab.rda",
-                        package = "foieGras"))
+                        package = "aniMotum"))
   n <- length(lc)
   
   eor.m <- ellps.tab$eor.mn[lc]

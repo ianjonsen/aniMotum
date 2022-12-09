@@ -14,11 +14,11 @@ knitr::opts_chunk$set(
 )
 require(dplyr)
 require(patchwork)
-require(foieGras)
+require(aniMotum)
 ```
 
 ### Processing data
-Fitting SSM's to tracking data in `foieGras` is intended to be as simple as possible using `fit_ssm()`. Provided the data are in an expected format (see `vignette('Overview')`), `fit_ssm` can be invoked immediately to both process the data and fit the SSM. Within `fit_ssm`, data processing consists of:  
+Fitting SSM's to tracking data in `aniMotum` is intended to be as simple as possible using `fit_ssm()`. Provided the data are in an expected format (see `vignette('Overview')`), `fit_ssm` can be invoked immediately to both process the data and fit the SSM. Within `fit_ssm`, data processing consists of:  
 
 1. identifying the most appropriate measurement error model to use based on the format of the data;  
 2. date formatting, ordering observations in time, flagging duplicate date-time observations, flagging observations occurring within a minimum time period (default = 60 s);  
@@ -45,7 +45,7 @@ fit <- fit_ssm(ellie,
 This call uses the defaults for data processing and all other arguments (see `?fit_ssm` for details). More control can be exerted over the model fitting process via the arguments: `emf`, `map`, and `control`. 
 
 #### `emf`: specifying error multiplication factors 
-The `emf` argument is helpful when modelling older Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf's used by default in `foieGras` (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies that draw on Argos - GPS double-tagging data such as (Costa et al. 2010). 
+The `emf` argument is helpful when modelling older Argos Least-Squares location data as it allows alternate specification of error multiplication factors for each location quality class. The error multiplication factors define the magnitude of the location error standard deviation for each Argos location quality class relative to the best quality class, 3. The emf's used by default in `aniMotum` (see Jonsen et al. 2020 for further details) are unlikely to be equally applicable to all tracking data sets. Alternate specifications could be derived from Argos location error studies that draw on Argos - GPS double-tagging data such as (Costa et al. 2010). 
 
 The default emf values are given by `emf()`:
 ```{r emf, message=FALSE}
@@ -101,7 +101,7 @@ c(fit1$ssm[[1]]$AICc, fit2$ssm[[1]]$AICc)
 Comparison of AIC~c~ from the model fits implies the model including the `psi` parameter `fit1` provides a slightly better fit.
 
 #### `control`: controlling the optimization
-By default, `foieGras` uses R's `nlminb` optimizer, but users can also select the more flexible `optim` to minimize the objective function defined by the built-in `TMB` C++ templates. Users can specify which optimizer to use via the `control` argument, which takes a named list as input that is provided by the utility function `ssm_control:
+By default, `aniMotum` uses R's `nlminb` optimizer, but users can also select the more flexible `optim` to minimize the objective function defined by the built-in `TMB` C++ templates. Users can specify which optimizer to use via the `control` argument, which takes a named list as input that is provided by the utility function `ssm_control:
 ```{r ssm_control, message=FALSE, warning=FALSE, eval = FALSE}
 fit <- fit_ssm(ellie, 
                model = "crw", 

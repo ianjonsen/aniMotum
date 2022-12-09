@@ -1,6 +1,6 @@
 ##' @title map_multi_track_mp
 ##'
-##' @description map foieGras-estimated locations from multiple tracks with
+##' @description map aniMotum-estimated locations from multiple tracks with
 ##' a behavioural index
 ##' 
 ##' @param map_type coastline data to be used in maps

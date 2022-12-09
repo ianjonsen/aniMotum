@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-require(foieGras)
+require(aniMotum)
 require(ggplot2)
 ```
 
@@ -54,7 +54,7 @@ m2 <- map(fit,
 ![](images/path_rerouting/map_1ab.jpg){width=95%}
 
 ### `route_path()`
-Thanks to the `pathroutr` R package (https://jmlondon.github.io/pathroutr/), we can quickly and objectively re-route estimated tracks off of land. `route_path()` is a wrapper function for the `pathroutr` package, which must be installed separately (via `install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")`). Our implementation is intended to be easy to use and integrate into a `foieGras` workflow, but for complicated re-routing problems we recommend using the `pathroutr` functions directly.
+Thanks to the `pathroutr` R package (https://jmlondon.github.io/pathroutr/), we can quickly and objectively re-route estimated tracks off of land. `route_path()` is a wrapper function for the `pathroutr` package, which must be installed separately (via `install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")`). Our implementation is intended to be easy to use and integrate into a `aniMotum` workflow, but for complicated re-routing problems we recommend using the `pathroutr` functions directly.
 
 #### re-route Weddell seal SSM-predicted locations
 Here we take the SSM fit object and pass the re-routed locations back to it.

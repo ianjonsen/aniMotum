@@ -1,6 +1,6 @@
 #' Roxygen commands
 #'
-#' @useDynLib foieGras
+#' @useDynLib aniMotum
 #'
 dummy <- function(){
   return(NULL)

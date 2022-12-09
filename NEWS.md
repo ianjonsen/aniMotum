@@ -1,3 +1,7 @@
+# aniMotum 1.1 (10/12/2022)
+
+* package name change to coincide with Methods in Ecology and Evolution manuscript: Jonsen et al. `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Accepted 06/12/2022.
+
 # foieGras 1.1 (01/12/2022)
 
 * adds `format_data()` to pre-process non-default data formats into that expected by `fit_ssm`

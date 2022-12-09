@@ -2,7 +2,7 @@
 ##'
 ##' @description visualize fits from an mpm object
 ##'
-##' @param x a `foieGras` `mpm` fit object with class `mpm_df`
+##' @param x a `aniMotum` `mpm` fit object with class `mpm_df`
 ##' @param y optional `ssm` fit object with class `ssm_df` corresponding to x. 
 ##' If absent, 1-d plots of `gamma_t` time series are rendered 
 ##' otherwise, 2-d track plots with locations coloured by `gamma_t`` are rendered.

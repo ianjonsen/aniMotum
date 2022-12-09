@@ -79,7 +79,7 @@ sim_fit <-
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
   ########################################
-  ## Simulate from a foieGras model fit ##
+  ## Simulate from a aniMotum model fit ##
   ########################################
   n <- nrow(x)
   d <- lapply(1:n, function(k) {

@@ -18,9 +18,9 @@ test_that("p has s3 classes `ssmmpm`, `tbl_df`, `tbl`, `data.frame`", {
 })
 
 test_that("join catches non ssm class in ssm input", {
-  expect_error(join(grab(xs, "p"), xm), "ssm must be a foieGras ssm fit object with class `ssm_df`")
+  expect_error(join(grab(xs, "p"), xm), "ssm must be an aniMotum ssm fit object with class `ssm_df`")
 })
 
 test_that("join catches non mpm class in mpm input", {
-  expect_error(join(xs, grab(xm, "f")), "mpm must be a foieGras mpm fit object with class `mpm_df`")
+  expect_error(join(xs, grab(xm, "f")), "mpm must be an aniMotum mpm fit object with class `mpm_df`")
 })

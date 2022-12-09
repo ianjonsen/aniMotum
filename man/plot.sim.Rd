@@ -7,7 +7,7 @@
 \method{plot}{sim}(x, type = 2, error = FALSE, pal = "Plasma", rev = FALSE, ...)
 }
 \arguments{
-\item{x}{a \code{foieGras} simulation data.frame with class \code{sim}}
+\item{x}{a \code{aniMotum} simulation data.frame with class \code{sim}}
 
 \item{type}{either 1, a 1-D time-series of speed (if model is \code{rw} or \code{crw}
 specified behavioural states) or move persistence (g; if model is \code{mp}); or

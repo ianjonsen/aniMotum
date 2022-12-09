@@ -2,13 +2,13 @@
 % Please edit documentation in R/osar.r
 \name{osar}
 \alias{osar}
-\title{calculate one-step-ahead (prediction) residuals from a \code{foieGras}
+\title{calculate one-step-ahead (prediction) residuals from a \code{aniMotum}
 \code{ssm} fit}
 \usage{
 osar(x, method = "fullGaussian", ...)
 }
 \arguments{
-\item{x}{a \code{foieGras} \code{ssm} fit object with class \code{ssm_df}}
+\item{x}{a \code{aniMotum} \code{ssm} fit object with class \code{ssm_df}}
 
 \item{method}{method to calculate prediction residuals
 (default is \code{oneStepGaussianOffMode}; see \link[TMB:oneStepPredict]{TMB::oneStepPredict} for details)}
@@ -16,7 +16,7 @@ osar(x, method = "fullGaussian", ...)
 \item{...}{other arguments to \link[TMB:oneStepPredict]{TMB::oneStepPredict}}
 }
 \description{
-calculate one-step-ahead (prediction) residuals from a \code{foieGras}
+calculate one-step-ahead (prediction) residuals from a \code{aniMotum}
 \code{ssm} fit
 }
 \details{

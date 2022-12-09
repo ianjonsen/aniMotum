@@ -12,12 +12,12 @@
 ##' pooled random variance parameter (`sigma_g`)
 ##' @param coords column numbers of the location coordinates (default = 3:4)
 ##' @param control list of control settings for the outer optimizer 
-##' (see [foieGras::mpm_control] for details)
+##' (see [aniMotum::mpm_control] for details)
 ##' @param inner.control list of control parameters for the inner optimization
 ##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
-##' see [foieGras::ssm_control] for details
+##' see [aniMotum::ssm_control] for details
 ##' @param optim is deprecated, use ssm_control(optim = "optim") instead, 
-##' see [foieGras::ssm_control] for details
+##' see [aniMotum::ssm_control] for details
 ##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, 
 ##' see [ssm_control] for details
 ##' 

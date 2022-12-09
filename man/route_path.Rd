@@ -65,7 +65,7 @@ object but with the locations within each simulation re-routed.
 
 We recommend that users working on complex rerouting problems and/or
 requiring higher resolution land barrier data work with the \code{pathroutr}
-package directly by first exctracting foieGras-estimated locations with
+package directly by first exctracting aniMotum-estimated locations with
 \code{grab}. Higher resolution land barrier data (polygon shapefiles) must be
 obtained independently.
 }

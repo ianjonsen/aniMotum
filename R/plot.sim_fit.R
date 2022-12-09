@@ -1,8 +1,8 @@
 ##' @title plot
 ##'
-##' @description visualize tracks simulated from a `foieGras` model fit
+##' @description visualize tracks simulated from a `aniMotum` model fit
 ##'
-##' @param x a `foieGras` simulation data.frame with class `sim_fit`
+##' @param x a `aniMotum` simulation data.frame with class `sim_fit`
 ##' @param type plots tracks as "line", "points" or "both" (default). 
 ##' @param zoom logical; should map extent be defined by track extent (TRUE; default) or 
 ##' should global map be drawn (FALSE).  

@@ -17,7 +17,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} \code{mpm} fit object with class \code{mpm_df}}
+\item{x}{a \code{aniMotum} \code{mpm} fit object with class \code{mpm_df}}
 
 \item{y}{optional \code{ssm} fit object with class \code{ssm_df} corresponding to x.
 If absent, 1-d plots of \code{gamma_t} time series are rendered

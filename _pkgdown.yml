@@ -1,5 +1,5 @@
-title: foieGras
-url: https://ianjonsen.github.io/foieGras
+title: aniMotum
+url: https://ianjonsen.github.io/aniMotum
 template:
   params:
     bootswatch: cerulean
@@ -37,4 +37,4 @@ navbar:
     github:
       text: GitHub
       icon: fa-github fa-lg
-      href: https://github.com/ianjonsen/foieGras
+      href: https://github.com/ianjonsen/aniMotum

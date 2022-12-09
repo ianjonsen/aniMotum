@@ -1,10 +1,10 @@
 ##' @title map
 ##'
-##' @description map foieGras-estimated locations and behavioural indices with
+##' @description map aniMotum-estimated locations and behavioural indices with
 ##' coastline and projection options
 ##'
-##' @param x a `foieGras` ssm fit object with class `ssm_df` or (old) `fG_ssm`
-##' @param y optionally, a `foieGras` mpm fit object with class `mpm_df` or (old)
+##' @param x a `aniMotum` ssm fit object with class `ssm_df` or (old) `fG_ssm`
+##' @param y optionally, a `aniMotum` mpm fit object with class `mpm_df` or (old)
 ##' `fG_mpm`
 ##' @param what specify which location estimates to map: fitted, predicted or
 ##' rerouted
@@ -83,9 +83,9 @@ map <- function(x,
                 ...) {
 
   what <- match.arg(what)
-  stopifnot("x must be a foieGras ssm fit object with class `ssm_df`" = 
+  stopifnot("x must be a aniMotum ssm fit object with class `ssm_df`" = 
               any(inherits(x, "ssm_df"), inherits(x, "fG_ssm")))
-  stopifnot("y must either be NULL or a foieGras mpm fit object with class `mpm_df`" = 
+  stopifnot("y must either be NULL or a aniMotum mpm fit object with class `mpm_df`" = 
               any(inherits(y, "mpm_df"), inherits(y, "fG_mpm"), is.null(y)))
   stopifnot("individual `ssm` fit objects with differing projections not currently supported" = 
               length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)

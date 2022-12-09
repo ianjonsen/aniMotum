@@ -1,9 +1,9 @@
-##' @title print \code{foieGras} fit object summary information
+##' @title print \code{aniMotum} fit object summary information
 ##'
 ##' @method print ssm
 ##'
 ##' @aliases print
-##' @param x a foieGras ssm fit object
+##' @param x a aniMotum ssm fit object
 ##' @param ... unused. For compatibility with the generic method.
 ##'
 ##' @examples

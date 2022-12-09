@@ -1,9 +1,9 @@
 ##' @title plot
 ##'
 ##' @description plot **One-Step-Ahead (prediction) residuals** from a 
-##' `foieGras` `osar` object
+##' `aniMotum` `osar` object
 ##'
-##' @param x a `foieGras` `osar` object with class `osar`
+##' @param x a `aniMotum` `osar` object with class `osar`
 ##' @param type type of residual plot to generate: time-series (ts; default), qqnorm 
 ##' (qq), or acf
 ##' @param pages plots of all individuals on a single page (pages = 1; default) 

@@ -27,7 +27,7 @@ fit_ssm(
 \arguments{
 \item{x}{a \code{data.frame}, \code{tibble} or \code{sf-tibble} of observations, depending
 on the tracking data type. See more in the Details section, below, and the
-Overview vignette \code{vignette("Overview", package = "foieGras")}.}
+Overview vignette \code{vignette("Overview", package = "aniMotum")}.}
 
 \item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
 outlier locations}

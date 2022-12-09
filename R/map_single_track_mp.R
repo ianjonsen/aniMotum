@@ -1,6 +1,6 @@
 ##' @title map_single_track_mp
 ##'
-##' @description map foieGras-estimated locations from a single track with
+##' @description map aniMotum-estimated locations from a single track with
 ##' a behavioural index
 ##' 
 ##' @param map_type coastline data to be used in maps

@@ -2,8 +2,8 @@
 ##'
 ##' @description `join()` joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using `as_sf = FALSE`.
 ##'
-##' @param ssm a `foieGras` ssm fitted model object
-##' @param mpm a `foieGras` mpm fitted model object
+##' @param ssm a `aniMotum` ssm fitted model object
+##' @param mpm a `aniMotum` mpm fitted model object
 ##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
 ##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble
@@ -19,7 +19,7 @@
 ##' @importFrom tibble as_tibble
 ##' @importFrom dplyr rename select mutate
 ##' @examples
-##' ## load example foieGras fit objects (to save time)
+##' ## load example aniMotum fit objects (to save time)
 ##' ## generate a ssm fit object
 ##' xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=24, control = ssm_control(verbose = 0))
 ##' xm <- fit_mpm(xs, what = "p", model = "mpm")
@@ -37,8 +37,8 @@ join <- function(ssm,
                  normalise = FALSE,
                  group = FALSE) {
   
-  if(!inherits(ssm, "ssm_df")) stop("ssm must be a foieGras ssm fit object with class `ssm_df`")
-  if(!inherits(mpm, "mpm_df")) stop("mpm must be a foieGras mpm fit object with class `mpm_df`")
+  if(!inherits(ssm, "ssm_df")) stop("ssm must be a aniMotum ssm fit object with class `ssm_df`")
+  if(!inherits(mpm, "mpm_df")) stop("mpm must be a aniMotum mpm fit object with class `mpm_df`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
   y <- grab(mpm, what = "fitted", normalise = normalise, group = group)

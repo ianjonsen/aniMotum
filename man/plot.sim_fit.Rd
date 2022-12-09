@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{x}{a \code{foieGras} simulation data.frame with class \code{sim_fit}}
+\item{x}{a \code{aniMotum} simulation data.frame with class \code{sim_fit}}
 
 \item{type}{plots tracks as "line", "points" or "both" (default).}
 
@@ -39,7 +39,7 @@ plot rendering time so is set to FALSE by default, in which case
 Plots of simulated tracks.
 }
 \description{
-visualize tracks simulated from a \code{foieGras} model fit
+visualize tracks simulated from a \code{aniMotum} model fit
 }
 \examples{
 fit <- fit_ssm(ellie, model = "crw", time.step = 24)

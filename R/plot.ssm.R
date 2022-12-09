@@ -24,7 +24,7 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
 ##'
 ##' @description visualize fits from an ssm object
 ##'
-##' @param x a `foieGras` ssm fit object with class `ssm_df`
+##' @param x a `aniMotum` ssm fit object with class `ssm_df`
 ##' @param what specify which location estimates to display on time-series plots: 
 ##' fitted, predicted, or rerouted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately 

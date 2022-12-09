@@ -3,17 +3,17 @@
 \name{print.ssm}
 \alias{print.ssm}
 \alias{print}
-\title{print \code{foieGras} fit object summary information}
+\title{print \code{aniMotum} fit object summary information}
 \usage{
 \method{print}{ssm}(x, ...)
 }
 \arguments{
-\item{x}{a foieGras ssm fit object}
+\item{x}{a aniMotum ssm fit object}
 
 \item{...}{unused. For compatibility with the generic method.}
 }
 \description{
-print \code{foieGras} fit object summary information
+print \code{aniMotum} fit object summary information
 }
 \examples{
 ## see summary fit output
