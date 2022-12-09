@@ -14,9 +14,9 @@ join(
 )
 }
 \arguments{
-\item{ssm}{a \code{aniMotum} ssm fitted model object}
+\item{ssm}{an \code{aniMotum} ssm fitted model object}
 
-\item{mpm}{a \code{aniMotum} mpm fitted model object}
+\item{mpm}{an \code{aniMotum} mpm fitted model object}
 
 \item{what.ssm}{specifies whether ssm \code{predicted} or \code{fitted} values are to be extracted}
 

@@ -2,7 +2,7 @@ context("test fit_ssm")
 
 ## fit_ssm output is a compound tibble
 ##  tests expect that fit$ssm are 13-element lists (if optimiser does not crash)
-##  that have S3 class foieGras
+##  that have S3 class aniMotum
 data(ellie)
 dkf <- ellie
 ## drop KF error ellipse info to exercise LS portions of code
@@ -38,7 +38,7 @@ test_that("fit_ssm catches min.dt error & returns appropriate msg", {
 
 ## step through prefilter-specific arguments first
 ## minimum specified arguments - crw
-test_that("fit_ssm defaults + crw + KF return foieGras list w 15 elements", {
+test_that("fit_ssm defaults + crw + KF return aniMotum list w 15 elements", {
   f <- fit_ssm(dkf, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 15)
@@ -46,7 +46,7 @@ test_that("fit_ssm defaults + crw + KF return foieGras list w 15 elements", {
 })
 
 
-test_that("fit_ssm defaults + crw + LS return foieGras list w 15 elements", {
+test_that("fit_ssm defaults + crw + LS return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dls, model = "crw", time.step = 72, control = ssm_control(verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -55,7 +55,7 @@ test_that("fit_ssm defaults + crw + LS return foieGras list w 15 elements", {
 })
 
 ## minimum specified arguments - rw + KF
-test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
+test_that("fit_ssm defaults + rw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, model = "rw", time.step = 72, map = list(psi = as.factor(NA)), control = ssm_control(verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -64,7 +64,7 @@ test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
 })
 
 ## minimum specified arguments - rw + LS
-test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
+test_that("fit_ssm defaults + rw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dls, model = "rw", time.step = 72, map = list(psi = as.factor(NA)), control = ssm_control(verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -73,7 +73,7 @@ test_that("fit_ssm defaults + rw return foieGras list w 15 elements", {
 })
 
 ## low vmax - crw
-test_that("fit_ssm vmax + crw return foieGras list w 15 elements", {
+test_that("fit_ssm vmax + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -82,7 +82,7 @@ test_that("fit_ssm vmax + crw return foieGras list w 15 elements", {
 })
 
 ## low vmax, ang=c(15,25) - crw
-test_that("fit_ssm vmax,ang + crw return foieGras list w 15 elements", {
+test_that("fit_ssm vmax,ang + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, ang=c(15,25), model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -91,7 +91,7 @@ test_that("fit_ssm vmax,ang + crw return foieGras list w 15 elements", {
 })
 
 ## low vmax, ang=c(15,25), min.dt=120 - crw
-test_that("fit_ssm vmax,ang,min.dt + crw return foieGras list w 15 elements", {
+test_that("fit_ssm vmax,ang,min.dt + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=5, ang=c(15,25), min.dt=120, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -100,7 +100,7 @@ test_that("fit_ssm vmax,ang,min.dt + crw return foieGras list w 15 elements", {
 })
 
 ## turn speed filter off - crw
-test_that("fit_ssm no spd filter + crw return foieGras list w 15 elements", {
+test_that("fit_ssm no spd filter + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, spdf=FALSE, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -110,7 +110,7 @@ test_that("fit_ssm no spd filter + crw return foieGras list w 15 elements", {
 
 ## step through some SSM arguments
 ## optim="nlminb" - crw
-test_that("fit_ssm optim + crw return foieGras list w 15 elements", {
+test_that("fit_ssm optim + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, model = "crw", time.step = 72, control = ssm_control(verbose = 1, optim="nlminb"))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -119,7 +119,7 @@ test_that("fit_ssm optim + crw return foieGras list w 15 elements", {
 })
 
 ## fit to full data - rw
-test_that("fit_ssm full data + crw return foieGras list w 15 elements", {
+test_that("fit_ssm full data + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, fit.to.subset=FALSE, model = "rw", time.step = 72, control = ssm_control(verbose = 0))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -128,7 +128,7 @@ test_that("fit_ssm full data + crw return foieGras list w 15 elements", {
 })
 
 ## turn trace on - crw
-test_that("fit_ssm verbose + crw return foieGras list w 15 elements", {
+test_that("fit_ssm verbose + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose=2))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -137,7 +137,7 @@ test_that("fit_ssm verbose + crw return foieGras list w 15 elements", {
 })
 
 # fiddle w inner control list - crw
-test_that("fit_ssm inner.control + crw return foieGras list w 15 elements", {
+test_that("fit_ssm inner.control + crw return aniMotum list w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, inner.control=list(maxit=200), model = "crw", time.step = 72, control = ssm_control(verbose = 0, optim = "nlminb"))
   expect_s3_class(f$ssm[[1]], "ssm")
@@ -146,7 +146,7 @@ test_that("fit_ssm inner.control + crw return foieGras list w 15 elements", {
 })
 
 ## specify lower, upper parameter bounds
-test_that("fit_ssm multi-track returns foieGras lists w 15 elements", {
+test_that("fit_ssm multi-track returns aniMotum lists w 15 elements", {
   skip_on_cran()
   f <- fit_ssm(dkf, vmax=4, model="crw", time.step=72, control = 
                  ssm_control(verbose = 0, 

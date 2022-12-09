@@ -29,8 +29,8 @@ m <- ggplot() +
   xlab(element_blank()) +
   ylab(element_blank()) +
   theme(legend.position = "none",
-        panel.grid.major = element_line(size=0.05),
-        panel.grid.minor = element_line(size=0.05),
+        panel.grid.major = element_line(linewidth = 0.5),
+        panel.grid.minor = element_line(linewidth = 0.5),
         axis.text = element_blank())
 
 m1 <- ggdraw() +
@@ -45,7 +45,7 @@ m1 <- ggdraw() +
 s <- sticker(
   m1,
   package = "aniMotum",
-  p_size = 6,
+  p_size = 16,
   p_y = 1.6,
   p_family = "sans",
   p_color = "#C4B56CFF",

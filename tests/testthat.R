@@ -1,4 +1,4 @@
 library(testthat)
-library(foieGras)
+library(aniMotum)
 
-test_check("foieGras")
+test_check("aniMotum")

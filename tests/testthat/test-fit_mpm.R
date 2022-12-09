@@ -2,7 +2,7 @@ context("test fit_mpm")
 
 ## fit_mpm output is a compound tibble with class `mpm`
 ##  tests expect that fit$mpm are 8-element lists (if optimiser does not crash)
-##  that have S3 class foieGras
+##  that have S3 class aniMotum
 
 ## generate ssm obj as quickly as possible
 test_that("fit_mpm returns mpm list w 8 elements", {

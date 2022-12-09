@@ -2,8 +2,8 @@
 ##'
 ##' @description `join()` joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using `as_sf = FALSE`.
 ##'
-##' @param ssm a `aniMotum` ssm fitted model object
-##' @param mpm a `aniMotum` mpm fitted model object
+##' @param ssm an `aniMotum` ssm fitted model object
+##' @param mpm an `aniMotum` mpm fitted model object
 ##' @param what.ssm specifies whether ssm `predicted` or `fitted` values are to be extracted
 ##' @param as_sf logical; if FALSE then return a tibble with un-projected lonlat
 ##' coordinates, otherwise return an sf tibble
@@ -37,8 +37,8 @@ join <- function(ssm,
                  normalise = FALSE,
                  group = FALSE) {
   
-  if(!inherits(ssm, "ssm_df")) stop("ssm must be a aniMotum ssm fit object with class `ssm_df`")
-  if(!inherits(mpm, "mpm_df")) stop("mpm must be a aniMotum mpm fit object with class `mpm_df`")
+  if(!inherits(ssm, "ssm_df")) stop("ssm must be an aniMotum ssm fit object with class `ssm_df`")
+  if(!inherits(mpm, "mpm_df")) stop("mpm must be an aniMotum mpm fit object with class `mpm_df`")
   
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
   y <- grab(mpm, what = "fitted", normalise = normalise, group = group)
