@@ -1,21 +1,21 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# {foieGras} <a href='https://ianjonsen.github.io/foieGras/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
+# {aniMotum} <a href='https://ianjonsen.github.io/aniMotum/index.html'><img src='man/figures/logo.png' align="right" height="250" /></a>
 
 #### fit latent variable movement models to animal tracking data for location quality control and behavioural inference
 
 <!-- badges: start -->
 
-[![foieGras status
-badge](https://ianjonsen.r-universe.dev/badges/foieGras)](https://ianjonsen.r-universe.dev)
+[![aniMotum status
+badge](https://ianjonsen.r-universe.dev/badges/aniMotum)](https://ianjonsen.r-universe.dev)
 [![Coverage
-status](https://codecov.io/gh/ianjonsen/foieGras/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/foieGras?branch=master)
+status](https://codecov.io/gh/ianjonsen/aniMotum/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/aniMotum?branch=master)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
-![R-CMD-check](https://github.com/ianjonsen/foieGras/actions/workflows/check-full.yaml/badge.svg?branch=master)
+![R-CMD-check](https://github.com/ianjonsen/aniMotum/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
 
-`{foieGras}` is an R package that fits continuous-time models in
+`{aniMotum}` is an R package that fits continuous-time models in
 state-space form to filter error-prone animal movement data obtained via
 the Argos satellite system, and to estimate changes in movement
 behaviour. Template Model Builder {TMB} is used for fast estimation.
@@ -41,22 +41,22 @@ R.Version()
 
 ### From R-Universe
 
-As of `v1.0-5`, `{foieGras}` is available via R-Universe. This is where
+As of `v1.0-5`, `{aniMotum}` is available via R-Universe. This is where
 the latest stable version can always be found. Installation is simple:
 
 ``` r
 # install from my R-universe repository
-install.packages("foieGras", 
+install.packages("aniMotum", 
                  repos = "https://ianjonsen.r-universe.dev")
 ```
 
-However, this will not install any of `{foieGras}`’s Suggested packages,
+However, this will not install any of `{aniMotum}`’s Suggested packages,
 which add extra functionality such as path re-routing around land. To
 ensure all Suggested packages, either from R-Universe or CRAN are also
 installed:
 
 ``` r
-install.packages("foieGras", 
+install.packages("aniMotum", 
                  repos = c("https://cloud.r-project.org",
                            "https://ianjonsen.r-universe.dev"),
                  dependencies = "Suggests")
@@ -68,10 +68,10 @@ newer. Answer `Yes` to install the source version, provided you have the
 appropriate compiler tools available (See **From GitHub (source)**,
 below).
 
-To avoid doing the above every time you want to re-install `{foieGras}`,
+To avoid doing the above every time you want to re-install `{aniMotum}`,
 you can add my R-Universe repo to your local list of repositories for
 package download in your `.Rprofile`. This ensures `install.packages`
-automatically grabs the latest version of `{foieGras}`
+automatically grabs the latest version of `{aniMotum}`
 
 ``` r
 #install.packages("usethis")
@@ -84,34 +84,24 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 
 If you don’t want to install compiler tools or have trouble getting them
 to work then you can manually download a binary version of the
-`{foieGras}` package for Windows or Mac from here
-<https://ianjonsen.r-universe.dev/ui#package:foieGras>. In R, use the
+`{aniMotum}` package for Windows or Mac from here
+<https://ianjonsen.r-universe.dev/ui#package:aniMotum>. In R, use the
 following command to install from the file you’ve just downloaded (where
 `path_to_file` is wherever you saved the download:
 
 ``` r
 # for Windows
-install.packages("path_to_file\package-windows-release\foieGras_1.0-5.zip", 
+install.packages("path_to_file\package-windows-release\aniMotum_1.0-5.zip", 
                  repos=NULL, type="binary")
 
 # for Mac
-install.packages("path_to_file/package-macos-release/foieGras_1.0-5.tgz", 
+install.packages("path_to_file/package-macos-release/aniMotum_1.0-5.tgz", 
                  repos=NULL, type="binary")
 ```
 
-### From CRAN
-
-`{foieGras}` `v0.7-6` is on
-[CRAN](https://cran.r-project.org/package=foieGras/) and can be
-downloaded within `R`, in the usual way `install.packages("foieGras")`
-or, more completely:
-`install.packages("foieGras", depedencies = c("Imports","LinkingTo","Suggests"))`.
-{foieGras} `v1.0-5` and later versions probably won’t become available
-on CRAN.
-
 ### From GitHub (source)
 
-To get the very latest but likely unstable `{foieGras}` version, you can
+To get the very latest but likely unstable `{aniMotum}` version, you can
 install from GitHub.
 
 On PC’s running Windows, ensure you have installed
@@ -126,7 +116,7 @@ installed (e.g.,
 <https://github.com/fxcoudert/gfortran-for-macOS/releases>).
 
 ``` r
-remotes::install_github("ianjonsen/foieGras@staging")
+remotes::install_github("ianjonsen/aniMotum@staging")
 ```
 
 Note: there can be issues getting compilers to work properly, especially
@@ -141,12 +131,12 @@ worry about compiler software or issues!
 
 ## Usage
 
-`{foieGras}` is intended to be as easy to use as possible. Here’s a
+`{aniMotum}` is intended to be as easy to use as possible. Here’s a
 simple example showing how to fit a move persistence model to Argos
 tracking data and visualise the result:
 
 ``` r
-library(foieGras)
+library(aniMotum)
 
 fit <- fit_ssm(sese, 
                vmax= 4, 
@@ -156,6 +146,9 @@ fit <- fit_ssm(sese,
 
 plot(fit, type = 3, pages = 1, ncol = 2)
 ```
+
+    #> Warning: namespace 'foieGras' is not available and has been replaced
+    #> by .GlobalEnv when processing object 'fit'
 
 <img src="man/figures/README-ex1-1.png" width="100%" />
 
@@ -178,8 +171,8 @@ Bruxelles)
 ## What to do if you encounter a problem
 
 If you are convinced you have encountered a bug or
-unexpected/inconsistent behaviour when using `{foieGras}`, you can post
-an issue [here](https://github.com/ianjonsen/foieGras/issues). First,
+unexpected/inconsistent behaviour when using `{aniMotum}`, you can post
+an issue [here](https://github.com/ianjonsen/aniMotum/issues). First,
 have a read through the posted issues to see if others have encountered
 the same problem and whether a solution has been offered. You can reply
 to an existing issue if you have the same problem and have more details
@@ -193,17 +186,17 @@ screenshots/images that nicely illustrate the problem.
 
 Contributions from anyone in the Movement Ecology/Bio-Logging
 communities are welcome. Consider submitting a feature request
-[here](https://github.com/ianjonsen/foieGras/issues/new/choose) to start
+[here](https://github.com/ianjonsen/aniMotum/issues/new/choose) to start
 a discussion. Alternatively, if your idea is well-developed then you can
 submit a pull request for evaluation
-[here](https://github.com/ianjonsen/foieGras/pulls). Unsure about what
+[here](https://github.com/ianjonsen/aniMotum/pulls). Unsure about what
 all this means but still want to discuss your idea? then have a look
 through the GitHub pages of community-built R packages like
 [tidyverse/dplyr](https://github.com/tidyverse/dplyr) for examples.
 
 ## Code of Conduct
 
-Please note that the foieGras project is released with a [Contributor
+Please note that the aniMotum project is released with a [Contributor
 Code of
 Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
@@ -235,7 +228,7 @@ Guinet). SMRU SRDL-CTD tags were partly funded by CNES-TOSCA and IMOS.
 All tagging procedures were approved and executed under University of
 Tasmania Animal Ethics Committee guidelines.
 
-Animal silhouettes used in the `foieGras` logo were obtained and
+Animal silhouettes used in the `aniMotum` logo were obtained and
 modified from sources:  
 - southern elephant seal, Anton Van de Putte
 ([@AntonArctica](https://twitter.com/Antonarctica), Université Libre de
