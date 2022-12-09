@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement • foieGras</title>
+<title>Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement • aniMotum</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -19,7 +19,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement">
 <meta property="og:description" content="Fits continuous-time random walk, correlated random walk and move persistence state-space models for location estimation and behavioural inference from animal tracking data (Argos, processed light-level geolocation, GPS). Template Model Builder (TMB) is used for fast random-effects estimation. The Argos data can be: (older) least squares-based locations; (newer) Kalman filter-based locations with error ellipse information; or a mixture of both. The models estimate two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular). A track re-routing function is provided to adjust location estimates for known movement barriers. Track simulation functions are provided. Latent variable models are also provided to estimate move persistence from track data not requiring state-space model filtering. ">
-<meta property="og:image" content="https://ianjonsen.github.io/foieGras/logo.png">
+<meta property="og:image" content="https://ianjonsen.github.io/aniMotum/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -39,7 +39,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">foieGras</a>
+        <a class="navbar-link" href="index.html">aniMotum</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
@@ -81,7 +81,7 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+  <a href="https://github.com/ianjonsen/aniMotum" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
     GitHub
@@ -100,7 +100,7 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="foiegras-">{foieGras} <a href="https://ianjonsen.github.io/foieGras/index.html"><img src="reference/figures/logo.png" align="right" height="250"></a>
+<div class="page-header"><h1 id="foiegras-">{foieGras} <a href="https://ianjonsen.github.io/foieGras/index.html" class="external-link"><img src="reference/figures/logo.png" align="right" height="250"></a>
 <a class="anchor" aria-label="anchor" href="#foiegras-"></a>
 </h1></div>
 <div class="section level4">
@@ -231,9 +231,8 @@ Additional support was provided by France’s Centre de Synthèse et d’Analyse
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://cloud.r-project.org/package=foieGras" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/ianjonsen/foieGras/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/ianjonsen/foieGras/issues/" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/ianjonsen/aniMotum/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ianjonsen/aniMotum/issues/" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -255,7 +254,7 @@ Additional support was provided by France’s Centre de Synthèse et d’Analyse
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing foieGras</a></li>
+<li><a href="authors.html#citation">Citing aniMotum</a></li>
 </ul>
 </div>
 

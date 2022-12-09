@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Overview • foieGras</title>
+<title>Overview • aniMotum</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -18,8 +18,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Overview">
-<meta property="og:description" content="foieGras">
-<meta property="og:image" content="https://ianjonsen.github.io/foieGras/logo.png">
+<meta property="og:description" content="aniMotum">
+<meta property="og:image" content="https://ianjonsen.github.io/aniMotum/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -39,7 +39,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">foieGras</a>
+        <a class="navbar-link" href="../index.html">aniMotum</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
@@ -81,7 +81,7 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+  <a href="https://github.com/ianjonsen/aniMotum" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
     GitHub
@@ -103,7 +103,7 @@
       <h1 data-toc-skip>Overview</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/vignettes/Overview.Rmd" class="external-link"><code>vignettes/Overview.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/aniMotum/blob/HEAD/vignettes/Overview.Rmd" class="external-link"><code>vignettes/Overview.Rmd</code></a></small>
       <div class="hidden name"><code>Overview.Rmd</code></div>
 
     </div>
@@ -114,7 +114,7 @@
 <h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
 </h2>
 <p>This vignette is an extended set of examples to highlight
-<code>foieGras</code>’s functionality. Please, do NOT interpret these
+<code>aniMotum</code>’s functionality. Please, do NOT interpret these
 examples as instructions for conducting analysis of animal movement
 data. Numerous essential steps in a proper analysis have been left out
 of these vignettes. It is your job to understand your data, ensure you
@@ -124,9 +124,9 @@ you!</p>
 <div class="section level3">
 <h3 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
 </h3>
-<p>This is an overview of how to use <code>foieGras</code> to filter
+<p>This is an overview of how to use <code>aniMotum</code> to filter
 animal track locations obtained via the Argos satellite system or
-(possibly) another tracking system. <code>foieGras</code> provides three
+(possibly) another tracking system. <code>aniMotum</code> provides three
 state-space models (SSM’s), two for filtering (ie. estimating “true”
 locations and associated movement model parameters, while accounting for
 error-prone observations), and another for filtering and estimating move
@@ -162,7 +162,7 @@ changes in movement behaviour along tracks then estimating locations and
 move persistence simultaneously within a state-space model is the
 preferred approach, as location uncertainty is accounted for in the move
 persistence estimates.</p>
-<p>Additionally, <code>foieGras</code> provides separate models
+<p>Additionally, <code>aniMotum</code> provides separate models
 (<code>mpm</code>, <code>jmpm</code>) for estimating move persistence
 <em>after</em> fitting either the <code>rw</code> or <code>crw</code>
 SSM (see Jonsen et al. 2019 for details). Using the <code>fit_mpm</code>
@@ -179,7 +179,7 @@ but they assume that locations are known without error.</p>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
-<p><code>foieGras</code> can accept input data in several possible
+<p><code>aniMotum</code> can accept input data in several possible
 formats. Here, we outline the default formats but users are not
 restricted to using these. Input data with variable names and/or column
 ordering that differs from the defaults can be used, provided the
@@ -189,11 +189,11 @@ location quality class, and longitude and latitude (or projected x and
 y) coordinates. We expand on these and additional variables in the
 following sections.</p>
 <p>A pre-processing function <code><a href="../reference/format_data.html">format_data()</a></code> can be used to
-correctly structure the input data for use in <code>foieGras</code>.
+correctly structure the input data for use in <code>aniMotum</code>.
 This function checks for the presence of the essential variables,
 converts date-time to <code>POSIX</code> format, maps custom variable
 names onto the default names, and puts the variables into the default
-column order expected by <code>foieGras</code>. Users may choose to call
+column order expected by <code>aniMotum</code>. Users may choose to call
 <code><a href="../reference/format_data.html">format_data()</a></code> themselves, prior to fitting an SSM with
 <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>, or they can allow <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> to
 format the data automatically. We illustrate these approaches in the
@@ -203,7 +203,7 @@ format the data automatically. We illustrate these approaches in the
 </h4>
 <p>We’ll start out with the original Argos data, CLS Argos’
 Least-Squares-based (LS) locations. These data contain the minimum
-information required by <code>foieGras</code>’s SSM’s. A minimal input
+information required by <code>aniMotum</code>’s SSM’s. A minimal input
 <code>data.frame</code> or <code>tibble</code>, containing only the
 information required to fit the SSM, looks like this:</p>
 <pre><code><span><span class="co">#&gt;             id                date lc   lon    lat</span></span>
@@ -218,7 +218,7 @@ information required to fit the SSM, looks like this:</p>
 <code>data.frame</code><br>
 - <code>date</code> a date-time variable in the form
 <code>YYYY-mm-dd HH:MM:SS</code> (or <code>YYYY/mm/dd HH:MM:SS</code>).
-These can be text strings, in which case <code>foieGras</code> converts
+These can be text strings, in which case <code>aniMotum</code> converts
 them to <code>POSIX</code> format and assumes the timezone is
 <code>UTC</code>. If the date-times are from a local timezone then you
 must specify this via the <code>tz</code> argument to
@@ -264,38 +264,38 @@ observations are treated as Argos LS data.</p>
 <div class="section level4">
 <h4 id="gps-location-data">GPS location data<a class="anchor" aria-label="anchor" href="#gps-location-data"></a>
 </h4>
-<p>The <code>foieGras</code> SSM’s can be fit to GPS location data, for
+<p>The <code>aniMotum</code> SSM’s can be fit to GPS location data, for
 example to deal with (rare) extreme locations and/or to time-regularise
 locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2022-12-06 15:37:12  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2022-12-06 16:37:12  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2022-12-06 17:37:12  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2022-12-06 18:37:12  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2022-12-06 19:37:12  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2022-12-09 15:03:13  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2022-12-09 16:03:13  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2022-12-09 17:03:13  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2022-12-09 18:03:13  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2022-12-09 19:03:13  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
 </h4>
-<p>The <code>foieGras</code> SSM’s can be fit to processed light-level
+<p>The <code>aniMotum</code> SSM’s can be fit to processed light-level
 geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2022-12-06 15:37:13 GL 100.0 -55 0.1103570 1.0075452</span></span>
-<span><span class="co">#&gt; 2 54632 2022-12-07 03:37:13 GL 100.5 -54 0.2003541 0.4098192</span></span>
-<span><span class="co">#&gt; 3 54632 2022-12-07 15:37:13 GL 101.0 -53 1.0405229 1.1160109</span></span>
-<span><span class="co">#&gt; 4 54632 2022-12-08 03:37:13 GL 101.5 -52 0.2321247 1.7103702</span></span>
-<span><span class="co">#&gt; 5 54632 2022-12-08 15:37:13 GL 102.0 -51 2.0673076 0.3630064</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2022-12-09 15:03:14 GL 100.0 -55 0.8215365 0.67775056</span></span>
+<span><span class="co">#&gt; 2 54632 2022-12-10 03:03:14 GL 100.5 -54 0.5334636 0.01780486</span></span>
+<span><span class="co">#&gt; 3 54632 2022-12-10 15:03:14 GL 101.0 -53 0.2901591 0.79106156</span></span>
+<span><span class="co">#&gt; 4 54632 2022-12-11 03:03:14 GL 101.5 -52 0.4022114 0.12492240</span></span>
+<span><span class="co">#&gt; 5 54632 2022-12-11 15:03:14 GL 102.0 -51 0.3572882 2.23009974</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
 have observed strongly non-Gaussian location uncertainty in tracks of
 highly migratory tunas that traverse very different water masses in both
-the vertical and horizontal directions. Because <code>foieGras</code>’s
+the vertical and horizontal directions. Because <code>aniMotum</code>’s
 SSM’s assume bi-variate Normal location errors, fitting to geolocations
 with non-Gaussian errors would not be appropriate and likely result in
 highly biased location estimates. Geolocation data collected from birds
@@ -308,12 +308,12 @@ locations from light-level data.</p>
 </h4>
 <p>Users can provide projected location data as an
 <code>sf-tibble</code> or <code>sf data.frame</code>. By default,
-<code>foieGras</code>’s SSM’s fit to locations that are transformed to
+<code>aniMotum</code>’s SSM’s fit to locations that are transformed to
 the Mercator projection (EPSG 3395) and estimated locations are
 back-transformed to spherical coordinates (lon, lat). When an
 <code>sf</code>-projected data set is supplied, the
-<code>foieGras</code> SSM’s are fit to locations on the supplied
-projection (<code>foieGras</code> ensures that distance units are set to
+<code>aniMotum</code> SSM’s are fit to locations on the supplied
+projection (<code>aniMotum</code> ensures that distance units are set to
 km). Here is an example <code>sf-tibble</code> Argos data set in a polar
 stereographic projection:</p>
 <pre><code><span><span class="co">#&gt; Simple feature collection with 6 features and 6 fields</span></span>
@@ -344,7 +344,7 @@ a double-tagged individual:</p>
 <span><span class="co">#&gt; 3 F02-B-17 2017-10-05 04:03:25  G 70.1 -49.3    NA   NA  NA</span></span>
 <span><span class="co">#&gt; 4 F02-B-17 2017-10-05 06:28:20  A 71.1 -48.7 28532 1723 101</span></span>
 <span><span class="co">#&gt; 5 F02-B-17 2017-10-05 10:21:18  B 70.8 -48.5 45546 3303  97</span></span></code></pre>
-<p>These mixtures are possible because the <code>foieGras</code> SSM’s
+<p>These mixtures are possible because the <code>aniMotum</code> SSM’s
 apply the most appropriate measurement error model for each observation,
 based on its location class and error information (i.e., numeric values
 vs NA’s).</p>
@@ -387,7 +387,7 @@ more details.</p>
 <div class="section level4">
 <h4 id="custom-data-formats">Custom data formats<a class="anchor" aria-label="anchor" href="#custom-data-formats"></a>
 </h4>
-<p>Users do not need to adhere to the default <code>foieGras</code> data
+<p>Users do not need to adhere to the default <code>aniMotum</code> data
 formatting presented above, so long as their input data contain the
 essential variables. The variables can have arbitrary names and be in
 any order. Here is an example using a custom formatted
@@ -410,7 +410,7 @@ any order. Here is an example using a custom formatted
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      77.8    -<span style="color: #BB0000;">52.8</span> 2009-02-05 16:03:58 A     ct36-E-09</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 285 more rows</span></span></span></code></pre></div>
 <p>Note the columns are in a different order than the default expected
-by <code>foieGras</code>, and the first three variables have different
+by <code>aniMotum</code>, and the first three variables have different
 names: <code>longitude</code>, <code>latitude</code> and
 <code>time</code>. There are two approaches to format these data. The
 first, is to call <code>format_data</code> as a data pre-processing step

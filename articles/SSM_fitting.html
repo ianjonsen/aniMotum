@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSM_fitting • foieGras</title>
+<title>SSM_fitting • aniMotum</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -18,8 +18,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="SSM_fitting">
-<meta property="og:description" content="foieGras">
-<meta property="og:image" content="https://ianjonsen.github.io/foieGras/logo.png">
+<meta property="og:description" content="aniMotum">
+<meta property="og:image" content="https://ianjonsen.github.io/aniMotum/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -39,7 +39,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">foieGras</a>
+        <a class="navbar-link" href="../index.html">aniMotum</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1</span>
       </span>
     </div>
@@ -81,7 +81,7 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/ianjonsen/foieGras" class="external-link">
+  <a href="https://github.com/ianjonsen/aniMotum" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
     GitHub
@@ -103,7 +103,7 @@
       <h1 data-toc-skip>SSM_fitting</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/foieGras/blob/HEAD/vignettes/SSM_fitting.Rmd" class="external-link"><code>vignettes/SSM_fitting.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ianjonsen/aniMotum/blob/HEAD/vignettes/SSM_fitting.Rmd" class="external-link"><code>vignettes/SSM_fitting.Rmd</code></a></small>
       <div class="hidden name"><code>SSM_fitting.Rmd</code></div>
 
     </div>
@@ -113,7 +113,7 @@
 <div class="section level3">
 <h3 id="processing-data">Processing data<a class="anchor" aria-label="anchor" href="#processing-data"></a>
 </h3>
-<p>Fitting SSM’s to tracking data in <code>foieGras</code> is intended
+<p>Fitting SSM’s to tracking data in <code>aniMotum</code> is intended
 to be as simple as possible using <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>. Provided the
 data are in an expected format (see <code><a href="../articles/Overview.html">vignette('Overview')</a></code>),
 <code>fit_ssm</code> can be invoked immediately to both process the data
@@ -216,7 +216,7 @@ error multiplication factors for each location quality class. The error
 multiplication factors define the magnitude of the location error
 standard deviation for each Argos location quality class relative to the
 best quality class, 3. The emf’s used by default in
-<code>foieGras</code> (see Jonsen et al. 2020 for further details) are
+<code>aniMotum</code> (see Jonsen et al. 2020 for further details) are
 unlikely to be equally applicable to all tracking data sets. Alternate
 specifications could be derived from Argos location error studies that
 draw on Argos - GPS double-tagging data such as (Costa et al. 2010).</p>
@@ -308,7 +308,7 @@ slightly better fit.</p>
 <h4 id="control-controlling-the-optimization">
 <code>control</code>: controlling the optimization<a class="anchor" aria-label="anchor" href="#control-controlling-the-optimization"></a>
 </h4>
-<p>By default, <code>foieGras</code> uses R’s <code>nlminb</code>
+<p>By default, <code>aniMotum</code> uses R’s <code>nlminb</code>
 optimizer, but users can also select the more flexible
 <code>optim</code> to minimize the objective function defined by the
 built-in <code>TMB</code> C++ templates. Users can specify which
