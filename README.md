@@ -147,9 +147,6 @@ fit <- fit_ssm(sese,
 plot(fit, type = 3, pages = 1, ncol = 2)
 ```
 
-    #> Warning: namespace 'foieGras' is not available and has been replaced
-    #> by .GlobalEnv when processing object 'fit'
-
 <img src="man/figures/README-ex1-1.png" width="100%" />
 
 ``` r
