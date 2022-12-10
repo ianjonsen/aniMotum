@@ -66,11 +66,13 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "18.04"))')
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "22.04"))')
           
-      - name: "[Custom block] [Linux] Install spatial & igraph-req libraries"
+      - name: "[Custom block] [Linux] Install spatial libraries"
         if: runner.os == 'Linux'
-        run: sudo apt-get install -y libgdal-dev libproj-dev libgeos-dev libudunits2-dev libmkl-rt libglpk-dev libxml2 libgmp-dev
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libgdal-dev libproj-dev libgeos-dev libudunits2-dev libmkl-rt libglpk-dev libxml2 libgmp-dev
       
       - name: "[Custom block] [macOS] Install spatial libraries"
         if: runner.os == 'macOS'
