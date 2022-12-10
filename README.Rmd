@@ -28,33 +28,33 @@ knitr::opts_chunk$set(
 
 
 
-`{aniMotum}` is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as light-level geolocations and GPS. 
+`{aniMotum}` is an R package that fits continuous-time models in state-space form to filter error-prone animal movement data obtained via the Argos satellite system, and to estimate changes in movement behaviour. Template Model Builder {TMB} is used for fast estimation. Argos data can be either (older) Least Squares-based locations, (newer) Kalman Filter-based locations with error ellipse information, or a mixture of the two. The state-space models estimate two sets of location states: 1) corresponding to each observation, which are usually irregularly timed (fitted states); and 2) corresponding to (usually) regular time intervals specified by the user (predicted states). Locations are returned as both LongLat and on the Mercator projection (units=km). The models may be applied with appropriate caution to tracking data obtained from other systems, such as GPS and light-level geolocations. 
 
 ## Installation 
-First, ensure you have R version >= 4.0.0 installed (preferably R 4.1.0 or higher):
+First, ensure you have R version >= 4.0.0 installed (preferably R 4.2.0 or higher):
 
 ```{r get-version, eval = FALSE}
 R.Version()
 ```
 
 ### From R-Universe
-As of `v1.0-5`, `{aniMotum}` is available via R-Universe. This is where the latest stable version can always be found. Installation is simple:
+As of `v1.1`, `{aniMotum}` is available via R-Universe. This is where the latest stable version can always be found. Installation is simple:
 ```{r, eval = FALSE}
 # install from my R-universe repository
 install.packages("aniMotum", 
                  repos = "https://ianjonsen.r-universe.dev")
 
 ```
-However, this will not install any of `{aniMotum}`'s Suggested packages, which add extra functionality such as path re-routing around land. To ensure all Suggested packages, either from R-Universe or CRAN are also installed:
+However, this may not install any of `{aniMotum}`'s Suggested packages, which add extra functionality such as path re-routing around land. To ensure all Suggested packages, either from R-Universe or CRAN are also installed:
 ```{r, eval=FALSE}
 install.packages("aniMotum", 
                  repos = c("https://cloud.r-project.org",
                            "https://ianjonsen.r-universe.dev"),
                  dependencies = "Suggests")
 ```
-`install.packages` will tell you that both a binary (CRAN, v0.7-6) and a source (R-Universe, >= v1.0-5) version exist but the source version is newer. Answer `Yes` to install the source version, provided you have the appropriate compiler tools available (See **From GitHub (source)**, below). 
+If queried, answer `Yes` to install the source version, provided you have the appropriate compiler tools available (See **From GitHub (source)**, below). 
 
-To avoid doing the above every time you want to re-install `{aniMotum}`, you can add my R-Universe repo to your local list of repositories for package download in your `.Rprofile`. This ensures `install.packages` automatically grabs the latest version of `{aniMotum}`
+To avoid typing the above every time you want to re-install `{aniMotum}`, you can add my R-Universe repo to your local list of repositories for package download in your `.Rprofile`. This ensures `install.packages` automatically grabs the latest version of `{aniMotum}`
 ```{r, eval=FALSE}
 #install.packages("usethis")
 usethis::edit_r_profile()
@@ -68,18 +68,18 @@ If you don't want to install compiler tools or have trouble getting them to work
 
 ```{r, eval=FALSE}
 # for Windows
-install.packages("path_to_file\package-windows-release\aniMotum_1.0-5.zip", 
+install.packages("path_to_file\package-windows-release\aniMotum_1.1.zip", 
                  repos=NULL, type="binary")
 
 # for Mac
-install.packages("path_to_file/package-macos-release/aniMotum_1.0-5.tgz", 
+install.packages("path_to_file/package-macos-release/aniMotum_1.1.tgz", 
                  repos=NULL, type="binary")
 
 ```
 
 
 ### From GitHub (source)  
-To get the very latest but likely unstable `{aniMotum}` version, you can install from GitHub. 
+To get the very latest but possibly unstable `{aniMotum}` version, you can install from the staging branch on GitHub. 
 
 On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/) 
 
@@ -93,7 +93,7 @@ Note: there can be issues getting compilers to work properly, especially on M1 M
 
 
 ## Usage
-`{aniMotum}` is intended to be as easy to use as possible. Here's a simple example showing how to fit a move persistence model to Argos tracking data and visualise the result:
+`{aniMotum}` is intended to be as easy to use as possible. Here's a simple example showing how to fit a move persistence state-space model to Argos tracking data and visualise the result:
 ```{r example1, eval=FALSE, message=FALSE, fig.dim=c(9,4), out.width="100%"}
 library(aniMotum)
 
