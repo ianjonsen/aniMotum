@@ -11,7 +11,7 @@
 badge](https://ianjonsen.r-universe.dev/badges/aniMotum)](https://ianjonsen.r-universe.dev)
 [![Coverage
 status](https://codecov.io/gh/ianjonsen/aniMotum/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/aniMotum?branch=master)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2628481.svg)](https://doi.org/10.5281/zenodo.2628481)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7425388.svg)](https://doi.org/10.5281/zenodo.7425388)
 ![R-CMD-check](https://github.com/ianjonsen/aniMotum/actions/workflows/check-full.yaml/badge.svg?branch=master)
 <!-- badges: end -->
 
