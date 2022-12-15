@@ -3,9 +3,10 @@
 (1) flags (keep = FALSE) observations with duplicate
 dates &amp;amp; removes subsequent observations occurring within min.dt s of one another
 (2) determines Argos data type (LS, KF, G, or GL);
-(3) uses trip::sda filter to identify extreme locations. trip::sda is a
-fast, vectorized version of the now CRAN-archived argosfilter::sdafilter
-see ?trip::sda for additional details
+(3) uses sda filter to identify extreme locations. sda is a
+fast, vectorized version of the now CRAN-archived argosfilter::sdafilter.
+sda is a native implementation of that found in the currently archived trip
+package (by MD Sumner: https://github.com/Trackage/trip).
 (4) projects lonlat coords to mercator x,y coords (in km) &amp;amp; shifts longitudes
 that straddle -180,180 to 0,360 and vice-versa;
 (5) adds location error multiplication factors based on Argos location
@@ -89,9 +90,10 @@ class (for type LS);"><meta property="og:image" content="https://ianjonsen.githu
 (1) flags (<code>keep = FALSE</code>) observations with duplicate
 dates &amp; removes subsequent observations occurring within min.dt s of one another
 (2) determines Argos data type (LS, KF, G, or GL);
-(3) uses <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme locations. <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> is a
-fast, vectorized version of the now CRAN-archived <code>argosfilter::sdafilter</code>
-see <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">?trip::sda</a></code> for additional details
+(3) uses <code>sda</code> filter to identify extreme locations. <code>sda</code> is a
+fast, vectorized version of the now CRAN-archived <code>argosfilter::sdafilter</code>.
+<code>sda</code> is a native implementation of that found in the currently archived <code>trip</code>
+package (by MD Sumner: https://github.com/Trackage/trip).
 (4) projects lonlat coords to mercator x,y coords (in km) &amp; shifts longitudes
 that straddle -180,180 to 0,360 and vice-versa;
 (5) adds location error multiplication factors based on Argos location
@@ -122,14 +124,14 @@ class (for type LS);</p>
 
 <dt>ang</dt>
 <dd><p>angles of outlier location "spikes" (default is <code>c(15,25)</code> deg);
-<code>ang = NA</code> turns off <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter in favour of
-<code><a href="https://rdrr.io/pkg/trip/man/speedfilter.html" class="external-link">trip::speedfilter</a></code></p></dd>
+<code>ang = NA</code> turns off <code>sda</code> filter in favour of
+<code>speedfilter</code></p></dd>
 
 
 <dt>distlim</dt>
 <dd><p>lengths of outlier location "spikes" in km (default is
-<code>c(2.5, 5)</code> m); <code>distlim = NA</code> turns off <code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter
-in favour of <code><a href="https://rdrr.io/pkg/trip/man/speedfilter.html" class="external-link">trip::speedfilter</a></code>. Either <code>ang = NA</code> or
+<code>c(2.5, 5)</code> m); <code>distlim = NA</code> turns off <code>sda</code> filter
+in favour of <code>speedfilter</code>. Either <code>ang = NA</code> or
 <code>distlim = NA</code> are sufficient.</p></dd>
 
 

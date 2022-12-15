@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2022-12-12 14:39:18  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2022-12-12 15:39:18  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2022-12-12 16:39:18  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2022-12-12 17:39:18  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2022-12-12 18:39:18  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2022-12-15 00:52:02  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2022-12-15 01:52:02  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2022-12-15 02:52:02  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2022-12-15 03:52:02  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2022-12-15 04:52:02  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr    laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2022-12-12 14:39:18 GL 100.0 -55 0.04411594 2.4876313</span></span>
-<span><span class="co">#&gt; 2 54632 2022-12-13 02:39:18 GL 100.5 -54 2.96763920 0.1189984</span></span>
-<span><span class="co">#&gt; 3 54632 2022-12-13 14:39:18 GL 101.0 -53 0.05266594 3.1727255</span></span>
-<span><span class="co">#&gt; 4 54632 2022-12-14 02:39:18 GL 101.5 -52 0.50569608 1.2188948</span></span>
-<span><span class="co">#&gt; 5 54632 2022-12-14 14:39:18 GL 102.0 -51 0.55658380 1.7496312</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2022-12-15 00:52:02 GL 100.0 -55 0.7816802 0.01443384</span></span>
+<span><span class="co">#&gt; 2 54632 2022-12-15 12:52:02 GL 100.5 -54 0.6356471 5.15991811</span></span>
+<span><span class="co">#&gt; 3 54632 2022-12-16 00:52:02 GL 101.0 -53 0.2633044 0.40148714</span></span>
+<span><span class="co">#&gt; 4 54632 2022-12-16 12:52:02 GL 101.5 -52 0.5960818 0.84391718</span></span>
+<span><span class="co">#&gt; 5 54632 2022-12-17 00:52:02 GL 102.0 -51 0.3683516 0.37743618</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -510,26 +510,26 @@ control parameters).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  Animal id Model Time n.obs n.filt n.fit n.pred n.rr converged   AICc</span></span>
-<span><span class="co">#&gt;  ct36-E-09   crw   24   170     22   148     58    .      TRUE 3022.8</span></span>
-<span><span class="co">#&gt;  ct36-F-09   crw   24   125     17   108    110    .      TRUE 2531.4</span></span>
+<span><span class="co">#&gt;  ct36-E-09   crw   24   170     26   144     58    .      TRUE 2952.2</span></span>
+<span><span class="co">#&gt;  ct36-F-09   crw   24   125     24   101    110    .      TRUE 2392.4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --------------</span></span>
 <span><span class="co">#&gt; ct36-E-09 </span></span>
 <span><span class="co">#&gt; --------------</span></span>
 <span><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
-<span><span class="co">#&gt;          D   0.2071  0.0356</span></span>
-<span><span class="co">#&gt;      rho_o   0.1298  0.1143</span></span>
-<span><span class="co">#&gt;      tau_x   0.9378  0.0728</span></span>
-<span><span class="co">#&gt;      tau_y   0.6794  0.0576</span></span>
+<span><span class="co">#&gt;          D   0.2061  0.0358</span></span>
+<span><span class="co">#&gt;      rho_o   0.1326  0.1183</span></span>
+<span><span class="co">#&gt;      tau_x   0.9748  0.0779</span></span>
+<span><span class="co">#&gt;      tau_y   0.6788  0.0579</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --------------</span></span>
 <span><span class="co">#&gt; ct36-F-09 </span></span>
 <span><span class="co">#&gt; --------------</span></span>
 <span><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
-<span><span class="co">#&gt;          D   0.0818  0.0145</span></span>
-<span><span class="co">#&gt;      rho_o   0.3527  0.1227</span></span>
-<span><span class="co">#&gt;      tau_x   1.3695  0.1362</span></span>
-<span><span class="co">#&gt;      tau_y   1.9665  0.1897</span></span></code></pre></div>
+<span><span class="co">#&gt;          D   0.0854  0.0157</span></span>
+<span><span class="co">#&gt;      rho_o   0.3656  0.1298</span></span>
+<span><span class="co">#&gt;      tau_x   1.4332  0.1481</span></span>
+<span><span class="co">#&gt;      tau_y    2.096  0.2137</span></span></code></pre></div>
 <p>The summary table lists information about the fit, including the
 number of observations in the input data (<code>n.obs</code>), the
 number of observation flagged to be ignored by the SSM
@@ -565,11 +565,11 @@ using <code><a href="../reference/grab.html">grab()</a></code>:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
 <span><span class="co">#&gt;   id     date                  lon   lat     x      y   x.se   y.se     u      v</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-… 2009-02-01 <span style="color: #949494;">17:50:46</span>  72.5 -<span style="color: #BB0000;">50.2</span> <span style="text-decoration: underline;">8</span>069. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">450.</span>  0.486  0.483 0.343 -<span style="color: #BB0000;">0.232</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-… 2009-02-02 <span style="color: #949494;">03:30:26</span>  72.8 -<span style="color: #BB0000;">50.4</span> <span style="text-decoration: underline;">8</span>108. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">477.</span> 11.5    9.57  4.09  -<span style="color: #BB0000;">2.80</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>200. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 18.7   14.1   6.43  -<span style="color: #BB0000;">5.00</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-… 2009-02-03 <span style="color: #949494;">07:39:08</span>  74.5 -<span style="color: #BB0000;">51.2</span> <span style="text-decoration: underline;">8</span>292. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">619.</span> 14.5   10.4   6.64  -<span style="color: #BB0000;">5.08</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-… 2009-02-03 <span style="color: #949494;">15:29:59</span>  74.9 -<span style="color: #BB0000;">51.4</span> <span style="text-decoration: underline;">8</span>340. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">655.</span> 13.4    9.66  6.10  -<span style="color: #BB0000;">4.64</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-… 2009-02-01 <span style="color: #949494;">17:50:46</span>  72.5 -<span style="color: #BB0000;">50.2</span> <span style="text-decoration: underline;">8</span>069. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">450.</span>  0.485  0.482 0.339 -<span style="color: #BB0000;">0.233</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-… 2009-02-02 <span style="color: #949494;">03:30:26</span>  72.8 -<span style="color: #BB0000;">50.4</span> <span style="text-decoration: underline;">8</span>108. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">477.</span> 11.7    9.55  4.04  -<span style="color: #BB0000;">2.80</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>199. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 19.0   14.1   6.41  -<span style="color: #BB0000;">5.00</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-… 2009-02-03 <span style="color: #949494;">07:39:08</span>  74.5 -<span style="color: #BB0000;">51.2</span> <span style="text-decoration: underline;">8</span>291. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">619.</span> 14.9   10.4   6.65  -<span style="color: #BB0000;">5.09</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-… 2009-02-03 <span style="color: #949494;">15:29:59</span>  74.9 -<span style="color: #BB0000;">51.4</span> <span style="text-decoration: underline;">8</span>339. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">655.</span> 13.9    9.65  6.12  -<span style="color: #BB0000;">4.64</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span></span>
 <span></span>
 <span><span class="co">## grab predicted locations in projected form</span></span>
@@ -578,16 +578,16 @@ using <code><a href="../reference/grab.html">grab()</a></code>:</p>
 <span><span class="co">#&gt; Simple feature collection with 5 features and 10 fields</span></span>
 <span><span class="co">#&gt; Geometry type: POINT</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.538 xmax: 8675.265 ymax: -6449.872</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.527 xmax: 8675.541 ymax: -6449.872</span></span>
 <span><span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 11</span></span></span>
 <span><span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:00:00</span> 9.80<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> -<span style="color: #BB0000;">6.63</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:00:00</span> 6.41<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.98</span><span style="color: #949494;">e</span>+ 0 1.11<span style="color: #949494;">e</span>+0 9.48<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.80<span style="color: #949494;">e</span>+1 1.36<span style="color: #949494;">e</span>+1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.03<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.30<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.38<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E… 2009-02-04 <span style="color: #949494;">17:00:00</span> 5.71<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.36</span><span style="color: #949494;">e</span>+ 0 1.01<span style="color: #949494;">e</span>+0 8.39<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.29<span style="color: #949494;">e</span>+1 9.31<span style="color: #949494;">e</span>+0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E… 2009-02-05 <span style="color: #949494;">17:00:00</span> 9.40<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.43</span><span style="color: #949494;">e</span>+ 0 1.19<span style="color: #949494;">e</span>+0 1.09<span style="color: #949494;">e</span>+0 1.24<span style="color: #949494;">e</span>+1 9.16<span style="color: #949494;">e</span>+0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:00:00</span> 9.73<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> -<span style="color: #BB0000;">6.67</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 1.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:00:00</span> 6.38<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.98</span><span style="color: #949494;">e</span>+ 0 1.12<span style="color: #949494;">e</span>+0 9.47<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.83<span style="color: #949494;">e</span>+1 1.36<span style="color: #949494;">e</span>+1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.06<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.31<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.43<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E… 2009-02-04 <span style="color: #949494;">17:00:00</span> 5.74<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.36</span><span style="color: #949494;">e</span>+ 0 1.03<span style="color: #949494;">e</span>+0 8.38<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.33<span style="color: #949494;">e</span>+1 9.30<span style="color: #949494;">e</span>+0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E… 2009-02-05 <span style="color: #949494;">17:00:00</span> 9.34<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.43</span><span style="color: #949494;">e</span>+ 0 1.20<span style="color: #949494;">e</span>+0 1.09<span style="color: #949494;">e</span>+0 1.28<span style="color: #949494;">e</span>+1 9.14<span style="color: #949494;">e</span>+0</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></span></code></pre></div>
 <p>Here, the output from the <code>crw</code> SSM is returned as a
 fitted location data.frame (floc) that includes individual id, date,
