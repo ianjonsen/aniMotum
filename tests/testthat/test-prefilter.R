@@ -13,7 +13,8 @@ test_that("format_data catches incorrect names", {
 })
 
 ## test that format_data accepts timezone when character dates input
-ellie.dt <- ellie %>% mutate(date = as.character(date))
+ellie.dt <- ellie
+ellie.dt$date <- as.character(ellie.dt$date)
 test_that("format_data accepts timezone", {
   expect_no_error(format_data(ellie.dt, tz = "GMT"))
 })
@@ -32,7 +33,7 @@ test_that("format_data orders variables properly", {
 ## test that format_data & prefilter handle sf-tibbles
 test_that("prefilter handles incoming sf data", {
   f <- format_data(ellie_sf)
-  f <- prefilter(f, vmax=10, ang=c(15,25), min.dt=120)
+  f <- prefilter(f, vmax=5, ang=c(15,25), min.dt=120)
   expect_s3_class(f, "sf")
   expect_equal(names(f), c("id","date","lc","smaj","smin","eor","lonerr","laterr","keep","obs.type","emf.x","emf.y","geometry"))
 })
@@ -64,4 +65,3 @@ test_that("prefilter converts m to km for projected data", {
   expect_s3_class(f, "sf")
   expect_true(grepl("units=km", sf::st_crs(f)$input, fixed = TRUE))
 })
-

@@ -4,9 +4,10 @@
 ##' (1) flags (`keep = FALSE`) observations with duplicate
 ##'  dates & removes subsequent observations occurring within min.dt s of one another 
 ##' (2) determines Argos data type (LS, KF, G, or GL);
-##' (3) uses `trip::sda` filter to identify extreme locations. `trip::sda` is a 
-##' fast, vectorized version of the now CRAN-archived `argosfilter::sdafilter`
-##' see `?trip::sda` for additional details
+##' (3) uses `sda` filter to identify extreme locations. `sda` is a 
+##' fast, vectorized version of the now CRAN-archived `argosfilter::sdafilter`. 
+##' `sda` is a native implementation of that found in the currently archived `trip`
+##' package (by MD Sumner: https://github.com/Trackage/trip).
 ##' (4) projects lonlat coords to mercator x,y coords (in km) & shifts longitudes
 ##' that straddle -180,180 to 0,360 and vice-versa;
 ##' (5) adds location error multiplication factors based on Argos location
@@ -17,11 +18,11 @@
 ##' @param x input data, must have 5 (LS), or 8 (KF) columns (see details)
 ##' @param vmax max travel rate (m/s)
 ##' @param ang angles of outlier location "spikes" (default is \code{c(15,25)} deg);
-##' \code{ang = NA} turns off \code{trip::sda} filter in favour of 
-##' \code{trip::speedfilter}
+##' \code{ang = NA} turns off \code{sda} filter in favour of 
+##' \code{speedfilter}
 ##' @param distlim lengths of outlier location "spikes" in km (default is 
-##' \code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter 
-##' in favour of \code{trip::speedfilter}. Either \code{ang = NA} or 
+##' \code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{sda} filter 
+##' in favour of \code{speedfilter}. Either \code{ang = NA} or 
 ##' \code{distlim = NA} are sufficient.
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference in s between observations; 

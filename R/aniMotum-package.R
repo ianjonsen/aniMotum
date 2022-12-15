@@ -30,7 +30,7 @@
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
 ##' @importFrom raster extent extract nlayers
-##' @importFrom trip sda speedfilter trip
+##' @importFrom traipse track_distance track_angle track_distance_to
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median qlogis qnorm pnorm runif
 ##' @importFrom utils flush.console globalVariables

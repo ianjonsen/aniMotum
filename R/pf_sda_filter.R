@@ -1,21 +1,22 @@
-##' @title Use `trip::sda` to identify extreme locations
+##' @title Use `sda` to identify extreme locations
 ##' 
-##' @details `trip::sda` is a vectorized implementation of the Argos filter 
+##' @details `sda` is a vectorized implementation of the Argos filter 
 ##' presented in Freitas et al. (2008) Mar Mamm Sci 24:315-325. This function
-##' checks for errors returned by `trip::sda` and falls back to using the simpler 
-##' `trip::speedfilter` if an error is returned.
+##' checks for errors returned by `sda` and falls back to using the simpler 
+##' `speedfilter` if an error is returned. Both `sda` and `speedfilter` are native
+##' implementations of those from the `trip` package 
+##' (MD Sumner: https://github.com/Trackage/trip).
 ##'
 ##' @param x data from `pf_obs_type()`
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param vmax max travel rate (m/s)
 ##' @param ang angles of outlier location "spikes" (default is `c(15,25)` deg);
-##' `ang = NA` turns off `trip::sda` filter in favour of 
-##' `trip::speedfilter`
+##' `ang = NA` turns off `sda` filter in favour of 
+##' `speedfilter`
 ##' @param distlim lengths of outlier location "spikes" in km (default is 
-##' `c(2.5, 5)` m); `distlim = NA` turns off `trip::sda` filter 
-##' in favour of `trip::speedfilter`. Either `ang = NA` or 
+##' `c(2.5, 5)` m); `distlim = NA` turns off `sda` filter 
+##' in favour of `speedfilter`. Either `ang = NA` or 
 ##' `distlim = NA` are sufficient.
-##' @importFrom trip sda speedfilter trip
 ##' @importFrom sf st_coordinates st_is_longlat st_crs st_transform 
 ##' @keywords internal
 ##' @md
@@ -37,15 +38,18 @@ if (spdf) {
     names(xy) <- c("lon","lat")
     x <- cbind(x, xy)
   } 
-  x.tr <- subset(x, keep)[, c("lon","lat","date","id","lc","smaj","smin",
-                              "eor","lonerr","laterr","keep","obs.type")]
-  names(x.tr)[1:2] <- c("x","y")
-  x.tr <- suppressWarnings(trip(as.data.frame(x.tr), TORnames = c("date", "id"), 
-                                correct_all = FALSE))
+  ## was req'd when using trip::sda - keep in case we want to revert now that
+  ##  {trip} has been updated and 'un-archived'
+#  x.tr <- subset(x, keep)[, c("lon","lat","date","id","lc","smaj","smin",
+#                              "eor","lonerr","laterr","keep","obs.type")]
+#  names(x.tr)[1:2] <- c("x","y")
+#  x.tr <- suppressWarnings(trip(as.data.frame(x.tr), TORnames = c("date", "id"), 
+#                                correct_all = FALSE))
+  x.tr <- subset(x, keep)
   
   if(any(is.na(ang))) ang <- c(0,0)
   if(any(is.na(distlim))) distlim <- c(0,0)
-  
+
   tmp <-
     suppressWarnings(try(
       sda(
@@ -88,6 +92,7 @@ if (spdf) {
       )
     }
   }
+  
   x[x$keep, "keep"] <- tmp
   
 } 

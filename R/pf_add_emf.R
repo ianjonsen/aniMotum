@@ -18,9 +18,11 @@ pf_add_emf <- function(x, emf) {
   } else if(is.data.frame(emf)) {
     tmp <- emf
   } 
-  
+
   x$lc <- with(x, as.character(lc))
   x <- merge(x, tmp, by = "lc", all.x = TRUE, sort = FALSE)
+  
+  
   x <- x[order(x$date), c("id","date","lc","smaj","smin","eor",
                                 "lonerr","laterr","keep","obs.type",
                                 "emf.x","emf.y","geometry")]

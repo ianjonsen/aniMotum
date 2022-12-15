@@ -2,7 +2,7 @@
 % Please edit documentation in R/pf_sda_filter.R
 \name{pf_sda_filter}
 \alias{pf_sda_filter}
-\title{Use \code{trip::sda} to identify extreme locations}
+\title{Use \code{sda} to identify extreme locations}
 \usage{
 pf_sda_filter(x, spdf, vmax, ang, distlim)
 }
@@ -14,21 +14,23 @@ pf_sda_filter(x, spdf, vmax, ang, distlim)
 \item{vmax}{max travel rate (m/s)}
 
 \item{ang}{angles of outlier location "spikes" (default is \code{c(15,25)} deg);
-\code{ang = NA} turns off \code{trip::sda} filter in favour of
-\code{trip::speedfilter}}
+\code{ang = NA} turns off \code{sda} filter in favour of
+\code{speedfilter}}
 
 \item{distlim}{lengths of outlier location "spikes" in km (default is
-\code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{trip::sda} filter
-in favour of \code{trip::speedfilter}. Either \code{ang = NA} or
+\code{c(2.5, 5)} m); \code{distlim = NA} turns off \code{sda} filter
+in favour of \code{speedfilter}. Either \code{ang = NA} or
 \code{distlim = NA} are sufficient.}
 }
 \description{
-Use \code{trip::sda} to identify extreme locations
+Use \code{sda} to identify extreme locations
 }
 \details{
-\code{trip::sda} is a vectorized implementation of the Argos filter
+\code{sda} is a vectorized implementation of the Argos filter
 presented in Freitas et al. (2008) Mar Mamm Sci 24:315-325. This function
-checks for errors returned by \code{trip::sda} and falls back to using the simpler
-\code{trip::speedfilter} if an error is returned.
+checks for errors returned by \code{sda} and falls back to using the simpler
+\code{speedfilter} if an error is returned. Both \code{sda} and \code{speedfilter} are native
+implementations of those from the \code{trip} package
+(MD Sumner: https://github.com/Trackage/trip).
 }
 \keyword{internal}
