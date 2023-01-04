@@ -50,16 +50,18 @@ install.packages("aniMotum",
                  repos = "https://ianjonsen.r-universe.dev")
 ```
 
-However, this may not install any of `{aniMotum}`’s Suggested packages,
-which add extra functionality such as path re-routing around land. To
-ensure all Suggested packages, either from R-Universe or CRAN are also
-installed:
+However, this will only install R packages available from the R-universe
+that are imported by `{aniMotum}`. Those packages available only on CRAN
+and/or suggested by `{aniMotum}`, which add extra functionality such as
+path re-routing around land, will not be installed. To ensure all
+dependent packages, either from R-Universe or CRAN, are also installed
+use the following:
 
 ``` r
 install.packages("aniMotum", 
                  repos = c("https://cloud.r-project.org",
                            "https://ianjonsen.r-universe.dev"),
-                 dependencies = "Suggests")
+                 dependencies = TRUE)
 ```
 
 If queried, answer `Yes` to install the source version, provided you
@@ -91,11 +93,11 @@ following command to install from the file you’ve just downloaded (where
 ``` r
 # for Windows
 install.packages("path_to_file\package-windows-release\aniMotum_1.1.zip", 
-                 repos=NULL, type="binary")
+                 repos=NULL, type="binary", dependencies = TRUE)
 
 # for Mac
 install.packages("path_to_file/package-macos-release/aniMotum_1.1.tgz", 
-                 repos=NULL, type="binary")
+                 repos=NULL, type="binary", dependencies = TRUE)
 ```
 
 ### From GitHub (source)
