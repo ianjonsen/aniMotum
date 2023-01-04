@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2022-12-15 00:52:02  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2022-12-15 01:52:02  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2022-12-15 02:52:02  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2022-12-15 03:52:02  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2022-12-15 04:52:02  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2023-01-04 13:48:01  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2023-01-04 14:48:01  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2023-01-04 15:48:01  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2023-01-04 16:48:01  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2023-01-04 17:48:01  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2022-12-15 00:52:02 GL 100.0 -55 0.7816802 0.01443384</span></span>
-<span><span class="co">#&gt; 2 54632 2022-12-15 12:52:02 GL 100.5 -54 0.6356471 5.15991811</span></span>
-<span><span class="co">#&gt; 3 54632 2022-12-16 00:52:02 GL 101.0 -53 0.2633044 0.40148714</span></span>
-<span><span class="co">#&gt; 4 54632 2022-12-16 12:52:02 GL 101.5 -52 0.5960818 0.84391718</span></span>
-<span><span class="co">#&gt; 5 54632 2022-12-17 00:52:02 GL 102.0 -51 0.3683516 0.37743618</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr     laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2023-01-04 13:48:01 GL 100.0 -55 1.16020579 1.95677319</span></span>
+<span><span class="co">#&gt; 2 54632 2023-01-05 01:48:01 GL 100.5 -54 1.16746922 0.57504753</span></span>
+<span><span class="co">#&gt; 3 54632 2023-01-05 13:48:01 GL 101.0 -53 0.07483509 0.26722148</span></span>
+<span><span class="co">#&gt; 4 54632 2023-01-06 01:48:01 GL 101.5 -52 0.39244189 0.06667839</span></span>
+<span><span class="co">#&gt; 5 54632 2023-01-06 13:48:01 GL 102.0 -51 0.57662913 1.64835363</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -357,7 +357,7 @@ vs NA’s).</p>
 steps: a data formatting step, a pre-filtering step, and the actual
 model fitting step. A number of checks are made on the input data during
 the formatting and pre-filtering steps, including applying the
-<code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme observations (see
+<code>trip::sda</code> filter to identify extreme observations (see
 <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details). The pre-filter step is fully
 automated, although various arguments can be used to modify it’s
 actions, and called via the <code>fit_ssm</code> function:</p>
@@ -716,7 +716,7 @@ animal-borne tags. Movement Ecology 8:31.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -124,12 +124,12 @@
 <code class="sourceCode R"><span><span class="co"># install from my R-universe repository</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aniMotum"</span>, </span>
 <span>                 repos <span class="op">=</span> <span class="st">"https://ianjonsen.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
-<p>However, this may not install any of <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>’s Suggested packages, which add extra functionality such as path re-routing around land. To ensure all Suggested packages, either from R-Universe or CRAN are also installed:</p>
+<p>However, this will only install R packages available from the R-universe that are imported by <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>. Those packages available only on CRAN and/or suggested by <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>, which add extra functionality such as path re-routing around land, will not be installed. To ensure all dependent packages, either from R-Universe or CRAN, are also installed use the following:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aniMotum"</span>, </span>
 <span>                 repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://cloud.r-project.org"</span>,</span>
 <span>                           <span class="st">"https://ianjonsen.r-universe.dev"</span><span class="op">)</span>,</span>
-<span>                 dependencies <span class="op">=</span> <span class="st">"Suggests"</span><span class="op">)</span></span></code></pre></div>
+<span>                 dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>If queried, answer <code>Yes</code> to install the source version, provided you have the appropriate compiler tools available (See <strong>From GitHub (source)</strong>, below).</p>
 <p>To avoid typing the above every time you want to re-install <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a>, you can add my R-Universe repo to your local list of repositories for package download in your <code>.Rprofile</code>. This ensures <code>install.packages</code> automatically grabs the latest version of <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -142,11 +142,11 @@
 <p>If you don’t want to install compiler tools or have trouble getting them to work then you can manually download a binary version of the <a href="https://github.com/ianjonsen/aniMotum/" class="external-link">aniMotum</a> package for Windows or Mac from here <a href="https://ianjonsen.r-universe.dev/ui#package:aniMotum" class="external-link uri">https://ianjonsen.r-universe.dev/ui#package:aniMotum</a>. In R, use the following command to install from the file you’ve just downloaded (where <code>path_to_file</code> is wherever you saved the download:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for Windows</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file\package-windows-release</span><span class="sc">\a</span><span class="st">niMotum_1.1.zip"</span>, </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># for Mac</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"path_to_file/package-macos-release/aniMotum_1.1.tgz"</span>, </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>)</span></code></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repos=</span><span class="cn">NULL</span>, <span class="at">type=</span><span class="st">"binary"</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="from-github-source">From GitHub (source)<a class="anchor" aria-label="anchor" href="#from-github-source"></a>
@@ -282,7 +282,7 @@ Additional support was provided by France’s Centre de Synthèse et d’Analyse
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

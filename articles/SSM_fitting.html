@@ -137,10 +137,10 @@ and angle (Freitas et al. 2008).</li>
 <p>Several arguments to <code>fit_ssm</code> provide a measure of
 control over data processing. The <code>vmax</code>, <code>ang</code>
 and <code>distlim</code> arguments provide control over the
-<code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details).
+<code>trip::sda</code> filter (see <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details).
 The <code>sda</code> filter can occasionally fail (possibly when
 calculating angles between successive displacements), in this case we
-fall back to using <code><a href="https://rdrr.io/pkg/trip/man/speedfilter.html" class="external-link">trip::speedfilter</a></code> and a warning issued.
+fall back to using <code>trip::speedfilter</code> and a warning issued.
 The <code>trip</code> filter can be turned off altogether with
 <code>spdf = FALSE</code>, although this is usually not advisable if
 working with older Least-Squares Argos data, the lower prevalence of
@@ -187,7 +187,7 @@ processed data as a projected <code>sf</code> data.frame prior to
 fitting an SSM. Looking at the <code>keep</code> column, we can see that
 the 3rd, 4th and 7th observations have been flagged to be ignored by the
 SSM, in this case because they failed the distance limits imposed by the
-<code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter. Also note that because the data included
+<code>trip::sda</code> filter. Also note that because the data included
 CLS Argos location ellipse error information, the observation type has
 been designated <code>KF</code> for Kalman filter and this ensures that
 the appropriate measurement error model is used when fitting the SSM to
@@ -400,7 +400,7 @@ ellipse. <em>Methods in Ecology and Evolution</em> 6:266–77.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
