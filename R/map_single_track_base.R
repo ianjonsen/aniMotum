@@ -129,7 +129,7 @@ map_single_track_base <- function(map_type,
         linewidth = aes$df$size[3]
       )
   } else if(aes$line & by.date) {
-    browser()
+
     p <- p +
       geom_sf(
         data = line_sf,
