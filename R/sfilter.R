@@ -186,7 +186,7 @@ sfilter <-
         X = t(xs),
         mu = t(xs),
         v = t(v),
-        l_D = 0,
+        l_D = c(0,0),
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -329,13 +329,13 @@ sfilter <-
     ## Set parameter bounds - most are -Inf, Inf
     L = c(l_sigma=c(-Inf,-Inf),
           l_rho_p=-7,
-          l_D=-Inf,
+          l_D=c(-Inf,-Inf),
           l_psi=-Inf,
           l_tau=c(-Inf,-Inf),
           l_rho_o=-7) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
     U = c(l_sigma=c(Inf,Inf),
           l_rho_p=7,
-          l_D=Inf,
+          l_D=c(Inf,Inf),
           l_psi=Inf,
           l_tau=c(Inf,Inf),
           l_rho_o=7)
@@ -354,8 +354,8 @@ sfilter <-
     L <- L[!names(L) %in% names(map)]
     U <- U[!names(U) %in% names(map)]
     if(model == "rw") {
-      L <- L[names(L) != "l_D"] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
-      U <- U[names(U) != "l_D"]
+      L <- L[!names(L) %in% c("l_D","l_D")] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
+      U <- U[!names(U) %in% c("l_D","l_D")]
     } else if(model == "crw") {
       L <- L[!names(L) %in% c("l_sigma","l_sigma","l_rho_p")] 
       U <- U[!names(U) %in% c("l_sigma","l_sigma","l_rho_p")]
