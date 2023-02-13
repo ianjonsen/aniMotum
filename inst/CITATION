@@ -1,4 +1,25 @@
-citHeader("To cite aniMotum in publications, please, usee these references:")
+citHeader("To cite aniMotum in publications, please, use these references:")
+
+citEntry(entry = "article",
+         title        = "aniMotum, an R package for animal movement data: Rapid quality control, behavioural estimation and simulation",
+         author       = personList(as.person("Ian D. Jonsen"),
+                                   as.person("W. James Grecian"),
+                                   as.person("Lachlan Phillips"),
+                                   as.person("Gemma Carroll"),
+                                   as.person("Clive R. McMahon"),
+                                   as.person("Robert G. Harcourt"),
+                                   as.person("Mark A. Hindell"),
+                                   as.person("Toby A. Patterson")),
+         journal      = "Methods in Ecology and Evolution",
+         year         = "2023",
+         doi          = "10.1111/2041-210X.14060",
+         
+         textVersion  = 
+           paste("Ian Jonsen, W James Grecian, Lachlan Phillips, Gemma Carroll, Clive R. McMahon, Robert G. Harcourt, Mark A. Hindell, and Toby A. Patterson (2023) ",
+                 "aniMotum, an R package for animal movement data: Rapid quality control, behavioural estimation and simulation.",
+                 " Methods in Ecology and Evolution DOI: 10.1111/2041-210X.14060")
+)
+
 
 citEntry(entry = "article",
          title        = "A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags",
@@ -29,25 +50,6 @@ citEntry(entry = "article",
                  " Movement Ecology 8:31.")
 )
 
-citEntry(entry = "article",
-         title        = "Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model",
-         author       = personList(as.person("Ian D. Jonsen"),
-                                   as.person("Clive R. McMahon"),
-                                   as.person("Toby A. Patterson"),
-                                   as.person("Marie Auger-Méthé"),
-                                   as.person("Robert G. Harcourt"),
-                                   as.person("Mark A. Hindell"),
-                                   as.person("Sophie Bestley")),
-         journal      = "Ecology",
-         year         = "2019",
-         volume       = "100",
-         pages        = "e02566",
-         
-         textVersion  =
-           paste("Jonsen, I.D., McMahon, C.R., Patterson, T.A. et al. (2019) ",
-                 "Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model.",
-                 " Ecology 100:e02566.")
-)
 
 citEntry(entry = "misc",
          title        = "fit latent variable movement models to animal tracking data for location quality control and behavioural inference",

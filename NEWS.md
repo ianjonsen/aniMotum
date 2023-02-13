@@ -1,3 +1,11 @@
+# aniMotum 1.1-02 (13/02/2023)
+
+* update citations to include new aniMotum R package paper in Methods in Ecology and Evolution as the primary reference.
+
+# aniMotum 1.1-01 (01/02/2023)
+
+* fixes issue with map() where function could become paused one some calls.
+
 # aniMotum 1.1 (10/12/2022)
 
 * package name change to coincide with Methods in Ecology and Evolution manuscript: Jonsen et al. `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Accepted 06/12/2022.
