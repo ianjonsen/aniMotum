@@ -186,7 +186,8 @@ sfilter <-
         X = t(xs),
         mu = t(xs),
         v = t(v),
-        l_D = c(0,0),
+        l_D = c(1,1),
+        l_rho_p = 0.1,
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -357,8 +358,8 @@ sfilter <-
       L <- L[!names(L) %in% c("l_D","l_D")] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
       U <- U[!names(U) %in% c("l_D","l_D")]
     } else if(model == "crw") {
-      L <- L[!names(L) %in% c("l_sigma","l_sigma","l_rho_p")] 
-      U <- U[!names(U) %in% c("l_sigma","l_sigma","l_rho_p")]
+      L <- L[!names(L) %in% c("l_sigma","l_sigma")] #,"l_rho_p"
+      U <- U[!names(U) %in% c("l_sigma","l_sigma")] #,"l_rho_p"
     }
 
     ## Minimize objective function
@@ -406,6 +407,9 @@ sfilter <-
       } 
       if("tau" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "tau")] <- c("tau_x","tau_y")
+      }
+      if("D" %in% row.names(fxd)) {
+        row.names(fxd)[which(row.names(fxd) == "D")] <- c("D_x","D_y")
       }
       ## separate speed+se if present
       if("sf" %in% row.names(fxd)) {

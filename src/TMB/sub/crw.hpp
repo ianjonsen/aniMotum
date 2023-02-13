@@ -44,10 +44,12 @@ Type crw(objective_function<Type>* obj) {
   PARAMETER(l_psi); 				  // error SD scaling parameter to account for possible uncertainty in Argos error ellipse variables
   // for LS/GPS OBS MODEL
   PARAMETER_VECTOR(l_tau);     	// error dispersion for LS obs model (log scale)
-  PARAMETER(l_rho_o);             // error correlation
+  PARAMETER(l_rho_p);             // process error correlation b/w x,y
+  PARAMETER(l_rho_o);             // measurement error correlation b/w x,y
   
   // Transform parameters
   vector<Type> tau = exp(l_tau);
+  Type rho_p = Type(2.0) / (Type(1.0) + exp(-l_rho_p)) - Type(1.0);
   Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi = exp(l_psi);
   vector<Type> D = exp(l_D);
@@ -66,6 +68,8 @@ Type crw(objective_function<Type>* obj) {
   cov(1,1) = tiny;
   cov(2,2) = 2 * D(0) * dt(0);
   cov(3,3) = 2 * D(1) * dt(0);
+  cov(2,3) = pow(2 * D(0) * dt(0), 0.5) * pow(2 * D(1) * dt(0), 0.5) * rho_p;
+  cov(3,2) = cov(2,3);
     
   // loop over 2 coords and update nll of start location and velocities.
   for(int i = 0; i < Y.rows(); i++) {
@@ -84,6 +88,8 @@ Type crw(objective_function<Type>* obj) {
     cov(1,1) = tiny;
     cov(2,2) = 2 * D(0) * dt(i);
     cov(3,3) = 2 * D(1) * dt(i);
+    cov(2,3) = pow(2 * D(0) * dt(i), 0.5) * pow(2 * D(1) * dt(i), 0.5) * rho_p;
+    cov(3,2) = cov(2,3);
       
     // location innovations
     x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
@@ -166,6 +172,7 @@ Type crw(objective_function<Type>* obj) {
   }
     
   ADREPORT(D);
+  ADREPORT(rho_p);
   ADREPORT(rho_o);
   ADREPORT(tau);
   ADREPORT(psi);
