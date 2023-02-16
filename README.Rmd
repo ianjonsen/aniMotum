@@ -85,7 +85,7 @@ On PC's running Windows, ensure you have installed [Rtools](https://cran.r-proje
 On Mac's, ensure you have installed the Command Line Tools for Xcode by executing `xcode-select --install` in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed (e.g., https://github.com/fxcoudert/gfortran-for-macOS/releases).
 
 ```{r gh-installation_staging, eval = FALSE}
-remotes::install_github("ianjonsen/aniMotum@staging")
+remotes::install_github("ianjonsen/aniMotum")
 ```
 
 Note: there can be issues getting compilers to work properly, especially on M1 Macs. Often, this is due to missing or incorrect Xcode Command Line Tools and/or Fortran compiler. If you encounter install and compile issues, you may find a solution in the excellent documentation here [glmmTMB](https://github.com/glmmTMB/glmmTMB). Alternatively, if you don't care to have the very latest version then installing from R-Universe is the preferred approach. R-Universe automatically builds binary package versions for all common platforms, so you won't have to worry about compiler software or issues!
