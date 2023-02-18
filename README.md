@@ -126,7 +126,7 @@ style="width:50.0%;height:50.0%" />
 If you have a Mac with an M1 (or later) processor, the above binary file
 will not work as R-universe currently builds their Mac binaries on an
 Intel Mac. Instead, you will need to download the binary from here
-<https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-02>. Follow the
+<https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-03>. Follow the
 same installation procedure (R console or GUI) as above. Note, this
 binary was built for **R 4.2.2**, the current release version.
 

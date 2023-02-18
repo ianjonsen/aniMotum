@@ -86,7 +86,7 @@ Then, click the "Browse" button to navigate to wherever you saved the `.zip` (Wi
 
 ![](man/figures/README-install_3.png){#id .class width=50% height=50%}
 
-If you have a Mac with an M1 (or later) processor, the above binary file will not work as R-universe currently builds their Mac binaries on an Intel Mac. Instead, you will need to download the binary from here https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-02. Follow the same installation procedure (R console or GUI) as above. Note, this binary was built for **R 4.2.2**, the current release version. 
+If you have a Mac with an M1 (or later) processor, the above binary file will not work as R-universe currently builds their Mac binaries on an Intel Mac. Instead, you will need to download the binary from here https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-03. Follow the same installation procedure (R console or GUI) as above. Note, this binary was built for **R 4.2.2**, the current release version. 
 
 ### From GitHub (source)  
 If you prefer installing from GitHub via `remotes::install_github()` and know your way around the installation of compilers and associated libraries, then you will need to ensure you have the proper compilation tools and libraries installed. 
