@@ -84,14 +84,15 @@ binary version of the `{aniMotum}` package for Windows or Intel Mac from
 here <https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
 binary versions for Windows & Mac, each corresponds to a different major
 release of R: 4.3, 4.2, and 4.1 - choose the one that matches your R
-version.
+version. You can check your R version by typing `R.Version()` in the R
+console.
 
-On a Mac, it is important to right click and choose “Download Linked
-File As…” so that the file isn’t automatically uncompressed. If you have
-download the file correctly, its extension will be `.tgz` **not**
-`.tar`. In R, you can use the following command in the R console to
-install the file you’ve just downloaded (where `path_to_file` is
-wherever you saved the download):
+When downloading the binary version on a Mac, it is important to right
+click and choose “Download Linked File As…” so that the file isn’t
+automatically uncompressed. If you have downloaded the file correctly,
+its extension will be `.tgz`, **not** `.tar`. You can use the following
+command in the R console to install the file you’ve just downloaded
+(where `path_to_file` is wherever you saved the download):
 
 ``` r
 # for Windows
