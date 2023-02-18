@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-03</span>
       </span>
     </div>
 
@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2023-02-17 11:27:57  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2023-02-17 12:27:57  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2023-02-17 13:27:57  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2023-02-17 14:27:57  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2023-02-17 15:27:57  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2023-02-18 14:13:51  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2023-02-18 15:13:51  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2023-02-18 16:13:51  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2023-02-18 17:13:51  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2023-02-18 18:13:51  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr     laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2023-02-17 11:27:57 GL 100.0 -55 0.11411171 0.06339251</span></span>
-<span><span class="co">#&gt; 2 54632 2023-02-17 23:27:57 GL 100.5 -54 0.81219457 0.76959257</span></span>
-<span><span class="co">#&gt; 3 54632 2023-02-18 11:27:57 GL 101.0 -53 0.96286796 1.58758312</span></span>
-<span><span class="co">#&gt; 4 54632 2023-02-18 23:27:57 GL 101.5 -52 1.04814161 1.54573616</span></span>
-<span><span class="co">#&gt; 5 54632 2023-02-19 11:27:57 GL 102.0 -51 0.08242777 3.30736347</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2023-02-18 14:13:51 GL 100.0 -55 0.5532184 0.2114500</span></span>
+<span><span class="co">#&gt; 2 54632 2023-02-19 02:13:51 GL 100.5 -54 0.6973112 2.1655562</span></span>
+<span><span class="co">#&gt; 3 54632 2023-02-19 14:13:51 GL 101.0 -53 0.1396232 0.1394396</span></span>
+<span><span class="co">#&gt; 4 54632 2023-02-20 02:13:51 GL 101.5 -52 0.1971581 0.5636943</span></span>
+<span><span class="co">#&gt; 5 54632 2023-02-20 14:13:51 GL 102.0 -51 1.0148189 2.1037697</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
