@@ -83,9 +83,9 @@ have trouble getting them to work then you can manually download a
 binary version of the `{aniMotum}` package for Windows or Intel Mac from
 here <https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
 binary versions for Windows & Mac, each corresponds to a different major
-release of R: 4.3, 4.2, and 4.1 - choose the one that matches your R
-version. You can check your R version by typing `R.Version()` in the R
-console.
+release of R: 4.3 (development version), 4.2 (current version), and 4.1
+(old version) - choose the one that matches your R version. You can
+check your R version by typing `R.Version()` in the R console.
 
 When downloading the binary version on a Mac, it is important to right
 click and choose “Download Linked File As…” so that the file isn’t
@@ -128,8 +128,7 @@ will not work as R-universe currently builds their Mac binaries on an
 Intel Mac. Instead, you will need to download the binary from here
 <https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-02>. Follow the
 same installation procedure (R console or GUI) as above. Note, this
-binary was built for **R 4.2** releases. A version for **R 4.3** will be
-available soon.
+binary was built for **R 4.2.2**, the current release version.
 
 ### From GitHub (source)
 
