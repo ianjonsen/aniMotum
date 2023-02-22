@@ -142,9 +142,25 @@ route_path <-
         st_intersection(world_mc) %>% 
         st_collection_extract('POLYGON') %>% 
         st_sf())
-    
-      # create visibility graph
-      vis_graph <- pathroutr::prt_visgraph(land_region, ...)
+
+      ### if none of the tracks have any points on land, land_region will have no rows in it.
+      ### this causes prt_visgaph(land_region, ...) to fail with the following message:
+      ###    <simpleError in pathroutr::prt_visgraph(land_region, ...):
+      ###    barrier must be a simple feature collection with geometry type 'POLYGON' or 'MULTIPOLYGON>
+      ### in this case where are no points on land, there is no need for rerouting to change any locations,
+      ### but instead of failing and forcing the user to go back to the original fit_rw locations, 
+      ### it is coventient to get the original data packaged in the usual way this function returns it.
+      ### so we set a flag to do this that is checked later in the script.
+      if(prod(dim(land_region))==0) { 
+         output_unchanged_locations=TRUE
+         message("all tracks given to reroute_path() are entirely in water:")
+         message("not changing any paths.")
+      } else {
+         output_unchanged_locations=FALSE
+         # create visibility graph
+          vis_graph <- pathroutr::prt_visgraph(land_region, ...)
+      } 
+
 
     if (inherits(x, "ssm_df")) {
       # create nested tibble grouped by individual track
@@ -163,7 +179,18 @@ route_path <-
       }
 
       df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
-        if(!inherits(x, "try-error")) pathroutr::prt_reroute(x, land_region, vis_graph)
+        ### when output_unchanged_locations is true, we want unchanged input locations,
+        ### but run through the rest of this script so they are packaged as usual as if prt_reroute had been run. 
+        if (output_unchanged_locations) { 
+            ### we cannot run prt_reroute here, because vis_graph is undefined, since land_region was empty.
+            ### so we simulate as if we had run prt_reroute and it found no conflicts, by returning an empty tibble, 
+            ### ?pathroutr::prt_reroute says "If trkpts and barrier do not spatially intersect and empty tibble is returned."
+            tibble()
+        } else {
+            if (!inherits(x, "try-error")) {
+                pathroutr::prt_reroute(x, land_region, vis_graph)
+            }
+        }
       })
 
       df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
