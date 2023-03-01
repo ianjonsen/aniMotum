@@ -1,3 +1,8 @@
+# aniMotum 1.1-04 (01/03/2023)
+
+* fixes issue with `grab()` where multiple data sets with `lon` modulo 0,360 resulted in an error
+* fixes issue with `route_path()` where rerouting tracks that have no locations on land resulted in an error. In these cases, `route_path()` now returns a tibble identical to that supplied (fitted or predicted locations) and issues a message on the console.
+
 # aniMotum 1.1-02 (13/02/2023)
 
 * update citations to include new aniMotum R package paper in Methods in Ecology and Evolution as the primary reference.
