@@ -74,6 +74,11 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="1.1-04" id="animotum-11-04-01032023">aniMotum 1.1-04 (01/03/2023)<a class="anchor" aria-label="anchor" href="#animotum-11-04-01032023"></a></h2>
+<ul><li>fixes issue with <code><a href="../reference/grab.html">grab()</a></code> where multiple data sets with <code>lon</code> modulo 0,360 resulted in an error</li>
+<li>fixes issue with <code><a href="../reference/route_path.html">route_path()</a></code> where rerouting tracks that have no locations on land resulted in an error. In these cases, <code><a href="../reference/route_path.html">route_path()</a></code> now returns a tibble identical to that supplied (fitted or predicted locations) and issues a message on the console.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1-02" id="animotum-11-02-13022023">aniMotum 1.1-02 (13/02/2023)<a class="anchor" aria-label="anchor" href="#animotum-11-02-13022023"></a></h2>
 <ul><li>update citations to include new aniMotum R package paper in Methods in Ecology and Evolution as the primary reference.</li>
 </ul></div>
