@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2023-03-01 14:05:03  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2023-03-01 15:05:03  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2023-03-01 16:05:03  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2023-03-01 17:05:03  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2023-03-01 18:05:03  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2023-06-12 14:17:41  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2023-06-12 15:17:41  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2023-06-12 16:17:41  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2023-06-12 17:17:41  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2023-06-12 18:17:41  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2023-03-01 14:05:04 GL 100.0 -55 0.3137582 0.01227192</span></span>
-<span><span class="co">#&gt; 2 54632 2023-03-02 02:05:04 GL 100.5 -54 0.6153372 1.77343699</span></span>
-<span><span class="co">#&gt; 3 54632 2023-03-02 14:05:04 GL 101.0 -53 0.1527319 0.39748625</span></span>
-<span><span class="co">#&gt; 4 54632 2023-03-03 02:05:04 GL 101.5 -52 0.1495112 0.93182971</span></span>
-<span><span class="co">#&gt; 5 54632 2023-03-03 14:05:04 GL 102.0 -51 0.1987644 2.38203561</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat     lonerr     laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2023-06-12 14:17:41 GL 100.0 -55 0.04538146 0.04744647</span></span>
+<span><span class="co">#&gt; 2 54632 2023-06-13 02:17:41 GL 100.5 -54 0.03152120 2.19785523</span></span>
+<span><span class="co">#&gt; 3 54632 2023-06-13 14:17:41 GL 101.0 -53 1.22389975 0.43893001</span></span>
+<span><span class="co">#&gt; 4 54632 2023-06-14 02:17:41 GL 101.5 -52 0.18392016 0.33539169</span></span>
+<span><span class="co">#&gt; 5 54632 2023-06-14 14:17:41 GL 102.0 -51 0.28535005 2.69157584</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -320,7 +320,7 @@ stereographic projection:</p>
 <span><span class="co">#&gt; Geometry type: POINT</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: 1110.769 ymin: -948.5686 xmax: 1118.995 ymax: -936.6922</span></span>
-<span><span class="co">#&gt; CRS:           +proj=stere +lat_0=-60 +lon_0=85 +ellps=WGS84 +units=km +no_defs</span></span>
+<span><span class="co">#&gt; Projected CRS: +proj=stere +lat_0=-60 +lon_0=85 +ellps=WGS84 +units=km +no_defs</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
 <span><span class="co">#&gt;   id    date                lc     smaj  smin   eor             geometry</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;POINT [km]&gt;</span></span></span>
@@ -408,7 +408,7 @@ any order. Here is an example using a custom formatted
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      76.7    -<span style="color: #BB0000;">52.2</span> 2009-02-04 21:05:50 A     ct36-E-09</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      77.0    -<span style="color: #BB0000;">52.7</span> 2009-02-05 10:57:22 A     ct36-E-09</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      77.8    -<span style="color: #BB0000;">52.8</span> 2009-02-05 16:03:58 A     ct36-E-09</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 285 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 285 more rows</span></span></span></code></pre></div>
 <p>Note the columns are in a different order than the default expected
 by <code>aniMotum</code>, and the first three variables have different
 names: <code>longitude</code>, <code>latitude</code> and
@@ -435,7 +435,7 @@ to use the <code>date</code> and <code>coord</code> arguments:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ct36-E… 2009-02-04 <span style="color: #949494;">21:05:50</span> A      76.7 -<span style="color: #BB0000;">52.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ct36-E… 2009-02-05 <span style="color: #949494;">10:57:22</span> A      77.0 -<span style="color: #BB0000;">52.7</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ct36-E… 2009-02-05 <span style="color: #949494;">16:03:58</span> A      77.8 -<span style="color: #BB0000;">52.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 285 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 285 more rows</span></span></span></code></pre></div>
 <p>We then fit the SSM to the formatted data <code>d</code> via
 <code>fit_ssm</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -570,7 +570,7 @@ using <code><a href="../reference/grab.html">grab()</a></code>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-… 2009-02-02 <span style="color: #949494;">17:50:48</span>  73.7 -<span style="color: #BB0000;">50.8</span> <span style="text-decoration: underline;">8</span>199. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">549.</span> 19.0   14.1   6.41  -<span style="color: #BB0000;">5.00</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-… 2009-02-03 <span style="color: #949494;">07:39:08</span>  74.5 -<span style="color: #BB0000;">51.2</span> <span style="text-decoration: underline;">8</span>291. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">619.</span> 14.9   10.4   6.65  -<span style="color: #BB0000;">5.09</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-… 2009-02-03 <span style="color: #949494;">15:29:59</span>  74.9 -<span style="color: #BB0000;">51.4</span> <span style="text-decoration: underline;">8</span>339. -<span style="color: #BB0000; text-decoration: underline;">6</span><span style="color: #BB0000;">655.</span> 13.9    9.65  6.12  -<span style="color: #BB0000;">4.64</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span></span>
 <span></span>
 <span><span class="co">## grab predicted locations in projected form</span></span>
 <span><span class="va">ploc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, as_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -579,7 +579,7 @@ using <code><a href="../reference/grab.html">grab()</a></code>:</p>
 <span><span class="co">#&gt; Geometry type: POINT</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.527 xmax: 8675.541 ymax: -6449.872</span></span>
-<span><span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
+<span><span class="co">#&gt; Projected CRS: +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 11</span></span></span>
 <span><span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -588,7 +588,7 @@ using <code><a href="../reference/grab.html">grab()</a></code>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-03 <span style="color: #949494;">17:00:00</span> 6.06<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">4.63</span><span style="color: #949494;">e</span>+ 0 1.31<span style="color: #949494;">e</span>+0 1.16<span style="color: #949494;">e</span>+0 1.43<span style="color: #949494;">e</span>+1 1.01<span style="color: #949494;">e</span>+1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E… 2009-02-04 <span style="color: #949494;">17:00:00</span> 5.74<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.36</span><span style="color: #949494;">e</span>+ 0 1.03<span style="color: #949494;">e</span>+0 8.38<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 1.33<span style="color: #949494;">e</span>+1 9.30<span style="color: #949494;">e</span>+0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E… 2009-02-05 <span style="color: #949494;">17:00:00</span> 9.34<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">5.43</span><span style="color: #949494;">e</span>+ 0 1.20<span style="color: #949494;">e</span>+0 1.09<span style="color: #949494;">e</span>+0 1.28<span style="color: #949494;">e</span>+1 9.14<span style="color: #949494;">e</span>+0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></span></code></pre></div>
 <p>Here, the output from the <code>crw</code> SSM is returned as a
 fitted location data.frame (floc) that includes individual id, date,
 longitude, latitude, x and y (typically from the default Mercator
@@ -617,15 +617,14 @@ extracted from the output:</p>
 <code class="sourceCode R"><span><span class="va">fp.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span>
 <span><span class="va">fp.data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
-<span><span class="co">#&gt;   id       date                lc      lon   lat  smaj  smin   eor obs.t…¹ keep </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E-… 2009-02-01 <span style="color: #949494;">17:50:46</span> A      72.5 -<span style="color: #BB0000;">50.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E-… 2009-02-02 <span style="color: #949494;">03:30:26</span> A      73.0 -<span style="color: #BB0000;">50.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E-… 2009-02-02 <span style="color: #949494;">17:50:48</span> B      73.8 -<span style="color: #BB0000;">50.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E-… 2009-02-03 <span style="color: #949494;">07:39:08</span> A      74.6 -<span style="color: #BB0000;">51.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E-… 2009-02-03 <span style="color: #949494;">15:29:59</span> A      74.9 -<span style="color: #BB0000;">51.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS      TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: x &lt;dbl&gt;, y &lt;dbl&gt;, emf.x &lt;dbl&gt;, emf.y &lt;dbl&gt;, and</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   abbreviated variable name ¹​obs.type</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   id      date                lc      lon   lat  smaj  smin   eor obs.type keep </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ct36-E… 2009-02-01 <span style="color: #949494;">17:50:46</span> A      72.5 -<span style="color: #BB0000;">50.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS       TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ct36-E… 2009-02-02 <span style="color: #949494;">03:30:26</span> A      73.0 -<span style="color: #BB0000;">50.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS       TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ct36-E… 2009-02-02 <span style="color: #949494;">17:50:48</span> B      73.8 -<span style="color: #BB0000;">50.8</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS       TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ct36-E… 2009-02-03 <span style="color: #949494;">07:39:08</span> A      74.6 -<span style="color: #BB0000;">51.2</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS       TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ct36-E… 2009-02-03 <span style="color: #949494;">15:29:59</span> A      74.9 -<span style="color: #BB0000;">51.4</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span> LS       TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: x &lt;dbl&gt;, y &lt;dbl&gt;, emf.x &lt;dbl&gt;, emf.y &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>Here, <code>fp.data</code> is in the form that is passed to the
 <code>crw</code> SSM. The first 5 columns (<code>id</code>,
 <code>date</code>, <code>lc</code>, <code>lon</code>, <code>lat</code>)
