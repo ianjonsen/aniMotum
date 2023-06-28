@@ -29,14 +29,13 @@ fit_ssm(
 on the tracking data type. See more in the Details section, below, and the
 Overview vignette \code{vignette("Overview", package = "aniMotum")}.}
 
-\item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
-outlier locations}
+\item{vmax}{max travel rate (m/s) to identify implausible locations}
 
-\item{ang}{angles (deg) of outlier location "spikes"}
+\item{ang}{angles (deg) of implausible location "spikes"}
 
-\item{distlim}{lengths (m) of outlier location "spikes"}
+\item{distlim}{lengths (m) of implausible location "spikes"}
 
-\item{spdf}{(logical) turn \link[trip:sda]{trip::sda} pre-filtering on (default; TRUE) or off}
+\item{spdf}{(logical) turn pre-filtering on (default; TRUE) or off}
 
 \item{min.dt}{minimum allowable time difference between observations;
 \code{dt <= min.dt} will be ignored by the SSM}
