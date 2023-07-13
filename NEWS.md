@@ -1,3 +1,7 @@
+# aniMotum 1.1-06 (13/07/2023)
+
+* fixes issue with `route_path()` where simulated tracks that are entirely on land resulted in an error
+
 # aniMotum 1.1-04 (01/03/2023)
 
 * fixes issue with `grab()` where multiple data sets with `lon` modulo 0,360 resulted in an error

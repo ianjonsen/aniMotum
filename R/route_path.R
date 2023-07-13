@@ -198,7 +198,7 @@ route_path <-
           pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
         }
       })
-        
+      
       # pull the corrected points from the object and reformat for aniMotum
       df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
         if(!is.null(x)) {
@@ -278,21 +278,63 @@ route_path <-
     df_rrt <- df_sf %>% 
       nest_by(id, rep) %>%
       rowwise() %>%
-      mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
-             rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
-             pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
+      mutate(pts = suppressWarnings(list(try(data %>% 
+                                               pathroutr::prt_trim(land_region), 
+                                             silent = TRUE))))
+
+    ## check for errors due to entire simulated track on land & return message
+    idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
     
+    if(length(idx) > 0) {
+      message("The following track(s) are entirely on land:")
+      cat(paste0("id: ", as.character(df_rrt[idx,]$id), ", rep: ", as.character(df_rrt[idx,]$rep)), sep = "; ")
+      message("\nIgnoring these and rerouting all others")
+    }
+    
+    df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
+      ### when output_unchanged_locations is true, we want unchanged input locations,
+      ### but run through the rest of this script so they are packaged as usual as if prt_reroute had been run. 
+      if (output_unchanged_locations) { 
+        ### we cannot run prt_reroute here, because vis_graph is undefined, since land_region was empty.
+        ### so we simulate as if we had run prt_reroute and it found no conflicts, by returning an empty tibble, 
+        ### ?pathroutr::prt_reroute says "If trkpts and barrier do not spatially intersect and empty tibble is returned."
+        tibble()
+      } else {
+        if (!inherits(x, "try-error")) {
+          pathroutr::prt_reroute(x, land_region, vis_graph)
+        }
+      }
+    })
+    
+    df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
+      if(!inherits(df_rrt$pts[[i]], "try-error")) {
+        pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
+      }
+    })         
+             
     # pull the corrected points from the object and reformat for aniMotum
-    df_rrt <- df_rrt %>%
-      select(id, rep, pts_fix) %>%
-      mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
-                            mutate(lon = st_coordinates(.)[,1],
-                                   lat = st_coordinates(.)[,2]) %>%
-                            st_drop_geometry() %>%
-                            select(model, date, lon, lat, x, y)))
+    df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
+      if(!is.null(x)) {
+        st_transform(x, crs = 4326) %>%
+          mutate(lon = st_coordinates(.)[,1],
+                 lat = st_coordinates(.)[,2]) %>%
+          st_drop_geometry() %>%
+          select(model, date, lon, lat, x, y)
+      }
+    }) 
+    
+    df_rrt <- df_rrt %>% select(id, rep, pts_rrt) %>% ungroup()
+    
+    # df_rrt <- df_rrt %>%
+    #   select(id, rep, pts_fix) %>%
+    #   mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
+    #                         mutate(lon = st_coordinates(.)[,1],
+    #                                lat = st_coordinates(.)[,2]) %>%
+    #                         st_drop_geometry() %>%
+    #                         select(model, date, lon, lat, x, y)))
     
     # remove nesting by individual path
-    df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
+    df_rrt <- df_rrt %>% unnest(cols = c(pts_rrt))
     
     # format to aniMotum object - including nesting by animal id
     df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
