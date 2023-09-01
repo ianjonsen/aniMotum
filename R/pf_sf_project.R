@@ -18,20 +18,29 @@ pf_sf_project <- function(x) {
     
     xx <- subset(x, keep)
     
-    ## projection not provided by user so project to Mercator
-    sf_locs <- st_as_sf(x, coords = c("lon", "lat"), 
-                        crs = st_crs("+proj=longlat +datum=WGS84 +no_defs"))
-    
-    if (any(diff(wrap_lon(xx$lon, 0)) > 300)) {
-      prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
-    } else if (any(diff(wrap_lon(xx$lon,-180)) < -300) ||
-               any(diff(wrap_lon(xx$lon,-180)) > 300)) {
-      prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+    if("lon" %in% names(x)) {
+      coords <- c("lon", "lat")
+      sf_locs <- st_as_sf(x, coords = coords, 
+                          crs = st_crs("+proj=longlat +datum=WGS84 +no_defs"))
+      
+      if (any(diff(wrap_lon(xx$lon, 0)) > 300)) {
+        prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+      } else if (any(diff(wrap_lon(xx$lon,-180)) < -300) ||
+                 any(diff(wrap_lon(xx$lon,-180)) > 300)) {
+        prj <- "+proj=merc +lon_0=180 +datum=WGS84 +units=km +no_defs"
+      } else {
+        prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+      }
+      
+      sf_locs <-  st_transform(sf_locs, st_crs(prj))
+      
     } else {
-      prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+      coords <- c("x", "y")
+      sf_locs <- st_as_sf(x, coords = coords, 
+                          crs = st_crs("+proj=merc +units=m +datum=WGS84 +no_defs"))
+      prj <- st_crs(sf_locs)$input
+      sf_locs <- st_transform(sf_locs, sub("units=m", "units=km", prj, fixed = TRUE))
     }
-    
-    sf_locs <-  st_transform(sf_locs, st_crs(prj))
     
   } else {
     ## if input data projection is longlat then set prj merc, otherwise respect 

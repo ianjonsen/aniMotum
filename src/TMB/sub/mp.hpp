@@ -36,6 +36,8 @@ Type mp(objective_function<Type>* obj) {
   PARAMETER(l_psi); 				    // error SD scaling parameter to account for possible uncertainty in Argos error ellipse variables
   // for LS/GPS OBS MODEL
   PARAMETER_VECTOR(l_tau);     	// error dispersion for LS obs model (log scale)
+  // for GL observation model
+  DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
   PARAMETER(l_rho_o);  
   
   
@@ -107,6 +109,14 @@ Type mp(objective_function<Type>* obj) {
         cov_obs(0,1) = (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
         cov_obs(1,0) = cov_obs(0,1);
         
+      } else if(obs_mod(i) == 2) {
+        // GL observations
+        Type sdLon = GLerr(i,0);
+        Type sdLat = GLerr(i,1);
+        cov_obs(0,0) = sdLon * sdLon;
+        cov_obs(1,1) = sdLat * sdLat;
+        cov_obs(0,1) = sdLon * sdLat * rho_o;
+        cov_obs(1,0) = cov_obs(0,1);
       } else {
         Rf_error ("C++: unexpected obs_mod value");
       }

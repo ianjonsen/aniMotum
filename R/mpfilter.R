@@ -28,7 +28,7 @@
 ##' @param lpsi is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption FreeADFun
-##' @importFrom stats approx cov sd predict nlminb optim na.omit
+##' @importFrom stats approx cov sd predict nlminb optim na.omit filter
 ##' @importFrom utils flush.console
 ##' @importFrom tibble as_tibble
 ##' @importFrom sf st_crs st_coordinates st_geometry<- st_as_sf st_set_crs
@@ -145,7 +145,7 @@ mpfilter <-
              xout = d.all$date,
              rule = 2)$y
     x.init <-
-      as.numeric(stats::filter(x.init1, rep(1, 5) / 5))
+      as.numeric(filter(x.init1, rep(1, 5) / 5))
     x.na <- which(is.na(x.init))
     x.init[x.na] <- x.init1[x.na]
     
@@ -185,8 +185,8 @@ mpfilter <-
     
     ## start to work out which obs_mod to use for each observation
     d <- d %>% mutate(obs.type = factor(obs.type, 
-                                        levels = c("LS","KF","GPS"), 
-                                        labels = c("LS","KF","GPS"))
+                                        levels = c("LS","KF","GL","GPS"), 
+                                        labels = c("LS","KF","GL","GPS"))
                       )
     p.obst <- table(d$obs.type) / nrow(d)
     obst <- which(table(d$obs.type) > 0)
@@ -244,7 +244,8 @@ mpfilter <-
       m = d.all$smin,
       M = d.all$smaj,
       c = d.all$eor,
-      K = cbind(d.all$emf.x, d.all$emf.y)
+      K = cbind(d.all$emf.x, d.all$emf.y),
+      GLerr = cbind(d.all$x.sd, d.all$y.sd)
     ) 
     
     ## TMB - create objective function

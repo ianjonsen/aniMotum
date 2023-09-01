@@ -29,7 +29,7 @@
 ##' @importFrom tibble as_tibble tibble
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs
 ##' @importFrom sf st_coordinates st_geometry<- st_bbox st_cast
-##' @importFrom raster extent extract nlayers
+##' @importFrom terra ext extract
 ##' @importFrom traipse track_distance track_angle track_distance_to
 ##' @importFrom TMB MakeADFun sdreport newtonOption oneStepPredict
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit median qlogis qnorm pnorm runif
@@ -39,7 +39,6 @@
 ##' @importFrom ggplot2 element_text scale_colour_manual scale_colour_gradientn
 ##' @importFrom grDevices extendrange grey hcl.colors
 ##' @importFrom rnaturalearth ne_countries
-##' @importFrom broom tidy
 NULL
 
 ##' @name ellie

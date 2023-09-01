@@ -72,7 +72,7 @@ prefilter <-
     
     ##  2. determine observation type: LS, KF, GPS or GLS
     x <- pf_obs_type(x)
-    
+
     ##  3. identify extreme locations with a speed/distance/angle filter
     x <- pf_sda_filter(x, spdf, vmax, ang, distlim)
   

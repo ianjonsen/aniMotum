@@ -1,0 +1,56 @@
+---
+title: "Jonah Crab ex"
+author: "Jonsen et al"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## install aniMotum dev branch
+```{r, eval=FALSE}
+remotes::install_github("ianjonsen/aniMotum@dev")
+```
+
+```{r load pkgs, message=FALSE}
+require(tidyverse, quietly = TRUE)
+require(aniMotum, quietly = TRUE) 
+```
+
+```{r format data}
+jc <- readRDS("Jcrab35.rds")
+names(jc) <- tolower(names(jc))
+
+d <- jc %>%
+  select(id = transmitter,
+         date = datetime,
+         x,
+         y,
+         sd.x = sdx,
+         sd.y = sdy) %>%
+  mutate(date = mdy_hm(date, tz = "America/New_York")) %>%
+  tibble()
+
+#df <- format_data(d, coord = c("lon","lat"), sderr = c("sd.x","sd.y"))
+df <- format_data(d, coord = c("x","y"), sderr = c("sd.x","sd.y"))
+```
+
+### Fit `crw` SSM with 5 min time.step
+```{r fit crw ssm}
+
+fit <- fit_ssm(df, model = "crw", time.step = 5/60, 
+               control = ssm_control(verbose = 0))
+```
+
+### Visualize fit as 1-D time series
+```{r plot1}
+plot(fit, "p")
+```
+
+### Visualize fit as 2-D track
+```{r plot2}
+plot(fit, "p", type=2, alpha = 0.01)
+```
+

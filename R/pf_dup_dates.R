@@ -9,10 +9,9 @@
 pf_dup_dates <- function(x, min.dt) {
   
   ##  flag any duplicate date records,
-  
-  x$keep <- with(x, difftime(date, c(as.POSIXct(NA), date[-nrow(x)]), 
-                             units = "secs") > min.dt)
-  x$keep <- with(x, ifelse(is.na(keep), TRUE, keep))
+  x$keep <- difftime(x$date, c(as.POSIXct(NA), x$date[-nrow(x)]), 
+                     units = "secs") > min.dt
+  x$keep <- ifelse(is.na(x$keep), TRUE, x$keep)
   
   return(x)
 }

@@ -196,13 +196,13 @@ sfilter <-
 
     ## start to work out which obs_mod to use for each observation
     d <- d %>% mutate(obs.type = factor(obs.type, 
-                                        levels = c("LS","KF","GLS","GPS"), 
-                                        labels = c("LS","KF","GLS","GPS"))
+                                        levels = c("LS","KF","GL","GPS"), 
+                                        labels = c("LS","KF","GL","GPS"))
                       )
     p.obst <- table(d$obs.type) / nrow(d)
     # favours KF when mix of few LS + many KF
     obst <- round(which(table(d$obs.type) * p.obst > 0))
-    
+ 
     automap <- switch(model, 
                      rw = {
                        list(
@@ -269,7 +269,7 @@ sfilter <-
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
     ##  as isd makes likelihood contribution go to 0 in C++ code
     obs_mod <- ifelse(is.na(obs_mod), 0, obs_mod)
-    
+
     ## calculate fitted & predicted indices + delta t for proper speed estimates
     fidx <- which(d.all$isd)
     fdt <- as.numeric(difftime(d.all$date[fidx], 
@@ -296,7 +296,7 @@ sfilter <-
       M = d.all$smaj,
       c = d.all$eor,
       K = cbind(d.all$emf.x, d.all$emf.y),
-      GLerr = cbind(d.all$lonerr, d.all$laterr)
+      GLerr = cbind(d.all$x.sd, d.all$y.sd)
     )
     
     ## TMB - create objective function
@@ -395,7 +395,7 @@ sfilter <-
     rep <- try(sdreport(obj)) #, skip.delta.method = !control$se
 
     options(warn = oldw) ## turn warnings back on
-    
+   
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
 
       ## Parameters, states and the fitted values

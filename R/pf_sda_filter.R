@@ -22,8 +22,7 @@
 ##' @md
 
 pf_sda_filter <- function(x, spdf, vmax, ang, distlim) {
-
-## Use trip::sda to identify outlier locations
+## Use internal version of trip::sda to identify outlier locations
 if (spdf) {
   if(inherits(x, "sf") && st_is_longlat(x)) {
     
@@ -38,6 +37,7 @@ if (spdf) {
     names(xy) <- c("lon","lat")
     x <- cbind(x, xy)
   } 
+  
   ## was req'd when using trip::sda - keep in case we want to revert now that
   ##  {trip} has been updated and 'un-archived'
 #  x.tr <- subset(x, keep)[, c("lon","lat","date","id","lc","smaj","smin",
@@ -46,42 +46,57 @@ if (spdf) {
 #  x.tr <- suppressWarnings(trip(as.data.frame(x.tr), TORnames = c("date", "id"), 
 #                                correct_all = FALSE))
   x.tr <- subset(x, keep)
+  p.GL <- sum(x$obs.type == "GL") / nrow(x)
+  if(p.GL > 0.75) {
+    filt <- "spd"
+  } else {
+    filt <- "sda"
+  }
   
   if(any(is.na(ang))) ang <- c(0,0)
   if(any(is.na(distlim))) distlim <- c(0,0)
 
-  tmp <-
-    suppressWarnings(try(
-      sda(
-        x.tr,
-        smax = vmax * 3.6,    # convert m/s to km/h
-        ang = ang,
-        distlim = distlim / 1000     # convert m to km
-      ),
-      silent = TRUE)
-    )
-  ## screen potential sdafilter errors
-  if (inherits(tmp, "try-error")) {
-    
-    warning(
-      paste(
-        "\ntrip::sda produced an error on id",
-        x$id[1],
-        "using trip::speedfilter instead"
-      ),
-      immediate. = TRUE
-    )
-    
+  if (filt == "sda") {
     tmp <-
-      suppressWarnings(try(
-        speedfilter(x.tr,
-                    max.speed = vmax * 3.6    # convert m/s to km/h
-        ),
-        silent = TRUE)
-      )
+      suppressWarnings(try(sda(x.tr,
+                               smax = vmax * 3.6,
+                               # convert m/s to km/h
+                               ang = ang,
+                               distlim = distlim / 1000),     # convert m to km
+                               silent = TRUE))
+                       ## screen potential sdafilter errors
+                       if (inherits(tmp, "try-error")) {
+                         warning(
+                           paste(
+                             "\ntrip::sda produced an error on id",
+                             x$id[1],
+                             "using trip::speedfilter instead"
+                           ),
+                           immediate. = TRUE
+                         )
+                         
+                         tmp <-
+                           suppressWarnings(try(speedfilter(x.tr,
+                                                            max.speed = vmax * 3.6),    # convert m/s to km/h
+                                                            silent = TRUE))
+                                            
+                                            if (inherits(tmp, "try-error")) {
+                                              warning(
+                                                paste(
+                                                  "\ntrip::speedfilter also produced an error on id",
+                                                  x$id[1],
+                                                  "can not apply speed filter prior to SSM filtering"
+                                                ),
+                                                immediate. = TRUE
+                                              )
+                                            }
+                       }
+  } else if (filt == "spd") {
+    tmp <-
+      suppressWarnings(try(speedfilter(x.tr, max.speed = vmax * 3.6),
+                           silent = TRUE))
     
     if (inherits(tmp, "try-error")) {
-      
       warning(
         paste(
           "\ntrip::speedfilter also produced an error on id",

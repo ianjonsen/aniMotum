@@ -11,7 +11,7 @@ format_data(
   lc = "lc",
   coord = c("lon", "lat"),
   epar = c("smaj", "smin", "eor"),
-  sderr = c("lonerr", "laterr"),
+  sderr = c("x.sd", "y.sd"),
   tz = "UTC"
 )
 }
@@ -40,9 +40,10 @@ parameters: defaults are "smaj" (ellipse semi-major axis),
 these variables are missing from the input data.}
 
 \item{sderr}{the names (as quoted character strings) of provided standard
-errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
-these are only provided for processed light-level geolocation data. Ignored if
-these variables are missing from the input data.}
+errors for \verb{lon,lat} or \verb{x,y}: default names are \code{x.sd}, \code{y.sd}. Typically,
+these are only provided for generic location data such as processed light-level
+geolocations, or high-resolution acoustic detections. The argument is ignored
+if these variables are missing from the input data.}
 
 \item{tz}{the timezone the applies to the data/time variable if they are not
 in \code{tz = 'UTC'}. A list of valid timezone names can be viewed via \code{OlsonNames()}}
@@ -50,7 +51,7 @@ in \code{tz = 'UTC'}. A list of valid timezone names can be viewed via \code{Ols
 \value{
 a data.frame or sf-tibble of input data in expected aniMotum format.
 Additional columns required by \code{fit_ssm()}, if missing, will be added to the
-formatted tibble: \code{smaj}, \code{smin}, \code{eor}, \code{lonerr}, and \code{laterr}.
+formatted tibble: \code{smaj}, \code{smin}, \code{eor}, \code{x.sd}, and \code{y.sd}.
 }
 \description{
 format data by mapping supplied variable names to those expected by

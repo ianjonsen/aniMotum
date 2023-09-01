@@ -133,7 +133,7 @@ Type crw(objective_function<Type>* obj) {
         cov_obs(1,0) = cov_obs(0,1);
         
       } else if(obs_mod(i) == 2) {
-        // GLS observations
+        // GL observations
         Type sdLon = GLerr(i,0);
         Type sdLat = GLerr(i,1);
         cov_obs(0,0) = sdLon * sdLon;

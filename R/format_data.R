@@ -24,15 +24,16 @@
 ##' "smin" (ellipse semi-minor axis), and "eor" (ellipse orientation). Ignored if
 ##' these variables are missing from the input data.
 ##' @param sderr the names (as quoted character strings) of provided standard 
-##' errors in longitude and latitude: defaults are "lonerr", "laterr". Typically,
-##' these are only provided for processed light-level geolocation data. Ignored if
-##' these variables are missing from the input data.
+##' errors for `lon,lat` or `x,y`: default names are `x.sd`, `y.sd`. Typically,
+##' these are only provided for generic location data such as processed light-level
+##' geolocations, or high-resolution acoustic detections. The argument is ignored
+##' if these variables are missing from the input data.
 ##' @param tz the timezone the applies to the data/time variable if they are not 
 ##' in `tz = 'UTC'`. A list of valid timezone names can be viewed via `OlsonNames()`
 ##' 
 ##' @return a data.frame or sf-tibble of input data in expected aniMotum format. 
 ##' Additional columns required by `fit_ssm()`, if missing, will be added to the 
-##' formatted tibble: `smaj`, `smin`, `eor`, `lonerr`, and `laterr`.
+##' formatted tibble: `smaj`, `smin`, `eor`, `x.sd`, and `y.sd`.
 ##' 
 ##' @importFrom sf st_crs
 ##' @importFrom dplyr tibble select everything
@@ -57,7 +58,7 @@ format_data <- function(x,
                         lc = "lc",
                         coord = c("lon","lat"),
                         epar = c("smaj","smin","eor"),
-                        sderr = c("lonerr","laterr"),
+                        sderr = c("x.sd","y.sd"),
                         tz = "UTC") {
   
   ## check that all variable names are character strings
@@ -100,7 +101,7 @@ format_data <- function(x,
   
   ## add lc if missing from input data
   if (!lc %in% names(x)) {
-    ## Case when data are GLS/geolocations
+    ## Case when data are Generic Locations
     if (all(!epar %in% names(x)) & all(sderr %in% names(x))) {
       if (inherits(x, "data.frame", which = TRUE) == 1) {
         x <- data.frame(x, lc = rep("GL", nrow(x)))
@@ -169,18 +170,18 @@ format_data <- function(x,
     }
   }
   if(all(!epar %in% names(x), sderr %in% names(x))) {
-    ## GLS data
+    ## Generic Location data
     ## add expected error ellipse variables
     x$smaj <- x$smin <- x$eor <- as.double(NA)
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
     if(!inherits(x, "sf")) {
-      names(xx)[c(1:5, 9:10)] <- c("id","date","lc",coord,"lonerr","laterr")
-      names(xx)[4:5] <- c("lon","lat")
+      names(xx)[c(1:5, 9:10)] <- c("id","date","lc",coord,"x.sd","y.sd")
+      #names(xx)[4:5] <- c("lon","lat")
     } else if (inherits(x, "sf")) {
-      names(xx)[c(1:4, 8:9)] <- c("id","date","lc",coord,"lonerr","laterr")
+      names(xx)[c(1:4, 8:9)] <- c("id","date","lc",coord,"x.sd","y.sd")
     }
   }
-  
+
   ## in cases where user supplies id as a factor, drop any unused factor levels 
   ##    and coerce to character
   if(is.factor(xx$id)) xx$id <- droplevels(xx$id)

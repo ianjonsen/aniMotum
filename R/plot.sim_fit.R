@@ -7,7 +7,8 @@
 ##' @param zoom logical; should map extent be defined by track extent (TRUE; default) or 
 ##' should global map be drawn (FALSE).  
 ##' @param or orientation of projected map, default is to centre on 
-##' start of fitted track (ignored if `mapproj` package is not installed).
+##' start of fitted track (ignored if `mapproj` package is not installed). This argument
+##' is deprecated and, if specified, will be ignored with a warning.
 ##' @param ncol number of columns to arrange multiple plots
 ##' @param hires logical; use high-resolution coastline data. Attempts to use
 ##' high-res coastline data via [rnaturalearth::ne_countries] with `scale = 10`, 
@@ -19,9 +20,8 @@
 ##' @return Plots of simulated tracks. 
 ##' 
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
-##' @importFrom ggplot2 element_blank xlab ylab geom_polygon 
-##' @importFrom ggplot2 coord_map coord_quickmap theme_void
-##' @importFrom broom tidy
+##' @importFrom ggplot2 element_blank xlab ylab geom_sf 
+##' @importFrom ggplot2 coord_sf
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices extendrange
 ##' @importFrom rnaturalearth ne_countries
@@ -38,7 +38,6 @@
 plot.sim_fit <- function(x, 
                         type = c("lines","points","both"),
                         zoom = TRUE,
-                        or = NULL,
                         ncol = 1,
                         hires = FALSE,
                         ...)
@@ -53,13 +52,12 @@ plot.sim_fit <- function(x,
   
   ## get worldmap
   if(all(hires, requireNamespace("rnaturalearthhires", quietly = TRUE))) {
-    wm <- ne_countries(scale = 10, returnclass = "sp")
+    wm <- ne_countries(scale = 10, returnclass = "sf")
   } else {
-    wm <- ne_countries(scale = 50, returnclass = "sp")
+    wm <- ne_countries(scale = 50, returnclass = "sf")
   }
-  wm <- suppressMessages(tidy(wm))
-  wm$region <- wm$id
-  wm.df <- wm[,c("long","lat","group","region")]
+  
+  wm.df <- wm[, c("geometry", "region_un")]
   
   ## do plots
   p <- lapply(x$sims, function(x) {
@@ -72,25 +70,14 @@ plot.sim_fit <- function(x,
     } else {
       bounds <- c(range(x$lon), range(x$lat))
     }
- 
-    if(is.null(or)) or <- c(x$lat[1], x$lon[1], 0)
     
-      m <- ggplot() + 
-        geom_polygon(data = wm.df, 
-                     aes(long, lat, group = group), 
-                     fill = grey(0.6))
-      
-      if(requireNamespace("mapproj", quietly = TRUE)) {
-        m <- m + coord_map("ortho",
-                  orientation = or,
-                  xlim = bounds[1:2],
-                  ylim = bounds[3:4])
-      } else {
-        m <- m + coord_quickmap(
-          xlim = bounds[1:2],
-          ylim = bounds[3:4]
-        )
-      }
+    m <- ggplot() +
+      geom_sf(data = wm.df,
+              aes(group = region_un),
+              fill = grey(0.6))
+    
+    m <- m + coord_sf(xlim = bounds[1:2],
+                      ylim = bounds[3:4])
     
     switch(type, 
            lines = {
@@ -133,7 +120,7 @@ plot.sim_fit <- function(x,
       ) +
       xlab(element_blank()) +
       ylab(element_blank()) + 
-      theme_void()
+      theme_minimal()
       
   })
   ## arrange plots

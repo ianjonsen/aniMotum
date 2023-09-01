@@ -29,14 +29,14 @@ fit_ssm(
 on the tracking data type. See more in the Details section, below, and the
 Overview vignette \code{vignette("Overview", package = "aniMotum")}.}
 
-\item{vmax}{max travel rate (m/s) passed to \link[trip:sda]{trip::sda} to identify
+\item{vmax}{max travel rate (m/s) to identify
 outlier locations}
 
 \item{ang}{angles (deg) of outlier location "spikes"}
 
 \item{distlim}{lengths (m) of outlier location "spikes"}
 
-\item{spdf}{(logical) turn \link[trip:sda]{trip::sda} pre-filtering on (default; TRUE) or off}
+\item{spdf}{(logical) turn pre-filtering on (default; TRUE) or off}
 
 \item{min.dt}{minimum allowable time difference between observations;
 \code{dt <= min.dt} will be ignored by the SSM}
@@ -97,10 +97,11 @@ a list with components
 fits: i) a simple random walk (\code{rw}) ii) a correlated random walk
 (\code{crw} - a random walk on velocity), or iii) a time-varying move persistence
 model (\code{mp}), all in continuous-time, to filter Argos LS, and/or KF/KS
-location data, processed light-level geolocation data (GLS), and/or GPS data.
-Location data of different types can combined in a single data frame
-(see details). Predicts locations at user-specified time intervals
-(regular or irregular).
+location data, GPS data, and/or generic locations with associated standard
+errors (e.g., processed light-level geolocation data, or high-resolution
+acoustic telemetry data). Location data of different types can combined in a
+single data frame (see details). Predicts locations at user-specified time
+intervals (regular or irregular).
 }
 \details{
 \code{x} is a \code{data.frame}, \code{tibble}, or \code{sf-tibble} with 5, 7 or 8
@@ -110,10 +111,11 @@ Least-Squares and GPS data should have 5 columns in the following order:
 string in YYYY-MM-DD HH:MM:SS format. If a text string is supplied then the
 time zone is assumed to be \code{UTC}. lc (location class) can include the
 following values: 3, 2, 1, 0, A, B, Z, G, or GL. The latter two are for GPS
-and GLS locations, respectively. Class Z values are assumed to have the same
-error variances as class B. By default, class \code{G} (GPS) locations are assumed
-to have error variances 10x smaller than Argos class 3 variances, but unlike
-Argos error variances the GPS variances are the same for longitude and latitude.
+locations and 'Generic Locations', respectively. Class Z values are assumed
+to have the same error variances as class B. By default, class \code{G} (GPS)
+locations are assumed to have error variances 10x smaller than Argos class 3
+variances, but unlike Argos error variances the GPS variances are the same for
+longitude and latitude.
 
 The \link{format_data} function can be used as a data pre-processing
 step or called automatically within \code{fit_ssm} to restructure data that is
@@ -128,10 +130,14 @@ Argos Kalman Filter (or Kalman Smoother) data should have 8 columns,
 including the above 5 plus \strong{\code{smaj}, \code{smin}, \code{eor}} that contain Argos error
 ellipse variables (in m for \code{smaj}, \code{smin} and deg for \code{eor}).
 
-Light-level geolocation (GLS) locations can be modelled provided each
-longitude and latitude has a corresponding standard error. These data should
-have 7 columns, including the above 5 plus \code{lonerr}, \code{laterr} (in degrees).
-In this case, all lc values should be set to \code{GL}.
+Generic locations can be modelled provided each longitude and latitude
+(or X and Y) coordinate has a corresponding standard error. These data should
+have 7 columns, including the above 5 plus two extra columns, typically
+named \code{x.sd}, \code{y.sd} that provide the standard errors for the longitude,
+latitude (or X, Y) coordinates. Longitude and latitude standard errors should
+be in degrees, whereas X and Y standard errors should be in m. In either case,
+all \code{lc} values should be set to \code{GL} (Generic Location), the helper function
+\link{format_data} will add the \code{lc} variable to the input data automatically.
 
 Multiple location data types can be combined in a single data frame
 (see the Overview vignette for examples).

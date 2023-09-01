@@ -45,7 +45,7 @@
 ##' @importFrom tibble tibble as_tibble
 ##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
 ##' @importFrom stats rgamma runif
-##' @importFrom raster extent extract nlayers
+##' @importFrom terra ext extract
 ##' @importFrom CircStats rvm
 ##' @export
 
@@ -65,9 +65,9 @@ sim_fit <-
   what <- match.arg(what)
   
   if(!is.null(grad)) {
-    if(!inherits(grad, "RasterStack")) 
-      stop("grad must be NULL or a RasterStack with 2 layers")
-    if(inherits(grad, "RasterStack") & nlayers(grad) != 2)
+    if(!inherits(grad, "SpatRaster")) 
+      stop("grad must be NULL or a SpatRaster with 2 layers")
+    if(inherits(grad, "SpatRaster") & length(names(grad)) != 2)
       stop("grad must have 2 layers")
   }
   if(length(beta) != 2) 
@@ -99,7 +99,7 @@ sim_fit <-
     ## get parameters from model fit object
     switch(model,
            crw = {
-             Sigma <- diag(2) * 2 * x$ssm[[k]]$par["D", 1]
+             Sigma <- diag(2) * 2 * x$ssm[[k]]$par[c("D_x","D_y"), 1]
              vmin <- with(loc,
                           c(min(u, na.rm = TRUE),
                             min(v, na.rm = TRUE))) # in km/h
@@ -126,7 +126,7 @@ sim_fit <-
     ## Simulate movement process ##
     ###############################
     if(!is.null(grad)) {
-      ex <- extent(grad[[1]])
+      ex <- ext(grad[[1]])
     } else {
       ex <- c(-20077.51,20082.49,-19622.54,18437.46) ## approx extents of world mercator in km
     }

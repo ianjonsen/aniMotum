@@ -8,7 +8,6 @@
   x,
   type = c("lines", "points", "both"),
   zoom = TRUE,
-  or = NULL,
   ncol = 1,
   hires = FALSE,
   ...
@@ -22,9 +21,6 @@
 \item{zoom}{logical; should map extent be defined by track extent (TRUE; default) or
 should global map be drawn (FALSE).}
 
-\item{or}{orientation of projected map, default is to centre on
-start of fitted track (ignored if \code{mapproj} package is not installed).}
-
 \item{ncol}{number of columns to arrange multiple plots}
 
 \item{hires}{logical; use high-resolution coastline data. Attempts to use
@@ -34,6 +30,10 @@ plot rendering time so is set to FALSE by default, in which case
 \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 50} data are used.}
 
 \item{...}{additional arguments to be ignored}
+
+\item{or}{orientation of projected map, default is to centre on
+start of fitted track (ignored if \code{mapproj} package is not installed). This argument
+is deprecated and, if specified, will be ignored with a warning.}
 }
 \value{
 Plots of simulated tracks.

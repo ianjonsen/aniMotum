@@ -88,10 +88,24 @@ wrap_lon <- function(lon, lon_min = -180) {
 ##' @keywords internal
 
 sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
-  x$speed.ok <- speedfilter(x, max.speed = smax)
   
-  dsts <- track_distance(x$lon, x$lat)
-  angs <- track_angle(x$lon, x$lat)
+  x$speed.ok <- speedfilter(x, max.speed = smax)
+  if(all("lon" %in% names(x), "lat" %in% names(x))) {
+    latlon <- TRUE
+  } else {
+    latlon <- FALSE
+  }
+  
+  if(latlon) {
+    dsts <- track_distance(x$lon, x$lat)
+    angs <- track_angle(x$lon, x$lat)
+  } else if (!latlon) {
+    dx <- diff(x$x)
+    dy <- diff(x$y)
+    dsts <- c(NA, sqrt(dx^2 + dy^2))
+    angs <- NA
+  }
+  
   ## simple way to deal with missing angles
   ### (which don't make sense for first and last position or zero-movement)
   angs[is.na(angs)] <- 180
@@ -114,10 +128,16 @@ sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
   
   ## distlim and angles, progressively
   for (i in 1:length(distlim)) {
-    #dsts <- trackDistance(df)
-    dsts <- track_distance(df$lon, df$lat)
-    #angs <- trackAngle(df)
-    angs <- track_angle(df$lon, df$lat)
+    if(latlon) {
+      dsts <- track_distance(df$lon, df$lat)
+      angs <- track_angle(df$lon, df$lat)
+    } else if (!latlon) {
+      dx <- diff(df$x)
+      dy <- diff(df$y)
+      dsts <- c(NA, sqrt(dx^2 + dy^2))
+      angs <- NA
+    }
+    
     dprev <- dsts
     dnext <- c(dsts[-1L], 0)
     
@@ -147,8 +167,17 @@ sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
 ##' @keywords internal
 speedfilter <- function (x, max.speed = NULL, test = FALSE) 
 {
-  coords <- as.matrix(x[, c("lon","lat")])[,1:2] # req'd to drop geometry if inherits 'sf'
+
+  if(all("lon" %in% names(x), "lat" %in% names(x))) {
+    # req'd to drop geometry if inherits 'sf'
+    coords <- as.matrix(x[, c("lon","lat")])[,1:2] 
+    latlon <- TRUE
+  } else {
+    coords <- as.matrix(x[, c("x", "y")])
+    latlon <- FALSE
+  }
   dimnames(coords)[[2]] <- c("x","y")
+
   tids <- as.data.frame(x[, c("date","id")])
   time <- tids[, 1]
   id <- factor(tids[, 2])
@@ -184,27 +213,39 @@ speedfilter <- function (x, max.speed = NULL, test = FALSE)
     }
     index <- 1:npts
     iter <- 1
+ 
     while (any(RMS > max.speed, na.rm = TRUE)) {
       n <- length(which(ok))
       x1 <- xy[ok, ]
-      # speed1 <- trip::trackDistance(x1[-nrow(x1), 1], x1[-nrow(x1), 
-      #                                              2], x1[-1, 1], x1[-1, 2], longlat = !projected)/(diff(unclass(tms[ok]))/3600)
-      # 
-      speed1 <- track_distance_to(x1[-nrow(x1), 1], x1[-nrow(x1), 
-                                                                2], x1[-1, 1], x1[-1, 2])/1000
-      speed1 <- speed1/(diff(unclass(tms[ok]))/3600)
-      
-      speed2 <- track_distance_to(x1[-((nrow(x1) - 1):nrow(x1)), 
-                                              1], x1[-((nrow(x1) - 1):nrow(x1)), 2], x1[-(1:2), 1], x1[-(1:2), 2])/1000
-      speed2 <- speed2/((unclass(tms[ok][-c(1, 2)]) - unclass(tms[ok][-c(n - 1, n)]))/3600)
-      # speed2 <- trip::trackDistance(x1[-((nrow(x1) - 1):nrow(x1)), 
-      #                            1], x1[-((nrow(x1) - 1):nrow(x1)), 2], x1[-(1:2), 
-      #                                                                      1], x1[-(1:2), 2], longlat = !projected)/((unclass(tms[ok][-c(1, 
-      #                                                                                                                                    2)]) - unclass(tms[ok][-c(n - 1, n)]))/3600)
+      if(latlon) {
+        speed1 <- track_distance_to(x1[-nrow(x1), 1], x1[-nrow(x1),
+                                                         2], x1[-1, 1], x1[-1, 2]) /
+          1000
+        speed1 <- speed1 / (diff(unclass(tms[ok])) / 3600)
+        
+        speed2 <- track_distance_to(x1[-((nrow(x1) - 1):nrow(x1)),
+                                       1], x1[-((nrow(x1) - 1):nrow(x1)), 2], x1[-(1:2), 1], x1[-(1:2), 2]) /
+          1000
+        speed2 <-
+          speed2 / ((unclass(tms[ok][-c(1, 2)]) - unclass(tms[ok][-c(n - 1, n)])) /
+                      3600)
+      } else if (!latlon) {
+        speed1 <- sqrt((x1[-nrow(x1), 1] - x1[-1,1])^2 + 
+                         (x1[-nrow(x1), 2] - x1[-1,2])^2) / 1000
+        speed1 <- speed1 / ((unclass(tms[ok])) / 3600)
+        speed2 <- sqrt((x1[-((nrow(x1) - 1): nrow(x1)), 1] - 
+                          x1[-(1:2), 1])^2 +
+                         (x1[-((nrow(x1) - 1):nrow(x1)), 2] -
+                            x1[-(1:2), 2])^2) / 1000
+        speed2 <- speed2 / ((unclass(tms[ok][-c(1, 2)]) - unclass(tms[ok][-c(n - 1, n)])) /
+                              3600)
+      }
+
       thisIndex <- index[ok]
       npts <- length(speed1)
       if (npts < pprm) 
         next
+      
       sub1 <- rep(1:2, npts - offset) + rep(1:(npts - offset), 
                                             each = 2)
       sub2 <- rep(c(0, 2), npts - offset) + rep(1:(npts - 
