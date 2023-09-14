@@ -149,9 +149,12 @@ Type crw(objective_function<Type>* obj) {
       jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
       
       SIMULATE {
-        Y.col(i) = nll_obs.simulate() + mu.col(i);
+        Y.col(i) = nll_obs.simulate() + mu.col(i); 
       }  
     } else if(isd(i) == 0) {
+      SIMULATE {
+        Y.col(i) = nll_proc.simulate() + mu.col(i); 
+      }
       continue;
     } else {  
       Rf_error ("C++: unexpected isd value");

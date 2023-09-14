@@ -145,7 +145,7 @@ format_data <- function(x,
     ## add expected error ellipse variables
     x$smaj <- x$smin <- x$eor <- as.double(NA)
     ## add expected sderr variables
-    x$lonerr <- x$laterr <- as.double(NA)
+    x$x.sd <- x$y.sd <- as.double(NA)
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
     
     if(all(!inherits(x, "sf"), all(coord %in% c("lon","lat")))) {
@@ -160,7 +160,7 @@ format_data <- function(x,
   if(all(epar %in% names(x), !sderr %in% names(x))) {
     ## Argos KF/KS data
     ## add expected sderr variables
-    x$lonerr <- x$laterr <- as.double(NA)
+    x$x.sd <- x$y.sd <- as.double(NA)
     xx <- x[, c(id, date, lc, coord, epar, sderr, xt.vars)]
     if(all(!inherits(x, "sf"), coord != "geometry")) {
       names(xx)[1:8] <- c("id","date","lc",coord,"smaj","smin","eor")
