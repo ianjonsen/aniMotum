@@ -137,7 +137,7 @@ sfilter <-
     } else {
       d.all <- d
     }
-    
+
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- as.numeric(difftime(d.all$date, c(as.POSIXct(NA),d.all$date[-nrow(d.all)]), 
                               units = "hours"))

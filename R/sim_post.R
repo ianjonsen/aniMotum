@@ -82,7 +82,7 @@ sim_post <- function(x,
                   rep(!x$ssm[[1]]$isd, each = 2)
                 })
   
-  ## return as a list (prob less efficient that array...)
+  ## return as a list (prob less efficient than array...)
   rtracks <- lapply(1:reps, function(i) {
     ## obs - subset to just fitted or predicted locs
     matrix(rtracks[i, obs],
