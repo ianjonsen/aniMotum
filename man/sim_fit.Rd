@@ -8,6 +8,8 @@ sim_fit(
   x,
   what = c("fitted", "predicted"),
   reps = 1,
+  start = NULL,
+  end = NULL,
   grad = NULL,
   beta = c(-300, -300),
   cpf = FALSE,
@@ -22,6 +24,12 @@ sim_fit(
 
 \item{reps}{number of replicate tracks to simulate from an \code{ssm} model
 fit object}
+
+\item{start}{a 2-element vector for the simulated track start location
+(lon,lat or x,y)}
+
+\item{end}{a 2-element vector for the simulated track end location
+(lon,lat or x,y)}
 
 \item{grad}{a rasterStack of x- and y-gradients as separate layers (see details)}
 

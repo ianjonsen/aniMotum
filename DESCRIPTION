@@ -48,7 +48,6 @@ Imports:
     rnaturalearthdata,
     rosm,
     ggspatial,
-    mapproj,
     terra
 LinkingTo: TMB, RcppEigen
 Suggests: 
@@ -56,7 +55,6 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    rgeos,
     future,
     furrr,
     parallelly

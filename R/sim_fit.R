@@ -8,6 +8,10 @@
 ##' (typically regular in time) locations 
 ##' @param reps number of replicate tracks to simulate from an \code{ssm} model 
 ##' fit object
+##' @param start a 2-element vector for the simulated track start location 
+##' (lon,lat or x,y)
+##' @param end a 2-element vector for the simulated track end location 
+##' (lon,lat or x,y)
 ##' @param grad a rasterStack of x- and y-gradients as separate layers (see details)
 ##' @param beta a 2-element vector of parameters defining the potential function 
 ##' magnitude in x- and y-directions (ignored if \code{is.null(grad)}, 
@@ -43,7 +47,7 @@
 ##' @importFrom tmvtnorm rtmvnorm
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom tibble tibble as_tibble
-##' @importFrom sf st_coordinates st_as_sf st_transform st_geometry<-
+##' @importFrom sf st_crs st_coordinates st_as_sf st_transform st_geometry<-
 ##' @importFrom stats rgamma runif
 ##' @importFrom terra ext extract
 ##' @importFrom CircStats rvm
@@ -53,6 +57,8 @@ sim_fit <-
   function(x,
            what = c("fitted", "predicted"),
            reps = 1,
+           start = NULL,
+           end = NULL,
            grad = NULL,
            beta = c(-300, -300),
            cpf = FALSE,
@@ -70,6 +76,12 @@ sim_fit <-
     if(inherits(grad, "SpatRaster") & length(names(grad)) != 2)
       stop("grad must have 2 layers")
   }
+  
+  if(all(!is.null(start), length(start) != 2)) 
+    stop("start location must be a single lon,lat or x,y coordinate")
+  if(all(!is.null(end), length(end) != 2)) 
+    stop("end location must be a single lon,lat or x,y coordinate")
+  
   if(length(beta) != 2) 
     stop("beta must be specified as a 2-element vector")
   
@@ -77,6 +89,21 @@ sim_fit <-
   
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
+  
+  if(!is.null(start)) {
+    start <- data.frame(lon = start[1], lat = start[2])
+    st1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
+      st_transform(crs = "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs") |>
+      st_coordinates() 
+    names(st1) <- c("x","y")
+  }
+  if(!is.null(end)) {
+    end <- data.frame(lon = end[1], lat = end[2])
+    ed1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
+      st_transform(crs = "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs") |>
+      st_coordinates()
+    names(ed1) <- c("x","y")
+  }
   
   ########################################
   ## Simulate from a aniMotum model fit ##
@@ -91,6 +118,7 @@ sim_fit <-
            predicted = {
              loc <- grab(x[k,], "predicted", as_sf = FALSE)
            })
+    
     N <- nrow(loc)
     dts <- loc$date
     dt <- as.numeric(difftime(dts, c(as.POSIXct(NA), dts[-length(dts)]), units = "hours"))
@@ -128,9 +156,13 @@ sim_fit <-
     if(!is.null(grad)) {
       ex <- ext(grad[[1]])
     } else {
-      ex <- c(-20077.51,20082.49,-19622.54,18437.46) ## approx extents of world mercator in km
+      ## approx extents of world mercator in km
+      ex <- c(-20077.51,20082.49,-19622.54,18437.46) 
     }
-    wrap_x <- function(mu, x_rng) c((mu[1] - x_rng[1]) %% sum(abs(x_rng)) + x_rng[1], mu[2])
+    wrap_x <- function(mu, x_rng) {
+      c((mu[1] - x_rng[1]) %% sum(abs(x_rng)) + x_rng[1], mu[2])
+    }
+    
     reflect_y <- function(mu, y_rng) {
       if(mu[2] < y_rng[1]) {
         c(mu[1], y_rng[1] * 2 - mu[2])
@@ -146,7 +178,11 @@ sim_fit <-
              crw = {
                mu <- v <- matrix(NA, N, 2)
                time <- seq(0, 1, length = N)
-               mu[1,] <- c(loc$x[1], loc$y[1])
+               if(is.null(start)) {
+                 mu[1,] <- c(loc$x[1], loc$y[1])
+               } else {
+                 mu[1,] <- st1
+               }
                v[1, ] <- c(loc$u[1], loc$v[1])
                for (i in 2:N) {
                  v[i,] <- rtmvnorm(1,
@@ -158,8 +194,8 @@ sim_fit <-
                  mu1 <- wrap_x(mu[i-1,] + v[i,] * dt[i], ex[1:2])
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
-                   pv <- c(extract(grad[[1]], rbind(mu1))[1],
-                           extract(grad[[2]], rbind(mu1))[1])
+                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1))[1],
+                           extract(grad[[2]], rbind(mu1))[1]))
                    mu[i,] <- mu1 + pv * beta
                  } else {
                    mu[i,] <- mu1
@@ -171,20 +207,25 @@ sim_fit <-
                  x = mu[, 1],
                  y = mu[, 2]
                )
-               if(cpf) {
+               if(cpf & is.null(end)) {
                  df <- df %>%
                    mutate(x = ((x - x[1]) - time *
                                  (x - x[1])[N]) + x[1]) %>%
                    mutate(y = ((y - y[1]) - time *
                                  (y - y[1])[N]) + y[1])
                  
-               }
+               } 
                df
              },
              rw = {
                mu <- matrix(NA, N, 2) 
                time <- seq(0, 1, length = N)
-               mu[1, ] <- c(loc$x[1], loc$y[1])
+               if(is.null(start)) {
+                 mu[1, ] <- c(loc$x[1], loc$y[1])
+               } else {
+                 mu[1, ] <- st1
+               }
+               
                mu[2, ] <- rmvnorm(1, mu[1,], sigma = Sigma * dt[2]^2)
                for (i in 3:N) {
                  dxy <- rtmvnorm(100, mu[i - 1, ] - mu[i - 2,], 
@@ -199,8 +240,8 @@ sim_fit <-
                  mu1 <- wrap_x(mu[i-1,] + dxy, ex[1:2])
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
-                   pv <- c(extract(grad[[1]], rbind(mu1))[1],
-                           extract(grad[[2]], rbind(mu1))[1])
+                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1))[1],
+                           extract(grad[[2]], rbind(mu1))[1]))
                    mu[i,] <- mu1 + pv * beta
                  } else {
                    mu[i,] <- mu1
@@ -212,7 +253,7 @@ sim_fit <-
                  x = mu[, 1],
                  y = mu[, 2]
                )
-               if(cpf) {
+               if(cpf & is.null(end)) {
                  df$x <- ((x - x[1]) - time * (x - x[1])[N]) + x[1]
                  df$y <- ((y - y[1]) - time * (y - y[1])[N]) + y[1]
                }

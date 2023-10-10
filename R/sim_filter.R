@@ -64,10 +64,11 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     ungroup()
   
   trs_lst <- split(trs_df, trs_df$id)
+
   flg <- lapply(trs_lst, function(x) {
     sapply(split(x, x$rep)[-1], function(.x) {
       similarity_flag(
-        track = x %>% filter(rep == 0),
+        track = x %>% dplyr::filter(rep == 0),
         sim_track = .x,
         flag = flag,
         cpf = ifelse("cpf" %in% class(trs), TRUE, FALSE)
