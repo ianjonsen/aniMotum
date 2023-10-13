@@ -1,6 +1,6 @@
 # compile tmb models
 TMBver <- as.character(packageVersion("TMB"))
-write(TMBver, file = "../../inst/TMB-version")
+write(TMBver, file = file.path("..", "..", "inst", "TMB-version"))
 
 invisible(sapply(Sys.glob("*.cpp"),
                  TMB::compile,
