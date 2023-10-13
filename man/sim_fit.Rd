@@ -11,8 +11,9 @@ sim_fit(
   start = NULL,
   end = NULL,
   grad = NULL,
-  beta = c(-300, -300),
+  beta = c(-150, -150),
   cpf = FALSE,
+  pass2 = FALSE,
   sim_only = FALSE
 )
 }
@@ -31,7 +32,7 @@ fit object}
 \item{end}{a 2-element vector for the simulated track end location
 (lon,lat or x,y)}
 
-\item{grad}{a rasterStack of x- and y-gradients as separate layers (see details)}
+\item{grad}{a SpatRaster of x- and y-gradients as separate layers (see details)}
 
 \item{beta}{a 2-element vector of parameters defining the potential function
 magnitude in x- and y-directions (ignored if \code{is.null(grad)},
@@ -39,6 +40,10 @@ ie. no potential function; see details).}
 
 \item{cpf}{logical; should simulated tracks return to their start point
 (ie. a central-place forager)}
+
+\item{pass2}{logical; if cpf = TRUE, should potential function be applied a
+second time to attempt moving tracks off land. Ignored if cpf = FALSE and/or
+gradient rasters are not supplied.}
 
 \item{sim_only}{logical, do not include \code{ssm} estimated location in output
 (default is FALSE)}
