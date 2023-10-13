@@ -62,7 +62,7 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     mutate(dist = track_distance_to(lon, lat, first(lon), first(lat)) / 1000) %>%
     mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) %>%
     ungroup()
-  
+
   trs_lst <- split(trs_df, trs_df$id)
 
   flg <- lapply(trs_lst, function(x) {

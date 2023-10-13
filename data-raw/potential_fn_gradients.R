@@ -12,7 +12,7 @@ wm <- rnaturalearth::ne_countries(scale = 10, returnclass = "sf")
 
 y <- terra::rast(crs = sf::st_crs(wm)$wkt,
           vals = 1,
-          resolution = c(0.1, 0.1),
+          resolution = c(0.5, 0.5),
           xmin = -180,
           xmax = 180,
           ymin = -86,

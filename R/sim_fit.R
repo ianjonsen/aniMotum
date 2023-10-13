@@ -12,12 +12,15 @@
 ##' (lon,lat or x,y)
 ##' @param end a 2-element vector for the simulated track end location 
 ##' (lon,lat or x,y)
-##' @param grad a rasterStack of x- and y-gradients as separate layers (see details)
+##' @param grad a SpatRaster of x- and y-gradients as separate layers (see details)
 ##' @param beta a 2-element vector of parameters defining the potential function 
 ##' magnitude in x- and y-directions (ignored if \code{is.null(grad)}, 
 ##' ie. no potential function; see details).
 ##' @param cpf logical; should simulated tracks return to their start point 
 ##' (ie. a central-place forager)
+##' @param pass2 logical; if cpf = TRUE, should potential function be applied a 
+##' second time to attempt moving tracks off land. Ignored if cpf = FALSE and/or
+##' gradient rasters are not supplied.
 ##' @param sim_only logical, do not include \code{ssm} estimated location in output 
 ##' (default is FALSE)
 ##' 
@@ -60,8 +63,9 @@ sim_fit <-
            start = NULL,
            end = NULL,
            grad = NULL,
-           beta = c(-300, -300),
+           beta = c(-150, -150),
            cpf = FALSE,
+           pass2 = FALSE,
            sim_only = FALSE) {
     
   
@@ -99,7 +103,7 @@ sim_fit <-
   }
   if(!is.null(end)) {
     end <- data.frame(lon = end[1], lat = end[2])
-    ed1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
+    ed1 <- st_as_sf(end, coords = c("lon","lat"), crs = 4326) |>
       st_transform(crs = "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs") |>
       st_coordinates()
     names(ed1) <- c("x","y")
@@ -128,6 +132,7 @@ sim_fit <-
     switch(model,
            crw = {
              Sigma <- diag(2) * 2 * x$ssm[[k]]$par[c("D_x","D_y"), 1]
+             Sigma[1,2] <- Sigma[2,1] <- x$ssm[[k]]$par["rho_p",1] * sqrt(Sigma[1,1]) * sqrt(Sigma[2,2])
              vmin <- with(loc,
                           c(min(u, na.rm = TRUE),
                             min(v, na.rm = TRUE))) # in km/h
@@ -208,13 +213,33 @@ sim_fit <-
                  y = mu[, 2]
                )
                if(cpf & is.null(end)) {
-                 df <- df %>%
+                 df <- df |>
                    mutate(x = ((x - x[1]) - time *
                                  (x - x[1])[N]) + x[1]) %>%
                    mutate(y = ((y - y[1]) - time *
                                  (y - y[1])[N]) + y[1])
                  
-               } 
+               } else if (!is.null(end)) { 
+                 df <- df |>
+                   mutate(x = ((x - x[1]) - time *
+                                 (x - ed1[1])[N]) + x[1]) |>
+                   mutate(y = ((y - y[1]) - time *
+                                 (y - ed1[2])[N]) + y[1])
+                 
+               }
+               if(all(!is.null(end), !is.null(grad), pass2)) {
+                 ## second pass with potential fn
+                 mu1 <- cbind(df$x, df$y)
+                 mu <- sapply(1:nrow(mu1), function(i) {
+                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1[i, ]))[1],
+                                      extract(grad[[2]], rbind(mu1[i, ]))[1]))
+                   mu1[i, ] + pv * beta * 2
+                 })
+                 mu <- t(mu)
+                 df$x <- mu[,1]
+                 df$y <- mu[,2]
+               }
+               
                df
              },
              rw = {
@@ -289,7 +314,7 @@ sim_fit <-
   }) 
   
   d <- tibble(id = x$id, model = x$pmodel, sims = d)
-  if(cpf) class(d) <- append("cpf", class(d))
+  if(cpf | !is.null(end)) class(d) <- append("cpf", class(d))
   
   switch(unique(x$pmodel),
          rw = { 
@@ -300,5 +325,6 @@ sim_fit <-
          })
 
   class(d) <- append("sim_fit", class(d))
+  
   return(d)
 }
