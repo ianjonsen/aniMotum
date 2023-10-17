@@ -145,7 +145,7 @@ mpfilter <-
              xout = d.all$date,
              rule = 2)$y
     x.init <-
-      as.numeric(filter(x.init1, rep(1, 5) / 5))
+      as.numeric(stats::filter(x.init1, rep(1, 5) / 5))
     x.na <- which(is.na(x.init))
     x.init[x.na] <- x.init1[x.na]
     
@@ -184,7 +184,7 @@ mpfilter <-
     } 
     
     ## start to work out which obs_mod to use for each observation
-    d <- d %>% mutate(obs.type = factor(obs.type, 
+    d <- mutate(d, obs.type = factor(obs.type, 
                                         levels = c("LS","KF","GL","GPS"), 
                                         labels = c("LS","KF","GL","GPS"))
                       )

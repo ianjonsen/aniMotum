@@ -3,7 +3,6 @@
 ##' @param object an `ssm_df` fit object
 ##' @param ... additional arguments to be ignored
 ##' @importFrom stats pnorm AIC BIC
-##' @importFrom dplyr %>%
 ##' @method summary ssm_df
 ##' @export
 summary.ssm_df <- function(object, ...) {

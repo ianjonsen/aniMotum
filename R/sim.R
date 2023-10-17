@@ -75,8 +75,8 @@ ellp.par <- function(lc) {
     Sigma <- diag(2) * c(s1[i], s2[i])
     Sigma[!Sigma] <- s12[i]
     rmvnorm(1, c(0, 0), sigma = Sigma)
-  }) %>%
-    do.call(rbind, .) / 1000 # convert errors in m to km
+  })
+  errs <- do.call(rbind, errs) / 1000 # convert errors in m to km
   
   data.frame(x.err = errs[,1],
          y.err = errs[,2], 

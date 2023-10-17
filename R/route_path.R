@@ -110,37 +110,37 @@ route_path <-
     what <- match.arg(what)
     
     # pathroutr needs a land shapefile to create a visibility graph from
-    world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-      st_transform(crs = 3857) %>%
+    world_mc <- ne_countries(scale = map_scale, returnclass = "sf") |>
+      st_transform(crs = 3857) |>
       st_make_valid()
     
     if (inherits(x, "ssm_df")) {
       # unnest aniMotum ssm object
-      df <- x %>% grab(what)
+      df <- x |> grab(what)
     
       # this should be trimmed to reduce computation time
       # base the trimming on the trs data
-      df_sf <- df %>% 
-        st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+      df_sf <- df |> 
+        st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
         st_transform(crs = 3857)
       
     } else if (inherits(x, "sim_fit")) {
       # unnest aniMotum sim_fit object
-      df <- x %>% unnest(cols = c(sims))
+      df <- x |> unnest(cols = c(sims))
       
       # this should be trimmed to reduce computation time
       # base the trimming on the trs data
-      df_sf <- df %>% 
-        st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+      df_sf <- df |> 
+        st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
         st_transform(crs = 3857)
       
     }
   
-      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
-        st_union() %>% 
-        st_convex_hull() %>% 
-        st_intersection(world_mc) %>% 
-        st_collection_extract('POLYGON') %>% 
+      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) |> 
+        st_union() |> 
+        st_convex_hull() |> 
+        st_intersection(world_mc) |> 
+        st_collection_extract('POLYGON') |> 
         st_sf())
     
       # create visibility graph
@@ -149,10 +149,10 @@ route_path <-
     if (inherits(x, "ssm_df")) {
       # create nested tibble grouped by individual track
       # use rowwise to process each row in turn
-      df_rrt <- df_sf %>% 
-        nest_by(id) %>%
-        rowwise() %>%
-        mutate(pts = suppressWarnings(list(try(data %>% pathroutr::prt_trim(land_region), silent = TRUE))))
+      df_rrt <- df_sf |> 
+        nest_by(id) |>
+        rowwise() |>
+        mutate(pts = suppressWarnings(list(try(data |> pathroutr::prt_trim(land_region), silent = TRUE))))
       
       ## check for errors due to entire track on land & return message
       idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
@@ -175,17 +175,17 @@ route_path <-
       # pull the corrected points from the object and reformat for aniMotum
       df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
         if(!is.null(x)) {
-          st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
+          st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") |>
             select(date, x.se, y.se)
         }
       }) 
-      df_rrt <- df_rrt %>% select(id, pts_rrt) %>% ungroup()
+      df_rrt <- df_rrt |> select(id, pts_rrt) |> ungroup()
       
       ## append id to each sf tibble
       df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
         if(!is.null(df_rrt$pts_rrt[[i]])) {
-          df_rrt$pts_rrt[[i]] %>% 
-            mutate(id = df_rrt$id[i]) %>%
+          df_rrt$pts_rrt[[i]] |> 
+            mutate(id = df_rrt$id[i]) |>
             select(id, everything())
         }
       })
@@ -200,9 +200,9 @@ route_path <-
         x$ssm <- lapply(1:nrow(x), function(i) {
           if(!is.null(df_rrt$pts_rrt[[i]])) {
             if("g" %in% names(x$ssm[[i]]$predicted)) {
-              x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
+              x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) |>
                                                  select(date, logit_g, logit_g.se, g),
-                                               by = "date") %>%
+                                               by = "date") |>
                 select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
             } else {
               x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
@@ -219,28 +219,28 @@ route_path <-
         
        out <-  lapply(1:nrow(df_rrt), function(i) {
          if("g" %in% names(x$ssm[[i]]$predicted)) {
-           left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
+           left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) |>
                        select(date, logit_g, logit_g.se, g),
-                     by = "date") %>%
-             select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) %>%
+                     by = "date") |>
+             select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) |>
             mutate(x = st_coordinates(.)[,1], 
-                   y = st_coordinates(.)[,2]) %>% 
-            st_transform(4326) %>% 
+                   y = st_coordinates(.)[,2]) |> 
+            st_transform(4326) |> 
             mutate(lon = st_coordinates(.)[,1], 
-                   lat = st_coordinates(.)[,2]) %>% 
-            st_drop_geometry() %>%
+                   lat = st_coordinates(.)[,2]) |> 
+            st_drop_geometry() |>
             select(id, date, lon, lat, x, y, x.se, y.se, logit_g, logit_g.se, g)
          } else {
-           df_rrt$pts_rrt[[i]] %>% 
+           df_rrt$pts_rrt[[i]] |> 
              mutate(x = st_coordinates(.)[,1], 
-                    y = st_coordinates(.)[,2]) %>% 
-             st_transform(4326) %>% 
+                    y = st_coordinates(.)[,2]) |> 
+             st_transform(4326) |> 
              mutate(lon = st_coordinates(.)[,1], 
-                    lat = st_coordinates(.)[,2]) %>% 
-             st_drop_geometry() %>%
+                    lat = st_coordinates(.)[,2]) |> 
+             st_drop_geometry() |>
              select(id, date, lon, lat, x, y, x.se, y.se)
          }
-        }) %>%
+        }) |>
           bind_rows()
        
       }
@@ -248,27 +248,27 @@ route_path <-
     } else if (inherits(x, "sim_fit")) {
     # create nested tibble grouped by individual track
     # use rowwise to process each row in turn
-    df_rrt <- df_sf %>% 
-      nest_by(id, rep) %>%
-      rowwise() %>%
-      mutate(pts = list(data %>% pathroutr::prt_trim(land_region)),
+    df_rrt <- df_sf |> 
+      nest_by(id, rep) |>
+      rowwise() |>
+      mutate(pts = list(data |> pathroutr::prt_trim(land_region)),
              rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
              pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
     
     # pull the corrected points from the object and reformat for aniMotum
-    df_rrt <- df_rrt %>%
-      select(id, rep, pts_fix) %>%
-      mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
+    df_rrt <- df_rrt |>
+      select(id, rep, pts_fix) |>
+      mutate(pts_fix = list(pts_fix |> st_transform(crs = 4326) |>
                             mutate(lon = st_coordinates(.)[,1],
-                                   lat = st_coordinates(.)[,2]) %>%
-                            st_drop_geometry() %>%
+                                   lat = st_coordinates(.)[,2]) |>
+                            st_drop_geometry() |>
                             select(model, date, lon, lat, x, y)))
     
     # remove nesting by individual path
-    df_rrt <- df_rrt %>% unnest(cols = c(pts_fix))
+    df_rrt <- df_rrt |> unnest(cols = c(pts_fix))
     
     # format to aniMotum object - including nesting by animal id
-    df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
+    df_rrt <- df_rrt |> nest(sims = c(rep, date, lon, lat, x, y))
     class(df_rrt) <- append("rws", class(df_rrt))
     class(df_rrt) <- append("sim_fit", class(df_rrt))
     

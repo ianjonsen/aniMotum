@@ -22,11 +22,10 @@
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
-##' @importFrom ggplot2 element_rect coord_sf
+##' @importFrom ggplot2 element_rect coord_sf element_line
 ##' @importFrom rnaturalearth ne_countries
 ##' @importFrom sf st_union st_convex_hull st_intersection st_collection_extract 
 ##' @importFrom sf st_sf st_crs st_make_valid
-##' @importFrom dplyr "%>%"
 ##' 
 ##' @keywords internal
 map_single_track_base <- function(map_type, 
@@ -49,7 +48,7 @@ map_single_track_base <- function(map_type,
   
   if (by.date) {
     lab_dates <-
-      with(loc_sf, pretty(seq(min(date), max(date), l = 10), n = 5)) %>% as.Date()
+      with(loc_sf, pretty(seq(min(date), max(date), l = 10), n = 5)) |> as.Date()
   }
   
   prj <- st_crs(loc_sf)
@@ -57,13 +56,13 @@ map_single_track_base <- function(map_type,
   ## get worldmap
   if (map_type == "default") {
     if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-      wm <- ne_countries(scale = 10, returnclass = "sf") %>%
-        st_transform(crs = prj) %>%
+      wm <- ne_countries(scale = 10, returnclass = "sf") |>
+        st_transform(crs = prj) |>
         st_make_valid()
       if(!silent) cat("using map scale: 10\n")
     } else {
-      wm <- ne_countries(scale = 50, returnclass = "sf") %>%
-        st_transform(crs = prj) %>%
+      wm <- ne_countries(scale = 50, returnclass = "sf") |>
+        st_transform(crs = prj) |>
         st_make_valid()
       if(!silent) cat("using map scale 50\n")
     }
@@ -71,12 +70,12 @@ map_single_track_base <- function(map_type,
     ## define map region & clip land polygons
     if(!is.null(obs_sf)) pts <- obs_sf
     else pts <- loc_sf
-    land <- suppressWarnings(st_buffer(pts, dist = buffer) %>% 
-                               st_union() %>% 
-                               st_convex_hull() %>% 
-                               st_intersection(wm) %>% 
-                               st_collection_extract('POLYGON') %>% 
-                               st_sf() %>%
+    land <- suppressWarnings(st_buffer(pts, dist = buffer) |> 
+                               st_union() |> 
+                               st_convex_hull() |> 
+                               st_intersection(wm) |> 
+                               st_collection_extract('POLYGON') |> 
+                               st_sf() |>
       st_make_valid())
     
     p <- ggplot() + 

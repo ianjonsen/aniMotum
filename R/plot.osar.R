@@ -96,7 +96,7 @@ plot.osar <-
             y.acf <- acf(x[x$coord == "y", "residual"], plot = FALSE)
             x1 <- rbind(with(x.acf, data.frame(lag, acf, coord = rep("x", length(x.acf$lag)))), 
                        with(y.acf, data.frame(lag, acf, coord = rep("y", length(y.acf$lag))))
-                       ) %>%
+                       ) |>
               mutate(id = unique(x$id))
             
             cil.x <- qnorm((1 - 0.95)/2) / sqrt(nrow(x[x$coord == "x", ]))

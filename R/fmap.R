@@ -37,18 +37,6 @@
 ##' @param rev reverse colour palette (logical)
 ##' @param last_loc colour to render last location of each track (default = NULL)
 ##' @param ... additional arguments passed to [ggspatial::annotation_map_tile]
-##' @importFrom ggplot2 ggplot geom_sf aes aes_string ggtitle xlim ylim unit 
-##' @importFrom ggplot2 element_text theme  scale_fill_gradientn scale_fill_manual 
-##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
-##' @importFrom ggplot2 element_line coord_sf
-##' @importFrom sf st_bbox st_transform st_crop st_as_sf st_as_sfc st_buffer 
-##' @importFrom sf st_crs st_coordinates st_cast st_multipolygon st_polygon st_union
-##' @importFrom sf st_make_valid
-##' @importFrom utils data
-##' @importFrom grDevices extendrange grey
-##' @importFrom dplyr group_by summarise
-##' @importFrom grDevices hcl.colors
-##' @importFrom rnaturalearth ne_countries
 ##' @export
 
 fmap <- function(x,

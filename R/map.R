@@ -149,7 +149,7 @@ map <- function(x,
       conf <- lapply(1:nrow(x), function(j)
         with(x, elps(x[j], y[j], x.se[j], y.se[j], 90)))
       lapply(conf, function(x)
-        st_polygon(list(x))) %>%
+        st_polygon(list(x))) |>
         st_multipolygon()
     })
 

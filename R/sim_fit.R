@@ -215,7 +215,7 @@ sim_fit <-
                if(cpf & is.null(end)) {
                  df <- df |>
                    mutate(x = ((x - x[1]) - time *
-                                 (x - x[1])[N]) + x[1]) %>%
+                                 (x - x[1])[N]) + x[1]) |>
                    mutate(y = ((y - y[1]) - time *
                                  (y - y[1])[N]) + y[1])
                  

@@ -21,11 +21,10 @@
 ##' @importFrom ggplot2 ggplot geom_sf aes ggtitle xlim ylim unit 
 ##' @importFrom ggplot2 element_text theme scale_fill_gradientn scale_fill_manual 
 ##' @importFrom ggplot2 element_blank scale_colour_manual scale_colour_gradientn
-##' @importFrom ggplot2 element_rect coord_sf unit
+##' @importFrom ggplot2 element_rect coord_sf unit element_line
 ##' @importFrom rnaturalearth ne_countries
 ##' @importFrom sf st_union st_convex_hull st_intersection st_collection_extract 
 ##' @importFrom sf st_sf st_crs st_make_valid
-##' @importFrom dplyr "%>%" filter
 ##' 
 ##' @keywords internal
 map_single_track_mp <- function(map_type, 
@@ -50,13 +49,13 @@ map_single_track_mp <- function(map_type,
   ## get worldmap
   if (map_type == "default") {
     if (requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-      wm <- ne_countries(scale = 10, returnclass = "sf") %>%
-        st_transform(crs = prj) %>%
+      wm <- ne_countries(scale = 10, returnclass = "sf") |>
+        st_transform(crs = prj) |>
         st_make_valid()
       if(!silent) cat("using map scale: 10\n")
     } else {
-      wm <- ne_countries(scale = 50, returnclass = "sf") %>%
-        st_transform(crs = prj) %>%
+      wm <- ne_countries(scale = 50, returnclass = "sf") |>
+        st_transform(crs = prj) |>
         st_make_valid()
       if(!silent) cat("using map scale: 50\n")
     }
@@ -64,12 +63,12 @@ map_single_track_mp <- function(map_type,
     ## define map region & clip land polygons
     if(!is.null(obs_sf)) pts <- obs_sf
     else pts <- loc_sf
-    land <- st_buffer(pts, dist = buffer) %>% 
-                               st_union() %>% 
-                               st_convex_hull() %>% 
-                               st_intersection(wm) %>% 
-                               st_collection_extract('POLYGON') %>% 
-                               st_sf() %>%
+    land <- st_buffer(pts, dist = buffer) |>
+                               st_union() |>
+                               st_convex_hull() |>
+                               st_intersection(wm) |>
+                               st_collection_extract('POLYGON') |>
+                               st_sf() |> 
       st_make_valid()
     
     p <- ggplot() + 
@@ -127,14 +126,14 @@ map_single_track_mp <- function(map_type,
   if (all(aes$est, aes$mp)) {
     p <- p +
       geom_sf(
-        data = loc_sf %>% filter(g > 0.5),
+        data = loc_sf |> dplyr::filter(g > 0.5),
         aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.2,
         shape = aes$df$shape[1]
       ) +
       geom_sf(
-        data = loc_sf %>% filter(g <= 0.5),
+        data = loc_sf |> dplyr::filter(g <= 0.5),
         aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.2,

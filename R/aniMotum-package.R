@@ -23,8 +23,8 @@
 ##' 
 ##' @keywords aniMotum
 ##' @importFrom utils data flush.console globalVariables
-##' @importFrom dplyr %>% select mutate slice group_by
-##' @importFrom dplyr distinct arrange filter left_join lag full_join bind_cols
+##' @importFrom dplyr select mutate slice group_by
+##' @importFrom dplyr distinct arrange left_join lag full_join bind_cols
 ##' @importFrom dplyr summarise
 ##' @importFrom tibble as_tibble tibble
 ##' @importFrom sf st_as_sf st_set_crs st_transform st_is_longlat st_crs

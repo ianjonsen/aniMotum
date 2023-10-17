@@ -26,7 +26,7 @@
 ##' 
 ##' res <- osar(xs)
 ##'
-##' @importFrom dplyr "%>%" select slice mutate bind_rows everything
+##' @importFrom dplyr select slice mutate bind_rows everything
 ##' @importFrom tibble as_tibble
 ##' @importFrom TMB oneStepPredict
 ##' @export
@@ -56,7 +56,7 @@ osar <- function(x, method = "fullGaussian", ...)
     cl <- future::makeClusterPSOCK(parallelly::availableCores())
     future::plan("future::cluster", workers = cl)
     
-    r <- x$ssm %>%
+    r <- x$ssm |>
       furrr::future_map(~ try(map_fn(.x, method), silent = TRUE), 
                  .options = furrr::furrr_options(seed = TRUE))
     
@@ -88,7 +88,7 @@ osar <- function(x, method = "fullGaussian", ...)
       cl <- future::makeClusterPSOCK(parallelly::availableCores())
       future::plan("future::cluster", workers = cl)
       
-      r.redo <- redo$ssm %>%
+      r.redo <- redo$ssm |>
         furrr::future_map(~ try(map_fn(.x, method = "oneStepGaussianOffMode")), 
                    .options = furrr::furrr_options(seed = TRUE))
       
@@ -125,20 +125,20 @@ osar <- function(x, method = "fullGaussian", ...)
     stop("no residuals calculated", call. = FALSE)
   } else {
     out <- lapply(1:length(r), function(i) {
-      z <- r[[i]] %>%
-        mutate(id = x$id[i]) %>%
+      z <- r[[i]] |>
+        mutate(id = x$id[i]) |>
         select(id, everything())
-      x.z <- z %>% slice(seq(1, nrow(z), by = 2))
-      y.z <- z %>% slice(seq(2, nrow(z), by = 2))
+      x.z <- z |> slice(seq(1, nrow(z), by = 2))
+      y.z <- z |> slice(seq(2, nrow(z), by = 2))
       date <- x$ssm[[i]]$fitted$date
-      bind_rows(data.frame(date, x.z), data.frame(date, y.z)) %>%
+      bind_rows(data.frame(date, x.z), data.frame(date, y.z)) |>
         mutate(coord = rep(c("x", "y"), each = nrow(z) / 2))
     }) 
     
     out <- lapply(out, function(x) {
         x[, c("id", "date", "residual", "coord")]
-      }) %>% 
-      do.call(rbind, .) %>% 
+      }) 
+    out <- do.call(rbind, out) |> 
       as_tibble() 
 
     class(out) <- append("osar", class(out))

@@ -37,7 +37,7 @@
 ##' @references Hazen et al. (2017) WhaleWatch: a dynamic management tool for 
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
 ##' 
-##' @importFrom dplyr group_by ungroup select "%>%" filter bind_rows mutate
+##' @importFrom dplyr group_by ungroup select bind_rows mutate
 ##' @importFrom dplyr first
 ##' @importFrom tidyr nest unnest
 ##' @importFrom traipse track_distance_to track_bearing_to
@@ -54,13 +54,13 @@ sim_filter <- function(trs, keep = .25, flag = 2){
   # filter based on similarity to original path
   # apply the similarity flag function to each simulated track
   # unnest the sim_fit object to extract the simulations
-  trs_df <- trs %>% unnest(cols = c(sims))
+  trs_df <- trs |> unnest(cols = c(sims))
   
   ## append distance (km), bearing along tracks via traipse fn's
-  trs_df <- trs_df %>%
-    group_by(rep) %>%
-    mutate(dist = track_distance_to(lon, lat, first(lon), first(lat)) / 1000) %>%
-    mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) %>%
+  trs_df <- trs_df |>
+    group_by(rep) |>
+    mutate(dist = track_distance_to(lon, lat, first(lon), first(lat)) / 1000) |>
+    mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) |>
     ungroup()
 
   trs_lst <- split(trs_df, trs_df$id)
@@ -68,7 +68,7 @@ sim_filter <- function(trs, keep = .25, flag = 2){
   flg <- lapply(trs_lst, function(x) {
     sapply(split(x, x$rep)[-1], function(.x) {
       similarity_flag(
-        track = x %>% dplyr::filter(rep == 0),
+        track = x |> dplyr::filter(rep == 0),
         sim_track = .x,
         flag = flag,
         cpf = ifelse("cpf" %in% class(trs), TRUE, FALSE)
@@ -86,14 +86,14 @@ sim_filter <- function(trs, keep = .25, flag = 2){
   foo <- lapply(1:length(trs_lst), function(i) {
     rep0 <- split(trs_lst[[i]], trs_lst[[i]]$rep)[[1]]
     tmp <- split(trs_lst[[i]], trs_lst[[i]]$rep)[-1]
-    reps <- tmp[k.idx[[i]]] %>% bind_rows()
+    reps <- tmp[k.idx[[i]]] |> bind_rows()
     rbind(rep0, reps)
-  }) %>%
-    bind_rows() %>%
+  }) |>
+    bind_rows() |>
     select(-dist, -bear)
   
   # format for aniMotum output
-  trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y))
+  trs_filt <- foo |> nest(sims = c(rep, date, lon, lat, x, y))
   class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
   
   return(trs_filt) 

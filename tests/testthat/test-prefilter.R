@@ -27,7 +27,7 @@ ellie_n <- ellie_n[, sample(1:ncol(ellie_n))]
 test_that("format_data orders variables properly", {
   f <- format_data(ellie_n, id = "ind", date = "time", lc = "lq", 
                    coord = c("long","lat"))
-  expect_equal(names(f), c("id","date","lc","lon","lat","smaj","smin","eor","lonerr","laterr"))
+  expect_equal(names(f), c("id","date","lc","lon","lat","smaj","smin","eor","x.sd","y.sd"))
 })
 
 ## test that format_data & prefilter handle sf-tibbles
@@ -35,7 +35,7 @@ test_that("prefilter handles incoming sf data", {
   f <- format_data(ellie_sf)
   f <- prefilter(f, vmax=5, ang=c(15,25), min.dt=120)
   expect_s3_class(f, "sf")
-  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","lonerr","laterr","keep","obs.type","emf.x","emf.y","geometry"))
+  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","x.sd","y.sd","keep","obs.type","emf.x","emf.y","geometry"))
 })
 
 ## test that format_data & prefilter handle sf data.frames
@@ -43,7 +43,7 @@ test_that("prefilter handles incoming sf data", {
   f <- format_data(ellie_no.sf)
   f <- prefilter(f, vmax=10, ang=c(15,25), min.dt=120)
   expect_s3_class(f, "sf")
-  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","lonerr","laterr","keep","obs.type","emf.x","emf.y","geometry"))
+  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","x.sd","y.sd","keep","obs.type","emf.x","emf.y","geometry"))
 })
 
 ## test on sf data with epsg 3031
@@ -53,7 +53,7 @@ test_that("prefilter handles incoming sf data", {
   f <- format_data(ellie_sf)
   f <- prefilter(f, vmax=10, ang=c(15,25), min.dt=120)
   expect_s3_class(f, "sf")
-  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","lonerr","laterr","keep","obs.type","emf.x","emf.y","geometry"))
+  expect_equal(names(f), c("id","date","lc","smaj","smin","eor","x.sd","y.sd","keep","obs.type","emf.x","emf.y","geometry"))
 })
 
 ## test that prefilter converts sf w units=m to units=km
