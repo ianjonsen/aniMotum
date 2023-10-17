@@ -107,8 +107,10 @@ In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast 
 
 ```{r sim_fit potential fn, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 load(system.file("extdata/grad.rda", package = "aniMotum"))
+grad <- terra::unwrap(grad)
+
 set.seed(pi)
-st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-350,-350))
+st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-300,-300))
 
 plot(st.pf, zoom=TRUE)
 ```

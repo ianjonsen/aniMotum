@@ -49,55 +49,63 @@ loc.crw <- grab(fit.crw, "fitted")
 #    geom_point(data = loc.rw, aes(date, y), cex = 0.7, col = "firebrick") +  # RW SSM fitted y
 #    geom_point(data = loc.crw, aes(date, y), cex = 0.4, col = "orange")      # CRW SSM fitted y
 
-## ----sim_fit 1b, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  set.seed(pi)
-#  fit <- fit_ssm(sese2,
-#                 model="crw",
-#                 time.step=24,
-#                 control=ssm_control(verbose=0))
-#  
-#  st <- sim_fit(fit[2,], what="predicted", reps=5)
-#  
-#  plot(st, zoom=TRUE)
+## ----sim_fit 1b, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+set.seed(pi)
+fit <- fit_ssm(sese2, 
+               model="crw", 
+               time.step=24, 
+               control=ssm_control(verbose=0))
 
-## ----sim_fit potential fn, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  load(system.file("extdata/grad.rda", package = "aniMotum"))
-#  set.seed(pi)
-#  st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-350,-350))
-#  
-#  plot(st.pf, zoom=TRUE)
+st <- sim_fit(fit[2,], what="predicted", reps=5)
 
-## ----sim_fit 4, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  st.cpf <- sim_fit(fit[2, ], what = "predicted", reps=5, cpf = TRUE)
-#  
-#  plot(st.cpf, zoom=TRUE)
+plot(st, zoom=TRUE)
+ggsave(file = "images/track_simulation/st_1.jpg")
 
-## ----sim_filter 1, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  # simulate 50 tracks
-#  st <- sim_fit(fit[1,], what = "predicted", reps = 50)
-#  
-#  # filter, keep only top 20 %
-#  st_f <- sim_filter(st, keep = 0.2)
-#  
-#  # compare unfiltered vs. filtered tracks
-#  plot(st) | plot(st_f)
+## ----sim_fit potential fn, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+load(system.file("extdata/grad.rda", package = "aniMotum"))
+grad <- terra::unwrap(grad)
 
-## ----sim_filter 2, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  # simulate 50 cpf tracks
-#  st.cpf <- sim_fit(fit[2,], what = "predicted", reps = 50, cpf = TRUE)
-#  
-#  # filter, keep only top 20 %
-#  st.cpf_f <- sim_filter(st.cpf, keep = 0.2)
-#  
-#  # compare unfiltered vs. filtered tracks
-#  plot(st.cpf) | plot(st.cpf_f)
+set.seed(pi)
+st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-150,-150))
 
-## ----route_path b, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
-#  # reroute simulated tracks
-#  st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
-#  
-#  # compare
-#  plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
+plot(st.pf, zoom=TRUE)
+ggsave(file = "images/track_simulation/st_2.jpg")
+
+## ----sim_fit 4, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+st.cpf <- sim_fit(fit[2, ], what = "predicted", reps=5, cpf = TRUE)
+
+plot(st.cpf, zoom=TRUE)
+ggsave(file = "images/track_simulation/st_3.jpg")
+
+## ----sim_filter 1, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+# simulate 50 tracks
+st <- sim_fit(fit[1,], what = "predicted", reps = 50)
+
+# filter, keep only top 20 %
+st_f <- sim_filter(st, keep = 0.2)
+
+# compare unfiltered vs. filtered tracks
+plot(st) | plot(st_f)
+ggsave(file = "images/track_simulation/st_4ab.jpg")
+
+## ----sim_filter 2, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+# simulate 50 cpf tracks
+st.cpf <- sim_fit(fit[2,], what = "predicted", reps = 50, cpf = TRUE)
+
+# filter, keep only top 20 %
+st.cpf_f <- sim_filter(st.cpf, keep = 0.2)
+
+# compare unfiltered vs. filtered tracks
+plot(st.cpf) | plot(st.cpf_f)
+ggsave(file = "images/track_simulation/st_5ab.jpg")
+
+## ----route_path b, eval=TRUE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
+# reroute simulated tracks
+st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
+
+# compare
+plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
+ggsave(file = "images/track_simulation/st_6ab.jpg")
 
 ## ----route_path a, eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6----
 #  if(requireNamespace("pathroutr", quietly = TRUE)) {

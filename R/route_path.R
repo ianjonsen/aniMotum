@@ -61,7 +61,7 @@
 ##'   grab(fit, what = "rerouted")
 ##' }
 ##' 
-##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
+##' @importFrom dplyr "%>%" group_by ungroup rowwise select nest_by mutate bind_rows
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
@@ -257,12 +257,13 @@ route_path <-
     
     # pull the corrected points from the object and reformat for aniMotum
     df_rrt <- df_rrt |>
-      select(id, rep, pts_fix) |>
-      mutate(pts_fix = list(pts_fix |> st_transform(crs = 4326) |>
-                            mutate(lon = st_coordinates(.)[,1],
-                                   lat = st_coordinates(.)[,2]) |>
-                            st_drop_geometry() |>
-                            select(model, date, lon, lat, x, y)))
+      select(id, rep, pts_fix)
+    df_rrt <- mutate(df_rrt, pts_fix = list(pts_fix %>% 
+                                              st_transform(crs = 4326) %>% 
+                                              mutate(lon = st_coordinates(.)[,1], 
+                                                     lat = st_coordinates(.)[,2]) %>% 
+                                              st_drop_geometry() %>% 
+                                              select(model, date, lon, lat, x, y)))
     
     # remove nesting by individual path
     df_rrt <- df_rrt |> unnest(cols = c(pts_fix))

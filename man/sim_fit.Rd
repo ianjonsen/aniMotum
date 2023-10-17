@@ -13,7 +13,6 @@ sim_fit(
   grad = NULL,
   beta = c(-150, -150),
   cpf = FALSE,
-  pass2 = FALSE,
   sim_only = FALSE
 )
 }
@@ -40,10 +39,6 @@ ie. no potential function; see details).}
 
 \item{cpf}{logical; should simulated tracks return to their start point
 (ie. a central-place forager)}
-
-\item{pass2}{logical; if cpf = TRUE, should potential function be applied a
-second time to attempt moving tracks off land. Ignored if cpf = FALSE and/or
-gradient rasters are not supplied.}
 
 \item{sim_only}{logical, do not include \code{ssm} estimated location in output
 (default is FALSE)}

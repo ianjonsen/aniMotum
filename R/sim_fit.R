@@ -18,9 +18,6 @@
 ##' ie. no potential function; see details).
 ##' @param cpf logical; should simulated tracks return to their start point 
 ##' (ie. a central-place forager)
-##' @param pass2 logical; if cpf = TRUE, should potential function be applied a 
-##' second time to attempt moving tracks off land. Ignored if cpf = FALSE and/or
-##' gradient rasters are not supplied.
 ##' @param sim_only logical, do not include \code{ssm} estimated location in output 
 ##' (default is FALSE)
 ##' 
@@ -65,10 +62,13 @@ sim_fit <-
            grad = NULL,
            beta = c(-150, -150),
            cpf = FALSE,
-           pass2 = FALSE,
+#           pass2 = FALSE,
            sim_only = FALSE) {
     
-  
+    ## @param pass2 logical; if cpf = TRUE, should potential function be applied a 
+    ## second time to attempt moving tracks off land. Ignored if cpf = FALSE and/or
+    ## gradient rasters are not supplied.
+    
   ################
   ## Check args ##
   ################
@@ -227,19 +227,19 @@ sim_fit <-
                                  (y - ed1[2])[N]) + y[1])
                  
                }
-               if(all(!is.null(end), !is.null(grad), pass2)) {
-                 ## second pass with potential fn
-                 mu1 <- cbind(df$x, df$y)
-                 mu <- sapply(1:nrow(mu1), function(i) {
-                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1[i, ]))[1],
-                                      extract(grad[[2]], rbind(mu1[i, ]))[1]))
-                   mu1[i, ] + pv * beta * 2
-                 })
-                 mu <- t(mu)
-                 df$x <- mu[,1]
-                 df$y <- mu[,2]
-               }
-               
+               # if(all(!is.null(end), !is.null(grad), pass2)) {
+               #   ## second pass with potential fn
+               #   mu1 <- cbind(df$x, df$y)
+               #   mu <- sapply(1:nrow(mu1), function(i) {
+               #     pv <- as.numeric(c(extract(grad[[1]], rbind(mu1[i, ]))[1],
+               #                        extract(grad[[2]], rbind(mu1[i, ]))[1]))
+               #     mu1[i, ] + pv * beta * 2
+               #   })
+               #   mu <- t(mu)
+               #   df$x <- mu[,1]
+               #   df$y <- mu[,2]
+               # }
+               # 
                df
              },
              rw = {

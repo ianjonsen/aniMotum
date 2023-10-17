@@ -491,11 +491,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code>#&gt;         id                date lc  lon   lat
-#&gt; 1 F02-B-17 2022-12-09 08:41:13  G 70.1 -49.2
-#&gt; 2 F02-B-17 2022-12-09 09:41:13  G 70.6 -48.2
-#&gt; 3 F02-B-17 2022-12-09 10:41:13  G 71.1 -47.2
-#&gt; 4 F02-B-17 2022-12-09 11:41:13  G 71.6 -46.2
-#&gt; 5 F02-B-17 2022-12-09 12:41:13  G 72.1 -45.2</code></pre>
+#&gt; 1 F02-B-17 2023-02-03 09:44:40  G 70.1 -49.2
+#&gt; 2 F02-B-17 2023-02-03 10:44:40  G 70.6 -48.2
+#&gt; 3 F02-B-17 2023-02-03 11:44:40  G 71.1 -47.2
+#&gt; 4 F02-B-17 2023-02-03 12:44:40  G 71.6 -46.2
+#&gt; 5 F02-B-17 2023-02-03 13:44:40  G 72.1 -45.2</code></pre>
 </div>
 <div id="light-level-geolocation-data" class="section level4">
 <h4>Light-level geolocation data</h4>
@@ -504,12 +504,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code>#&gt;      id                date lc   lon lat      lonerr    laterr
-#&gt; 1 54632 2022-12-09 08:41:13 GL 100.0 -55 0.764350556 0.8606958
-#&gt; 2 54632 2022-12-09 20:41:13 GL 100.5 -54 0.171131308 0.4139740
-#&gt; 3 54632 2022-12-10 08:41:13 GL 101.0 -53 0.005379372 0.9542101
-#&gt; 4 54632 2022-12-10 20:41:13 GL 101.5 -52 0.008880740 0.2121996
-#&gt; 5 54632 2022-12-11 08:41:13 GL 102.0 -51 0.403467312 0.1549127</code></pre>
+<pre><code>#&gt;      id                date lc   lon lat     lonerr    laterr
+#&gt; 1 54632 2023-02-03 09:44:40 GL 100.0 -55 0.04945354 0.9904201
+#&gt; 2 54632 2023-02-03 21:44:40 GL 100.5 -54 0.30455523 3.4603820
+#&gt; 3 54632 2023-02-04 09:44:40 GL 101.0 -53 0.37095450 3.8676923
+#&gt; 4 54632 2023-02-04 21:44:40 GL 101.5 -52 1.15895932 0.3958820
+#&gt; 5 54632 2023-02-05 09:44:40 GL 102.0 -51 0.64470792 0.3660808</code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -718,26 +718,28 @@ control parameters).</p>
 <code>summary</code> function:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Animal id Model Time n.obs n.filt n.fit n.pred n.rr converged   AICc</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ct36-E-09   crw   24   170     22   148     58    .      TRUE 3022.8</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ct36-F-09   crw   24   125     17   108    110    .      TRUE 2531.4</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ct36-E-09   crw   24   170     26   144     58    .      TRUE 2953.8</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ct36-F-09   crw   24   125     24   101    110    .      TRUE 2377.8</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ct36-E-09 </span></span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.2071  0.0356</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      rho_o   0.1298  0.1143</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_x   0.9378  0.0728</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_y   0.6794  0.0576</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ct36-F-09 </span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.0818  0.0145</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      rho_o   0.3527  0.1227</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_x   1.3695  0.1362</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_y   1.9665  0.1897</span></span></code></pre></div>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.1717   0.046</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.2219  0.0497</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      rho_o   0.1169  0.1178</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_x   0.9738  0.0782</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_y   0.6761  0.0585</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ct36-F-09 </span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; --------------</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Parameter Estimate Std.Err</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.0264  0.0088</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          D   0.1424  0.0343</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      rho_o   0.3438  0.1326</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_x   1.6573  0.1651</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      tau_y   1.9348  0.1984</span></span></code></pre></div>
 <p>The summary table lists information about the fit, including the
 number of observations in the input data (<code>n.obs</code>), the
 number of observation flagged to be ignored by the SSM
@@ -772,11 +774,11 @@ using <code>grab()</code>:</p>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 × 14</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   id     date                  lon   lat     x      y   x.se   y.se     u      v</span></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;dttm&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 ct36-… 2009-02-01 17:50:46  72.5 -50.2 8069. -6450.  0.486  0.483 0.343 -0.232</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 ct36-… 2009-02-02 03:30:26  72.8 -50.4 8108. -6477. 11.5    9.57  4.09  -2.80 </span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 ct36-… 2009-02-02 17:50:48  73.7 -50.8 8200. -6549. 18.7   14.1   6.43  -5.00 </span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 ct36-… 2009-02-03 07:39:08  74.5 -51.2 8292. -6619. 14.5   10.4   6.64  -5.08 </span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 ct36-… 2009-02-03 15:29:59  74.9 -51.4 8340. -6655. 13.4    9.66  6.10  -4.64 </span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 ct36-… 2009-02-01 17:50:46  72.5 -50.2 8069. -6450.  0.443  0.499 0.329 -0.233</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 ct36-… 2009-02-02 03:30:26  72.8 -50.4 8107. -6477. 11.1    9.72  3.92  -2.81 </span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 ct36-… 2009-02-02 17:50:48  73.6 -50.8 8197. -6549. 18.3   14.3   6.34  -5.02 </span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 ct36-… 2009-02-03 07:39:08  74.5 -51.2 8289. -6619. 14.7   10.5   6.68  -5.08 </span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 ct36-… 2009-02-03 15:29:59  74.9 -51.4 8338. -6655. 13.7    9.70  6.20  -4.62 </span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # … with 4 more variables: u.se &lt;dbl&gt;, v.se &lt;dbl&gt;, s &lt;dbl&gt;, s.se &lt;lgl&gt;</span></span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="do">## grab predicted locations in projected form</span></span>
@@ -785,16 +787,16 @@ using <code>grab()</code>:</p>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 5 features and 10 fields</span></span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.538 xmax: 8675.265 ymax: -6449.872</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 8068.437 ymin: -6912.515 xmax: 8676.196 ymax: -6449.872</span></span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CRS:           +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 × 11</span></span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   id      date                       u         v    u.se    v.se    x.se    y.se</span></span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;   &lt;dttm&gt;                 &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 ct36-E… 2009-02-01 17:00:00 9.80e-11 -6.63e-11 1.00e-5 1.00e-5 1.00e-5 1.00e-5</span></span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 ct36-E… 2009-02-02 17:00:00 6.41e+ 0 -4.98e+ 0 1.11e+0 9.48e-1 1.80e+1 1.36e+1</span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 ct36-E… 2009-02-03 17:00:00 6.03e+ 0 -4.63e+ 0 1.30e+0 1.16e+0 1.38e+1 1.01e+1</span></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 ct36-E… 2009-02-04 17:00:00 5.71e+ 0 -5.36e+ 0 1.01e+0 8.39e-1 1.29e+1 9.31e+0</span></span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 ct36-E… 2009-02-05 17:00:00 9.40e+ 0 -5.43e+ 0 1.19e+0 1.09e+0 1.24e+1 9.16e+0</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 ct36-E… 2009-02-01 17:00:00 1.13e-10 -6.20e-11 1.00e-5 1.00e-5 1.00e-5 1.00e-5</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 ct36-E… 2009-02-02 17:00:00 6.31e+ 0 -5.01e+ 0 1.06e+0 9.69e-1 1.76e+1 1.38e+1</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 ct36-E… 2009-02-03 17:00:00 6.13e+ 0 -4.60e+ 0 1.23e+0 1.19e+0 1.41e+1 1.02e+1</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 ct36-E… 2009-02-04 17:00:00 5.81e+ 0 -5.37e+ 0 9.87e-1 8.53e-1 1.30e+1 9.33e+0</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 ct36-E… 2009-02-05 17:00:00 9.24e+ 0 -5.42e+ 0 1.13e+0 1.12e+0 1.25e+1 9.20e+0</span></span>
 <span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # … with 3 more variables: s &lt;dbl&gt;, s.se &lt;lgl&gt;, geometry &lt;POINT [km]&gt;</span></span></code></pre></div>
 <p>Here, the output from the <code>crw</code> SSM is returned as a
 fitted location data.frame (floc) that includes individual id, date,
