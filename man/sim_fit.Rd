@@ -11,7 +11,7 @@ sim_fit(
   start = NULL,
   end = NULL,
   grad = NULL,
-  beta = c(-150, -150),
+  beta = c(-300, -300),
   cpf = FALSE,
   sim_only = FALSE
 )

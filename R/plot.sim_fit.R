@@ -22,6 +22,7 @@
 ##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal
 ##' @importFrom ggplot2 element_blank xlab ylab geom_sf 
 ##' @importFrom ggplot2 coord_sf
+##' @importFrom sf st_transform st_as_sf st_crs st_make_valid
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom grDevices extendrange
 ##' @importFrom rnaturalearth ne_countries
@@ -36,10 +37,11 @@
 ##' @md
 
 plot.sim_fit <- function(x, 
-                        type = c("lines","points","both"),
+                        type = "points",
                         zoom = TRUE,
                         ncol = 1,
                         hires = FALSE,
+                        ortho = TRUE,
                         ...)
 {
   if (length(list(...)) > 0) {
@@ -48,7 +50,15 @@ plot.sim_fit <- function(x,
   
   stopifnot("x must be a sim_fit object with class `sim_fit`" = inherits(x, "sim_fit"))
   
-  type <- match.arg(type)
+  if(type == "lines") {
+    message("setting type to points...")
+    type <- "points"
+  } else if(type == "both") {
+    message("setting type to points...")
+    type <- "points"
+  }  
+  ## lines not working with sf for some reason...so force all to points
+  type <- match.arg(type, choices = c("points"))
   
   ## get worldmap
   if(all(hires, requireNamespace("rnaturalearthhires", quietly = TRUE))) {
@@ -56,34 +66,48 @@ plot.sim_fit <- function(x,
   } else {
     wm <- ne_countries(scale = 50, returnclass = "sf")
   }
-  
   wm.df <- wm[, c("geometry", "region_un")]
-  
+
   ## do plots
   p <- lapply(x$sims, function(x) {
+
     if(min(x$lon) < -175 & max(x$lon > 175)) {
       x$lon <- ifelse(x$lon < 0, x$lon + 360, x$lon)
     }
 
-    if(!zoom) { 
-      bounds <- c(-180,180,-89.99,89.99)
-    } else {
-      bounds <- c(range(x$lon), range(x$lat))
-    }
+    lat0 <- round(x$lat[1])
+    lat0 <- ifelse(lat0 < -40, -40, ifelse(lat0 > 40, 40, lat0))
+    lon0 <- round(x$lon[1])
+    
+    x <- st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
+
+    wm.df <- wm.df |>
+      st_transform(crs = paste0(
+        "+proj=ortho +lon_0=",
+        lon0,
+        " +lat_0=",
+        lat0,
+        " +units=km +datum=WGS84"
+      )) |>
+      st_make_valid()
+  
+    x <- st_transform(x, crs = st_crs(wm.df)$input)
+    
+    bounds <- st_bbox(x)
     
     m <- ggplot() +
-      geom_sf(data = wm.df,
-              aes(group = region_un),
-              fill = grey(0.6))
-    
-    m <- m + coord_sf(xlim = bounds[1:2],
-                      ylim = bounds[3:4])
-    
+      geom_sf(
+        data = wm.df,
+        aes(group = region_un),
+        fill = grey(0.6)
+      ) +
+      xlim(bounds[c(1,3)]) +
+      ylim(bounds[c(2,4)])
+      
     switch(type, 
            lines = {
              m <- m + 
-               geom_path(data = subset(x, rep != 0),
-                         aes(lon, lat, group = rep),
+               geom_sf(data = subset(xl, rep != 0),
                          colour = "dodgerblue",
                          linewidth = 0.5,
                          alpha = 0.6
@@ -91,30 +115,27 @@ plot.sim_fit <- function(x,
            },
            points = {
              m <- m + 
-               geom_point(data = subset(x, rep != 0),
-                          aes(lon, lat),
+               geom_sf(data = subset(x, rep != 0),
                           colour = "dodgerblue",
-                          size = 0.75,
+                          size = 0.3,
                           alpha = 0.6)
            },
            both = {
              m <- m + 
-               geom_path(data = subset(x, rep != 0),
-                         aes(lon, lat, group = rep),
+               geom_sf(data = subset(xl, rep != 0),
                          colour = "dodgerblue",
                          linewidth = 0.5,
                          alpha = 0.6
                ) +
-               geom_point(data = subset(x, rep != 0),
-                          aes(lon, lat),
+               geom_sf(data = subset(x, rep != 0),
                           colour = "dodgerblue",
                           size = 0.75,
                           alpha = 0.6)
            })
+      
     m <- m + 
-      geom_point(
+      geom_sf(
         data = subset(x, rep == 0),
-        aes(lon, lat),
         colour = "firebrick",
         size = 1
       ) +

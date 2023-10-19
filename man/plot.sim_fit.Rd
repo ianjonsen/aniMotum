@@ -6,10 +6,11 @@
 \usage{
 \method{plot}{sim_fit}(
   x,
-  type = c("lines", "points", "both"),
+  type = "points",
   zoom = TRUE,
   ncol = 1,
   hires = FALSE,
+  ortho = TRUE,
   ...
 )
 }

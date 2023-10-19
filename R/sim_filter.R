@@ -9,14 +9,20 @@
 ##' 
 ##' @param trs a `sim_fit` object
 ##' @param keep the quantile of flag values to retain
-##' @param flag the similarity flag method (see details)
+##' @param flag the similarity flag method (see details). Ignored if var != NULL.
+##' @param var the name(s) of the appended variable(s) to use for similarity 
+##' calculations. Default is NULL, in which case similarity is calculated based
+##' on distance and bearing - e.g., Hazen et al (2017).
+##' @param FUN one of the following functions in quotes: mean, median, var, sd,
+##' sum, min, or max. Ignored if var = NULL.
+##' @param ... additional arguments to the specified FUN (e.g., na.rm = TRUE). 
+##' Ignored if var = NULL.
 ##' 
 ##' @details
 ##' * `flag = 1` will use an index based on Hazen (2017)
 ##' * `flag = 2` (the default) will use a custom index
 ##' 
 ##' @return a `sim_fit` object containing the filtered paths
-##' 
 ##' 
 ##' @examples
 ##' ## fit crw model to Argos LS data
@@ -38,48 +44,75 @@
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
 ##' 
 ##' @importFrom dplyr group_by ungroup select bind_rows mutate
-##' @importFrom dplyr first
+##' @importFrom dplyr first "%>%"
 ##' @importFrom tidyr nest unnest
 ##' @importFrom traipse track_distance_to track_bearing_to
 ##' @importFrom stats quantile
 ##' @export
 ##' @md
 
-sim_filter <- function(trs, keep = .25, flag = 2){
+sim_filter <- function(trs,
+                       keep = .25,
+                       flag = 2,
+                       var = NULL,
+                       FUN = "mean",
+                       ...) {
+  
 
   ## include `simfit` class for backwards compatibility
   stopifnot("trs must be a `sim_fit` object" = any(inherits(trs, "sim_fit"),
                                                    inherits(trs, "simfit")))
   
+  if(!is.null(var)) {
+    #stopifnot("only specify a single var" = (length(var) == 1))
+    stopifnot("var must be present in all tracks in the trs `simfit` object" = 
+                any(sapply(trs$sims, function(x) var %in% names(x))))
+  }
+  
   # filter based on similarity to original path
   # apply the similarity flag function to each simulated track
   # unnest the sim_fit object to extract the simulations
   trs_df <- trs |> unnest(cols = c(sims))
-  
+
   ## append distance (km), bearing along tracks via traipse fn's
   trs_df <- trs_df |>
     group_by(rep) |>
     mutate(dist = track_distance_to(lon, lat, first(lon), first(lat)) / 1000) |>
-    mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) |>
+    mutate(bear = track_bearing_to(lon, lat, first(lon), first(lat)) + 180) |> 
     ungroup()
+  
 
   trs_lst <- split(trs_df, trs_df$id)
-
-  flg <- lapply(trs_lst, function(x) {
-    sapply(split(x, x$rep)[-1], function(.x) {
-      similarity_flag(
-        track = x |> dplyr::filter(rep == 0),
-        sim_track = .x,
-        flag = flag,
-        cpf = ifelse("cpf" %in% class(trs), TRUE, FALSE)
-      )
-    }) 
-  })
+  
+  if (is.null(var)) {
+    flg <- lapply(trs_lst, function(x) {
+      sapply(split(x, x$rep)[-1], function(.x) {
+        similarity_flag(
+          track = x |> dplyr::filter(rep == 0),
+          sim_track = .x,
+          flag = flag,
+          cpf = ifelse("cpf" %in% class(trs), TRUE, FALSE)
+        )
+      })
+    })
+  } else {
+    flg <- lapply(trs_lst, function(x) {
+      sapply(split(x, x$rep)[-1], function(.x) {
+        similarity_var(
+          track = x |> dplyr::filter(rep == 0),
+          sim_track = .x,
+          var = var,
+          FUN = FUN,
+          ...
+        )
+      })
+    })
+  }
   
   k.idx <- lapply(flg, function(x) {
     which(abs(x) < quantile(abs(x), keep))
   })
-
+  
   # filter based on user defined 'keep'
   # flag values can be positive or negative but will be centered around 0 (perfect match)
   # select only those tracks that have a flag value in the top 'keep' of flag values
@@ -93,7 +126,16 @@ sim_filter <- function(trs, keep = .25, flag = 2){
     select(-dist, -bear)
   
   # format for aniMotum output
-  trs_filt <- foo |> nest(sims = c(rep, date, lon, lat, x, y))
+  if(is.null(var)) {
+    trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y))
+  } else {
+    if(length(var) == 1) {
+      trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y, .data[[var[1]]]))
+    } else {
+      trs_filt <- foo %>% nest(sims = c(rep, date, lon, lat, x, y, .data[[var[1]]], .data[[var[2]]]))
+    }
+  }
+  
   class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
   
   return(trs_filt) 

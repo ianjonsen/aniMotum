@@ -4,14 +4,24 @@
 \alias{sim_filter}
 \title{Filter \code{sim_fit} simulations}
 \usage{
-sim_filter(trs, keep = 0.25, flag = 2)
+sim_filter(trs, keep = 0.25, flag = 2, var = NULL, FUN = "mean", ...)
 }
 \arguments{
 \item{trs}{a \code{sim_fit} object}
 
 \item{keep}{the quantile of flag values to retain}
 
-\item{flag}{the similarity flag method (see details)}
+\item{flag}{the similarity flag method (see details). Ignored if var != NULL.}
+
+\item{var}{the name(s) of the appended variable(s) to use for similarity
+calculations. Default is NULL, in which case similarity is calculated based
+on distance and bearing - e.g., Hazen et al (2017).}
+
+\item{FUN}{one of the following functions in quotes: mean, median, var, sd,
+sum, min, or max. Ignored if var = NULL.}
+
+\item{...}{additional arguments to the specified FUN (e.g., na.rm = TRUE).
+Ignored if var = NULL.}
 }
 \value{
 a \code{sim_fit} object containing the filtered paths

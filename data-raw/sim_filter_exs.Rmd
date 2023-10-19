@@ -1,0 +1,114 @@
+---
+title: "sim_filter_arbitrary"
+author: "Jonsen et al"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## install aniMotum dev branch
+```{r, eval=FALSE}
+remotes::install_github("ianjonsen/aniMotum@dev", dependencies = TRUE)
+```
+
+```{r load pkgs, message=FALSE}
+require(tidyverse, quietly = TRUE)
+require(aniMotum, quietly = TRUE) 
+```
+
+## Fit `crw` SSM with 12 h time.step
+```{r fit SSM}
+fit <- fit_ssm(sese2, model = "crw", time.step = 12,
+               control = ssm_control(verbose = 0))
+```
+
+## Simulate 200 tracks from the 2nd fitted track, ensuring they return to the start & plot
+```{r simulate}
+trs <- sim_fit(fit[2,], what = "p", reps = 200, cpf = TRUE)
+
+plot(trs)
+```
+
+## Filter simulated tracks using similarity flag = 1, keep top 30 % & plot
+```{r filter w flag 1}
+trs.f1 <- sim_filter(trs, keep = 0.3, flag = 1)
+
+plot(trs.f1)
+```
+
+## Filter simulated tracks using mean lon-lat as similarity metrix, keep top 30 % & plot
+```{r filter w lonlat}
+trs.fll <- sim_filter(trs, keep = 0.3, var = c("lon","lat"), FUN = "mean")
+
+plot(trs.fll)
+```
+
+#### Comparison of mean lon-lat simulated track locations to the fitted track appears to give a slightly better match than similarity flag 1. 
+
+## Use path re-routing to move simulated tracks off of land
+```{r rr}
+trs.fllr <- route_path(trs.fll, centroids = TRUE)
+
+plot(trs.fllr)
+```
+
+## Use Chl raster & extract values at track locations
+```{r arbitrary var}
+## read SpatRaster
+chl <- terra::rast("chl.grd")
+
+terra::plot(chl)
+
+trs.df <- unnest(trs.fllr, cols = c(sims))
+
+## extract chl values at track locations
+trs.df <- trs.df |> 
+  mutate(terra::extract(chl, cbind(lon, lat))) |>
+  rename(chl = chl_summer_climatology)
+
+## convert back to nested tibble
+trs.n <- nest(trs.df, sims = c(rep, date, lon, lat, x, y, chl))
+
+## append new nested tibble with correct aniMotum classes so sim_filter works
+class(trs.n) <- append(class(trs.fllr)[1:2], class(trs.n))
+```
+
+## Run sim_filter to select top 15% of tracks with chl most similar to the SSM-estimated track
+```{r filter chl}
+## try filtering on mean chl
+trs.chl.mn <- sim_filter(trs.n, keep = 0.15, var = "chl", FUN = "mean", na.rm = TRUE)
+```
+
+## Visualise
+```{r chl-track plots}
+plot(trs.chl.mn)
+
+## all tracks
+tmp.a <- unnest(trs.n, cols = c(sims))
+
+## filtered tracks
+tmp.f <- unnest(trs.chl.mn, cols = c(sims))
+
+## Kernel densities of all Chl values
+d.all <- density(tmp.a$chl, na.rm = TRUE)
+
+## densities of Chl values from estimated track
+d.e <- density(subset(tmp.f, rep == 0)$chl, na.rm = TRUE)
+
+## densities of Chl values from filtered random tracks
+d.s <- density(subset(tmp.f, rep > 0)$chl, na.rm = TRUE)
+
+## plot density of all chl values
+plot(d.all, ylim = c(0, 1.75), lwd = 2)
+
+## add density of Chl from estimated track
+lines(d.e, col = "red", lwd = 2)
+
+## add density of Chl from filtered random tracks
+lines(d.s, col = "blue", lwd = 2)
+
+```
+

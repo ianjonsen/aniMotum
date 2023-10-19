@@ -37,20 +37,6 @@ sim_post <- function(x,
               mp = {
                 "X"
               })
-  
-  
-  ## MV Normal random variate fn
-  ## FIXME:: can't get this fn to work properly as it extremely under-represents
-  ##          track uncertainty. Not sure why, but keeping here for now & using
-  ##          mvtnorm::rmvnorm() instead
-  rmvnorm_prec <- function(nsims, mu, chol_prec) {
-    z <- matrix(rnorm(length(mu) * nsims), ncol=nsims)
-    L <- chol_prec 
-    z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
-    z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
-    z <- as.matrix(z)
-    mu + z
-  }
 
   ## re-gen sdreport w jnt prec matrix
   sdp <- TMB::sdreport(x$ssm[[1]]$tmb, getJointPrecision = TRUE)
