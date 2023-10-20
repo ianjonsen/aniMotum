@@ -99,9 +99,9 @@ st <- sim_fit(fit[2,], what="predicted", reps=5)
 plot(st, zoom=TRUE)
 ```
 
-![](images/track_simulation/st_1.jpg){width="95%"}
+![](images/track_simulation/st_1.jpg){width="75%"}
 
-In this case, 3 of the 5 replicate tracks (purple) cross onto land in southeast Asia. We can further constrain the tracks to avoid land by adding a potential function (Brillinger et al. 2012) to the simulation that down-weights movements that cross onto land.
+In this case, 3 of the 5 replicate tracks cross onto the Antarctic continent. We can further constrain the tracks to avoid land by adding a potential function (Brillinger et al. 2012) to the simulation that down-weights movements that cross onto land.
 
 ### Simulate tracks with a potential function to help avoid land:
 
@@ -115,7 +115,8 @@ st.pf <- sim_fit(fit[2, ], what = "predicted", reps=5, grad=grad, beta=c(-300,-3
 plot(st.pf, zoom=TRUE)
 ```
 
-![](images/track_simulation/st_2.jpg){width="95%"} Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to down-weight movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with `beta = c(-300,-300)`, the tracks do not all entirely avoid crossing land. Features such as narrow islands or peninsulas pose a particular difficulty for this method, and tracks are not always guaranteed to remain off land.
+![](images/track_simulation/st_2.jpg){width="75%"} 
+Here, we use built in gradient rasters based on distance from ocean and strongly negative beta parameters (for the x and y directions, respectively) to repel movements onto land. Custom gradients can be supplied, e.g., for finer-scale tracks or for other kinds of barriers to movement. The strength of the potential function can be varied by altering the magnitude of the beta parameters, although extremely strong values can yield implausible artefacts in the resulting tracks. Note that with `beta = c(-300,-300)`, the tracks do not all entirely avoid land. Features such as narrow islands or peninsulas pose a particular difficulty for this method, and tracks are not always guaranteed to remain off land.
 
 ### Simulate central place foraging tracks
 
@@ -127,7 +128,7 @@ st.cpf <- sim_fit(fit[2, ], what = "predicted", reps=5, cpf = TRUE)
 plot(st.cpf, zoom=TRUE)
 ```
 
-![](images/track_simulation/st_3.jpg){width="98%"}
+![](images/track_simulation/st_3.jpg){width="75%"}
 
 The `cpf` argument can be used in conjunction with the potential function, however, care should be taken as their implementations are independent with the potential function applied first. This means tracks that successfully avoid crossing land due to the potential function are not guaranteed to remain so after applying the `cpf` argument.
 
@@ -163,25 +164,60 @@ plot(st.cpf) | plot(st.cpf_f)
 
 ![](images/track_simulation/st_5ab.jpg){width="98%"}
 
+Alternatively, we can filter tracks based on a comparison of the summary statistics of arbitrary variables. For example, we could filter based on a comparison of the mean longitude and latitude of the SSM fitted versus simulated tracks.
+```{r sim_filter 3, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+
+st.cpf_f1 <- sim_filter(st.cpf, keep = 0.2, var = c("lon","lat"), FUN = "mean")
+
+# compare tracks filtered by similarity flag vs mean lon,lat
+plot(st.cpf_f) | plot(st.cpf_f1)
+```
+![](images/track_simulation/st_7ab.jpg){width="98%"}
+
+We can also filter tracks based on a new variable appended to the tracks. Here we use a raster of chlorophyll a values. We extract those values at each track location using the `terra` package and append them to the simulated track object.
+```{r sim_filter 4, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+chl <- terra::rast("../data-raw/chl.grd")
+
+st.cpf.df <- tidyr::unnest(st.cpf, cols = c(sims))
+
+## extract chl values at track locations
+st.cpf.df <- st.cpf.df |> 
+  dplyr::mutate(terra::extract(chl, cbind(lon, lat))) |>
+  dplyr::rename(chl = chl_summer_climatology)
+
+## convert back to nested tibble
+st.cpf.n <- tidyr::nest(st.cpf.df, sims = c(rep, date, lon, lat, x, y, chl))
+
+## append new nested tibble with correct aniMotum classes so sim_filter works
+class(st.cpf.n) <- append(class(st.cpf)[1:2], class(st.cpf.n))
+
+## filter based on mean chl values
+st.cpf.chl <- sim_filter(st.cpf.n, keep = 0.2, var = "chl", FUN = "mean", na.rm = TRUE)
+
+## plot filtered tracks
+plot(st.cpf.chl)
+```
+![](images/track_simulation/st_8.jpg){width="75%"}
+
 ## `route_path()`
 
 We can use `route_path()` (see `vignette('Path_rerouting')` for more details) to re-route the few simulated track segments that cross land.
 
 ```{r route_path b, eval=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 # reroute simulated tracks
-st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
+st.cpf_f1rr <- route_path(st.cpf_f1, centroids = TRUE)
 
 # compare
-plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
+plot(st.cpf_f1, zoom=TRUE) | plot(st.cpf_f1rr, zoom=TRUE)
 ```
 
 ```{r route_path a, eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
 if(requireNamespace("pathroutr", quietly = TRUE)) {
   # reroute simulated tracks
-  st.cpf_frr <- route_path(st.cpf_f, centroids = TRUE)
+  st.cpf_f1rr <- route_path(st.cpf_f1, centroids = TRUE)
 
   # compare
-  plot(st.cpf_f, zoom=TRUE) | plot(st.cpf_frr, zoom=TRUE)
+  plot(st.cpf_f1, zoom=TRUE) | plot(st.cpf_f1rr, zoom=TRUE)
 } else {
   cat("\n the 'pathroutr' pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
           or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")

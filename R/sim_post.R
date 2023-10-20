@@ -1,4 +1,5 @@
-##' @title simulate from the posterior of a \code{ssm} fit, conditional on parameters and data
+##' @title simulate from the posterior of a \code{ssm} fit, conditional on 
+##' parameters and data.
 ##'
 ##' @description ... 
 ##' @param x a \code{ssm} fit object with class `ssm_df`
@@ -8,7 +9,6 @@
 ##' 
 ##' @return a \code{fG_sim_post} object containing the paths simulated from a 
 ##' \code{ssm} fit object
-##' 
 ##' 
 ##' @examples 
 ##' fit <- fit_ssm(sese2, model = "crw", time.step = 12)

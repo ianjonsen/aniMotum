@@ -2,7 +2,8 @@
 % Please edit documentation in R/sim_post.R
 \name{sim_post}
 \alias{sim_post}
-\title{simulate from the posterior of a \code{ssm} fit, conditional on parameters and data}
+\title{simulate from the posterior of a \code{ssm} fit, conditional on
+parameters and data.}
 \usage{
 sim_post(x, reps = 1, what = "predicted")
 }
