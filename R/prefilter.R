@@ -26,7 +26,8 @@
 ##' \code{distlim = NA} are sufficient.
 ##' @param spdf turn speed filter on/off (logical; default is TRUE)
 ##' @param min.dt minimum allowable time difference in s between observations; 
-##' \code{dt < min.dt} will be ignored by the SSM
+##' \code{dt < min.dt} will be ignored by the SSM. Default is NA: all time 
+##' differences > 0 are allowed
 ##' @param emf optionally supplied data.frame of error multiplication factors 
 ##' for Argos location quality classes. see Details
 ##'
@@ -48,7 +49,7 @@ prefilter <-
            ang = c(15,25),
            distlim = c(2500, 5000),
            spdf = TRUE,
-           min.dt = 60,
+           min.dt = NA,
            emf = NULL
            ) {
 
@@ -60,7 +61,7 @@ prefilter <-
     if(!any((is.numeric(distlim) & length(distlim) == 2) || is.na(distlim))) 
       stop("distlim must be either a vector of c(min, max) in m defining distances of extreme steps to be removed from trajectory, or NA")
     if(!is.logical(spdf)) stop("spdf must either TRUE to turn on, or FALSE to turn off speed filtering")
-    if(!(is.numeric(min.dt) & min.dt >= 0)) stop("min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
+    if(!is.na(min.dt) & !(is.numeric(min.dt) & min.dt >= 0)) stop("min.dt must be a positive, numeric value representing the minimum time difference between observed locations in s")
     if(!any(is.null(emf) || (is.data.frame(emf) & nrow(emf) > 0))) 
       stop("emf must be either NULL to use default emf (type emf() to see values), or a data.frame (see ?emf for details")  
 
