@@ -10,7 +10,7 @@ prefilter(
   ang = c(15, 25),
   distlim = c(2500, 5000),
   spdf = TRUE,
-  min.dt = 60,
+  min.dt = NA,
   emf = NULL
 )
 }
@@ -31,7 +31,8 @@ in favour of \code{speedfilter}. Either \code{ang = NA} or
 \item{spdf}{turn speed filter on/off (logical; default is TRUE)}
 
 \item{min.dt}{minimum allowable time difference in s between observations;
-\code{dt < min.dt} will be ignored by the SSM}
+\code{dt < min.dt} will be ignored by the SSM. Default is NA: all time
+differences > 0 are allowed}
 
 \item{emf}{optionally supplied data.frame of error multiplication factors
 for Argos location quality classes. see Details}

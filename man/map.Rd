@@ -58,7 +58,7 @@ used. Ignored if \code{map_type != "default"}.}
 to add land polygons). If the \code{rnaturalearthdata} package is installed then
 high-resolution land polygons will be used. If the \code{ggspatial}
 and \code{rosm} packages are installed then any tile map type returned by
-\link[rosm:osm.types]{rosm::osm.types} can be used for a potentially more detailed coastline at
+\link[rosm:deprecated]{rosm::osm.types} can be used for a potentially more detailed coastline at
 fine spatial scales, given appropriate zoom settings
 (see \link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile} for details).}
 

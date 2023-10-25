@@ -70,7 +70,7 @@ locations (default = FALSE)}
 
 \item{map_type}{background map type (default = NULL, which uses rnaturalearth
 to add landmasses); if packages \code{ggspatial} & \code{rosm} are installed
-then any map type returned by \link[rosm:osm.types]{rosm::osm.types} can be used for a more
+then any map type returned by \link[rosm:deprecated]{rosm::osm.types} can be used for a more
 detailed map background.}
 
 \item{pal}{\link{hcl.colors} palette to use (default: "Cividis"; type
