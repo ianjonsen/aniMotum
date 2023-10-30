@@ -4,20 +4,12 @@
 \alias{plot.sim_fit}
 \title{plot}
 \usage{
-\method{plot}{sim_fit}(
-  x,
-  type = "points",
-  zoom = TRUE,
-  ncol = 1,
-  hires = FALSE,
-  ortho = TRUE,
-  ...
-)
+\method{plot}{sim_fit}(x, type = NULL, zoom = TRUE, ncol = 1, hires = FALSE, ortho = TRUE, ...)
 }
 \arguments{
 \item{x}{a \code{aniMotum} simulation data.frame with class \code{sim_fit}}
 
-\item{type}{plots tracks as "line", "points" or "both" (default).}
+\item{type}{deprecated. All tracks are rendered as points.}
 
 \item{zoom}{logical; should map extent be defined by track extent (TRUE; default) or
 should global map be drawn (FALSE).}
@@ -30,11 +22,12 @@ if the \code{rnaturalearthhires} data package is installed. This extends the
 plot rendering time so is set to FALSE by default, in which case
 \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 50} data are used.}
 
-\item{...}{additional arguments to be ignored}
+\item{ortho}{logical; use an orthographic projection centered on the track
+starting location(s) (TRUE; default). An orthographic projection may be
+optimal for high latitude tracks and/or tracks that traverse long distances.
+If FALSE then a global Mercator projection is used.}
 
-\item{or}{orientation of projected map, default is to centre on
-start of fitted track (ignored if \code{mapproj} package is not installed). This argument
-is deprecated and, if specified, will be ignored with a warning.}
+\item{...}{additional arguments to be ignored}
 }
 \value{
 Plots of simulated tracks.

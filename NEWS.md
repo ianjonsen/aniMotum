@@ -1,3 +1,10 @@
+# aniMotum 1.2 (15/11/2023)
+
+* addition of `sim_post()`, a function for simulation from SSM posterior, conditional on data and movement parameters
+* `sim_filter()` updated to use arbitrary variables, including user-appended environmental variables, for filtering tracks simulated with `sim_fit()`
+* `sim_fit()` now simulates tracks from user-specified `start` and `end` locations that differ from the estimated track start and end.
+* a change to the `min.dt` argument in `fit_ssm()`, the default is now `min.dt = NA` (no minimum time interval between observations). Also, `min.dt`...
+
 # aniMotum 1.1 (10/12/2022)
 
 * package name change to coincide with Methods in Ecology and Evolution manuscript: Jonsen et al. `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Accepted 06/12/2022.
