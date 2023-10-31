@@ -77,7 +77,7 @@ sfilter <-
     st_geometry(xx) <- NULL
     d <- cbind(xx, loc)
     d$isd <- TRUE
-      
+    
     ## generate prediction intervals
     if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ## prediction times - assume on time.step-multiple of the hour
@@ -99,6 +99,7 @@ sfilter <-
         ## time.step < 1 h
         ## trunc so predictions start on the time.step immediately prior to 1st obs
         ts1 <- trunc(d$date[1] - tsp, "mins") + tsp
+        
         if(ts1 <= d$date[1]) {
           ts <-
             data.frame(id = d$id[1],
@@ -122,10 +123,10 @@ sfilter <-
     }
     
     if (all(!is.na(time.step))) {
-      ## add 1 s to observation time(s) that exactly match prediction time(s)
+      ## add 0.5 s to observation time(s) that exactly match prediction time(s)
       if (sum(d$date %in% ts$date) > 0) {
         o.times <- which(d$date %in% ts$date)
-        d[o.times, "date"] <- d[o.times, "date"] + 1
+        d[o.times, "date"] <- d[o.times, "date"] + 0.5
       }
 
     ## merge data and prediction times

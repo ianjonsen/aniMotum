@@ -39,7 +39,7 @@ outlier locations}
 \item{spdf}{(logical) turn pre-filtering on (default; TRUE) or off}
 
 \item{min.dt}{minimum allowable time difference between observations;
-\code{dt <= min.dt} will be ignored by the SSM. Default is NA: all time
+\code{dt <= min.dt} will be ignored by the SSM. Default is 0: all time
 differences > 0 are allowed.}
 
 \item{pf}{just pre-filter the data, do not fit the SSM (default is FALSE)}

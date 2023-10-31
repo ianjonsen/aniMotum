@@ -19,7 +19,7 @@
 ##' @param distlim lengths (m) of outlier location "spikes" 
 ##' @param spdf (logical) turn pre-filtering on (default; TRUE) or off
 ##' @param min.dt minimum allowable time difference between observations;
-##' `dt <= min.dt` will be ignored by the SSM. Default is NA: all time
+##' `dt <= min.dt` will be ignored by the SSM. Default is 0: all time
 ##' differences > 0 are allowed.
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit a simple random walk (`rw`), correlated random walk
