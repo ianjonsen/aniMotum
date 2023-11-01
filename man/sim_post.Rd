@@ -5,15 +5,18 @@
 \title{simulate from the posterior of a \code{ssm} fit, conditional on
 parameters and data.}
 \usage{
-sim_post(x, reps = 1, what = "predicted")
+sim_post(x, what = "predicted", reps = 1, sim_only = FALSE)
 }
 \arguments{
 \item{x}{a \code{ssm} fit object with class \code{ssm_df}}
 
-\item{reps}{number of replicate tracks to simulate from an \code{ssm} model
+\item{what}{simulate fitted or predicted locations}
+
+\item{reps}{number of replicate tracks to simulate from the \code{ssm} model
 fit object}
 
-\item{what}{simulate fitted or predicted locations}
+\item{sim_only}{logical, do not include \code{ssm} estimated locations in
+output (default is FALSE)}
 }
 \value{
 a \code{fG_sim_post} object containing the paths simulated from a
@@ -24,8 +27,8 @@ a \code{fG_sim_post} object containing the paths simulated from a
 }
 \examples{
 fit <- fit_ssm(sese2, model = "crw", time.step = 12)
-psims <- sim_post(fit[2,], reps = 500, what = "pred")
-plot(y ~ x, grab(fit[2,], "pred"), pch = NA)
+psims <- sim_post(fit[2,], "p", reps = 500)
+plot(y ~ x, grab(fit[2,], "p"), pch = NA)
 sapply(1:length(psims), function(i) lines(psims[[i]], lwd=0.25, col = rgb(0.7,0.7,0.7,0.4)))
 points(y ~ x, grab(fit[2,], "p"), pch = 19, cex=0.3, col="red")
 points(y ~ x, grab(fit[2,], "d"), pch = 19, cex=0.3, col="orange")

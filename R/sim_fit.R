@@ -51,6 +51,7 @@
 ##' @importFrom stats rgamma runif
 ##' @importFrom terra ext extract
 ##' @importFrom CircStats rvm
+##' @importFrom dplyr bind_rows
 ##' @export
 
 sim_fit <-
@@ -104,7 +105,32 @@ sim_fit <-
     names(ed1) <- c("x","y")
   }
   
-  ########################################
+  ######################
+  ## Helper functions ##    
+  ######################
+  wrap_x <- function(mu, x_rng) {
+    c((mu[1] - x_rng[1]) %% sum(abs(x_rng)) + x_rng[1], mu[2])
+  }
+  
+  reflect_y <- function(mu, y_rng) {
+    if(mu[2] < y_rng[1]) {
+      c(mu[1], y_rng[1] * 2 - mu[2])
+    } else if(mu[2] > y_rng[2]) {
+      c(mu[1], y_rng[2] * 2 - mu[2])
+    } else {
+      mu
+    }
+  }
+  
+  ## set up simulation extents
+  if(!is.null(grad)) {
+    ex <- ext(grad[[1]])
+  } else {
+    ## approx extents of world mercator in km
+    ex <- c(-20077.51,20082.49,-19622.54,18437.46) 
+  }
+  
+  ######################
   ## Simulate from a aniMotum model fit ##
   ########################################
   n <- nrow(x)
@@ -153,25 +179,6 @@ sim_fit <-
     ###############################
     ## Simulate movement process ##
     ###############################
-    if(!is.null(grad)) {
-      ex <- ext(grad[[1]])
-    } else {
-      ## approx extents of world mercator in km
-      ex <- c(-20077.51,20082.49,-19622.54,18437.46) 
-    }
-    wrap_x <- function(mu, x_rng) {
-      c((mu[1] - x_rng[1]) %% sum(abs(x_rng)) + x_rng[1], mu[2])
-    }
-    
-    reflect_y <- function(mu, y_rng) {
-      if(mu[2] < y_rng[1]) {
-        c(mu[1], y_rng[1] * 2 - mu[2])
-      } else if(mu[2] > y_rng[2]) {
-        c(mu[1], y_rng[2] * 2 - mu[2])
-      } else {
-        mu
-      }
-    }
     
     tmp <- lapply(1:reps, function(j) {
       switch(model,
@@ -268,7 +275,7 @@ sim_fit <-
              })
     }) 
     
-    tmp <- do.call(rbind, tmp)
+    tmp <- bind_rows(tmp)
     tmp <- as_tibble(tmp)
 
     if (!sim_only) {
