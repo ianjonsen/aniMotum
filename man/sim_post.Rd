@@ -26,11 +26,8 @@ a \code{fG_sim_post} object containing the paths simulated from a
 ...
 }
 \examples{
-fit <- fit_ssm(sese2, model = "crw", time.step = 12)
-psims <- sim_post(fit[2,], "p", reps = 500)
-plot(y ~ x, grab(fit[2,], "p"), pch = NA)
-sapply(1:length(psims), function(i) lines(psims[[i]], lwd=0.25, col = rgb(0.7,0.7,0.7,0.4)))
-points(y ~ x, grab(fit[2,], "p"), pch = 19, cex=0.3, col="red")
-points(y ~ x, grab(fit[2,], "d"), pch = 19, cex=0.3, col="orange")
+fit <- fit_ssm(ellie, model = "crw", time.step = 24)
+psim <- sim_post(fit, "p", reps = 10)
+plot(psim, type = "lines")
 
 }

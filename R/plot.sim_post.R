@@ -16,6 +16,8 @@
 ##' starting location(s) (TRUE; default). An orthographic projection may be 
 ##' optimal for high latitude tracks and/or tracks that traverse long distances. 
 ##' If FALSE then a global Mercator projection is used.
+##' @param alpha opacity of simulated track points/lines. Lower opacity can ease
+##'  visualization when multiple simulated overlap one another.
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return Plots of posterior simulated tracks. 
@@ -31,8 +33,8 @@
 ##'
 ##' @examples
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 24)
-##' psim <- sim_post(fit, what = "p", reps = 2)
-##' plot(psim)
+##' psim <- sim_post(fit, what = "p", reps = 10)
+##' plot(psim, type = "lines")
 ##'
 ##' @export
 ##' @md
@@ -43,6 +45,7 @@ plot.sim_post <- function(x,
                          ncol = 1,
                          hires = FALSE,
                          ortho = TRUE,
+                         alpha = 0.5,
                          ...)
 {
   if (length(list(...)) > 0) {
@@ -105,7 +108,8 @@ plot.sim_post <- function(x,
       geom_sf(
         data = wm.sf,
         aes(group = region_un),
-        fill = grey(0.6)
+        fill = grey(0.6),
+        colour = NA
       ) +
       xlim(bounds[c(1,3)]) +
       ylim(bounds[c(2,4)])
@@ -116,7 +120,7 @@ plot.sim_post <- function(x,
           data = subset(xl, rep != 0),
           colour = "dodgerblue",
           linewidth = 0.25,
-          alpha = 0.25
+          alpha = alpha
         ) +
         geom_sf(
           data = subset(xl, rep == 0),
@@ -131,7 +135,7 @@ plot.sim_post <- function(x,
           data = subset(xp, rep != 0),
           colour = "dodgerblue",
           size = 0.5,
-          alpha = 0.25
+          alpha = alpha
         ) +
         geom_sf(
           data = subset(xp, rep == 0),

@@ -11,6 +11,7 @@
   ncol = 1,
   hires = FALSE,
   ortho = TRUE,
+  alpha = 0.5,
   ...
 )
 }
@@ -35,6 +36,9 @@ starting location(s) (TRUE; default). An orthographic projection may be
 optimal for high latitude tracks and/or tracks that traverse long distances.
 If FALSE then a global Mercator projection is used.}
 
+\item{alpha}{opacity of simulated track points/lines. Lower opacity can ease
+visualization when multiple simulated overlap one another.}
+
 \item{...}{additional arguments to be ignored}
 }
 \value{
@@ -45,7 +49,7 @@ visualize tracks simulated from a \code{aniMotum} model fit
 }
 \examples{
 fit <- fit_ssm(ellie, model = "crw", time.step = 24)
-psim <- sim_post(fit, what = "p", reps = 2)
-plot(psim)
+psim <- sim_post(fit, what = "p", reps = 10)
+plot(psim, type = "lines")
 
 }
