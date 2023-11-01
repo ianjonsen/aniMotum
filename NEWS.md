@@ -1,8 +1,8 @@
 # aniMotum 1.2 (15/11/2023)
 
-* addition of `sim_post()`, a function for simulation from SSM posterior, conditional on data and movement parameters
+* addition of `sim_post()`, a function for posterior simulations from SSM fits, conditional on data and movement parameters
 * addition of plot method for `sim_post` objects
-* `sim_filter()` updated to use arbitrary variables, including user-appended environmental variables, for filtering tracks simulated with `sim_fit()`
+* `sim_filter()` can now use arbitrary variables, including user-appended environmental variables, for filtering tracks simulated with `sim_fit()`
 * `sim_fit()` now simulates tracks from user-specified `start` and `end` locations that differ from the estimated track start and end.
 * a change to the `min.dt` argument in `fit_ssm()`, the default is now `min.dt = 0` (no minimum time interval between observations, but any subsequent observations that occur at the same time are ignored when fitting an SSM).
 * fixed an issue with high temporal resolution data, where prediction times exactly match observation times when observations occur 1 s apart. This caused an error when fitting SSM's.
