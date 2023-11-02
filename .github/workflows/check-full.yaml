@@ -78,7 +78,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           # conflicts with gfortran from r-lib/actions when linking gcc
-          rm '/usr/local/bin/gfortran'
+          # rm '/usr/local/bin/gfortran'
           brew install pkg-config gdal proj geos
       
       - name: Install system dependencies (Windows)
