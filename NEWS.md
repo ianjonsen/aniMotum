@@ -1,4 +1,4 @@
-# aniMotum 1.2 (15/11/2023)
+# aniMotum 1.2 (03/11/2023)
 
 * addition of `sim_post()`, a function for posterior simulations from SSM fits, conditional on data and movement parameters
 * addition of plot method for `sim_post` objects
@@ -7,9 +7,32 @@
 * a change to the `min.dt` argument in `fit_ssm()`, the default is now `min.dt = 0` (no minimum time interval between observations, but any subsequent observations that occur at the same time are ignored when fitting an SSM).
 * fixed an issue with high temporal resolution data, where prediction times exactly match observation times when observations occur 1 s apart. This caused an error when fitting SSM's.
 
+
+# aniMotum 1.1-06 (13/07/2023)
+
+* fixes issue with `route_path()` where simulated tracks that are entirely on land resulted in an error
+
+
+# aniMotum 1.1-04 (01/03/2023)
+
+* fixes issue with `grab()` where multiple data sets with `lon` modulo 0,360 resulted in an error
+* fixes issue with `route_path()` where rerouting tracks that have no locations on land resulted in an error. In these cases, `route_path()` now returns a tibble identical to that supplied (fitted or predicted locations) and issues a message on the console.
+
+
+# aniMotum 1.1-02 (13/02/2023)
+
+* update citations to include new aniMotum R package paper in Methods in Ecology and Evolution as the primary reference.
+
+
+# aniMotum 1.1-01 (01/02/2023)
+
+* fixes issue with map() where function could become paused one some calls.
+
+
 # aniMotum 1.1 (10/12/2022)
 
 * package name change to coincide with Methods in Ecology and Evolution manuscript: Jonsen et al. `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Accepted 06/12/2022.
+
 
 # foieGras 1.1 (01/12/2022)
 

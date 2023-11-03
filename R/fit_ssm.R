@@ -13,10 +13,9 @@
 ##' @param x a `data.frame`, `tibble` or `sf-tibble` of observations, depending 
 ##' on the tracking data type. See more in the Details section, below, and the 
 ##' Overview vignette \code{vignette("Overview", package = "aniMotum")}.
-##' @param vmax max travel rate (m/s) to identify
-##'  outlier locations
-##' @param ang angles (deg) of outlier location "spikes" 
-##' @param distlim lengths (m) of outlier location "spikes" 
+##' @param vmax max travel rate (m/s) to identify implausible locations
+##' @param ang angles (deg) of implausible location "spikes" 
+##' @param distlim lengths (m) of implausible location "spikes" 
 ##' @param spdf (logical) turn pre-filtering on (default; TRUE) or off
 ##' @param min.dt minimum allowable time difference between observations;
 ##' `dt <= min.dt` will be ignored by the SSM. Default is 0: all time

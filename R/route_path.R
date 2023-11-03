@@ -61,7 +61,7 @@
 ##'   grab(fit, what = "rerouted")
 ##' }
 ##' 
-##' @importFrom dplyr "%>%" group_by ungroup rowwise select nest_by mutate bind_rows
+##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
@@ -80,206 +80,274 @@ route_path <-
            ...){
     
     if(requireNamespace("pathroutr", quietly = TRUE)) {
-    
-    stopifnot("x must be either a aniMotum ssm fit object with class `ssm_df`
+      
+      stopifnot("x must be either a aniMotum ssm fit object with class `ssm_df`
          or a `sim_fit` object containing the paths simulated from a `ssm` fit object" = 
-                any(inherits(x, "ssm_df"), inherits(x, "sim_fit"), inherits(x, "simfit")))
+                  any(inherits(x, "ssm_df"), inherits(x, "sim_fit"), inherits(x, "simfit")))
       
-    if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-      map_scale <- 50
-      cat("resetting map_scale = 50 because rnaturalearthhires is not installed, 
+      if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+        map_scale <- 50
+        cat("resetting map_scale = 50 because rnaturalearthhires is not installed, 
           use remotes::install_github(\"ropensci/rnaturalearthhires\") to install\n")
-    }
-    
-    ## required for pathroutr fn's
-    # default vals 
-    detach.dplyr.on.end <- FALSE
-    detach.sf.on.end <- FALSE
-    
-    if(!"package:dplyr" %in% search()) {
-      detach.dplyr.on.end <- TRUE
-      suppressMessages(attachNamespace("dplyr"))
-    }
-    if(!"package:sf" %in% search()) {
-      detach.sf.on.end <- TRUE
-      suppressMessages(attachNamespace("sf"))
-    }
-    
-    # what to do with the error information if the location is being moved by pathroutr...?
-    
-    what <- match.arg(what)
-    
-    # pathroutr needs a land shapefile to create a visibility graph from
-    world_mc <- ne_countries(scale = map_scale, returnclass = "sf") |>
-      st_transform(crs = 3857) |>
-      st_make_valid()
-    
-    if (inherits(x, "ssm_df")) {
-      # unnest aniMotum ssm object
-      df <- x |> grab(what)
-    
-      # this should be trimmed to reduce computation time
-      # base the trimming on the trs data
-      df_sf <- df |> 
-        st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
-        st_transform(crs = 3857)
-      
-    } else if (inherits(x, "sim_fit")) {
-      # unnest aniMotum sim_fit object
-      df <- x |> unnest(cols = c(sims))
-      
-      # this should be trimmed to reduce computation time
-      # base the trimming on the trs data
-      df_sf <- df |> 
-        st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
-        st_transform(crs = 3857)
-      
-    }
-  
-      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) |> 
-        st_union() |> 
-        st_convex_hull() |> 
-        st_intersection(world_mc) |> 
-        st_collection_extract('POLYGON') |> 
-        st_sf())
-    
-      # create visibility graph
-      vis_graph <- pathroutr::prt_visgraph(land_region, ...)
-
-    if (inherits(x, "ssm_df")) {
-      # create nested tibble grouped by individual track
-      # use rowwise to process each row in turn
-      df_rrt <- df_sf |> 
-        nest_by(id) |>
-        rowwise() |>
-        mutate(pts = suppressWarnings(list(try(data |> pathroutr::prt_trim(land_region), silent = TRUE))))
-      
-      ## check for errors due to entire track on land & return message
-      idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
-      if(length(idx) > 0) {
-        message("The following track(s) are entirely on land:")
-        cat(as.character(df_rrt[idx,]$id))
-        message("\nIgnoring these and rerouting all others")
       }
-
-      df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
-        if(!inherits(x, "try-error")) pathroutr::prt_reroute(x, land_region, vis_graph)
-      })
-
-      df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
-        if(!inherits(df_rrt$pts[[i]], "try-error")) {
-          pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
-        }
-      })
+      
+      ## required for pathroutr fn's
+      # default vals 
+      detach.dplyr.on.end <- FALSE
+      detach.sf.on.end <- FALSE
+      
+      if(!"package:dplyr" %in% search()) {
+        detach.dplyr.on.end <- TRUE
+        suppressMessages(attachNamespace("dplyr"))
+      }
+      if(!"package:sf" %in% search()) {
+        detach.sf.on.end <- TRUE
+        suppressMessages(attachNamespace("sf"))
+      }
+      
+      # what to do with the error information if the location is being moved by pathroutr...?
+      
+      what <- match.arg(what)
+      
+      # pathroutr needs a land shapefile to create a visibility graph from
+      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
+        st_transform(crs = 3857) %>%
+        st_make_valid()
+      
+      if (inherits(x, "ssm_df")) {
+        # unnest aniMotum ssm object
+        df <- x %>% grab(what)
         
-      # pull the corrected points from the object and reformat for aniMotum
-      df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
-        if(!is.null(x)) {
-          st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") |>
-            select(date, x.se, y.se)
-        }
-      }) 
-      df_rrt <- df_rrt |> select(id, pts_rrt) |> ungroup()
-      
-      ## append id to each sf tibble
-      df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
-        if(!is.null(df_rrt$pts_rrt[[i]])) {
-          df_rrt$pts_rrt[[i]] |> 
-            mutate(id = df_rrt$id[i]) |>
-            select(id, everything())
-        }
-      })
-      
-      ## create empty sf_tibble to populate NULL list elements
-      st <- min(which(!1:nrow(df_rrt) %in% idx))
-      null.tibble <- df_rrt$pts_rrt[[st]]
-      null.tibble <- null.tibble[-c(1:nrow(null.tibble)),]
-      
-      ## append rerouted sf tibble to fit_ssm objects - ensure any mp estimates get appended
-      if(append) {
-        x$ssm <- lapply(1:nrow(x), function(i) {
-          if(!is.null(df_rrt$pts_rrt[[i]])) {
-            if("g" %in% names(x$ssm[[i]]$predicted)) {
-              x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) |>
-                                                 select(date, logit_g, logit_g.se, g),
-                                               by = "date") |>
-                select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
-            } else {
-              x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
-            }
-          } else {
-            x$ssm[[i]]$rerouted <- null.tibble
-          }
-          x$ssm[[i]]
-        })
-        out <- x
+        # this should be trimmed to reduce computation time
+        # base the trimming on the trs data
+        df_sf <- df %>% 
+          st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+          st_transform(crs = 3857)
         
+      } else if (inherits(x, "sim_fit")) {
+        # unnest aniMotum sim_fit object
+        df <- x %>% unnest(cols = c(sims))
+        
+        # this should be trimmed to reduce computation time
+        # base the trimming on the trs data
+        df_sf <- df %>% 
+          st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+          st_transform(crs = 3857)
+        
+      }
+      
+      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
+                                        st_union() %>% 
+                                        st_convex_hull() %>% 
+                                        st_intersection(world_mc) %>% 
+                                        st_collection_extract('POLYGON') %>% 
+                                        st_sf())
+      
+      ### if none of the tracks have any points on land, land_region will have no rows in it.
+      ### this causes prt_visgaph(land_region, ...) to fail with the following message:
+      ###    <simpleError in pathroutr::prt_visgraph(land_region, ...):
+      ###    barrier must be a simple feature collection with geometry type 'POLYGON' or 'MULTIPOLYGON>
+      ### in this case where are no points on land, there is no need for rerouting to change any locations,
+      ### but instead of failing and forcing the user to go back to the original fit_rw locations, 
+      ### it is coventient to get the original data packaged in the usual way this function returns it.
+      ### so we set a flag to do this that is checked later in the script.
+      if(prod(dim(land_region))==0) { 
+        output_unchanged_locations=TRUE
+        message("all tracks given to reroute_path() are entirely in water:")
+        message("not changing any paths.")
       } else {
-        ## return as a single tibble, need to remove outer `id` to avoid error
+        output_unchanged_locations=FALSE
+        # create visibility graph
+        vis_graph <- pathroutr::prt_visgraph(land_region, ...)
+      } 
+      
+      
+      if (inherits(x, "ssm_df")) {
+        # create nested tibble grouped by individual track
+        # use rowwise to process each row in turn
+        df_rrt <- df_sf %>% 
+          nest_by(id) %>%
+          rowwise() %>%
+          mutate(pts = suppressWarnings(list(try(data %>% pathroutr::prt_trim(land_region), silent = TRUE))))
         
-       out <-  lapply(1:nrow(df_rrt), function(i) {
-         if("g" %in% names(x$ssm[[i]]$predicted)) {
-           left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) |>
-                       select(date, logit_g, logit_g.se, g),
-                     by = "date") |>
-             select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) |>
-            mutate(x = st_coordinates(.)[,1], 
-                   y = st_coordinates(.)[,2]) |> 
-            st_transform(4326) |> 
-            mutate(lon = st_coordinates(.)[,1], 
-                   lat = st_coordinates(.)[,2]) |> 
-            st_drop_geometry() |>
-            select(id, date, lon, lat, x, y, x.se, y.se, logit_g, logit_g.se, g)
-         } else {
-           df_rrt$pts_rrt[[i]] |> 
-             mutate(x = st_coordinates(.)[,1], 
-                    y = st_coordinates(.)[,2]) |> 
-             st_transform(4326) |> 
-             mutate(lon = st_coordinates(.)[,1], 
-                    lat = st_coordinates(.)[,2]) |> 
-             st_drop_geometry() |>
-             select(id, date, lon, lat, x, y, x.se, y.se)
-         }
-        }) |>
-          bind_rows()
-       
+        ## check for errors due to entire track on land & return message
+        idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
+        if(length(idx) > 0) {
+          message("The following track(s) are entirely on land:")
+          cat(as.character(df_rrt[idx,]$id))
+          message("\nIgnoring these and rerouting all others")
+        }
+        
+        df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
+          ### when output_unchanged_locations is true, we want unchanged input locations,
+          ### but run through the rest of this script so they are packaged as usual as if prt_reroute had been run. 
+          if (output_unchanged_locations) { 
+            ### we cannot run prt_reroute here, because vis_graph is undefined, since land_region was empty.
+            ### so we simulate as if we had run prt_reroute and it found no conflicts, by returning an empty tibble, 
+            ### ?pathroutr::prt_reroute says "If trkpts and barrier do not spatially intersect and empty tibble is returned."
+            tibble()
+          } else {
+            if (!inherits(x, "try-error")) {
+              pathroutr::prt_reroute(x, land_region, vis_graph)
+            }
+          }
+        })
+        
+        df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
+          if(!inherits(df_rrt$pts[[i]], "try-error")) {
+            pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
+          }
+        })
+        
+        # pull the corrected points from the object and reformat for aniMotum
+        df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
+          if(!is.null(x)) {
+            st_transform(x, crs = "+proj=merc +datum=WGS84 +units=km +no_defs") %>%
+              select(date, x.se, y.se)
+          }
+        }) 
+        df_rrt <- df_rrt %>% select(id, pts_rrt) %>% ungroup()
+        
+        ## append id to each sf tibble
+        df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
+          if(!is.null(df_rrt$pts_rrt[[i]])) {
+            df_rrt$pts_rrt[[i]] %>% 
+              mutate(id = df_rrt$id[i]) %>%
+              select(id, everything())
+          }
+        })
+        
+        ## create empty sf_tibble to populate NULL list elements
+        st <- min(which(!1:nrow(df_rrt) %in% idx))
+        null.tibble <- df_rrt$pts_rrt[[st]]
+        null.tibble <- null.tibble[-c(1:nrow(null.tibble)),]
+        
+        ## append rerouted sf tibble to fit_ssm objects - ensure any mp estimates get appended
+        if(append) {
+          x$ssm <- lapply(1:nrow(x), function(i) {
+            if(!is.null(df_rrt$pts_rrt[[i]])) {
+              if("g" %in% names(x$ssm[[i]]$predicted)) {
+                x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
+                                                   select(date, logit_g, logit_g.se, g),
+                                                 by = "date") %>%
+                  select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
+              } else {
+                x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
+              }
+            } else {
+              x$ssm[[i]]$rerouted <- null.tibble
+            }
+            x$ssm[[i]]
+          })
+          out <- x
+          
+        } else {
+          ## return as a single tibble, need to remove outer `id` to avoid error
+          
+          out <-  lapply(1:nrow(df_rrt), function(i) {
+            if("g" %in% names(x$ssm[[i]]$predicted)) {
+              left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
+                          select(date, logit_g, logit_g.se, g),
+                        by = "date") %>%
+                select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) %>%
+                mutate(x = st_coordinates(.)[,1], 
+                       y = st_coordinates(.)[,2]) %>% 
+                st_transform(4326) %>% 
+                mutate(lon = st_coordinates(.)[,1], 
+                       lat = st_coordinates(.)[,2]) %>% 
+                st_drop_geometry() %>%
+                select(id, date, lon, lat, x, y, x.se, y.se, logit_g, logit_g.se, g)
+            } else {
+              df_rrt$pts_rrt[[i]] %>% 
+                mutate(x = st_coordinates(.)[,1], 
+                       y = st_coordinates(.)[,2]) %>% 
+                st_transform(4326) %>% 
+                mutate(lon = st_coordinates(.)[,1], 
+                       lat = st_coordinates(.)[,2]) %>% 
+                st_drop_geometry() %>%
+                select(id, date, lon, lat, x, y, x.se, y.se)
+            }
+          }) %>%
+            bind_rows()
+          
+        }
+        
+      } else if (inherits(x, "sim_fit")) {
+        # create nested tibble grouped by individual track
+        # use rowwise to process each row in turn
+        df_rrt <- df_sf %>% 
+          nest_by(id, rep) %>%
+          rowwise() %>%
+          mutate(pts = suppressWarnings(list(try(data %>% 
+                                                   pathroutr::prt_trim(land_region), 
+                                                 silent = TRUE))))
+        
+        ## check for errors due to entire simulated track on land & return message
+        idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
+        
+        if(length(idx) > 0) {
+          message("The following track(s) are entirely on land:")
+          cat(paste0("id: ", as.character(df_rrt[idx,]$id), ", rep: ", as.character(df_rrt[idx,]$rep)), sep = "; ")
+          message("\nIgnoring these and rerouting all others")
+        }
+        
+        df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
+          ### when output_unchanged_locations is true, we want unchanged input locations,
+          ### but run through the rest of this script so they are packaged as usual as if prt_reroute had been run. 
+          if (output_unchanged_locations) { 
+            ### we cannot run prt_reroute here, because vis_graph is undefined, since land_region was empty.
+            ### so we simulate as if we had run prt_reroute and it found no conflicts, by returning an empty tibble, 
+            ### ?pathroutr::prt_reroute says "If trkpts and barrier do not spatially intersect and empty tibble is returned."
+            tibble()
+          } else {
+            if (!inherits(x, "try-error")) {
+              pathroutr::prt_reroute(x, land_region, vis_graph)
+            }
+          }
+        })
+        
+        df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
+          if(!inherits(df_rrt$pts[[i]], "try-error")) {
+            pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
+          }
+        })         
+        
+        # pull the corrected points from the object and reformat for aniMotum
+        df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
+          if(!is.null(x)) {
+            st_transform(x, crs = 4326) %>%
+              mutate(lon = st_coordinates(.)[,1],
+                     lat = st_coordinates(.)[,2]) %>%
+              st_drop_geometry() %>%
+              select(model, date, lon, lat, x, y)
+          }
+        }) 
+        
+        df_rrt <- df_rrt %>% select(id, rep, pts_rrt) %>% ungroup()
+        
+        # df_rrt <- df_rrt %>%
+        #   select(id, rep, pts_fix) %>%
+        #   mutate(pts_fix = list(pts_fix %>% st_transform(crs = 4326) %>%
+        #                         mutate(lon = st_coordinates(.)[,1],
+        #                                lat = st_coordinates(.)[,2]) %>%
+        #                         st_drop_geometry() %>%
+        #                         select(model, date, lon, lat, x, y)))
+        
+        # remove nesting by individual path
+        df_rrt <- df_rrt %>% unnest(cols = c(pts_rrt))
+        
+        # format to aniMotum object - including nesting by animal id
+        df_rrt <- df_rrt %>% nest(sims = c(rep, date, lon, lat, x, y))
+        class(df_rrt) <- append("rws", class(df_rrt))
+        class(df_rrt) <- append("sim_fit", class(df_rrt))
+        
+        out <- df_rrt
       }
       
-    } else if (inherits(x, "sim_fit")) {
-    # create nested tibble grouped by individual track
-    # use rowwise to process each row in turn
-    df_rrt <- df_sf |> 
-      nest_by(id, rep) |>
-      rowwise() |>
-      mutate(pts = list(data |> pathroutr::prt_trim(land_region)),
-             rrt_pts = list(pathroutr::prt_reroute(pts, land_region, vis_graph)),
-             pts_fix = list(pathroutr::prt_update_points(rrt_pts, pts)))
-    
-    # pull the corrected points from the object and reformat for aniMotum
-    df_rrt <- df_rrt |>
-      select(id, rep, pts_fix)
-    df_rrt <- mutate(df_rrt, pts_fix = list(pts_fix %>% 
-                                              st_transform(crs = 4326) %>% 
-                                              mutate(lon = st_coordinates(.)[,1], 
-                                                     lat = st_coordinates(.)[,2]) %>% 
-                                              st_drop_geometry() %>% 
-                                              select(model, date, lon, lat, x, y)))
-    
-    # remove nesting by individual path
-    df_rrt <- df_rrt |> unnest(cols = c(pts_fix))
-    
-    # format to aniMotum object - including nesting by animal id
-    df_rrt <- df_rrt |> nest(sims = c(rep, date, lon, lat, x, y))
-    class(df_rrt) <- append("rws", class(df_rrt))
-    class(df_rrt) <- append("sim_fit", class(df_rrt))
-    
-    out <- df_rrt
-    }
-    
-    if(detach.dplyr.on.end) detach(package:dplyr)
-    if(detach.sf.on.end) detach(package:sf)
-
-    return(out)
+      if(detach.dplyr.on.end) detach(package:dplyr)
+      if(detach.sf.on.end) detach(package:sf)
+      
+      return(out)
     } else {
       cat("\n pathroutr pkg is not installed, use remotes::install_github(\"jmlondon/pathroutr\")
           or install.packages(\"pathroutr\", repos = \"https://jmlondon.r-universe.dev\")to use this function\n")

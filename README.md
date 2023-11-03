@@ -42,37 +42,30 @@ R.Version()
 ### From R-Universe
 
 As of `v1.1`, `{aniMotum}` is available via R-Universe. This is where
-the latest stable version can always be found. Installation is simple:
+the latest stable version can always be found. If you are on Mac or
+Windows and are **certain** you have the correct compilation tools and
+libraries installed (See **From GitHub (source)** below), then
+installation is:
 
 ``` r
 # install from my R-universe repository
 install.packages("aniMotum", 
-                 repos = "https://ianjonsen.r-universe.dev")
-```
-
-However, this will only install R packages available from the R-universe
-that are imported by `{aniMotum}`. Those packages available only on CRAN
-and/or suggested by `{aniMotum}`, which add extra functionality such as
-path re-routing around land, will not be installed. To ensure all
-dependent packages, either from R-Universe or CRAN, are also installed
-use the following:
-
-``` r
-install.packages("aniMotum", 
                  repos = c("https://cloud.r-project.org",
-                           "https://ianjonsen.r-universe.dev"),
+                 "https://ianjonsen.r-universe.dev"),
                  dependencies = TRUE)
 ```
 
-If queried, answer `Yes` to install the source version, provided you
-have the appropriate compiler tools available (See **From GitHub
-(source)**, below).
+This installs all Imported and Suggested R packages from CRAN and
+R-universe. If queried, answer `Yes` to install the source version.
+Note, if you haven’t installed `{aniMotum}` previously then installation
+of dependent packages may take a while, especially if many of them need
+to be compiled. You should only need to go through this once, subsequent
+installation of `{aniMotum}` updates will be much faster.
 
-To avoid typing the above every time you want to re-install
-`{aniMotum}`, you can add my R-Universe repo to your local list of
-repositories for package download in your `.Rprofile`. This ensures
-`install.packages` automatically grabs the latest version of
-`{aniMotum}`
+To avoid typing the above every time you want to update `{aniMotum}`,
+you can add my R-Universe repo to your local list of repositories for
+package download in your `.Rprofile`. This ensures `install.packages`
+automatically grabs the latest version of `{aniMotum}`
 
 ``` r
 #install.packages("usethis")
@@ -83,52 +76,97 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
                   CRAN = 'https://cloud.r-project.org'))
 ```
 
-If you don’t want to install compiler tools or have trouble getting them
-to work then you can manually download a binary version of the
-`{aniMotum}` package for Windows or Mac from here
-<https://ianjonsen.r-universe.dev/ui#package:aniMotum>. In R, use the
-following command to install from the file you’ve just downloaded (where
-`path_to_file` is wherever you saved the download:
+### READ THIS CAREFULLY if you are unsure about compiler tools:
+
+If you don’t have compiler tools installed, are uncertain if you do, or
+have trouble getting them to work then you can manually download a
+binary version of the `{aniMotum}` package for Windows or Intel Mac from
+here <https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
+binary versions for Windows & Mac, each corresponds to a different major
+release of R: 4.3 (development version), 4.2 (current version), and 4.1
+(old version) - choose the one that matches your R version. You can
+check your R version by typing `R.Version()` in the R console.
+
+When downloading the binary version on a Mac, it is important to right
+click and choose “Download Linked File As…” so that the file isn’t
+automatically uncompressed. If you have downloaded the file correctly,
+its extension will be `.tgz`, **not** `.tar`. You can use the following
+command in the R console to install the file you’ve just downloaded
+(where `path_to_file` is wherever you saved the download):
 
 ``` r
 # for Windows
-install.packages("path_to_file\package-windows-release\aniMotum_1.1.zip", 
-                 repos=NULL, type="binary", dependencies = TRUE)
+install.packages("path_to_file\aniMotum_1.1-02.zip", 
+                 repos=NULL, type="win.binary", dependencies = TRUE)
 
 # for Mac
-install.packages("path_to_file/package-macos-release/aniMotum_1.1.tgz", 
-                 repos=NULL, type="binary", dependencies = TRUE)
+install.packages("path_to_file/aniMotum_1.1-02.tgz", 
+                 repos=NULL, type="mac.binary", dependencies = TRUE)
 ```
+
+Alternatively, in RStudio, you can use the GUI by clicking the Packages
+tab and then the Install button:
+
+<img src="man/figures/README-install_1.png" id="id" class="class"
+style="width:50.0%;height:50.0%" />
+
+This will open an install box, where you want to select “Package Archive
+File (.tgz, .tar.gz)” option under “Install from:”. On a Mac, this looks
+like the following (Windows will be similar):
+
+<img src="man/figures/README-install_2.png" id="id" class="class"
+style="width:50.0%;height:50.0%" />
+
+Then, click the “Browse” button to navigate to wherever you saved the
+`.zip` (Windows) or `.tgz` (Mac) binary file and click “Install”.
+
+<img src="man/figures/README-install_3.png" id="id" class="class"
+style="width:50.0%;height:50.0%" />
+
+If you have a Mac with an M1 (or later) processor, the above binary file
+will not work as R-universe currently builds their Mac binaries on an
+Intel Mac. Instead, you will need to download the binary from here
+<https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-04>. Follow the
+same installation procedure (R console or GUI) as above. Note, this
+binary was built for **R 4.2.2**, the current release version.
 
 ### From GitHub (source)
 
-To get the very latest but possibly unstable `{aniMotum}` version, you
-can install from the staging branch on GitHub.
+If you prefer installing from GitHub via `remotes::install_github()` and
+know your way around the installation of compilers and associated
+libraries, then you will need to ensure you have the proper compilation
+tools and libraries installed.
 
 On PC’s running Windows, ensure you have installed
-[Rtools](https://cran.r-project.org/bin/windows/Rtools/)
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
 On Mac’s, ensure you have installed the Command Line Tools for Xcode by
 executing `xcode-select --install` in the terminal; or you can download
 the latest version from the URL (free developer registration may be
 required). A full Xcode install uses up a lot of disk space and is not
 required. Also, ensure you have a suitable Gnu Fortran compiler
-installed (e.g.,
-<https://github.com/fxcoudert/gfortran-for-macOS/releases>).
+installed. The easiest install option is to download a compiled version
+from here <https://github.com/fxcoudert/gfortran-for-macOS/releases>.
+Just makes sure you choose the version that matches your MacOS and
+processor (Intel vs Arm 64). Getting Xcode compiler tools installed on
+M1/M2 Macs can be challenging!
 
 ``` r
-remotes::install_github("ianjonsen/aniMotum@staging")
+remotes::install_github("ianjonsen/aniMotum")
 ```
 
 Note: there can be issues getting compilers to work properly, especially
 on M1 Macs. Often, this is due to missing or incorrect Xcode Command
 Line Tools and/or Fortran compiler. If you encounter install and compile
 issues, you may find a solution in the excellent documentation here
-[glmmTMB](https://github.com/glmmTMB/glmmTMB). Alternatively, if you
-don’t care to have the very latest version then installing from
-R-Universe is the preferred approach. R-Universe automatically builds
-binary package versions for all common platforms, so you won’t have to
-worry about compiler software or issues!
+[glmmTMB](https://github.com/glmmTMB/glmmTMB).
+
+If you don’t have the time & patience for sorting out compiler/library
+issues then just install the appropriate binary version. `AniMotum`
+models may not fit quite as fast as they could on your setup, but they
+will still be fast. We’re talking about differences of milliseconds to a
+few seconds per animal track, so you decide where your time is best
+spent!
 
 ## Usage
 

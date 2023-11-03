@@ -117,11 +117,10 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                      "At least 1 model fit has locations centred on lon = 180, reprojecting all locations to that crs\n"
                    )
                  }
-                 
                  out <- lapply(1:length(out_lst), function(i) {
-                   st_as_sf(out_lst[[i]], coords = c("lon", "lat")) |>
-                     st_set_crs("+proj=longlat +datum=WGS84 +no_defs") |>
-                     st_transform(prj[[pos]])
+                   st_as_sf(out_lst[[i]], coords = c("lon", "lat")) %>%
+                     st_set_crs("+proj=longlat +datum=WGS84 +no_defs") %>%
+                     st_transform(prj[[pos[1]]]) #just use wkt from first lon_0=180 projected track
                  })
                  out <- bind_rows(out)
                  
