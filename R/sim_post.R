@@ -1,7 +1,8 @@
-##' @title simulate from the posterior of a \code{ssm} fit, conditional on 
-##' parameters and data.
+##' @title simulate from the posterior of a \code{ssm} fit.
 ##'
-##' @description ... 
+##' @description simulates track locations from the joint precision matrix of a 
+##' \code{ssm} model fit. Currently, the joint precision of the SSM movement 
+##' parameters is not included (ie. a full posterior simulation).
 ##' @param x a \code{ssm} fit object with class `ssm_df`
 ##' @param what simulate fitted or predicted locations
 ##' @param reps number of replicate tracks to simulate from the \code{ssm} model 

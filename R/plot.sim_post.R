@@ -9,8 +9,7 @@
 ##' @param ncol number of columns to arrange multiple plots
 ##' @param hires logical; use high-resolution coastline data. Attempts to use
 ##' high-res coastline data via [rnaturalearth::ne_countries] with `scale = 10`, 
-##' if the `rnaturalearthhires` data package is installed. This extends the
-##' plot rendering time so is set to FALSE by default, in which case 
+##' if the `rnaturalearthhires` data package is installed. If not, then 
 ##' [rnaturalearth::ne_countries] with `scale = 50` data are used.
 ##' @param ortho logical; use an orthographic projection centered on the track
 ##' starting location(s) (TRUE; default). An orthographic projection may be 
@@ -43,7 +42,7 @@ plot.sim_post <- function(x,
                           type = c("lines","points","both"),
                          zoom = TRUE,
                          ncol = 1,
-                         hires = FALSE,
+                         hires = TRUE,
                          ortho = TRUE,
                          alpha = 0.5,
                          ...)
@@ -67,18 +66,17 @@ plot.sim_post <- function(x,
   pos <- lapply(x$psims, function(x) select(x, rep, lon, lat)) |>
     bind_rows()
   
-  mlon <- sapply(x$psims, function(x) x$lon[1]) |> mean()
-  mlat <- sapply(x$psims, function(x) x$lat[1]) |> mean()
+  mlon <- sapply(x$psims, function(x) x$lon[1]) |> mean() |> round()
+  mlat <- sapply(x$psims, function(x) x$lat[1]) |> mean() |> round()
   pos.sf <- st_as_sf(pos, coords = c("lon","lat"), crs = 4326)
   
   if(ortho) {
     pos.sf <- st_transform(pos.sf, 
                            crs = paste0("+proj=ortho +lon_0=", mlon, 
                                         " +lat_0=", mlat, 
-                                        " +ellps=WGS84 +no_defs"))
+                                        " +units=km +ellps=WGS84 +no_defs"))
     wm.sf <- wm.sf |>
-      st_transform(crs = st_crs(pos.sf)) |>
-      st_make_valid()
+      st_transform(crs = st_crs(pos.sf))
   }
   
   if(!zoom) bounds <- st_bbox(wm.sf)
@@ -119,7 +117,7 @@ plot.sim_post <- function(x,
         geom_sf(
           data = subset(xl, rep != 0),
           colour = "dodgerblue",
-          linewidth = 0.25,
+          linewidth = 0.3,
           alpha = alpha
         ) +
         geom_sf(
@@ -144,10 +142,17 @@ plot.sim_post <- function(x,
         )
     } 
     
-    m <- m +
-      xlab(element_blank()) +
-      ylab(element_blank()) +
-      theme_minimal()
+    if(zoom) {
+      m <- m +
+        xlab(element_blank()) +
+        ylab(element_blank()) +
+        theme_minimal()
+    } else {
+      m <- m +
+        xlab(element_blank()) +
+        ylab(element_blank()) +
+        theme_void()
+    }
     
   })
   ## arrange plots

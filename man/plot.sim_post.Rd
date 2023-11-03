@@ -9,7 +9,7 @@
   type = c("lines", "points", "both"),
   zoom = TRUE,
   ncol = 1,
-  hires = FALSE,
+  hires = TRUE,
   ortho = TRUE,
   alpha = 0.5,
   ...
@@ -27,8 +27,7 @@ should global map be drawn (FALSE).}
 
 \item{hires}{logical; use high-resolution coastline data. Attempts to use
 high-res coastline data via \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 10},
-if the \code{rnaturalearthhires} data package is installed. This extends the
-plot rendering time so is set to FALSE by default, in which case
+if the \code{rnaturalearthhires} data package is installed. If not, then
 \link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries} with \code{scale = 50} data are used.}
 
 \item{ortho}{logical; use an orthographic projection centered on the track

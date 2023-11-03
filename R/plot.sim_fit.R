@@ -20,7 +20,7 @@
 ##' 
 ##' @return Plots of simulated tracks. 
 ##' 
-##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_void
+##' @importFrom ggplot2 ggplot aes geom_point geom_path theme_minimal theme_void
 ##' @importFrom ggplot2 element_blank xlab ylab geom_sf 
 ##' @importFrom ggplot2 coord_sf
 ##' @importFrom sf st_transform st_as_sf st_crs st_make_valid
@@ -65,8 +65,10 @@ plot.sim_fit <- function(x,
   pos <- lapply(x$sims, function(x) select(x, rep, lon, lat)) |>
     bind_rows()
   
-  mlon <- sapply(x$sims, function(x) x$lon[1]) |> mean()
-  mlat <- sapply(x$sims, function(x) x$lat[1]) |> mean()
+  mlon <- sapply(x$sims, function(x) x$lon[1]) |> mean() 
+  mlat <- sapply(x$sims, function(x) x$lat[1]) |> mean() 
+  mlat <- round(mlat / 10) * 10
+  
   pos.sf <- st_as_sf(pos, coords = c("lon","lat"), crs = 4326)
   
   if(ortho) {
@@ -103,17 +105,22 @@ plot.sim_fit <- function(x,
         colour = "dodgerblue",
         size = 0.5,
         alpha = 0.6
-      )
-    
-    m <- m +
+      ) + 
       geom_sf(
         data = subset(x, rep == 0),
         colour = "firebrick",
         size = 1
-      ) +
+      ) + 
       xlab(element_blank()) +
-      ylab(element_blank()) +
-      theme_void()
+      ylab(element_blank())
+    
+    if(zoom) {
+      m <- m + 
+      theme_minimal()
+    } else {
+      m <- m +
+        theme_void()
+    }
     
   })
   ## arrange plots
