@@ -28,7 +28,7 @@ class (for type LS);"><meta property="og:image" content="https://ianjonsen.githu
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-06</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@ class (for type LS);</p>
 <span>  ang <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">25</span><span class="op">)</span>,</span>
 <span>  distlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2500</span>, <span class="fl">5000</span><span class="op">)</span>,</span>
 <span>  spdf <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.dt <span class="op">=</span> <span class="fl">60</span>,</span>
+<span>  min.dt <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  emf <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -141,7 +141,8 @@ in favour of <code>speedfilter</code>. Either <code>ang = NA</code> or
 
 <dt>min.dt</dt>
 <dd><p>minimum allowable time difference in s between observations;
-<code>dt &lt; min.dt</code> will be ignored by the SSM</p></dd>
+<code>dt &lt; min.dt</code> will be ignored by the SSM. Default is NA: all time
+differences &gt; 0 are allowed</p></dd>
 
 
 <dt>emf</dt>

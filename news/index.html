@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-06</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
       </span>
     </div>
 
@@ -73,6 +73,18 @@
       <small>Source: <a href="https://github.com/ianjonsen/aniMotum/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.2" id="animotum-12-03112023">aniMotum 1.2 (03/11/2023)<a class="anchor" aria-label="anchor" href="#animotum-12-03112023"></a></h2>
+<ul><li>addition of <code><a href="../reference/sim_post.html">sim_post()</a></code>, a function for posterior simulations from SSM fits, conditional on data and movement parameters</li>
+<li>addition of plot method for <code>sim_post</code> objects</li>
+<li>
+<code><a href="../reference/sim_filter.html">sim_filter()</a></code> can now use arbitrary variables, including user-appended environmental variables, for filtering tracks simulated with <code><a href="../reference/sim_fit.html">sim_fit()</a></code>
+</li>
+<li>
+<code><a href="../reference/sim_fit.html">sim_fit()</a></code> now simulates tracks from user-specified <code>start</code> and <code>end</code> locations that differ from the estimated track start and end.</li>
+<li>a change to the <code>min.dt</code> argument in <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>, the default is now <code>min.dt = 0</code> (no minimum time interval between observations, but any subsequent observations that occur at the same time are ignored when fitting an SSM).</li>
+<li>fixed an issue with high temporal resolution data, where prediction times exactly match observation times when observations occur 1 s apart. This caused an error when fitting SSM’s.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1-06" id="animotum-11-06-13072023">aniMotum 1.1-06 (13/07/2023)<a class="anchor" aria-label="anchor" href="#animotum-11-06-13072023"></a></h2>
 <ul><li>fixes issue with <code><a href="../reference/route_path.html">route_path()</a></code> where simulated tracks that are entirely on land resulted in an error</li>

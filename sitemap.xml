@@ -145,6 +145,9 @@
     <loc>https://ianjonsen.github.io/aniMotum/reference/plot.sim_fit.html</loc>
   </url>
   <url>
+    <loc>https://ianjonsen.github.io/aniMotum/reference/plot.sim_post.html</loc>
+  </url>
+  <url>
     <loc>https://ianjonsen.github.io/aniMotum/reference/plot.ssm_df.html</loc>
   </url>
   <url>
@@ -184,7 +187,13 @@
     <loc>https://ianjonsen.github.io/aniMotum/reference/sim_fit.html</loc>
   </url>
   <url>
+    <loc>https://ianjonsen.github.io/aniMotum/reference/sim_post.html</loc>
+  </url>
+  <url>
     <loc>https://ianjonsen.github.io/aniMotum/reference/similarity_flag.html</loc>
+  </url>
+  <url>
+    <loc>https://ianjonsen.github.io/aniMotum/reference/similarity_var.html</loc>
   </url>
   <url>
     <loc>https://ianjonsen.github.io/aniMotum/reference/speedfilter.html</loc>

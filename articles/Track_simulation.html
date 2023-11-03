@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-06</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
       </span>
     </div>
 
@@ -220,34 +220,40 @@ Hindell et al. 2020).</p>
 <span></span>
 <span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what<span class="op">=</span><span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images/track_simulation/st_1.jpg" style="width:95.0%"></p>
-<p>In this case, 3 of the 5 replicate tracks (purple) cross onto land in
-southeast Asia. We can further constrain the tracks to avoid land by
-adding a potential function (Brillinger et al. 2012) to the simulation
-that down-weights movements that cross onto land.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_1.jpg" style="width:75.0%"></p>
+<p>In this case, 3 of the 5 replicate tracks cross onto the Antarctic
+continent. We can further constrain the tracks to avoid land by adding a
+potential function (Brillinger et al. 2012) to the simulation that
+down-weights movements that cross onto land.</p>
 </div>
 <div class="section level3">
 <h3 id="simulate-tracks-with-a-potential-function-to-help-avoid-land">Simulate tracks with a potential function to help avoid land:<a class="anchor" aria-label="anchor" href="#simulate-tracks-with-a-potential-function-to-help-avoid-land"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/grad.rda"</span>, package <span class="op">=</span> <span class="st">"aniMotum"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span></span>
-<span><span class="va">st.pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, grad<span class="op">=</span><span class="va">grad</span>, beta<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">350</span>,<span class="op">-</span><span class="fl">350</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grad</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/wrap.html" class="external-link">unwrap</a></span><span class="op">(</span><span class="va">grad</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.pf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images/track_simulation/st_2.jpg" style="width:95.0%">
-Here, we use built in gradient rasters based on distance from ocean and
-strongly negative beta parameters (for the x and y directions,
-respectively) to down-weight movements onto land. Custom gradients can
-be supplied, e.g., for finer-scale tracks or for other kinds of barriers
-to movement. The strength of the potential function can be varied by
-altering the magnitude of the beta parameters, although extremely strong
-values can yield implausible artefacts in the resulting tracks. Note
-that with <code>beta = c(-300,-300)</code>, the tracks do not all
-entirely avoid crossing land. Features such as narrow islands or
-peninsulas pose a particular difficulty for this method, and tracks are
-not always guaranteed to remain off land.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span></span>
+<span><span class="va">st.pf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, grad<span class="op">=</span><span class="va">grad</span>, beta<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">300</span>,<span class="op">-</span><span class="fl">300</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.pf</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_2.jpg" style="width:75.0%"></p>
+<p>Here, we use built in gradient rasters based on distance from ocean
+and strongly negative beta parameters (for the x and y directions,
+respectively) to repel movements onto land. Custom gradients can be
+supplied, e.g., for finer-scale tracks or for other kinds of barriers to
+movement. The strength of the potential function can be varied by
+altering the magnitude of the beta parameters (but they must always be
+negative to avoid land). Note that with
+<code>beta = c(-300,-300)</code>, the tracks do not all entirely avoid
+land. Features such as narrow islands or peninsulas pose a particular
+difficulty for this method, and tracks are not always guaranteed to
+remain off land. Adjustment of the beta values can yield a stronger
+(more negative) or weaker (less negative) repulsion from land, however
+the stronger the repulsion the more likely that unrealistic artefacts
+(e.g., zig-zagging movements) are introduced in the simulated
+tracks.</p>
 </div>
 <div class="section level3">
 <h3 id="simulate-central-place-foraging-tracks">Simulate central place foraging tracks<a class="anchor" aria-label="anchor" href="#simulate-central-place-foraging-tracks"></a>
@@ -264,8 +270,8 @@ using the <code>cpf</code> argument:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">st.cpf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps<span class="op">=</span><span class="fl">5</span>, cpf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images/track_simulation/st_3.jpg" style="width:98.0%"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_3.jpg" style="width:75.0%"></p>
 <p>The <code>cpf</code> argument can be used in conjunction with the
 potential function, however, care should be taken as their
 implementations are independent with the potential function applied
@@ -312,6 +318,43 @@ location to the most distant location.</p>
 <span><span class="co"># compare unfiltered vs. filtered tracks</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_5ab.jpg" style="width:98.0%"></p>
+<p>Alternatively, we can filter tracks based on a comparison of the
+summary statistics of arbitrary variables. For example, we could filter
+based on a comparison of the mean longitude and latitude of the SSM
+fitted versus simulated tracks.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">st.cpf_f1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st.cpf</span>, keep <span class="op">=</span> <span class="fl">0.2</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon"</span>,<span class="st">"lat"</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># compare tracks filtered by similarity flag vs mean lon,lat</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_7ab.jpg" style="width:98.0%"></p>
+<p>We can also filter tracks based on a new variable appended to the
+tracks. Here we use a raster of chlorophyll a values. We extract those
+values at each track location using the <code>terra</code> package and
+append them to the simulated track object.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">chl</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="st">"../data-raw/chl.grd"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">st.cpf.df</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">st.cpf</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">sims</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## extract chl values at track locations</span></span>
+<span><span class="va">st.cpf.df</span> <span class="op">&lt;-</span> <span class="va">st.cpf.df</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">chl</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">lon</span>, <span class="va">lat</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>chl <span class="op">=</span> <span class="va">chl_summer_climatology</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## convert back to nested tibble</span></span>
+<span><span class="va">st.cpf.n</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html" class="external-link">nest</a></span><span class="op">(</span><span class="va">st.cpf.df</span>, sims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">rep</span>, <span class="va">date</span>, <span class="va">lon</span>, <span class="va">lat</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">chl</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## append new nested tibble with correct aniMotum classes so sim_filter works</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">st.cpf.n</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">st.cpf</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">st.cpf.n</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## filter based on mean chl values</span></span>
+<span><span class="va">st.cpf.chl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_filter.html">sim_filter</a></span><span class="op">(</span><span class="va">st.cpf.n</span>, keep <span class="op">=</span> <span class="fl">0.2</span>, var <span class="op">=</span> <span class="st">"chl"</span>, FUN <span class="op">=</span> <span class="st">"mean"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## plot filtered tracks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf.chl</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_8.jpg" style="width:75.0%"></p>
 </div>
 <div class="section level2">
 <h2 id="route_path">
@@ -320,16 +363,35 @@ location to the most distant location.</p>
 <p>We can use <code><a href="../reference/route_path.html">route_path()</a></code> (see
 <code><a href="../articles/Path_rerouting.html">vignette('Path_rerouting')</a></code> for more details) to re-route
 the few simulated track segments that cross land.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># reroute simulated tracks</span></span>
-<span><span class="va">st.cpf_frr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, centroids <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">st.cpf_f1rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_path.html">route_path</a></span><span class="op">(</span><span class="va">st.cpf_f1</span>, centroids <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># compare</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_frr</span>, zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f1</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">st.cpf_f1rr</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/track_simulation/st_6ab.jpg" style="width:98.0%"></p>
 <p>In more severe cases, tracks first could be simulated using potential
 functions, filtered, and then any remaining segments re-routed from
 land.</p>
+</div>
+<div class="section level2">
+<h2 id="simulate-tracks-from-the-posterior-of-ssm-fits---sim_post">Simulate tracks from the posterior of SSM fit(s) -
+<code>sim_post()</code><a class="anchor" aria-label="anchor" href="#simulate-tracks-from-the-posterior-of-ssm-fits---sim_post"></a>
+</h2>
+<p>Posterior simulations from an SSM fit provide a useful
+characterization of track uncertainty. The <code>sim_post</code>
+function provides an efficient method for simulating tracks from the
+joint uncertainty of the estimated locations. These simulated tracks can
+be visualised using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> (see <code><a href="../reference/plot.sim_post.html">?plot.sim_post</a></code>
+for details), or they can be extracted and used in subsequent analyses
+where multiple imputation is desired. A future version will include the
+option to incorporate uncertainty in the SSM movement parameters.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">sese2</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">6</span>, control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">psim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_post.html">sim_post</a></span><span class="op">(</span><span class="va">fit</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">psim</span>, type <span class="op">=</span> <span class="st">"lines"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">psim</span>, type <span class="op">=</span> <span class="st">"both"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/track_simulation/st_9.jpg" style="width:98.0%"></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
