@@ -82,6 +82,8 @@
 </li>
 <li>
 <code><a href="../reference/sim_fit.html">sim_fit()</a></code> now simulates tracks from user-specified <code>start</code> and <code>end</code> locations that differ from the estimated track start and end.</li>
+<li>
+<code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> now handles “generic location” data provided the locations have <code>x</code> and <code>y</code> standard errors. These data can be light-level geolocations, acoustic telemetry positions, or other location data. Input data should have <code>lc = "GL"</code> for all generic locations.</li>
 <li>a change to the <code>min.dt</code> argument in <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code>, the default is now <code>min.dt = 0</code> (no minimum time interval between observations, but any subsequent observations that occur at the same time are ignored when fitting an SSM).</li>
 <li>fixed an issue with high temporal resolution data, where prediction times exactly match observation times when observations occur 1 s apart. This caused an error when fitting SSM’s.</li>
 </ul></div>
