@@ -4,6 +4,7 @@
 * addition of plot method for `sim_post` objects
 * `sim_filter()` can now use arbitrary variables, including user-appended environmental variables, for filtering tracks simulated with `sim_fit()`
 * `sim_fit()` now simulates tracks from user-specified `start` and `end` locations that differ from the estimated track start and end.
+* `fit_ssm()` now handles "generic location" data provided the locations have `x` and `y` standard errors. These data can be light-level geolocations, acoustic telemetry positions, or other location data. Input data should have `lc = "GL"` for all generic locations.
 * a change to the `min.dt` argument in `fit_ssm()`, the default is now `min.dt = 0` (no minimum time interval between observations, but any subsequent observations that occur at the same time are ignored when fitting an SSM).
 * fixed an issue with high temporal resolution data, where prediction times exactly match observation times when observations occur 1 s apart. This caused an error when fitting SSM's.
 

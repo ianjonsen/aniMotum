@@ -11,7 +11,7 @@ fit_ssm(
   ang = c(15, 25),
   distlim = c(2500, 5000),
   spdf = TRUE,
-  min.dt = NA,
+  min.dt = 0,
   pf = FALSE,
   model = "crw",
   time.step = NA,
