@@ -73,6 +73,19 @@ format_data <- function(x,
   stopifnot("epar must be a character vector with 3 elements" = all(is.character(epar)))
   stopifnot("sderr must be a character vector with 2 elements" = all(is.character(sderr)))
   
+  ## if "lonerr", "laterr" exist in x then rename "x.sd", "y.sd"
+  ## return warning that "lonerr", "laterr" are deprecated
+  if(all(all(c("lonerr","laterr") %in% names(x)), 
+         all(c("x.sd","y.sd") %in% sderr))) {
+    warning("The error variable names `lonerr`, `laterr` are deprecated as of v 1.2 and should be changed to `x.sd`, `y.sd` to avoid this warning.
+    See `?fit_ssm` for more details on `x.sd`, `y.sd` values.
+    Proceeding...",
+            call. = FALSE,
+            immediate. = TRUE)
+    err.idx <- which(names(x) %in% c("lonerr", "laterr"))
+    names(x)[err.idx] <- sderr
+  }
+  
   ## if input is an sf data.frame (ie. a data.frame with a geometry list object) then
   ##  coerce to an sf-tibble
   if(all(!inherits(x, "sf"), "geometry" %in% names(x))) {
