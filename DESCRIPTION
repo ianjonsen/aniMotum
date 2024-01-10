@@ -33,7 +33,7 @@ RoxygenNote: 7.2.3
 Imports: 
     tibble (>= 2.1.3),
     ggplot2 (>= 3.4.0),
-    TMB (>= 1.9.2),
+    TMB (>= 1.9.6),
     sf (>= 1.0-14),
     tidyr,
     dplyr (>= 1.0.0),
