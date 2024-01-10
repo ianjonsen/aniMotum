@@ -1,6 +1,6 @@
 ## code to prepare `potential_fn_gradients` dataset goes here
 
-usethis::use_data(potential_fn_gradients, overwrite = TRUE)
+#usethis::use_data(potential_fn_gradients, overwrite = TRUE)
 
 ## IDJ - 
 
@@ -12,7 +12,7 @@ wm <- rnaturalearth::ne_countries(scale = 10, returnclass = "sf")
 
 y <- terra::rast(crs = sf::st_crs(wm)$wkt,
           vals = 1,
-          resolution = c(0.5, 0.5),
+          resolution = c(0.25, 0.25),
           xmin = -180,
           xmax = 180,
           ymin = -86,

@@ -81,9 +81,16 @@ plot.sim_fit <- function(x,
       st_make_valid()
   }
   
-  if(!zoom) bounds <- st_bbox(wm.sf)
+  if(!zoom & ortho) {
+    message("Cannot render globe with ortho projection, setting zoom = TRUE...")
+    #bounds <- st_bbox(wm.sf)
+    bounds <- st_bbox(pos.sf)
+    } else if(!zoom & !ortho) {
+      bounds <- st_bbox(wm.sf)
+      }
+    
   if(zoom) bounds <- st_bbox(pos.sf)
-
+  
   ## do plots
   p <- lapply(x$sims, function(x) {
     
@@ -112,15 +119,8 @@ plot.sim_fit <- function(x,
         size = 1
       ) + 
       xlab(element_blank()) +
-      ylab(element_blank())
-    
-    if(zoom) {
-      m <- m + 
-      theme_minimal()
-    } else {
-      m <- m +
-        theme_void()
-    }
+      ylab(element_blank()) +
+      theme_void()
     
   })
   ## arrange plots
