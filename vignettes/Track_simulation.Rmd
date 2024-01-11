@@ -25,7 +25,7 @@ The `sim` function is useful for situations where simulated random tracks are re
 
 #### Simulate tracks from each of the 3 process models
 
-```{r sim}
+```{r sim, eval=FALSE}
 set.seed(pi) 
 sim.rw <- sim(N = 200, model = "rw")
 sim.crw <- sim(N = 200, model = "crw", D = 0.5)
@@ -44,8 +44,7 @@ sim.mp <- sim(N = 200, model = "mp", sigma_g = 0.3)
 ![](images/track_simulation/plot_sim1.jpg){width="95%"}
 
 #### Fit SSM to simulated lon,lat locations (with Argos error)
-
-```{r SSM, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+```{r SSM, eval=FALSE, warning=FALSE, message=FALSE}
 # coerce simulated RW data to format expected by fit_ssm
 d <- with(sim.rw, data.frame(id = 1, date, lc, lon, lat))
 
