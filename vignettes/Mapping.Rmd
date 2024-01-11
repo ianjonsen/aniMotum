@@ -29,14 +29,6 @@ fit <- fit_ssm(se2,
 
 map(fit, what = "predicted")
 ```
-
-```{r map 1a, eval=FALSE, echo=FALSE, fig.height=4, fig.width=7, warning=FALSE, message=FALSE}
-se2 <- subset(sese, id %in% unique(id)[1:2])
-fit <- fit_ssm(se2, 
-               model = "mp", 
-               time.step = 24, 
-               control = ssm_control(verbose = 0))
-```
 ![](images/mapping/map_1a.jpg){width=95%}
 
 Here, SSM-predicted locations are coloured by the estimated move persistence index ($\gamma_t$). To aid visualisation of high and low move persistence regions along each track, the $\gamma_t$ estimates are normalised separately for each track to span the interval 0,1. This can be turned off with `normalise = FALSE`, or applied to the group of tracks with `group = TRUE`.
