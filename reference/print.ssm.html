@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-01</span>
       </span>
     </div>
 
@@ -100,27 +100,15 @@
 <span class="r-in"><span><span class="co">## generate a ssm fit object (call is for speed only)</span></span></span>
 <span class="r-in"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">24</span>, </span></span>
 <span class="r-in"><span>control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in nlminb(obj$par, ifelse(control$verbose == 1, myfn, obj$fn), obj$gr,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   NA/NaN gradient evaluation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in updateCholesky(L, hessian.random) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   function 'sexp_as_cholmod_sparse' not provided by package 'Matrix'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rep$pdHess:</span> $ operator is invalid for atomic vectors</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">xs</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Process model: rw </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time interval: 24 hours </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of original observations: 64 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of observations fitted by ssm: 64 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of fitted states: 64 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> number of predicted states: 113 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> parameter estimates</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Estimate Std. Error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rho_p   -0.86827    0.03320</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_x  4.50053    0.42428</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_y  3.97017    0.37505</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rho_o    0.00000    0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> negative log-likelihood: 732.3869 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> convergence: yes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'xs' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

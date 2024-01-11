@@ -20,7 +20,7 @@ tibble."><meta property="og:image" content="https://ianjonsen.github.io/aniMotum
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-01</span>
       </span>
     </div>
 
@@ -137,10 +137,16 @@ will be re-projected to that <code>crs</code>.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## generate an ssm fit object</span></span></span>
 <span class="r-in"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, spdf<span class="op">=</span><span class="cn">FALSE</span>, model <span class="op">=</span> <span class="st">"rw"</span>, time.step<span class="op">=</span><span class="fl">24</span>, control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in nlminb(obj$par, ifelse(control$verbose == 1, myfn, obj$fn), obj$gr,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   NA/NaN gradient evaluation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in updateCholesky(L, hessian.random) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   function 'sexp_as_cholmod_sparse' not provided by package 'Matrix'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rep$pdHess:</span> $ operator is invalid for atomic vectors</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## grab predicted values as an un-projected tibble</span></span></span>
 <span class="r-in"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu">grab</span><span class="op">(</span><span class="va">xs</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'xs' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

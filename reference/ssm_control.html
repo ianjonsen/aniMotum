@@ -18,7 +18,7 @@ control parameters, and parameter bounds used by fit_ssm."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-01</span>
       </span>
     </div>
 
@@ -181,7 +181,12 @@ for available options. Adapted from S. Wotherspoon
 <span class="r-in"><span>    eval.max <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fitting crw SSM to 1 tracks...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   1 1 0 -3.3466       pars:   0.38939 0.36962 -0.0175 -3.82562       pars:   -1.44245 -1.52152 -0.06999 -5.2627       pars:   -2.33464 -2.54616 -0.20021 -4.03665       pars:   -0.88305 -0.96034 -0.07046 -4.52026       pars:   -1.41813 -1.62237 -0.13881 -2.74715       pars:   -2.90071 -2.84615 -0.24934 -2.34057       pars:   -3.44692 -3.57664 -0.42216 -0.60524       pars:   -4.34729 -1.99258 -0.85592 -0.00095       pars:   -3.39936 -3.31567 -0.45957 -0.46155       pars:   -3.37224 -3.33775 -0.61054 -0.20002       pars:   -3.48201 -3.2953 -0.89037 -0.21612       pars:   -3.48201 -3.2953 -0.89037 -0.21612      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pars:   1 1 0 -3.3466      Error in nlminb(obj$par, ifelse(control$verbose == 1, myfn, obj$fn), obj$gr,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   NA/NaN gradient evaluation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in updateCholesky(L, hessian.random) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   function 'sexp_as_cholmod_sparse' not provided by package 'Matrix'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rep$pdHess:</span> $ operator is invalid for atomic vectors</span>
 </code></pre></div>
     </div>
   </div>

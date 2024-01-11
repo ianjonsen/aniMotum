@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-01</span>
       </span>
     </div>
 
@@ -153,35 +153,7 @@ argument:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, </span>
 <span>        vmax <span class="op">=</span> <span class="fl">3</span>, </span>
-<span>        pf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Simple feature collection with 64 features and 12 fields</span></span>
-<span><span class="co">#&gt; Geometry type: POINT</span></span>
-<span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 7832.966 ymin: -9972.317 xmax: 12324.95 ymax: -6302.65</span></span>
-<span><span class="co">#&gt; Projected CRS: +proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs</span></span>
-<span><span class="co">#&gt; First 10 features:</span></span>
-<span><span class="co">#&gt;             id                date lc   smaj  smin       eor x.sd y.sd  keep</span></span>
-<span><span class="co">#&gt; 54591.1  54591 2012-03-05 05:09:33  1  2.442 0.416 0.7330383   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.4  54591 2012-03-06 04:55:14  0 49.660 0.391 1.5707963   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.20 54591 2012-03-07 04:23:10  A  5.032 0.472 1.6231562   NA   NA FALSE</span></span>
-<span><span class="co">#&gt; 54591.25 54591 2012-03-07 21:23:06  A  4.007 0.286 2.0245819   NA   NA FALSE</span></span>
-<span><span class="co">#&gt; 54591.43 54591 2012-03-09 04:27:49  B 13.063 0.956 1.4311700   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.15 54591 2012-03-10 00:10:41  A  5.099 0.478 1.3788101   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.46 54591 2012-03-10 23:56:13  B  1.844 0.224 1.5882496   NA   NA FALSE</span></span>
-<span><span class="co">#&gt; 54591.12 54591 2012-03-12 03:05:37  0 47.107 0.716 1.7976891   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.27 54591 2012-03-13 13:16:58  A  0.596 0.218 2.2165682   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt; 54591.18 54591 2012-03-14 13:11:48  A  4.489 2.754 2.0245819   NA   NA  TRUE</span></span>
-<span><span class="co">#&gt;          obs.type emf.x emf.y                   geometry</span></span>
-<span><span class="co">#&gt; 54591.1        KF    NA    NA POINT (12308.67 -9955.638)</span></span>
-<span><span class="co">#&gt; 54591.4        KF    NA    NA POINT (12283.02 -9946.821)</span></span>
-<span><span class="co">#&gt; 54591.20       KF    NA    NA POINT (12298.33 -9962.632)</span></span>
-<span><span class="co">#&gt; 54591.25       KF    NA    NA  POINT (12286.88 -9946.94)</span></span>
-<span><span class="co">#&gt; 54591.43       KF    NA    NA POINT (12297.82 -9972.317)</span></span>
-<span><span class="co">#&gt; 54591.15       KF    NA    NA POINT (12300.96 -9957.763)</span></span>
-<span><span class="co">#&gt; 54591.46       KF    NA    NA POINT (12324.95 -9967.605)</span></span>
-<span><span class="co">#&gt; 54591.12       KF    NA    NA POINT (12273.21 -9959.318)</span></span>
-<span><span class="co">#&gt; 54591.27       KF    NA    NA POINT (12288.02 -9948.256)</span></span>
-<span><span class="co">#&gt; 54591.18       KF    NA    NA POINT (12292.13 -9935.724)</span></span></code></pre></div>
+<span>        pf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>By setting <code>pf = TRUE</code>, <code>fit_ssm</code> returns the
 processed data as a projected <code>sf</code> data.frame prior to
 fitting an SSM. Looking at the <code>keep</code> column, we can see that
@@ -235,7 +207,7 @@ draw on Argos - GPS double-tagging data such as (Costa et al. 2010).</p>
 <p>These can be adjusted by modifying the data.frame and passing this to
 <code>fit_ssm</code> via `emf.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">emf2</span> <span class="op">&lt;-</span> <span class="fu">mutate</span><span class="op">(</span><span class="fu"><a href="../reference/emf.html">emf</a></span><span class="op">(</span><span class="op">)</span>, emf.x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">20</span>, <span class="fl">8</span>, <span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">emf2</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="../reference/emf.html">emf</a></span><span class="op">(</span><span class="op">)</span>, emf.x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">20</span>, <span class="fl">8</span>, <span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">sese2</span>, <span class="va">id</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, </span>
 <span>                model <span class="op">=</span> <span class="st">"rw"</span>, </span>
@@ -255,7 +227,7 @@ draw on Argos - GPS double-tagging data such as (Costa et al. 2010).</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="st">"f"</span><span class="op">)</span><span class="op">$</span><span class="va">y</span> <span class="op">-</span> <span class="fu"><a href="../reference/grab.html">grab</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"f"</span><span class="op">)</span><span class="op">$</span><span class="va">y</span>, breaks <span class="op">=</span> <span class="fl">20</span>, </span>
 <span>     main <span class="op">=</span> <span class="st">"fit1$y - fit2$y"</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="st">"Distance (km)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="SSM_fitting_files/figure-html/emf%20mod-1.png" width="672"></p>
+<p><img src="images/ssm_fitting/histos.jpeg" style="width:98.0%"></p>
 <p>In this contrived example, re-specified <code>emf.x</code> values
 result in differences in the predicted locations of up to about 20 km in
 the x-direction and a more subtle 4 km in the y-direction, even though
@@ -298,8 +270,8 @@ that ensures <code>psi</code> is fixed during optimization.</p>
 <span>                map <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>psi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span>, <span class="va">fit2</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1292.494 1295.765</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span>, <span class="va">fit2</span><span class="op">$</span><span class="va">ssm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">AICc</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] 1292.494 1295.789</span></span></code></pre>
 <p>Comparison of AIC<sub>c</sub> from the model fits implies the model
 including the <code>psi</code> parameter <code>fit1</code> provides a
 slightly better fit.</p>
@@ -315,7 +287,7 @@ built-in <code>TMB</code> C++ templates. Users can specify which
 optimizer to use via the <code>control</code> argument, which takes a
 named list as input that is provided by the utility function
 `ssm_control:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, </span>
 <span>               model <span class="op">=</span> <span class="st">"crw"</span>, </span>
 <span>               time.step <span class="op">=</span> <span class="fl">24</span>,</span>
@@ -329,7 +301,7 @@ on a list of control parameters that allow fine-tuning of the
 optimization process, which can aid convergence on tricky data sets.
 Users can specify any of these control parameters in
 <code>ssm_control</code>, for example:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_ssm.html">fit_ssm</a></span><span class="op">(</span><span class="va">ellie</span>, </span>
 <span>               model <span class="op">=</span> <span class="st">"crw"</span>, </span>
 <span>               time.step <span class="op">=</span> <span class="fl">24</span>,</span>

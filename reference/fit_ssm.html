@@ -26,7 +26,7 @@ intervals (regular or irregular)."><meta property="og:image" content="https://ia
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-01</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@ intervals (regular or irregular).</p>
 <span>  ang <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">25</span><span class="op">)</span>,</span>
 <span>  distlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2500</span>, <span class="fl">5000</span><span class="op">)</span>,</span>
 <span>  spdf <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.dt <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  min.dt <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  pf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"crw"</span>,</span>
 <span>  time.step <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -274,19 +274,20 @@ a mixed effects model. Ecology. 100(1):e02566</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## fit crw model to Argos LS data</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">fit_ssm</span><span class="op">(</span><span class="va">ellie</span>, vmax <span class="op">=</span> <span class="fl">4</span>, model <span class="op">=</span> <span class="st">"crw"</span>, time.step <span class="op">=</span> <span class="fl">24</span>, </span></span>
 <span class="r-in"><span>control <span class="op">=</span> <span class="fu"><a href="ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in nlminb(obj$par, ifelse(control$verbose == 1, myfn, obj$fn), obj$gr,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   NA/NaN gradient evaluation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in updateCholesky(L, hessian.random) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   function 'sexp_as_cholmod_sparse' not provided by package 'Matrix'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rep$pdHess:</span> $ operator is invalid for atomic vectors</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## time series plots of fitted values and observations</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`54591`</span>
-<span class="r-plt img"><img src="fit_ssm-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'fit' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## 2-D tracks plots of predicted values and observations</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`54591`</span>
-<span class="r-plt img"><img src="fit_ssm-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'fit' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
