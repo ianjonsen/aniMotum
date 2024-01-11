@@ -186,7 +186,7 @@ Original variable names are not preserved in the output object `fit` but rather 
 
 `fit_ssm` can be applied to single or multiple tracks, without modification. The specified SSM is fit to each individual separately and the resulting output is a compound `tibble` with rows corresponding to each individual `ssm_df` fit object. The `converged` column indicates whether each model fit converged successfully.
 
-```{r multi-fits, message=FALSE}
+```{r multi-fits, message=FALSE, eval=FALSE}
 ## fit to data with two individuals
 fit <- fit_ssm(sese2,
                model = "crw",
@@ -196,6 +196,11 @@ fit <- fit_ssm(sese2,
 ## list fit outcomes for both seals
 fit
 ```
+```{r multi-fits2, echo=FALSE}
+load("data/overview/fit.rda")
+fit
+```
+
 
 Individual `id` is displayed in the 1st column, all fit output resides in a list (`ssm`) in the 2nd column, `convergence` status (whether the optimizer found a global minimum) of each model fit is displayed in the 3rd column, whether the Hessian matrix was positive-definite and could be solved to obtain parameter standard errors (`pdHess`) is displayed in the 4th column, and the specified process model (`rw`, `crw`, or `mp`) in the 5th column. In some cases, the optimizer will converge but the Hessian matrix is not positive-definite, which typically indicates the optimizer converged on a local minimum. In this case, some standard errors may be calculated but not all. One possible solution is to try specifying a longer `time.step` or set `time.step = NA` to turn off predictions and return only fitted values (location estimates at the pre-filtered observation times). If `pdHess = FALSE` persists then careful inspection of the supplied data is warranted to determine if suspect observations not identified by `prefilter` are present. The excellent [glmmTMB troubleshooting vignette](https://CRAN.R-project.org/package=glmmTMB/vignettes/troubleshooting.html) may also provide hints at solutions. Convergence failures should be examined for potential data issues, however, in some cases changes to the optimization parameters via `ssm_control()` (see `?fit_ssm` and `?ssm_control` on usage) may overcome mild issues (see `?nlminb` or `?optim` for details on optimization control parameters).
 
