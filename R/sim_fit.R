@@ -197,16 +197,21 @@ sim_fit <-
                                    sigma = Sigma * dt[i],
                                    lower = vmin,
                                    upper = vmax)
+                 
                  ## wrap x values, reflect y values
                  mu1 <- wrap_x(mu[i-1,] + v[i,] * dt[i], ex[1:2])
+              
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
                    pv <- as.numeric(c(extract(grad[[1]], rbind(mu1))[1],
                            extract(grad[[2]], rbind(mu1))[1]))
+                   
+                   if(all(is.na(pv))) pv <- c(0,0) # unsure why NA's can creep in here
                    mu[i,] <- mu1 + pv * beta
                  } else {
                    mu[i,] <- mu1
                  }
+                 
                }
                df <- data.frame(
                  rep = j,

@@ -16,7 +16,7 @@ require(aniMotum)
 require(ggplot2)
 ```
 `aniMotum` provides a few different ways to fit a move persistence model to obtain estimates of a continuous-valued behavioural index along individual tracks (Auger-Méthé et al. 2017; Jonsen et al. 2019). In `aniMotum` versions prior to 1.0-5, move persistence was estimated via `fit_mpm()` and, when fitting to Argos or other location error-prone data types, required a two-stage approach of first calling `fit_ssm()` and then calling `fit_mpm()`. The first step fits a state-space model to account for location error in the data:
-```{r fit ssm, warning=FALSE, message=FALSE}
+```{r fit ssm, eval=FALSE, warning=FALSE, message=FALSE}
 d <- subset(sese, id == "ct109-186-14")
 fit <- fit_ssm(d, 
                vmax = 3,
@@ -26,7 +26,7 @@ fit <- fit_ssm(d,
 ```
 
 The second step estimates move persistence from the SSM-estimated locations:
-```{r fit mpm, warning=FALSE, message=FALSE}
+```{r fit mpm, eval=FALSE, warning=FALSE, message=FALSE}
 fmp <- fit_mpm(fit, 
                what = "predicted", 
                model = "mpm",
@@ -48,7 +48,7 @@ map(fit, fmp, what = "predicted", silent = TRUE)
 `aniMotum` now provides a move persistence model in state-space form to allow simultaneous estimation of move persistence and location states, and this is invoked via `fit_ssm()` by specifying `model = "mp"`. Currently, this model can only be fit to individuals separately.
 
 Here, we fit the move persistence SSM to the same southern elephant seal track as above:
-```{r fit_ssm, warning=FALSE, message=FALSE}
+```{r fit_ssm, eval=FALSE, warning=FALSE, message=FALSE}
 fit <- fit_ssm(d, 
                vmax = 3, 
                model = "mp", 

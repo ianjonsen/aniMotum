@@ -26,7 +26,7 @@ Fitting SSM's to tracking data in `aniMotum` is intended to be as simple as poss
 4. using [`trip::sda`](https://CRAN.R-project.org/package=trip) to identify potentially extreme observations based on speed, distance, and angle (Freitas et al. 2008).  
 
 Several arguments to `fit_ssm` provide a measure of control over data processing. The `vmax`, `ang` and `distlim` arguments provide control over the `trip::sda` filter (see `?fit_ssm` for details). The `sda` filter can occasionally fail (possibly when calculating angles between successive displacements), in this case we fall back to using `trip::speedfilter` and a warning issued. The `trip` filter can be turned off altogether with `spdf = FALSE`, although this is usually not advisable if working with older Least-Squares Argos data, the lower prevalence of extreme observations in newer Kalman filtered Argos data may not always require speed-filtering prior to fitting an SSM. The minimum time interval allowed between observations is set by `min.dt`. Finally, the processed data can be returned, e.g. for careful inspection, without fitting an SSM with the `pf = TRUE` argument:
-```{r pre-processing, message=FALSE}
+```{r pre-processing, eval=FALSE, message=FALSE}
 fit_ssm(ellie, 
         vmax = 3, 
         pf = TRUE)
@@ -52,8 +52,8 @@ The default emf values are given by `emf()`:
 emf()
 ```
 These can be adjusted by modifying the data.frame and passing this to `fit_ssm` via `emf.
-```{r emf mod, message=FALSE, fig.width=7, fig.height=6}
-emf2 <- mutate(emf(), emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
+```{r emf mod, eval=FALSE, message=FALSE}
+emf2 <- dplyr::mutate(emf(), emf.x = c(0.1, 1, 2, 4, 20, 8, 15, 15))
 
 fit1 <- fit_ssm(subset(sese2, id == unique(id)[1]), 
                 model = "rw", 
@@ -74,6 +74,7 @@ hist(grab(fit1, "f")$x - grab(fit2, "f")$x, breaks = 20,
 hist(grab(fit1, "f")$y - grab(fit2, "f")$y, breaks = 20, 
      main = "fit1$y - fit2$y", xlim = c(-20,20), xlab = "Distance (km)")
 ```
+![](images/ssm_fitting/histos.jpeg){width="98%"}
 
 In this contrived example, re-specified `emf.x` values result in differences in the predicted locations of up to about 20 km in the x-direction and a more subtle 4 km in the y-direction, even though the `emf.y` values were not edited. The latter is due to a model-estimated correlation between the x and y errors.
 
@@ -83,7 +84,7 @@ Now that CLS Argos provides locations estimated by their Kalman filter algorithm
 The `map` argument allows some model parameters to by turned off by fixing them at 0 on the log-scale. This can be useful in cases where model simplification can aid in convergence or simply provide a better fit to the data. For example, the `crw` has a parameter `psi` that re-scales the semi-major axis of Argos KF error ellipses to account for apparent bias in the error ellipses (Jonsen et al. 2020). Occasionally, there may be insufficient information to reliably estimate this parameter, or one might wish to compare model fits with and without error ellipse bias correction.
 
 Here we fit the `crw` model with (`fit1`) and without (`fit2`) the bias-correction parameter `psi`, by supplying a named list to the `map` argument. Where `factor(NA)` is a `TMB` convention that ensures `psi` is fixed during optimization.
-```{r demonstrate map use, message=FALSE, warning=FALSE}
+```{r demonstrate map use, eval=FALSE, message=FALSE, warning=FALSE}
 fit1 <- fit_ssm(ellie, 
                 model = "crw", 
                 time.step = 24,
@@ -95,6 +96,10 @@ fit2 <- fit_ssm(ellie,
                 map = list(psi = factor(NA)),
                 control = ssm_control(verbose = 0))
 
+c(fit1$ssm[[1]]$AICc, fit2$ssm[[1]]$AICc)
+```
+```{r demonstrate map use2, message=FALSE, echo=FALSE}
+load("data/ssm_fitting/fits_aic.rda")
 c(fit1$ssm[[1]]$AICc, fit2$ssm[[1]]$AICc)
 ```
 
