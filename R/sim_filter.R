@@ -44,7 +44,7 @@
 ##' predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-1428
 ##' 
 ##' @importFrom dplyr group_by ungroup select bind_rows mutate
-##' @importFrom dplyr first "%>%"
+##' @importFrom dplyr first %>%
 ##' @importFrom tidyr nest unnest
 ##' @importFrom traipse track_distance_to track_bearing_to
 ##' @importFrom stats quantile

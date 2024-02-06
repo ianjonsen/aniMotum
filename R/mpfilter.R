@@ -203,10 +203,12 @@ mpfilter <-
         ),
       list(
         l_psi = factor(NA)
+        ),
+      list(
+        l_psi = factor(NA)
         )
       )
 
-    
     mm <- unlist(automap[obst], recursive = FALSE)
     mm[which(duplicated(names(mm)))] <- NULL
     automap <- mm
@@ -340,11 +342,13 @@ mpfilter <-
     options(warn = oldw) ## turn warnings back on
   
     if (!inherits(opt, "try-error") & !inherits(rep, "try-error")) {
-      
       ## Parameters, states and the fitted values
       fxd <- summary(rep, "report")
-      fxd <- fxd[which(!rownames(fxd) %in% 
-                         sapply(strsplit(names(map), "_"), function(.) .[2])), ]
+      if(!is.null(map)) { 
+        fxd <- fxd[which(!rownames(fxd) %in%
+                           sapply(strsplit(names(map), "_"), function(.)
+                             .[2])),]
+      }
       if("sigma" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "sigma")] <- c("sigma_x","sigma_y")
       } 

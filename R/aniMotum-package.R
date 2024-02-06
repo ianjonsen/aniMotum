@@ -4,20 +4,19 @@
 ##'
 ##' @name aniMotum-package
 ##' @aliases aniMotum aniMotum-package
-##' @docType package
 ##' @author
 ##' **Maintainer:** Ian Jonsen <ian.jonsen@mq.edu.au> [ORCID](https://orcid.org/0000-0001-5423-6076)  
 ##' 
-##' Toby Patterson [ORCID](https://orcid.org/0000-0002-7150-9205)  
+##' **Contributor:** Toby Patterson [ORCID](https://orcid.org/0000-0002-7150-9205)  
 ##' 
-##' W. James Grecian [ORCID](https://orcid.org/0000-0002-6428-719X)  
+##' **Contributor:** W. James Grecian [ORCID](https://orcid.org/0000-0002-6428-719X)  
 ##'
 ##' @seealso Useful Links:
 ##' * [https://ianjonsen.github.io/aniMotum/](https://ianjonsen.github.io/aniMotum/)
 ##' * [https://github.com/ianjonsen/aniMotum/](https://github.com/ianjonsen/aniMotum/)
 ##' * Report bugs/issues at [https://github.com/ianjonsen/aniMotum/issues/](https://github.com/ianjonsen/aniMotum/issues/)
 ##' 
-##' @references Jonsen ID, Grecian WJ, Phillips L, et al. (2023) `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Methods in Ecology and Evolution. Accepted 06/12/2022.
+##' @references Jonsen ID, Grecian WJ, Phillips L, et al. (2023) `aniMotum`, an R package for animal movement data: rapid quality control, behavioural estimation and simulation. Methods in Ecology and Evolution 14:806-816.
 ##' @references Jonsen ID, Patterson TA, Costa DP, et al. (2020) A continuous-time state-space model for rapid quality-control of Argos locations from animal-borne tags. Movement Ecology 8:31.
 ##' @references Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to environment: fast inference of variation among southern elephant seals with a mixed effects model. Ecology. 100(1):e02566.
 ##' 
