@@ -1,6 +1,6 @@
 Package: aniMotum
 Title: Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement
-Version: 1.2-03.9001
+Version: 1.2-03
 Date: 2024-02-06
 Authors@R: 
     c(
