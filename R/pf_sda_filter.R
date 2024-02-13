@@ -18,6 +18,7 @@
 ##' in favour of `speedfilter`. Either `ang = NA` or 
 ##' `distlim = NA` are sufficient.
 ##' @importFrom sf st_coordinates st_is_longlat st_crs st_transform 
+##' @importFrom trip trip sda speedfilter
 ##' @keywords internal
 ##' @md
 
@@ -52,13 +53,15 @@ if (spdf) {
   } else {
     filt <- "sda"
   }
-  
+
   if(any(is.na(ang))) ang <- c(0,0)
   if(any(is.na(distlim))) distlim <- c(0,0)
-
+  trip.dat <- suppressWarnings(with(x.tr, trip(data.frame(lon, lat, tms = date, id), 
+                                                     correct_all = FALSE)))
+  
   if (filt == "sda") {
     tmp <-
-      suppressWarnings(try(sda(x.tr,
+      suppressWarnings(try(sda(trip.dat,
                                smax = vmax * 3.6,
                                # convert m/s to km/h
                                ang = ang,
@@ -76,7 +79,7 @@ if (spdf) {
                          )
                          
                          tmp <-
-                           suppressWarnings(try(speedfilter(x.tr,
+                           suppressWarnings(try(speedfilter(trip.dat,
                                                             max.speed = vmax * 3.6),    # convert m/s to km/h
                                                             silent = TRUE))
                                             

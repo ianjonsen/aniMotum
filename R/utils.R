@@ -69,7 +69,7 @@ wrap_lon <- function(lon, lon_min = -180) {
   
 }
 
-##' @title sda: filter track for speed, distance and angle.
+##' @title sda_int: filter track for speed, distance and angle.
 ##'
 ##' @description Create a filter index of a track for "bad" points with a
 ##' combination of speed, distance and angle tests.
@@ -87,7 +87,7 @@ wrap_lon <- function(lon, lon_min = -180) {
 ##' @importFrom traipse track_distance track_angle
 ##' @keywords internal
 
-sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
+sda_int <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
   
   x$speed.ok <- speedfilter(x, max.speed = smax)
   if(all("lon" %in% names(x), "lat" %in% names(x))) {
@@ -154,7 +154,7 @@ sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
   x$ok
 }
 
-##' @title speedfilter: filter track for speed.
+##' @title speedfilter_int: filter track for speed.
 ##'
 ##' @description Create a filter index of a track for "bad" points based only on
 ##' speed. Called from `sda`
@@ -165,7 +165,7 @@ sda <- function(x, smax, ang = c(15, 25), distlim = c(2.5, 5.0)) {
 ##' @return logical vector, with \code{FALSE} values where the tests failed
 ##' @importFrom traipse track_distance_to
 ##' @keywords internal
-speedfilter <- function (x, max.speed = NULL, test = FALSE) 
+speedfilter_int <- function (x, max.speed = NULL, test = FALSE) 
 {
 
   if(all("lon" %in% names(x), "lat" %in% names(x))) {
