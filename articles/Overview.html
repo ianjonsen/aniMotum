@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-03</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-03.9100</span>
       </span>
     </div>
 
@@ -270,11 +270,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2024-02-06 17:15:34  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2024-02-06 18:15:34  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2024-02-06 19:15:34  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2024-02-06 20:15:34  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2024-02-06 21:15:34  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2024-02-14 14:36:09  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2024-02-14 15:36:09  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2024-02-14 16:36:09  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2024-02-14 17:36:09  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2024-02-14 18:36:09  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -284,12 +284,12 @@ geolocation data, when they include longitude and latitude error SD’s
 (<code>lonerr</code>, <code>laterr</code>; units in degrees). In this
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
-<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr   laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2024-02-06 17:15:34 GL 100.0 -55 1.3768717 6.007222</span></span>
-<span><span class="co">#&gt; 2 54632 2024-02-07 05:15:34 GL 100.5 -54 0.7521801 1.837438</span></span>
-<span><span class="co">#&gt; 3 54632 2024-02-07 17:15:34 GL 101.0 -53 0.4627128 5.461953</span></span>
-<span><span class="co">#&gt; 4 54632 2024-02-08 05:15:34 GL 101.5 -52 0.1263894 1.813372</span></span>
-<span><span class="co">#&gt; 5 54632 2024-02-08 17:15:34 GL 102.0 -51 0.1226851 2.532561</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr    laterr</span></span>
+<span><span class="co">#&gt; 1 54632 2024-02-14 14:36:09 GL 100.0 -55 0.8734753 0.2968173</span></span>
+<span><span class="co">#&gt; 2 54632 2024-02-15 02:36:09 GL 100.5 -54 0.2629027 1.6265993</span></span>
+<span><span class="co">#&gt; 3 54632 2024-02-15 14:36:09 GL 101.0 -53 0.3598331 1.2869667</span></span>
+<span><span class="co">#&gt; 4 54632 2024-02-16 02:36:09 GL 101.5 -52 1.1992892 1.0147101</span></span>
+<span><span class="co">#&gt; 5 54632 2024-02-16 14:36:09 GL 102.0 -51 0.5993297 2.2118624</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -357,7 +357,7 @@ vs NA’s).</p>
 steps: a data formatting step, a pre-filtering step, and the actual
 model fitting step. A number of checks are made on the input data during
 the formatting and pre-filtering steps, including applying the
-<code>trip::sda</code> filter to identify extreme observations (see
+<code><a href="https://rdrr.io/pkg/trip/man/sda.html" class="external-link">trip::sda</a></code> filter to identify extreme observations (see
 <code><a href="../reference/fit_ssm.html">?fit_ssm</a></code> for details). The pre-filter step is fully
 automated, although various arguments can be used to modify it’s
 actions, and called via the <code>fit_ssm</code> function:</p>
