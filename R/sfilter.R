@@ -342,15 +342,15 @@ sfilter <-
           l_tau=c(Inf,Inf),
           l_rho_o=7)
     
+    names(L)[c(1:2,4:5,7:8)] <- rep(c("l_sigma", "l_D", "l_tau"), each = 2)
+    names(U)[c(1:2,4:5,7:8)] <- rep(c("l_sigma", "l_D", "l_tau"), each = 2)
+    
     if(any(!is.null(control$lower))) {
       L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
     }
     if(any(!is.null(control$upper))) {
       U[which(names(U) %in% names(control$upper))] <- unlist(control$upper)
     } 
- 
-    names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
 
     # Remove inactive parameters from bounds
     L <- L[!names(L) %in% names(map)]
