@@ -11,8 +11,9 @@
 ##' @param what if using a `ssm` object should the fitted (typically 
 ##' irregular in time) or predicted (typically regular in time) locations be 
 ##' re-routed.
-##' @param  map_scale scale of rnaturalearth map to use for land mass: one of 110,
-##' 50 (default), or 10. Note that map_scale = 10 is only available if you have 
+##' @param  map_scale scale of `rnaturalearth` map to use for land mass: one of 110,
+##' 50 (default), or 10. Ignored if an alternate simple feature barrier is provided 
+##' (see `barrier`). Note that map_scale = 10 is only available if you have 
 ##' the `rnaturalearthhires` package installed see: 
 ##' [https://github.com/ropensci/rnaturalearthhires](https://github.com/ropensci/rnaturalearthhires)
 ##' @param dist buffer distance (m) to add around track locations. The convex 
@@ -22,6 +23,9 @@
 ##' distance is a constant 50000 m.
 ##' @param append should re-routed locations be appended to the `ssm` 
 ##' (ssm fit) object (default = TRUE), or returned as a tibble.
+##' @param barrier a user-supplied barrier simple feature `POLYGON` or
+##' `MULTIPOLYGON` object. Default is NULL, in which case `rnaturalearth` data
+##' are used.
 ##' @param ... additional arguments passed to pathroutr::prt_visgraph
 ##' 
 ##' @details
@@ -77,6 +81,7 @@ route_path <-
            map_scale = 50,
            dist = 50000,
            append = TRUE,
+           barrier = NULL,
            ...){
     
     if(requireNamespace("pathroutr", quietly = TRUE)) {
@@ -85,10 +90,15 @@ route_path <-
          or a `sim_fit` object containing the paths simulated from a `ssm` fit object" = 
                   any(inherits(x, "ssm_df"), inherits(x, "sim_fit"), inherits(x, "simfit")))
       
-      if(map_scale == 10 & !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
-        map_scale <- 50
-        cat("resetting map_scale = 50 because rnaturalearthhires is not installed, 
-          use remotes::install_github(\"ropensci/rnaturalearthhires\") to install\n")
+      if (is.null(barrier)) {
+        if (map_scale == 10 &
+            !requireNamespace("rnaturalearthhires", quietly = TRUE)) {
+          map_scale <- 50
+          cat(
+            "resetting map_scale = 50 because rnaturalearthhires is not installed,
+          use remotes::install_github(\"ropensci/rnaturalearthhires\") to install\n"
+          )
+        }
       }
       
       ## required for pathroutr fn's
@@ -109,10 +119,15 @@ route_path <-
       
       what <- match.arg(what)
       
-      # pathroutr needs a land shapefile to create a visibility graph from
-      world_mc <- ne_countries(scale = map_scale, returnclass = "sf") %>%
-        st_transform(crs = 3857) %>%
-        st_make_valid()
+      if (is.null(barrier)) {
+        # pathroutr needs a land shapefile to create a visibility graph from
+        world_mc <-
+          ne_countries(scale = map_scale, returnclass = "sf") %>%
+          st_transform(crs = 3857) %>%
+          st_make_valid()
+      } else {
+        world_mc <- barrier
+      }
       
       if (inherits(x, "ssm_df")) {
         # unnest aniMotum ssm object
@@ -120,9 +135,10 @@ route_path <-
         
         # this should be trimmed to reduce computation time
         # base the trimming on the trs data
+        # transform locations to barrier projection if user-supplied
         df_sf <- df %>% 
           st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
-          st_transform(crs = 3857)
+          st_transform(crs = ifelse(is.null(barrier), 3857, st_crs(barrier)$input))
         
       } else if (inherits(x, "sim_fit")) {
         # unnest aniMotum sim_fit object
@@ -132,7 +148,7 @@ route_path <-
         # base the trimming on the trs data
         df_sf <- df %>% 
           st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
-          st_transform(crs = 3857)
+          st_transform(crs = ifelse(is.null(barrier), 3857, st_crs(barrier)$input))
         
       }
       

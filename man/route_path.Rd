@@ -10,6 +10,7 @@ route_path(
   map_scale = 50,
   dist = 50000,
   append = TRUE,
+  barrier = NULL,
   ...
 )
 }
@@ -21,8 +22,9 @@ a \code{sim_fit} object containing simulated paths}
 irregular in time) or predicted (typically regular in time) locations be
 re-routed.}
 
-\item{map_scale}{scale of rnaturalearth map to use for land mass: one of 110,
-50 (default), or 10. Note that map_scale = 10 is only available if you have
+\item{map_scale}{scale of \code{rnaturalearth} map to use for land mass: one of 110,
+50 (default), or 10. Ignored if an alternate simple feature barrier is provided
+(see \code{barrier}). Note that map_scale = 10 is only available if you have
 the \code{rnaturalearthhires} package installed see:
 \url{https://github.com/ropensci/rnaturalearthhires}}
 
@@ -34,6 +36,10 @@ distance is a constant 50000 m.}
 
 \item{append}{should re-routed locations be appended to the \code{ssm}
 (ssm fit) object (default = TRUE), or returned as a tibble.}
+
+\item{barrier}{a user-supplied barrier simple feature \code{POLYGON} or
+\code{MULTIPOLYGON} object. Default is NULL, in which case \code{rnaturalearth} data
+are used.}
 
 \item{...}{additional arguments passed to pathroutr::prt_visgraph}
 }
