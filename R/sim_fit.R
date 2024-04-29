@@ -121,10 +121,10 @@ sim_fit <-
       mu
     }
   }
-  
+
   ## set up simulation extents
   if(!is.null(grad)) {
-    ex <- ext(grad[[1]])
+    ex <- ext(grad)
   } else {
     ## approx extents of world mercator in km
     ex <- c(-20077.51,20082.49,-19622.54,18437.46) 
@@ -203,8 +203,7 @@ sim_fit <-
               
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
-                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1))[1],
-                           extract(grad[[2]], rbind(mu1))[1]))
+                   pv <- as.numeric(extract(grad, rbind(mu1)))
                    
                    if(all(is.na(pv))) pv <- c(0,0) # unsure why NA's can creep in here
                    mu[i,] <- mu1 + pv * beta
@@ -259,8 +258,8 @@ sim_fit <-
                  mu1 <- wrap_x(mu[i-1,] + dxy, ex[1:2])
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
-                   pv <- as.numeric(c(extract(grad[[1]], rbind(mu1))[1],
-                           extract(grad[[2]], rbind(mu1))[1]))
+                   pv <- as.numeric(extract(grad, rbind(mu1)))
+                   if(all(is.na(pv))) pv <- c(0,0) # unsure why NA's can creep in here
                    mu[i,] <- mu1 + pv * beta
                  } else {
                    mu[i,] <- mu1
