@@ -80,12 +80,14 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 
 If you don’t have compiler tools installed, are uncertain if you do, or
 have trouble getting them to work then you can manually download a
-binary version of the `{aniMotum}` package for Windows or Intel Mac from
-here <https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
-binary versions for Windows & Mac, each corresponds to a different major
-release of R: 4.3 (development version), 4.2 (current version), and 4.1
-(old version) - choose the one that matches your R version. You can
-check your R version by typing `R.Version()` in the R console.
+binary version of the `{aniMotum}` package for Windows or Mac from here
+<https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
+binary versions for Windows corresponding to a different major release
+of R, choose the one that matches your R version. You can check your R
+version by typing `R.Version()` in the R console. There are 4 binary
+versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and within these
+there are 2 versions for the latest release version of R and the
+previous version.
 
 When downloading the binary version on a Mac, it is important to right
 click and choose “Download Linked File As…” so that the file isn’t
@@ -123,13 +125,6 @@ Then, click the “Browse” button to navigate to wherever you saved the
 <img src="man/figures/README-install_3.png" id="id" class="class"
 style="width:50.0%;height:50.0%" />
 
-If you have a Mac with an M1 (or later) processor, the above binary file
-will not work as R-universe currently builds their Mac binaries on an
-Intel Mac. Instead, you will need to download the binary from here
-<https://github.com/ianjonsen/aniMotum/releases/tag/v1.1-04>. Follow the
-same installation procedure (R console or GUI) as above. Note, this
-binary was built for **R 4.2.2**, the current release version.
-
 ### From GitHub (source)
 
 If you prefer installing from GitHub via `remotes::install_github()` and
@@ -148,21 +143,20 @@ required. Also, ensure you have a suitable Gnu Fortran compiler
 installed. The easiest install option is to download a compiled version
 from here <https://github.com/fxcoudert/gfortran-for-macOS/releases>.
 Just makes sure you choose the version that matches your MacOS and
-processor (Intel vs Arm 64). Getting Xcode compiler tools installed on
-M1/M2 Macs can be challenging!
+processor (Intel vs Arm 64).
 
 ``` r
 remotes::install_github("ianjonsen/aniMotum")
 ```
 
-Note: there can be issues getting compilers to work properly, especially
-on M1 Macs. Often, this is due to missing or incorrect Xcode Command
-Line Tools and/or Fortran compiler. If you encounter install and compile
-issues, you may find a solution in the excellent documentation here
+Note: there can be issues getting compilers to work properly. Often,
+this is due to missing or incorrect Xcode Command Line Tools and/or
+Fortran compiler. If you encounter install and compile issues, you may
+find a solution in the excellent documentation here
 [glmmTMB](https://github.com/glmmTMB/glmmTMB).
 
 If you don’t have the time & patience for sorting out compiler/library
-issues then just install the appropriate binary version. `AniMotum`
+issues then just install the appropriate binary version. `aniMotum`
 models may not fit quite as fast as they could on your setup, but they
 will still be fast. We’re talking about differences of milliseconds to a
 few seconds per animal track, so you decide where your time is best
