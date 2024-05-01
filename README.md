@@ -98,11 +98,11 @@ command in the R console to install the file you’ve just downloaded
 
 ``` r
 # for Windows
-install.packages("path_to_file\aniMotum_1.1-02.zip", 
+install.packages("path_to_file\aniMotum_1.2-05.zip", 
                  repos=NULL, type="win.binary", dependencies = TRUE)
 
 # for Mac
-install.packages("path_to_file/aniMotum_1.1-02.tgz", 
+install.packages("path_to_file/aniMotum_1.2-05.tgz", 
                  repos=NULL, type="mac.binary", dependencies = TRUE)
 ```
 
