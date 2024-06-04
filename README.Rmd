@@ -60,16 +60,20 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 ```
 
 ### READ THIS CAREFULLY if you are unsure about compiler tools:
+<<<<<<< HEAD
 If you don't have compiler tools installed, are uncertain if you do, or have trouble getting them to work then you can manually download a binary version of the `{aniMotum}` package for Windows or Mac from here https://ianjonsen.r-universe.dev/ui#package:aniMotum. There are 3 binary versions for Windows corresponding to a different major release of R, choose the one that matches your R version. You can check your R version by typing `R.Version()` in the R console. There are 4 binary versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and within these there are 2 versions for the latest release version of R and the previous version.
+=======
+If you don't have compiler tools installed, are uncertain if you do, or have trouble getting them to work then you can manually download a binary version of the `{aniMotum}` package for Windows or Mac from here https://ianjonsen.r-universe.dev/ui#package:aniMotum. There are 3 binary versions for Windows corresponding to a different major release of R, choose the one that matches your R version. You can check your R version by typing `R.Version()` in the R console. There are 4 binary versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and 2 for Intel Macs (x86_64), within these 2 classes there are 2 versions for the latest release version of R and the previous version.
+>>>>>>> staging
 
 When downloading the binary version on a Mac, it is important to right click and choose "Download Linked File As..." so that the file isn't automatically uncompressed. If you have downloaded the file correctly, its extension will be `.tgz`, **not** `.tar`. You can use the following command in the R console to install the file you've just downloaded (where `path_to_file` is wherever you saved the download):
 ```{r, eval=FALSE}
 # for Windows
-install.packages("path_to_file\aniMotum_1.1-02.zip", 
+install.packages("path_to_file\aniMotum_1.2-05.zip", 
                  repos=NULL, type="win.binary", dependencies = TRUE)
 
 # for Mac
-install.packages("path_to_file/aniMotum_1.1-02.tgz", 
+install.packages("path_to_file/aniMotum_1.2-05.tgz", 
                  repos=NULL, type="mac.binary", dependencies = TRUE)
 
 ```
@@ -91,7 +95,11 @@ If you prefer installing from GitHub via `remotes::install_github()` and know yo
 
 On PC's running Windows, ensure you have installed [Rtools](https://cran.r-project.org/bin/windows/Rtools/). 
 
+<<<<<<< HEAD
 On Mac's, ensure you have installed the Command Line Tools for Xcode by executing `xcode-select --install` in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed. The easiest install option is to download a compiled version from here  https://github.com/fxcoudert/gfortran-for-macOS/releases. Just makes sure you choose the version that matches your MacOS and processor (Intel vs Arm 64). 
+=======
+On Mac's, ensure you have installed the Command Line Tools for Xcode by executing `xcode-select --install` in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed. The easiest install option is to download a compiled version from here  https://github.com/fxcoudert/gfortran-for-macOS/releases. Just make sure you choose the version that matches your MacOS and processor (Intel vs Arm 64). 
+>>>>>>> staging
 ```{r gh-installation_staging, eval = FALSE}
 remotes::install_github("ianjonsen/aniMotum")
 ```

@@ -85,9 +85,15 @@ binary version of the `{aniMotum}` package for Windows or Mac from here
 binary versions for Windows corresponding to a different major release
 of R, choose the one that matches your R version. You can check your R
 version by typing `R.Version()` in the R console. There are 4 binary
+<<<<<<< HEAD
 versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and within these
 there are 2 versions for the latest release version of R and the
 previous version.
+=======
+versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and 2 for Intel
+Macs (x86_64), within these 2 classes there are 2 versions for the
+latest release version of R and the previous version.
+>>>>>>> staging
 
 When downloading the binary version on a Mac, it is important to right
 click and choose “Download Linked File As…” so that the file isn’t
@@ -98,11 +104,11 @@ command in the R console to install the file you’ve just downloaded
 
 ``` r
 # for Windows
-install.packages("path_to_file\aniMotum_1.1-02.zip", 
+install.packages("path_to_file\aniMotum_1.2-05.zip", 
                  repos=NULL, type="win.binary", dependencies = TRUE)
 
 # for Mac
-install.packages("path_to_file/aniMotum_1.1-02.tgz", 
+install.packages("path_to_file/aniMotum_1.2-05.tgz", 
                  repos=NULL, type="mac.binary", dependencies = TRUE)
 ```
 
@@ -142,7 +148,11 @@ required). A full Xcode install uses up a lot of disk space and is not
 required. Also, ensure you have a suitable Gnu Fortran compiler
 installed. The easiest install option is to download a compiled version
 from here <https://github.com/fxcoudert/gfortran-for-macOS/releases>.
+<<<<<<< HEAD
 Just makes sure you choose the version that matches your MacOS and
+=======
+Just make sure you choose the version that matches your MacOS and
+>>>>>>> staging
 processor (Intel vs Arm 64).
 
 ``` r
