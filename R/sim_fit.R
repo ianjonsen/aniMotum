@@ -116,6 +116,7 @@ sim_fit <-
   }
   
   reflect_y <- function(mu, y_rng) {
+#    if(is.na(mu[2])) browser()
     if(mu[2] < y_rng[1]) {
       c(mu[1], y_rng[1] * 2 - mu[2])
     } else if(mu[2] > y_rng[2]) {
@@ -151,7 +152,7 @@ sim_fit <-
     dts <- loc$date
     dt <- as.numeric(difftime(dts, c(as.POSIXct(NA), dts[-length(dts)]), units = "hours"))
     dt[1] <- 0
-    
+       
     ## get parameters from model fit object
     switch(model,
            crw = {
@@ -178,7 +179,7 @@ sim_fit <-
                stop("Implausible travel rates detected, check SSM fit for implausible locations")
              ## implausible for pinnipeds but not for eg. birds** need to re-think this...***
            })
-    
+
     ###############################
     ## Simulate movement process ##
     ###############################
@@ -203,7 +204,6 @@ sim_fit <-
                  
                  ## wrap x values, reflect y values
                  mu1 <- wrap_x(mu[i-1,] + v[i,] * dt[i], ex[1:2])
-              
                  mu1 <- reflect_y(mu1, ex[3:4])
                  if(!is.null(grad)) {
                    pv <- as.numeric(extract(grad, rbind(mu1)))
@@ -253,10 +253,12 @@ sim_fit <-
                                  sigma = Sigma * dt[i]^2,
                                  lower = vmin,
                                  upper = vmax,
-                                 algorithm = "gibbs", burn.in.samples = 100)
+                                 algorithm = "gibbs", 
+                                 burn.in.samples = 100)
                  
                  dxy <- dxy[which(!is.na(dxy))[1],]
-            
+                 if(all(is.na(dxy))) dxy <- c(1,1)
+
                  ## wrap x values, reflect y values
                  mu1 <- wrap_x(mu[i-1,] + dxy, ex[1:2])
                  mu1 <- reflect_y(mu1, ex[3:4])
