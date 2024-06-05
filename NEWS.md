@@ -1,3 +1,8 @@
+# aniMotum 1.2-06 (05/06/2024)
+
+* various minor issues fixed including: build against TMB 1.9.11, fixes error when grad specified in `sim_fit()`.
+
+
 # aniMotum 1.2 (03/11/2023)
 
 * addition of `sim_post()`, a function for posterior simulations from SSM fits, conditional on data and movement parameters
