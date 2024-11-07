@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   Mapping: Mapping.html
@@ -9,8 +9,7 @@ articles:
   SSM_fitting: SSM_fitting.html
   SSM_validation: SSM_validation.html
   Track_simulation: Track_simulation.html
-last_built: 2024-07-02T14:43Z
+last_built: 2024-11-07T13:39Z
 urls:
   reference: https://ianjonsen.github.io/aniMotum/reference
   article: https://ianjonsen.github.io/aniMotum/articles
-
