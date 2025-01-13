@@ -140,6 +140,9 @@ format_data <- function(x,
     }
   }
   
+  ## In case all format_data-added variables already exist in x
+  xx <- x
+  
   ## determine if there are extra variables in x
   xt.vars <- names(x)[!names(x) %in% c(id, date, lc, coord, epar, sderr)]
 
