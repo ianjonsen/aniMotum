@@ -90,6 +90,9 @@ sim_fit <-
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
+  if(any(sapply(fit$ssm, function(x) x$pm) == "mp"))
+    stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
+  
   if(!is.null(start)) {
     start <- data.frame(lon = start[1], lat = start[2])
     st1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
