@@ -43,8 +43,7 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-
-      - uses: r-lib/actions/setup-pandoc@v2
+          use-public-rspm: true
 
       - name: Query dependencies
         run: |
