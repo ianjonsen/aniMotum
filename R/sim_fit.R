@@ -76,7 +76,7 @@ sim_fit <-
     if(inherits(grad, "SpatRaster") & length(names(grad)) != 2)
       stop("grad must have 2 layers")
   }
-  
+
   if(all(!is.null(start), length(start) != 2)) 
     stop("start location must be a single lon,lat or x,y coordinate")
   if(all(!is.null(end), length(end) != 2)) 
@@ -90,7 +90,7 @@ sim_fit <-
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
-  if(any(sapply(fit$ssm, function(x) x$pm) == "mp"))
+  if(any(sapply(x$ssm, function(x) x$pm) == "mp"))
     stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
   
   if(!is.null(start)) {
