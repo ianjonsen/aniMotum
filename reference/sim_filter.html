@@ -150,16 +150,14 @@ predicting blue whale density in the California Current J. Appl. Ecol. 54: 1415-
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">pi</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## generate 5 simulated paths from ssm fit</span></span></span>
 <span class="r-in"><span><span class="va">trs</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_fit.html">sim_fit</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, reps <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sim_fit(fit, what = "predicted", reps = 5):</span> object 'fit' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## filter simulations and keep paths in top 40% of flag values</span></span></span>
 <span class="r-in"><span><span class="va">trs_f</span> <span class="op">&lt;-</span> <span class="fu">sim_filter</span><span class="op">(</span><span class="va">trs</span>, keep <span class="op">=</span> <span class="fl">0.4</span>, flag <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'trs' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## compare unfiltered and filtered simulated paths</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trs</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trs_f</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'trs' not found</span>
+<span class="r-plt img"><img src="sim_filter-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
