@@ -90,7 +90,7 @@ sim_fit <-
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
-  if(any(sapply(fit$ssm, function(x) x$pm) == "mp"))
+  if(any(sapply(x$ssm, function(m) m$pm) == "mp"))
     stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
   
   if(!is.null(start)) {
