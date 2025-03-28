@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-09</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-10</span>
       </span>
     </div>
 
@@ -155,7 +155,8 @@
 </h3>
 <p>If you prefer installing from GitHub via <code>remotes::install_github()</code> and know your way around the installation of compilers and associated libraries, then you will need to ensure you have the proper compilation tools and libraries installed.</p>
 <p>On PC’s running Windows, ensure you have installed <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a>.</p>
-<p>On Mac’s, ensure you have installed the Command Line Tools for Xcode by executing <code>xcode-select --install</code> in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed. The easiest install option is to download a compiled version from here <a href="https://github.com/fxcoudert/gfortran-for-macOS/releases" class="external-link uri">https://github.com/fxcoudert/gfortran-for-macOS/releases</a>. Just make sure you choose the version that matches your MacOS and processor (Intel vs Arm 64).</p>
+<p>On Mac’s, ensure you have installed the Command Line Tools for Xcode by executing <code>xcode-select --install</code> in the terminal; or you can download the latest version from the URL (free developer registration may be required). A full Xcode install uses up a lot of disk space and is not required. Also, ensure you have a suitable Gnu Fortran compiler installed. The easiest install option is to download a compiled version from here <a href="https://github.com/fxcoudert/gfortran-for-macOS/releases" class="external-link uri">https://github.com/fxcoudert/gfortran-for-macOS/releases</a>.</p>
+<p>Just make sure you choose the version that matches your MacOS and processor (Intel vs Arm 64).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ianjonsen/aniMotum"</span><span class="op">)</span></span></code></pre></div>
 <p>Note: there can be issues getting compilers to work properly. Often, this is due to missing or incorrect Xcode Command Line Tools and/or Fortran compiler. If you encounter install and compile issues, you may find a solution in the excellent documentation here <a href="https://github.com/glmmTMB/glmmTMB" class="external-link">glmmTMB</a>.</p>
