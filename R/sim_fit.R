@@ -76,7 +76,7 @@ sim_fit <-
     if(inherits(grad, "SpatRaster") & length(names(grad)) != 2)
       stop("grad must have 2 layers")
   }
-  
+
   if(all(!is.null(start), length(start) != 2)) 
     stop("start location must be a single lon,lat or x,y coordinate")
   if(all(!is.null(end), length(end) != 2)) 

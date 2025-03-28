@@ -81,19 +81,13 @@ options(repos = c(ianjonsen = 'https://ianjonsen.r-universe.dev',
 If you don’t have compiler tools installed, are uncertain if you do, or
 have trouble getting them to work then you can manually download a
 binary version of the `{aniMotum}` package for Windows or Mac from here
-<https://ianjonsen.r-universe.dev/ui#package:aniMotum>. There are 3
-binary versions for Windows corresponding to a different major release
-of R, choose the one that matches your R version. You can check your R
-version by typing `R.Version()` in the R console. There are 4 binary
-<<<<<<< HEAD
-versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and within these
-there are 2 versions for the latest release version of R and the
-previous version.
-=======
-versions for Macs, 2 for Arm 64 Macs (ie. M1 - Mx Macs) and 2 for Intel
-Macs (x86_64), within these 2 classes there are 2 versions for the
-latest release version of R and the previous version.
->>>>>>> staging
+<https://ianjonsen.r-universe.dev/aniMotum>. There are 3 binary versions
+for Windows corresponding to a different major release of R, choose the
+one that matches your R version. You can check your R version by typing
+`R.Version()` in the R console. There are 4 binary versions for Macs, 2
+for Arm 64 Macs (ie. M1 - Mx Macs) and 2 for Intel Macs (x86_64), within
+these 2 classes there are 2 versions for the latest release version of R
+and the previous version.
 
 When downloading the binary version on a Mac, it is important to right
 click and choose “Download Linked File As…” so that the file isn’t
@@ -104,11 +98,11 @@ command in the R console to install the file you’ve just downloaded
 
 ``` r
 # for Windows
-install.packages("path_to_file\aniMotum_1.2-05.zip", 
+install.packages("path_to_file\aniMotum_1.2-06.zip", 
                  repos=NULL, type="win.binary", dependencies = TRUE)
 
 # for Mac
-install.packages("path_to_file/aniMotum_1.2-05.tgz", 
+install.packages("path_to_file/aniMotum_1.2-06.tgz", 
                  repos=NULL, type="mac.binary", dependencies = TRUE)
 ```
 
@@ -148,11 +142,8 @@ required). A full Xcode install uses up a lot of disk space and is not
 required. Also, ensure you have a suitable Gnu Fortran compiler
 installed. The easiest install option is to download a compiled version
 from here <https://github.com/fxcoudert/gfortran-for-macOS/releases>.
-<<<<<<< HEAD
-Just makes sure you choose the version that matches your MacOS and
-=======
+
 Just make sure you choose the version that matches your MacOS and
->>>>>>> staging
 processor (Intel vs Arm 64).
 
 ``` r
@@ -197,6 +188,9 @@ map(fit,
     what = "predicted", 
     crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
+
+    #> Warning: Package `magick` is required to draw images. Image not drawn.
+    #> Warning: Package `magick` is required to draw images. Image not drawn.
 
 <img src="man/figures/README-explots2-1.png" width="100%" />
 

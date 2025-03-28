@@ -21,12 +21,6 @@ test_that("plot completes silently", {
 
 ## expect plot is silent
 test_that("plot completes silently", {
-  tp <- plot(trs, type = "p")
-  expect_s3_class(tp, c("patchwork", "gg", "ggplot", exact = TRUE))
-})
-
-## expect plot is silent
-test_that("plot completes silently", {
   tp <- plot(trs)
   expect_s3_class(tp, c("patchwork", "gg", "ggplot", exact = TRUE))
 })

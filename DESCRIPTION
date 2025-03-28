@@ -1,7 +1,7 @@
 Package: aniMotum
 Title: Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement
-Version: 1.2-09.9005
-Date: 2025-01-13
+Version: 1.2-10.9015
+Date: 2025-03-28
 Authors@R: 
     c(
       person(given = "Ian",
@@ -20,7 +20,7 @@ Authors@R:
 Author: Ian Jonsen [aut, cre, cph],
   W. James Grecian [aut, ctb],
   Toby Patterson [aut, ctb]
-Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
+Maintainer: Ian Jonsen <jonsen@stochastic-qc.org>
 Description: Fits continuous-time random walk, correlated random walk and move persistence state-space models for location estimation and behavioural inference from animal tracking data ('Argos', processed light-level 'geolocation', 'GPS'). Template Model Builder ('TMB') is used for fast random-effects estimation. The 'Argos' data can be: (older) least squares-based locations; (newer) Kalman filter-based locations with error ellipse information; or a mixture of both. The models estimate two sets of location states corresponding to: 1) each observation, which are (usually) irregularly timed; and 2) user-specified time intervals (regular or irregular). A track re-routing function is provided to adjust location estimates for known movement barriers. Track simulation functions are provided. Latent variable models are also provided to estimate move persistence from track data not requiring state-space model filtering. 
 URL: https://github.com/ianjonsen/aniMotum/,
     https://ianjonsen.github.io/aniMotum/
@@ -29,11 +29,11 @@ License: MIT + file LICENSE
 LazyData: true
 NeedsCompilation: yes
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     tibble (>= 2.1.3),
     ggplot2 (>= 3.4.0),
-    TMB (>= 1.9.6),
+    TMB (>= 1.9.15),
     sf (>= 1.0-14),
     tidyr,
     dplyr (>= 1.0.0),
