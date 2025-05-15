@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-11</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@ the <code><a href="../reference/aes_lst.html">aes_lst()</a></code> function.</p>
 <span>               control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_1a.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_1a.jpg" style="width:95.0%"></p>
 <p>Here, SSM-predicted locations are coloured by the estimated move
 persistence index
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>γ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\gamma_t</annotation></semantics></math>).
@@ -150,7 +150,7 @@ layers returned by <code><a href="https://rdrr.io/pkg/rosm/man/deprecated.html" 
 <code>zoom</code> and <code>progress</code> are used here.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, map_type <span class="op">=</span> <span class="st">"cartodark"</span>, zoom <span class="op">=</span> <span class="fl">4</span>, progress <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_1b.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_1b.jpg" style="width:95.0%"></p>
 </div>
 <div class="section level4">
 <h4 id="control-track-components">Control track components<a class="anchor" aria-label="anchor" href="#control-track-components"></a>
@@ -163,7 +163,7 @@ on and the move persistence index has been turned off.</p>
 <code class="sourceCode R"><span><span class="va">my.aes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>obs<span class="op">=</span><span class="cn">TRUE</span>, line<span class="op">=</span><span class="cn">TRUE</span>, mp<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, aes <span class="op">=</span> <span class="va">my.aes</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_2.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_2.jpg" style="width:95.0%"></p>
 <p>Note that when turning off the move persistence index, tracks are
 automatically given unique colours. This can be turned off by using
 <code>by.id = FALSE</code>.</p>
@@ -184,7 +184,7 @@ so all tracks are displayed in a unique colour (default is
 <span>    what <span class="op">=</span> <span class="st">"p"</span>, </span>
 <span>    aes <span class="op">=</span> <span class="va">my.aes</span>, </span>
 <span>    by.id <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_3.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_3.jpg" style="width:95.0%"></p>
 <p>Alternatively, we can colour estimated locations by their date to
 better see how tracks evolve over time.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -193,7 +193,7 @@ better see how tracks evolve over time.</p>
 <span>    aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp<span class="op">=</span><span class="cn">FALSE</span>, conf<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>, </span>
 <span>    by.date <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>    by.id<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_4.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_4.jpg" style="width:95.0%"></p>
 <p>If you don’t like the default colour palettes, these can be changed
 by modifying the default <code>aes</code> object. Here, the
 <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors()</a></code> function is used to specify a new colour
@@ -205,13 +205,13 @@ palette for displaying date-along-track.</p>
 <span>                  conf<span class="op">=</span><span class="cn">FALSE</span>, </span>
 <span>                  date_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, <span class="st">"Plasma"</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    by.date <span class="op">=</span> <span class="cn">TRUE</span>, by.id<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_5.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_5.jpg" style="width:95.0%"></p>
 <p>And similarly for displaying move persistence.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, </span>
 <span>    what <span class="op">=</span> <span class="st">"p"</span>, </span>
 <span>    aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, <span class="st">"RdBu"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_6.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_6.jpg" style="width:95.0%"></p>
 </div>
 <div class="section level4">
 <h4 id="change-projection">Change projection<a class="anchor" aria-label="anchor" href="#change-projection"></a>
@@ -228,7 +228,7 @@ centered on 68<sup>o</sup> East, Iles Kerguelen.</p>
 <span>    what <span class="op">=</span> <span class="st">"p"</span>, </span>
 <span>    aes <span class="op">=</span> <span class="fu"><a href="../reference/aes_lst.html">aes_lst</a></span><span class="op">(</span>mp_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, <span class="st">"RdBu"</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    crs <span class="op">=</span> <span class="st">"+proj=stere +lon_0=68 +datum=WGS84 +units=km"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmapping%2Fmap_7.jpg" style="width:95.0%"></p>
+<p><img src="images/mapping/map_7.jpg" style="width:95.0%"></p>
 </div>
 </div>
   </div>
@@ -248,7 +248,7 @@ centered on 68<sup>o</sup> East, Iles Kerguelen.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer>

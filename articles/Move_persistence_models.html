@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-11</span>
       </span>
     </div>
 
@@ -130,10 +130,10 @@ the estimation of move persistence. This can potentially result in
 estimates of move persistence that are biased.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fmp</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmove_persistence%2Ffmp_plot.jpg" style="width:95.0%"></p>
+<p><img src="images/move_persistence/fmp_plot.jpg" style="width:95.0%"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">fmp</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmove_persistence%2Ffmp_map.jpg" style="width:95.0%"></p>
+<p><img src="images/move_persistence/fmp_map.jpg" style="width:95.0%"></p>
 <p><code>aniMotum</code> now provides a move persistence model in
 state-space form to allow simultaneous estimation of move persistence
 and location states, and this is invoked via <code><a href="../reference/fit_ssm.html">fit_ssm()</a></code> by
@@ -154,7 +154,7 @@ smoothed away that variability by fitting to SSM-smoothed location
 estimates as in the above example.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">3</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmove_persistence%2Fmp_plot.jpg" style="width:95.0%"></p>
+<p><img src="images/move_persistence/mp_plot.jpg" style="width:95.0%"></p>
 <p>Here, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> extracts move persistence estimates as
 either fitted (corresponding to observation times) or predicted
 (corresponding to regular time intervals) values using
@@ -178,7 +178,7 @@ the map using <code>fit_mpm</code> estimates, but there are subtle
 differences apparent.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map.html">map</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"p"</span>, normalise <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fmove_persistence%2Fmp_map.jpg" style="width:95.0%"></p>
+<p><img src="images/move_persistence/mp_map.jpg" style="width:95.0%"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -196,7 +196,7 @@ differences apparent.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer>

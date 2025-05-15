@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-11</span>
       </span>
     </div>
 
@@ -113,10 +113,10 @@ on model fit objects:</p>
 <span>                  control <span class="op">=</span> <span class="fu"><a href="../reference/ssm_control.html">ssm_control</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"fitted"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fssm_validation%2Ffit_rw_f.jpeg" style="width:98.0%"></p>
+<p><img src="images/ssm_validation/fit_rw_f.jpeg" style="width:98.0%"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, what <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fssm_validation%2Ffit_rw_p.jpeg" style="width:98.0%"></p>
+<p><img src="images/ssm_validation/fit_rw_p.jpeg" style="width:98.0%"></p>
 <p>Both fitted and predicted locations (gold) can be plotted as 1-D
 time-series on top of the observations (blue) to visually detect any
 lack of fit. Observations that failed to pass the <code>prefilter</code>
@@ -132,7 +132,7 @@ gaps.</p>
 <code>type</code> argument:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.rw</span>, <span class="st">"p"</span>, type <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fssm_validation%2Ffit_rw_track.jpeg" style="width:98.0%"></p>
+<p><img src="images/ssm_validation/fit_rw_track.jpeg" style="width:98.0%"></p>
 <p>This option provides an intuitive view of the estimated track (gold)
 through the observations (blue), along with a 2-dimensional
 representation of the location uncertainty (pale gold 95% confidence
@@ -155,7 +155,7 @@ plots, Q-Q plots, or autocorrelation functions:</p>
 <span></span>
 <span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> </span>
 <span>  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.rw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fssm_validation%2Fosar_rw_plots.jpg" style="width:98.0%"></p>
+<p><img src="images/ssm_validation/osar_rw_plots.jpg" style="width:98.0%"></p>
 <p>Here, the 3 residual plots highlight a poor fit of the
 <code>rw</code> SSM to the x-coordinate. The time-series residual plot
 implies a bias in the <code>rw</code> SSM fit over the latter half of
@@ -176,7 +176,7 @@ coordinates.</p>
 <span></span>
 <span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"ts"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> </span>
 <span>  <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res.crw</span>, type <span class="op">=</span> <span class="st">"acf"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_spacer.html" class="external-link">plot_spacer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Fssm_validation%2Fosar_crw_plots.jpg" style="width:98.0%"> Additionally, the <code>crw</code> model fit has
+<p><img src="images/ssm_validation/osar_crw_plots.jpg" style="width:98.0%"> Additionally, the <code>crw</code> model fit has
 a lower AIC<sub>c</sub> than the <code>rw</code> model. Note that AIC
 statistics can be misleading for time-series models and should not be
 used as the sole criterion for preferring one model fit over another.
@@ -219,7 +219,7 @@ a useful guide for diagnosing model fits (Hartig, 2022).</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer>

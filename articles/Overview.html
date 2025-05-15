@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aniMotum</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-11</span>
       </span>
     </div>
 
@@ -263,11 +263,11 @@ locations. The input data format is the same as for Argos LS data, but
 the <code>lc</code> class is set to <code>G</code> for all GPS
 locations:</p>
 <pre><code><span><span class="co">#&gt;         id                date lc  lon   lat</span></span>
-<span><span class="co">#&gt; 1 F02-B-17 2025-03-28 14:32:01  G 70.1 -49.2</span></span>
-<span><span class="co">#&gt; 2 F02-B-17 2025-03-28 15:32:01  G 70.6 -48.2</span></span>
-<span><span class="co">#&gt; 3 F02-B-17 2025-03-28 16:32:01  G 71.1 -47.2</span></span>
-<span><span class="co">#&gt; 4 F02-B-17 2025-03-28 17:32:01  G 71.6 -46.2</span></span>
-<span><span class="co">#&gt; 5 F02-B-17 2025-03-28 18:32:01  G 72.1 -45.2</span></span></code></pre>
+<span><span class="co">#&gt; 1 F02-B-17 2025-05-15 00:37:58  G 70.1 -49.2</span></span>
+<span><span class="co">#&gt; 2 F02-B-17 2025-05-15 01:37:58  G 70.6 -48.2</span></span>
+<span><span class="co">#&gt; 3 F02-B-17 2025-05-15 02:37:58  G 71.1 -47.2</span></span>
+<span><span class="co">#&gt; 4 F02-B-17 2025-05-15 03:37:58  G 71.6 -46.2</span></span>
+<span><span class="co">#&gt; 5 F02-B-17 2025-05-15 04:37:58  G 72.1 -45.2</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="light-level-geolocation-data">Light-level geolocation data<a class="anchor" aria-label="anchor" href="#light-level-geolocation-data"></a>
@@ -278,11 +278,11 @@ geolocation data, when they include longitude and latitude error SD’s
 case, the <code>lc</code> class is set to <code>GL</code> for all
 geolocation observations:</p>
 <pre><code><span><span class="co">#&gt;      id                date lc   lon lat    lonerr     laterr</span></span>
-<span><span class="co">#&gt; 1 54632 2025-03-28 14:32:01 GL 100.0 -55 1.1857219 1.27832424</span></span>
-<span><span class="co">#&gt; 2 54632 2025-03-29 02:32:01 GL 100.5 -54 0.3343330 0.69864596</span></span>
-<span><span class="co">#&gt; 3 54632 2025-03-29 14:32:01 GL 101.0 -53 0.1007609 0.81756453</span></span>
-<span><span class="co">#&gt; 4 54632 2025-03-30 02:32:01 GL 101.5 -52 0.8219809 0.03560142</span></span>
-<span><span class="co">#&gt; 5 54632 2025-03-30 14:32:01 GL 102.0 -51 2.5876548 1.46203516</span></span></code></pre>
+<span><span class="co">#&gt; 1 54632 2025-05-15 00:37:58 GL 100.0 -55 1.1857219 1.27832424</span></span>
+<span><span class="co">#&gt; 2 54632 2025-05-15 12:37:58 GL 100.5 -54 0.3343330 0.69864596</span></span>
+<span><span class="co">#&gt; 3 54632 2025-05-16 00:37:58 GL 101.0 -53 0.1007609 0.81756453</span></span>
+<span><span class="co">#&gt; 4 54632 2025-05-16 12:37:58 GL 101.5 -52 0.8219809 0.03560142</span></span>
+<span><span class="co">#&gt; 5 54632 2025-05-17 00:37:58 GL 102.0 -51 2.5876548 1.46203516</span></span></code></pre>
 <p>We caution users, that light-level geolocation errors can be (highly)
 non-Gaussian, depending on the species, tag technology, and algorithm
 used to estimate location from the light-level data. For example, we
@@ -650,7 +650,7 @@ allows a quick visual of the SSM fit to the data:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot time-series of the fitted values</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"fitted"</span>, type <span class="op">=</span> <span class="fl">1</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Foverview%2Ffit_plot1.jpg" style="width:95.0%"> Here,
+<p><img src="images/overview/fit_plot1.jpg" style="width:95.0%"> Here,
 the fitted values (state estimates corresponding to the time of each
 observation; orange points) are plotted on top of the observations that
 passed the <code>prefilter</code> stage (blue points and blue rug at
@@ -664,7 +664,7 @@ at bottom).</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot fitted values as a 2-d track</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, what <span class="op">=</span> <span class="st">"predicted"</span>, type <span class="op">=</span> <span class="fl">2</span>, pages <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images%2Foverview%2Ffit_plot2.jpg" style="width:95.0%"> The
+<p><img src="images/overview/fit_plot2.jpg" style="width:95.0%"> The
 predicted values (orange points) are the state estimates predicted at
 regular time intervals, specified by <code>time.step</code> (here a 24 h
 interval). 95 % confidence ellipses (orange-filled ellipses) around the
@@ -710,7 +710,7 @@ animal-borne tags. Movement Ecology 8:31.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer>
