@@ -38,7 +38,7 @@ pf_sf_project <- function(x) {
       coords <- c("x", "y")
       sf_locs <- st_as_sf(x, coords = coords, 
                           crs = st_crs("+proj=merc +units=m +datum=WGS84 +no_defs"))
-      prj <- st_crs(sf_locs)$input
+      prj <- st_crs(sf_locs)$proj4string
       sf_locs <- st_transform(sf_locs, sub("units=m", "units=km", prj, fixed = TRUE))
     }
     
@@ -48,7 +48,7 @@ pf_sf_project <- function(x) {
     if(st_is_longlat(x)) {
       prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
     } else {
-      prj <- st_crs(x)$input  
+      prj <- st_crs(x)$proj4string  
     }
   
     # if data CRS units are m then change to km, otherwise optimiser may choke
