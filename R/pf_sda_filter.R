@@ -96,7 +96,7 @@ if (spdf) {
                        }
   } else if (filt == "spd") {
     tmp <-
-      suppressWarnings(try(speedfilter(x.tr, max.speed = vmax * 3.6),
+      suppressWarnings(try(speedfilter(trip.dat, max.speed = vmax * 3.6),
                            silent = TRUE))
     
     if (inherits(tmp, "try-error")) {

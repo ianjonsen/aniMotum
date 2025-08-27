@@ -10,9 +10,9 @@
 [![aniMotum status
 badge](https://ianjonsen.r-universe.dev/badges/aniMotum)](https://ianjonsen.r-universe.dev)
 [![Coverage
-status](https://codecov.io/gh/ianjonsen/aniMotum/branch/master/graph/badge.svg)](https://codecov.io/github/ianjonsen/aniMotum?branch=master)
+status](https://codecov.io/gh/ianjonsen/aniMotum/branch/main/graph/badge.svg)](https://codecov.io/github/ianjonsen/aniMotum?branch=main)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7425388.svg)](https://doi.org/10.5281/zenodo.7425388)
-![R-CMD-check](https://github.com/ianjonsen/aniMotum/actions/workflows/check-full.yaml/badge.svg?branch=master)
+![R-CMD-check](https://github.com/ianjonsen/aniMotum/actions/workflows/check-full.yaml/badge.svg?branch=main)
 <!-- badges: end -->
 
 `{aniMotum}` is an R package that fits continuous-time models in
@@ -135,16 +135,25 @@ tools and libraries installed.
 On PC’s running Windows, ensure you have installed
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-On Mac’s, ensure you have installed the Command Line Tools for Xcode by
-executing `xcode-select --install` in the terminal; or you can download
-the latest version from the URL (free developer registration may be
-required). A full Xcode install uses up a lot of disk space and is not
-required. Also, ensure you have a suitable Gnu Fortran compiler
-installed. The easiest install option is to download a compiled version
-from here <https://github.com/fxcoudert/gfortran-for-macOS/releases>.
-
-Just make sure you choose the version that matches your MacOS and
-processor (Intel vs Arm 64).
+\<\<\<\<\<\<\< HEAD On Mac’s, ensure you have installed the Command Line
+Tools for Xcode by executing `xcode-select --install` in the terminal;
+or you can download the latest version from the URL (free developer
+registration may be required). A full Xcode install uses up a lot of
+disk space and is not required. Also, ensure you have a suitable Gnu
+Fortran compiler installed. The easiest install option is to download a
+compiled version from here
+<https://github.com/fxcoudert/gfortran-for-macOS/releases>. Just makes
+sure you choose the version that matches your MacOS and processor (Intel
+vs Arm 64). ======= On Mac’s, ensure you have installed the Command Line
+Tools for Xcode by executing `xcode-select --install` in the terminal;
+or you can download the latest version from the URL (free developer
+registration may be required). A full Xcode install uses up a lot of
+disk space and is not required. Also, ensure you have a suitable Gnu
+Fortran compiler installed. The easiest install option is to download a
+compiled version from here
+<https://github.com/fxcoudert/gfortran-for-macOS/releases>. Just make
+sure you choose the version that matches your MacOS and processor (Intel
+vs Arm 64). \>\>\>\>\>\>\> staging
 
 ``` r
 remotes::install_github("ianjonsen/aniMotum")
@@ -188,9 +197,6 @@ map(fit,
     what = "predicted", 
     crs = "+proj=stere +lon_0=68 +units=km +datum=WGS84")
 ```
-
-    #> Warning: Package `magick` is required to draw images. Image not drawn.
-    #> Warning: Package `magick` is required to draw images. Image not drawn.
 
 <img src="man/figures/README-explots2-1.png" width="100%" />
 

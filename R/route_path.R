@@ -149,7 +149,10 @@ route_path <-
           st_make_valid()
         
       } else {
-        world_mc <- barrier
+        
+        world_mc <- barrier |>
+          st_transform(crs = st_crs(df_sf))
+        
       }
       
       if(inherits(x, "sim_fit")) {
@@ -321,7 +324,7 @@ route_path <-
             tibble()
           } else {
             if (!inherits(x, "try-error")) {
-              pathroutr::prt_reroute(x, land_region, vis_graph)
+              pathroutr::prt_reroute(x, land_region, vis_graph, blend = FALSE)
             }
           }
         })
