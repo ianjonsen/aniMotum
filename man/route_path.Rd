@@ -8,7 +8,7 @@ route_path(
   x,
   what = c("fitted", "predicted"),
   map_scale = 50,
-  dist = 50000,
+  dist = 2000,
   append = TRUE,
   barrier = NULL,
   ...

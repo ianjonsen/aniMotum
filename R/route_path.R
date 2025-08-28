@@ -131,13 +131,15 @@ route_path <-
         #   st_transform(crs = ifelse(is.null(barrier), 3857, st_crs(barrier)$input))
         
       } else if (inherits(x, "sim_fit")) {
+        prj <- attributes(x)$prj
+        
         # unnest aniMotum sim_fit object
         df <- x %>% unnest(cols = c(sims))
         
         # this should be trimmed to reduce computation time
         # base the trimming on the trs data
          df_sf <- df %>% 
-           st_as_sf(coords = c("lon", "lat"), crs = 4326) 
+           st_as_sf(coords = c("x", "y"), crs = prj) 
         
       }
       
@@ -160,11 +162,12 @@ route_path <-
           st_transform(crs = st_crs(world_mc))
       }
       
-      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) %>% 
-                                        st_union() %>% 
-                                        st_convex_hull() %>% 
-                                        st_intersection(world_mc) %>% 
-                                        st_collection_extract('POLYGON') %>% 
+      land_region <- suppressWarnings(st_buffer(df_sf, dist = dist) |> 
+                                        st_union() |> 
+                                        st_make_valid() |>
+                                        st_convex_hull() |> 
+                                        st_intersection(world_mc) |> 
+                                        st_collection_extract('POLYGON') |> 
                                         st_sf())
       
       ### if none of the tracks have any points on land, land_region will have no rows in it.
@@ -338,10 +341,10 @@ route_path <-
         # pull the corrected points from the object and reformat for aniMotum
         df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
           if(!is.null(x)) {
-            st_transform(x, crs = 4326) %>%
-              mutate(lon = st_coordinates(.)[,1],
-                     lat = st_coordinates(.)[,2]) %>%
-              st_drop_geometry() %>%
+            x %>%
+              mutate(x = st_coordinates(.)[,1],
+                     y = st_coordinates(.)[,2]) |>
+              st_drop_geometry() |>
               select(model, date, lon, lat, x, y)
           }
         }) 

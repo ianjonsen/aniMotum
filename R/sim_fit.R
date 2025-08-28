@@ -93,17 +93,22 @@ sim_fit <-
   if(any(sapply(x$ssm, function(m) m$pm) == "mp"))
     stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
   
+  ## get crs from ssm_df object (must assume all crs are the same if multiple fit objects exist)
+  prj.fit <- grab(x, what, as_sf = TRUE) |>
+    st_crs()
+  prj.sim <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+
   if(!is.null(start)) {
     start <- data.frame(lon = start[1], lat = start[2])
     st1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
-      st_transform(crs = "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs") |>
+      st_transform(crs = prj.sim) |>
       st_coordinates() 
     names(st1) <- c("x","y")
   }
   if(!is.null(end)) {
     end <- data.frame(lon = end[1], lat = end[2])
     ed1 <- st_as_sf(end, coords = c("lon","lat"), crs = 4326) |>
-      st_transform(crs = "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs") |>
+      st_transform(crs = prj.sim) |>
       st_coordinates()
     names(ed1) <- c("x","y")
   }
@@ -140,6 +145,19 @@ sim_fit <-
   n <- nrow(x)
   d <- lapply(1:n, function(k) {
     model <- x$ssm[[k]]$pm
+    ## transform location projection if req'd
+    if(prj.fit[[1]] != prj.sim) {
+      switch(what, 
+             fitted = {
+               x$ssm[[k]]$fitted <- x$ssm[[k]]$fitted |>
+                 st_transform(crs = prj.sim)
+               }, 
+             predicted = {
+               x$ssm[[k]]$fitted <- x$ssm[[k]]$fitted |>
+                 st_transform(crs = prj.sim)
+             })
+    }
+    ## extract locations
     switch(what,
            fitted = {
              loc <- grab(x[k,], "fitted", as_sf = FALSE)
@@ -323,6 +341,7 @@ sim_fit <-
          })
 
   class(d) <- append("sim_fit", class(d))
+  attr(d, "prj") <- prj.sim
   
   return(d)
 }

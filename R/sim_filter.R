@@ -137,6 +137,7 @@ sim_filter <- function(trs,
   }
   
   class(trs_filt) <- append(class(trs)[1:2], class(trs_filt))
+  attr(trs_filt, "prj") <- attr(trs, "prj")
   
   return(trs_filt) 
 }
