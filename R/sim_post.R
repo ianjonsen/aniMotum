@@ -1,3 +1,15 @@
+## Taken from RTMB:::rgmrf0
+# Sampling from mean zero multivariate Gaussian using sparse precision matrix Q.
+# This is much more efficient if precision in sparse but Covariance is dense.
+rgmrf0 <- function (n, Q) 
+{
+  L <- Matrix::Cholesky(Q, super = TRUE, LDL = FALSE)
+  u <- matrix(stats::rnorm(ncol(L) * n), ncol(L), n)
+  u <- Matrix::solve(L, u, system = "Lt")
+  u <- Matrix::solve(L, u, system = "Pt")
+  as.matrix(u)
+}
+
 ##' @title simulate from the posterior of a \code{ssm} fit.
 ##'
 ##' @description simulates track locations from the joint precision matrix of a 
@@ -47,22 +59,38 @@ sim_post <- function(x,
   
     ## re-gen sdreport w jnt prec matrix
     sdp <- sdreport(x$ssm[[k]]$tmb, getJointPrecision = TRUE)
-  
+    
     ## get random parameters & subset to just locations
     reMu <- sdp$par.random
     reMu <- reMu[names(reMu) %in% X]
-
+    
+    # Not inverting full precision and sampling using rmvnorm on margin
+    # but sampling full parameter vector (including fixed effects) using
+    # RTMB:::rgmrf0 (which is efficient when precision is sparse) and then only keeping the desired margin
+    
+    jp <- sdp$jointPrecision # keeping this sparse
+    
+    # directly sample using sparse joint precision
+    samples <- rgmrf0(reps, jp) # no mean
+    sel <- rownames(jp) %in% X # selector variable
+    
+    # initialise with posterior mode
+    rtracks <- matrix(rep(reMu, reps), nrow = reps, ncol = length(reMu), byrow = TRUE)
+    
+    # add random sampled deviations (only desired margin using sel)
+    rtracks <- rtracks + t(samples[sel, , drop = FALSE])
+    
     ## use full joint prec matrix
-    jp <- as.matrix(sdp$jointPrecision)
-    muCov <- solve(jp) ## matrix inverse, 1/prec = varcov
+    # jp <- as.matrix(sdp$jointPrecision)
+    # muCov <- solve(jp) ## matrix inverse, 1/prec = varcov
     ## subset to just the location covars after inversion
-    muCov <- muCov[rownames(muCov) %in% X, colnames(muCov) %in% X]
+    # muCov <- muCov[rownames(muCov) %in% X, colnames(muCov) %in% X]
     
     # simulate
-    rtracks <- mvtnorm::rmvnorm(reps,
-                                mean = reMu,
-                                sigma = muCov,
-                                checkSymmetry = FALSE)
+    # rtracks <- mvtnorm::rmvnorm(reps,
+    #                             mean = reMu,
+    #                             sigma = muCov,
+    #                             checkSymmetry = FALSE)
     
     ## what are we simulating? fitted or predicted locations?
     ## use obs index to subset simulated locs - do after sim so

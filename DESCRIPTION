@@ -44,7 +44,9 @@ Imports:
     rnaturalearth,
     traipse,
     terra,
-    trip (>= 1.10.0)
+    trip (>= 1.10.0),
+    Matrix,
+    stats
 LinkingTo: TMB, RcppEigen
 Suggests: 
     testthat,
