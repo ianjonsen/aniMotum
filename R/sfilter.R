@@ -300,6 +300,28 @@ sfilter <-
       GLerr = cbind(d.all$x.sd, d.all$y.sd)
     )
     
+    if (model == "crw") {
+      ## Construct gap_flag: 1 where a time step exceeds the gap threshold,
+      ## 0 elsewhere. Length matches dt so indexing in the C++ loop is consistent.
+      ## Element 0 (R index 1) is never used by the process loop (which starts at
+      ## i=1 in C++) but is set to 0 for safety.
+      ##
+      ## The i=1 edge case (long gap immediately after the initial state) is handled
+      ## automatically: if dt[2] > gap.thresh then gap_flag[2] = 1L, and the C++
+      ## code uses the marginal velocity distribution at that transition, preventing
+      ## the tightly-pinned initial velocity in state0 from persisting into the gap.
+      
+      gap.thresh <- control$gap.thresh  # from ssm_control(); Inf by default
+      
+      gap_flag <- integer(length(dt))   # initialise all zeros, same length as dt
+      if (is.finite(gap.thresh)) {
+        gap_flag[dt > gap.thresh] <- 1L
+      }
+      
+      ## Add to TMB data list
+      data$gap_flag <- gap_flag
+    }
+    
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)

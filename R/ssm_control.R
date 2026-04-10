@@ -24,6 +24,9 @@
 ##' 1 = parameter trace (default); 2 = optimizer trace
 ##' @param se logical; should standard errors for speed estimates be calculated (default = FALSE). 
 ##' Turning this on will slow down computation time but provide SE's for speed-along-track calculations
+##' @param gap.thresh gap threshold in same units as dt (e.g. hours); transitions 
+##' where dt > gap.thresh have velocity innovation reset to marginal (suppresses looping).
+##' Inf = no gap flagging (default; preserves existing behaviour)
 ##' @param ... control parameters for the chosen optimizer
 ##' @return Returns a list with components
 ##'   \item{\code{optim}}{the name of the numerical optimizer as a
@@ -52,6 +55,7 @@ ssm_control <-
            upper = NULL,
            verbose = 1,
            se = FALSE,
+           gap.thresh = Inf,
            ...) {
     optim <- match.arg(optim)
     method <- match.arg(method)
@@ -98,5 +102,6 @@ ssm_control <-
          upper = upper,
          verbose = verbose,
          se = se,
+         gap.thresh = gap.thresh,
          control = pars)
   }

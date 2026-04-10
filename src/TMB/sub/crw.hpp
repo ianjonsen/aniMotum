@@ -23,6 +23,7 @@ Type crw(objective_function<Type>* obj) {
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   DATA_SCALAR(se);                  // turn delta method on/off for sv (speeds up model fitting if SE's not req'd & this allows param SE's to be calculated regardless)
+  DATA_IVECTOR(gap_flag);           // 1 = long data gap precedes this time step; velocity innovation uses marginal rather than conditional distribution
   
   // for KF observation model
   DATA_VECTOR(m);                 //  m is the semi-minor axis length
@@ -72,6 +73,10 @@ Type crw(objective_function<Type>* obj) {
   cov(3,2) = cov(2,3);
     
   // loop over 2 coords and update nll of start location and velocities.
+  // Note: initial velocity is pinned to state0 with tiny variance. If the
+  // track begins with a long gap (gap_flag(1) == 1), the velocity innovation
+  // at i=1 uses the marginal distribution, so this initial velocity does not
+  // persist into the gap - this case is handled automatically below.
   for(int i = 0; i < Y.rows(); i++) {
     jnll -= dnorm(mu(i,0), state0(i), tiny, true);
     jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
@@ -96,8 +101,13 @@ Type crw(objective_function<Type>* obj) {
     x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
       
     // velocity innovations
-    x_t(2) = (v(0,i) - v(0,i-1)); // /dt(i);
-    x_t(3) = (v(1,i) - v(1,i-1)); // /dt(i);
+    // For normal steps: v[i] - v[i-1], conditioning on previous velocity (directional persistence)
+    // For long gaps (gap_flag == 1): v[i] alone, drawn from marginal N(0, 2*D*dt[i]),
+    //   breaking directional persistence across the gap and suppressing looping artefacts.
+    //   This also correctly handles the i=1 case when the track begins with a long gap,
+    //   preventing the tightly-pinned initial velocity in state0 from persisting into the gap.
+    x_t(2) = gap_flag(i) ? v(0,i) : (v(0,i) - v(0,i-1));
+    x_t(3) = gap_flag(i) ? v(1,i) : (v(1,i) - v(1,i-1));
     
     nll_proc.setSigma(cov);   // set up ith cov matrix
     jnll += nll_proc(x_t);    // Process likelihood
