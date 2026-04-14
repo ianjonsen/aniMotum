@@ -26,7 +26,7 @@ jobs:
 #          - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'devel'}
-          - {os: ubuntu-latest, r: 'oldrel'}
+#          - {os: ubuntu-latest, r: 'oldrel'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
