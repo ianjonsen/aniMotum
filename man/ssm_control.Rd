@@ -12,6 +12,7 @@ ssm_control(
   verbose = 1,
   se = FALSE,
   gap.thresh = Inf,
+  ho_scale = 0.01,
   ...
 )
 }
@@ -37,9 +38,12 @@ defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are 
 \item{se}{logical; should standard errors for speed estimates be calculated (default = FALSE).
 Turning this on will slow down computation time but provide SE's for speed-along-track calculations}
 
-\item{gap.thresh}{gap threshold in same units as dt (e.g. hours); transitions
-where dt > gap.thresh have velocity innovation reset to marginal (suppresses looping).
-Inf = no gap flagging (default; preserves existing behaviour)}
+\item{gap.thresh}{gap threshold in hours; transitions where dt > gap.thresh
+have velocity innovation reset to marginal (suppresses looping). Inf = no gap
+flagging (default).}
+
+\item{ho_scale}{haulout process variance scale factor (0, 1];
+0.01 = nearly stationary; 1 = no constraint}
 
 \item{...}{control parameters for the chosen optimizer}
 }

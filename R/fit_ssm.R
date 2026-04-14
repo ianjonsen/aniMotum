@@ -182,6 +182,16 @@ fit_ssm <- function(x,
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = dots$lpsi)
   }
+
+  ## Extract ho lookup BEFORE format_data() or prefilter() touch the data.
+  ## Store as a plain data.frame keyed on id + date so it can be joined back
+  ## inside sfilter()/mpfilter() onto d.all after the prediction grid is built.
+  if ("ho" %in% names(x)) {
+    ho_lookup <- as.data.frame(x)[, c("id", "date", "ho")]
+    ho_lookup$date <- as.POSIXct(ho_lookup$date, tz = "UTC")
+  } else {
+    ho_lookup <- NULL
+  }
   
   ## ensure data is in expected format
   if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
@@ -220,7 +230,8 @@ fit_ssm <- function(x,
                         map = map,
                         fit.to.subset = fit.to.subset,
                         control = control,
-                        inner.control = inner.control
+                        inner.control = inner.control,
+                        ho_lookup = ho_lookup
                       )
                     })
       
@@ -235,7 +246,8 @@ fit_ssm <- function(x,
                         map = map,
                         fit.to.subset = fit.to.subset,
                         control = control,
-                        inner.control = inner.control
+                        inner.control = inner.control,
+                        ho_lookup = ho_lookup
                       )
                     })
       

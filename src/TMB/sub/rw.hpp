@@ -18,6 +18,19 @@ Type rw(objective_function<Type>* obj) {
   DATA_IVECTOR(isd);                //  indexes observations (1) vs. interpolation points (0)
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
+  DATA_IVECTOR(gap_flag);           //  1 = long data gap precedes this time step.
+                                    //  Declared for API consistency with crw and mp models.
+                                    //  In the RW, gaps are already expressed through the dt^2
+                                    //  variance scaling -- there is no directional persistence
+                                    //  to suppress -- so gap_flag is a structural no-op here.
+  DATA_IVECTOR(ho_flag);            //  1 = haulout: scale process variance by ho_scale to keep
+                                    //  location estimates nearly stationary. gap_flag takes
+                                    //  precedence (ho_flag is cleared wherever gap_flag is set
+                                    //  on the R side before reaching this template).
+  DATA_SCALAR(ho_scale);            //  variance scale factor during haulout (0, 1].
+                                    //  Small values (e.g. 0.01) make the process nearly
+                                    //  stationary regardless of observation precision or density.
+                                    //  Supplied via ssm_control(ho_scale = ...).
   
   // for KF observation model
   DATA_VECTOR(m);                 //  m is the semi-minor axis length
@@ -32,7 +45,7 @@ Type rw(objective_function<Type>* obj) {
   // for RW
   PARAMETER_VECTOR(l_sigma);    //  Innovation variance (link scale)
   PARAMETER(l_rho_p);           //  Innovation correlation (link scale)
-  PARAMETER_ARRAY(X);          //  Predicted locations TP - length(X) should be same as length(dt) - i.e. both interp & obs pos.
+  PARAMETER_ARRAY(X);           //  Predicted locations - length(X) same as length(dt)
   
   // OBSERVATION PARAMETERS
   // for KF OBS MODEL
@@ -53,7 +66,7 @@ Type rw(objective_function<Type>* obj) {
   
   // 2 x 2 covariance matrix for innovations
   matrix<Type> cov(2, 2);
-  matrix<Type> cov_dt(2, 2);            // tmp matrix for dt * cov calcs withn process loop
+  matrix<Type> cov_dt(2, 2);
     
   cov(0, 0) = sigma(0) * sigma(0);
   cov(0, 1) = rho_p * sigma(0) * sigma(1);
@@ -62,9 +75,34 @@ Type rw(objective_function<Type>* obj) {
     
   MVNORM_t<Type> nll_proc(cov);
     
+  // ---------------------------------------------------------------------------
   // RW PROCESS MODEL
+  //
+  // Two cases:
+  //
+  //  ho_flag(i) == 1  [haulout]
+  //    Scale cov_dt by ho_scale to keep estimated locations nearly stationary.
+  //    For GPS / dense data the tight observations already anchor locations, but
+  //    for Argos / sparse data the tightened variance prevents location drift
+  //    during haulout regardless of observation quality.
+  //    gap_flag takes precedence over ho_flag: a haulout period long enough to
+  //    exceed gap.thresh is treated as a normal gap (large variance, free drift)
+  //    rather than a tightly-constrained period. This priority is enforced on
+  //    the R side (ho_flag cleared where gap_flag is set) so no explicit check
+  //    is needed here.
+  //
+  //  normal step (including gap_flag steps)
+  //    Standard dt^2 scaled variance. gap_flag is a no-op in the RW: long
+  //    gaps are already expressed through the large dt, inflating variance
+  //    naturally without any additional mechanism.
+  // ---------------------------------------------------------------------------
+
   for(int i = 1; i < dt.size(); i++) {
-    cov_dt = dt(i) * dt(i) * cov;
+    if(ho_flag(i) == 1) {
+      cov_dt = ho_scale * dt(i) * dt(i) * cov;
+    } else {
+      cov_dt = dt(i) * dt(i) * cov;
+    }
     nll_proc.setSigma(cov_dt);
     jnll += nll_proc(X.col(i) - X.col(i - 1));
   }
@@ -137,4 +175,3 @@ Type rw(objective_function<Type>* obj) {
 #define TMB_OBJECTIVE_PTR this
 
 #endif
-

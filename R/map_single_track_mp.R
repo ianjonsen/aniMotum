@@ -126,14 +126,28 @@ map_single_track_mp <- function(map_type,
   if (all(aes$est, aes$mp)) {
     p <- p +
       geom_sf(
-        data = loc_sf |> dplyr::filter(g > 0.5),
+        data = loc_sf |> dplyr::filter(g > 0.75),
         aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.2,
         shape = aes$df$shape[1]
       ) +
       geom_sf(
-        data = loc_sf |> dplyr::filter(g <= 0.5),
+        data = loc_sf |> dplyr::filter(g > 0.33 & g <= 0.75),
+        aes(colour = g),
+        size = aes$df$size[1],
+        stroke = 0.2,
+        shape = aes$df$shape[1]
+      ) +
+      geom_sf(
+        data = loc_sf |> dplyr::filter(g > 0.15 & g <= 0.33),
+        aes(colour = g),
+        size = aes$df$size[1],
+        stroke = 0.2,
+        shape = aes$df$shape[1]
+      ) +
+      geom_sf(
+        data = loc_sf |> dplyr::filter(g <= 0.15),
         aes(colour = g),
         size = aes$df$size[1],
         stroke = 0.2,
@@ -142,7 +156,8 @@ map_single_track_mp <- function(map_type,
       scale_colour_gradientn(
         colours = aes$mp_pal,
         name = expression(gamma[t]),
-        limits = c(0, 1)
+        limits = c(0, 1),
+        na.value = grey(0.5)
       )
   } else if(aes$est & !aes$mp) {
     p <- p +

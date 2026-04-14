@@ -400,7 +400,8 @@ plot.ssm_df <-
             scale_colour_gradientn(
               colours = hcl.colors(n = 100, palette = pal),
               limits = c(0,1),
-              name = expression(gamma[t])
+              name = expression(gamma[t]),
+              na.value = grey(0.5)
             ) +
             labs(title = paste("id:", x[i, "id"]))
           
@@ -429,7 +430,7 @@ plot.ssm_df <-
                     "g" %in% names(ssm))
         ssm.lst <- split(ssm, ssm$id)
         p <- lapply(1:nrow(x), function(i) {
-          g.33 <- subset(ssm.lst[[i]], g <= quantile(ssm.lst[[i]]$g, 0.33))
+          g.33 <- subset(ssm.lst[[i]], g <= quantile(ssm.lst[[i]]$g, 0.33, na.rm = TRUE))
           m <- ggplot() +
             geom_path(
               data = ssm.lst[[i]],
@@ -451,7 +452,8 @@ plot.ssm_df <-
             scale_colour_gradientn(
               colours = hcl.colors(n=100, palette = pal),
               limits = c(0,1),
-              name = expression(gamma[t])
+              name = expression(gamma[t]),
+              na.value = grey(0.5)
               ) +
             labs(title = paste("id:", x[i, "id"])) +
             coord_fixed()

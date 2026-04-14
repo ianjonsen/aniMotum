@@ -23,8 +23,10 @@ Type crw(objective_function<Type>* obj) {
   DATA_IVECTOR(obs_mod);            //  indicates which obs error model to be used
   DATA_ARRAY_INDICATOR(keep, Y);    // for one step predictions
   DATA_SCALAR(se);                  // turn delta method on/off for sv (speeds up model fitting if SE's not req'd & this allows param SE's to be calculated regardless)
-  DATA_IVECTOR(gap_flag);           // 1 = long data gap precedes this time step; velocity innovation uses marginal rather than conditional distribution
-  
+  DATA_IVECTOR(gap_flag);           //  1 = long data gap precedes this time step; velocity innovation uses marginal rather than conditional distribution
+  DATA_IVECTOR(ho_flag);            //  1 = haulout: break directional persistence AND tighten velocity variance by ho_scale. gap_flag takes precedence (checked first).
+  DATA_SCALAR(ho_scale);            //  velocity variance scale factor during haulout (0,1]; small values (e.g. 0.01) keep locations nearly stationary
+
   // for KF observation model
   DATA_VECTOR(m);                 //  m is the semi-minor axis length
   DATA_VECTOR(M);                 //  M is the semi-major axis length
@@ -76,7 +78,7 @@ Type crw(objective_function<Type>* obj) {
   // Note: initial velocity is pinned to state0 with tiny variance. If the
   // track begins with a long gap (gap_flag(1) == 1), the velocity innovation
   // at i=1 uses the marginal distribution, so this initial velocity does not
-  // persist into the gap - this case is handled automatically below.
+  // persist into the gap - the edge case is handled automatically below.
   for(int i = 0; i < Y.rows(); i++) {
     jnll -= dnorm(mu(i,0), state0(i), tiny, true);
     jnll -= dnorm(v(i,0), state0(i+2), tiny, true);
@@ -87,28 +89,47 @@ Type crw(objective_function<Type>* obj) {
   MVNORM_t<Type> nll_proc(cov); // Multivariate Normal for states
   
   for(int i = 1; i < dt.size(); i++) {
-    // process cov at time t
-    cov.setZero();
-    cov(0,0) = tiny;
-    cov(1,1) = tiny;
-    cov(2,2) = 2 * D(0) * dt(i);
-    cov(3,3) = 2 * D(1) * dt(i);
-    cov(2,3) = pow(2 * D(0) * dt(i), 0.5) * pow(2 * D(1) * dt(i), 0.5) * rho_p;
-    cov(3,2) = cov(2,3);
-      
-    // location innovations
-    x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
-    x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
-      
-    // velocity innovations
-    // For normal steps: v[i] - v[i-1], conditioning on previous velocity (directional persistence)
-    // For long gaps (gap_flag == 1): v[i] alone, drawn from marginal N(0, 2*D*dt[i]),
-    //   breaking directional persistence across the gap and suppressing looping artefacts.
-    //   This also correctly handles the i=1 case when the track begins with a long gap,
-    //   preventing the tightly-pinned initial velocity in state0 from persisting into the gap.
-    x_t(2) = gap_flag(i) ? v(0,i) : (v(0,i) - v(0,i-1));
-    x_t(3) = gap_flag(i) ? v(1,i) : (v(1,i) - v(1,i-1));
-    
+
+    if(ho_flag(i) == 1) {
+      // HAULOUT: break directional persistence (marginal velocity distribution)
+      // AND tighten velocity variance by ho_scale, constraining location drift
+      // when observations are imprecise (Argos) or sparse during haulout.
+      // Position innovation is unchanged (near-rigid given velocity): with small
+      // velocity, mu[i] stays close to mu[i-1] + tiny_v * dt[i].
+      // gap_flag takes precedence over ho_flag (enforced on the R side before
+      // reaching the C++ template: ho_flag is cleared wherever gap_flag is set).
+      cov.setZero();
+      cov(0,0) = tiny;
+      cov(1,1) = tiny;
+      cov(2,2) = ho_scale * 2 * D(0) * dt(i);
+      cov(3,3) = ho_scale * 2 * D(1) * dt(i);
+      cov(2,3) = pow(ho_scale * 2 * D(0) * dt(i), Type(0.5)) *
+                 pow(ho_scale * 2 * D(1) * dt(i), Type(0.5)) * rho_p;
+      cov(3,2) = cov(2,3);
+
+      x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
+      x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
+      x_t(2) = v(0,i);   // marginal: no directional persistence
+      x_t(3) = v(1,i);
+
+    } else {
+      // NORMAL STEP or DATA GAP: standard velocity variance.
+      // gap_flag selects between conditional (normal) and marginal (gap)
+      // velocity innovation without changing the covariance structure.
+      cov.setZero();
+      cov(0,0) = tiny;
+      cov(1,1) = tiny;
+      cov(2,2) = 2 * D(0) * dt(i);
+      cov(3,3) = 2 * D(1) * dt(i);
+      cov(2,3) = pow(2 * D(0) * dt(i), Type(0.5)) * pow(2 * D(1) * dt(i), Type(0.5)) * rho_p;
+      cov(3,2) = cov(2,3);
+
+      x_t(0) = mu(0,i) - (mu(0,i-1) + (v(0,i) * dt(i)));
+      x_t(1) = mu(1,i) - (mu(1,i-1) + (v(1,i) * dt(i)));
+      x_t(2) = gap_flag(i) ? v(0,i) : (v(0,i) - v(0,i-1));
+      x_t(3) = gap_flag(i) ? v(1,i) : (v(1,i) - v(1,i-1));
+    }
+
     nll_proc.setSigma(cov);   // set up ith cov matrix
     jnll += nll_proc(x_t);    // Process likelihood
   }
@@ -203,4 +224,3 @@ Type crw(objective_function<Type>* obj) {
 #define TMB_OBJECTIVE_PTR this
 
 #endif
-

@@ -45,7 +45,8 @@ sfilter <-
            map = NULL,
            fit.to.subset = TRUE,
            control = ssm_control(),
-           inner.control = NULL) {
+           inner.control = NULL,
+           ho_lookup = NULL) {
 
     st <- proc.time()
     call <- match.call()
@@ -74,9 +75,33 @@ sfilter <-
     prj <- st_crs(xx)
     loc <- as.data.frame(st_coordinates(xx))
     names(loc) <- c("x","y")
+    xx.sf <- xx
     st_geometry(xx) <- NULL
     d <- cbind(xx, loc)
     d$isd <- TRUE
+    
+    ## ho_lookup is a plain data frame (id, date, ho) extracted from the raw input
+    ## in fit_ssm() BEFORE format_data() and prefilter() run -- the only safe
+    ## point at which ho is still present. It is passed as a new argument to
+    ## sfilter(). Neither x nor d carry ho here because prefilter() and
+    ## format_data() both drop unknown columns.
+    ##
+    ## The join is by date only (sfilter sees one individual at a time, so id
+    ## subsetting is done first). Any observation date not found in ho_lookup
+    ## (shouldn't happen if ho_lookup was built from the same raw data) gets
+    ## ho = 0 as a safe fallback. Prediction grid rows are not in d at this point
+    ## (they're added later in the full_join with ts), so they get ho = NA after
+    ## that merge -- insertion 2 handles the interpolation.
+    ## -----------------------------------------------------------------------------
+    
+    if (!is.null(ho_lookup)) {
+      id_i <- unique(d$id)
+      ho_i <- ho_lookup[ho_lookup$id == id_i, c("date", "ho")]
+      d    <- dplyr::left_join(d, ho_i, by = "date")
+      d$ho[is.na(d$ho)] <- 0L
+    } else {
+      d$ho <- 0L
+    }
     
     ## generate prediction intervals
     if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
@@ -139,6 +164,39 @@ sfilter <-
       d.all <- d
     }
 
+    ## At this point:
+    ##   - time.step path: observation rows have d.all$ho from d;
+    ##                     prediction rows have d.all$ho = NA (not in ts).
+    ##   - time.step = NA: d.all <- d, all rows are observations, all have ho.
+    ##
+    ## The forward/backward fill is a no-op in the time.step = NA case (no NAs),
+    ## so it is safe to run unconditionally after both branches.
+    ##
+    ## Rule: a prediction step is flagged as haulout only if bracketed by haulout
+    ## observations on BOTH sides (entirely within a haulout period). A step at
+    ## a haulout boundary is conservatively left as 0.
+    ## -----------------------------------------------------------------------------
+    
+    if (any(is.na(d.all$ho))) {
+      ho_obs <- ifelse(d.all$isd, as.integer(d.all$ho), NA_integer_)
+      
+      ## Forward fill
+      ho_fwd <- ho_obs
+      for (k in seq_along(ho_fwd))
+        if (is.na(ho_fwd[k]) && k > 1L) ho_fwd[k] <- ho_fwd[k - 1L]
+      
+      ## Backward fill
+      ho_bwd <- ho_obs
+      for (k in rev(seq_along(ho_bwd)))
+        if (is.na(ho_bwd[k]) && k < length(ho_bwd)) ho_bwd[k] <- ho_bwd[k + 1L]
+      
+      ## Require agreement from both sides
+      d.all$ho <- as.integer(
+        !is.na(ho_fwd) & !is.na(ho_bwd) & ho_fwd == 1L & ho_bwd == 1L
+      )
+    }
+    
+    
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- as.numeric(difftime(d.all$date, c(as.POSIXct(NA),d.all$date[-nrow(d.all)]), 
                               units = "hours"))
@@ -300,27 +358,73 @@ sfilter <-
       GLerr = cbind(d.all$x.sd, d.all$y.sd)
     )
     
-    if (model == "crw") {
-      ## Construct gap_flag: 1 where a time step exceeds the gap threshold,
-      ## 0 elsewhere. Length matches dt so indexing in the C++ loop is consistent.
-      ## Element 0 (R index 1) is never used by the process loop (which starts at
-      ## i=1 in C++) but is set to 0 for safety.
-      ##
-      ## The i=1 edge case (long gap immediately after the initial state) is handled
-      ## automatically: if dt[2] > gap.thresh then gap_flag[2] = 1L, and the C++
-      ## code uses the marginal velocity distribution at that transition, preventing
-      ## the tightly-pinned initial velocity in state0 from persisting into the gap.
+    ## -- gap_flag -----------------------------------------------------------------
+    ## Identifies time steps that fall within a large observation gap.
+    ##
+    ## IMPORTANT: gap_flag must be derived from *observation* gaps, not from the
+    ## dt vector of d.all. When a regular time.step is supplied, the prediction
+    ## grid fills the gap with regular steps (all dt = time.step), so no row of
+    ## d.all has a large dt during a data gap -- using dt > gap.thresh would never
+    ## flag any prediction step and gap_flag would always be all zeros.
+    ##
+    ## The correct approach: find consecutive observation pairs whose gap exceeds
+    ## gap.thresh, then flag ALL rows of d.all whose date falls strictly within
+    ## those observation gap intervals. The first prediction step within the gap
+    ## is flagged, breaking directional persistence from the pre-gap direction.
+    ## Subsequent prediction steps within the gap are also flagged so directional
+    ## persistence does not rebuild from random within-gap displacements.
+    ##
+    ## When time.step = NA (observation times only, d.all = d): each row IS an
+    ## observation, so isd is all TRUE. Consecutive obs gaps are then directly
+    ## reflected in dt. The interval-based approach still works correctly in this
+    ## case: the single step spanning the gap has its date = obs after gap, which
+    ## is strictly within the interval (obs before, obs after), so it is flagged.
+    ##
+    ## For crw and mp: gap_flag breaks directional persistence at the gap entry.
+    ## For rw:         gap_flag is a no-op in the C++ template (included for API
+    ##                 consistency; the RW has no directional persistence to suppress).
+    ##
+    ## gap_flag takes precedence over ho_flag: a haulout period that also exceeds
+    ## gap.thresh is treated as a data gap (uncertainty inflates freely).
+    
+    gap_flag <- integer(nrow(d.all))
+    
+    if (is.finite(control$gap.thresh)) {
+      ## Observation times only (rows where isd == TRUE)
+      obs_dates <- d.all$date[d.all$isd]
       
-      gap.thresh <- control$gap.thresh  # from ssm_control(); Inf by default
-      
-      gap_flag <- integer(length(dt))   # initialise all zeros, same length as dt
-      if (is.finite(gap.thresh)) {
-        gap_flag[dt > gap.thresh] <- 1L
+      if (length(obs_dates) >= 2) {
+        ## Gaps between consecutive observations (hours)
+        obs_gaps <- as.numeric(difftime(obs_dates[-1],
+                                        obs_dates[-length(obs_dates)],
+                                        units = "hours"))
+        
+        ## For each observation gap that exceeds the threshold, flag all rows of
+        ## d.all whose date falls strictly within (obs_before, obs_after).
+        large_gaps <- which(obs_gaps > control$gap.thresh)
+        
+        for (g in large_gaps) {
+          t_before <- obs_dates[g]
+          t_after  <- obs_dates[g + 1L]
+          in_gap   <- d.all$date > t_before & d.all$date < t_after
+          gap_flag[in_gap] <- 1L
+        }
       }
-      
-      ## Add to TMB data list
-      data$gap_flag <- gap_flag
     }
+  
+    ## -- ho_flag ------------------------------------------------------------------
+    ## Derived from d.all$ho (interpolated in insertion 2).
+    ## gap_flag takes precedence: ho_flag cleared wherever gap_flag is set so the
+    ## C++ templates never see both flags set on the same time step.
+    
+    ho_flag              <- as.integer(d.all$ho)
+    ho_flag[gap_flag == 1L] <- 0L
+    
+    ## -- Append to TMB data list --------------------------------------------------
+    data$gap_flag <- gap_flag
+    data$ho_flag  <- ho_flag
+    data$ho_scale <- control$ho_scale   # from ssm_control(); default 0.01
+    
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -498,6 +602,11 @@ sfilter <-
                } else {
                  pv <- NULL
                }
+               ## add gap_flag integer (all 0's)
+               fv$gap_flag <- gap_flag[d.all$isd]
+               if (!is.null(pv)) {
+                 pv$gap_flag <- gap_flag[!d.all$isd]
+               }
              },
              crw = {
                if(control$se) {
@@ -528,6 +637,11 @@ sfilter <-
                  pv$s.se <- sp.se
                } else {
                  pv <- NULL
+               }
+               ## add gap_flag integer
+               fv$gap_flag <- gap_flag[d.all$isd]
+               if (!is.null(pv)) {
+                 pv$gap_flag <- gap_flag[!d.all$isd]
                }
              })
       
