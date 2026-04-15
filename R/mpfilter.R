@@ -491,6 +491,9 @@ mpfilter <-
         rdm$logit_g.se[ho_flag == 1L] <- NA_real_
       }
       
+      ## add `ho` column to rdm so it flows into fitted/predicted output
+      rdm$ho <- as.integer(d.all$ho)
+      
       ## coerce x,y back to sf object
       rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)
       rdm <- st_set_crs(rdm, prj)

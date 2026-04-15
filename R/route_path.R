@@ -26,6 +26,13 @@
 ##' @param barrier a user-supplied barrier simple feature `POLYGON` or
 ##' `MULTIPOLYGON` object. Default is NULL, in which case `rnaturalearth` data
 ##' are used.
+##' @param ... additional arguments passed to \code{pathroutr::prt_visgraph}.
+##' If the \code{ssm} fit was produced with haulout information (via the
+##' \code{haulout} argument of [aniMotum::fit_ssm] or by calling
+##' [aniMotum::smru_haulout] before fitting), locations within haulout
+##' periods (\code{ho = 1}) are automatically exempt from rerouting. These
+##' locations are known to be on land by design and should not be moved into
+##' water.
 ##' @param ... additional arguments passed to pathroutr::prt_visgraph
 ##' 
 ##' @details
@@ -192,10 +199,27 @@ route_path <-
       if (inherits(x, "ssm_df")) {
         # create nested tibble grouped by individual track
         # use rowwise to process each row in turn
-        df_rrt <- df_sf %>% 
+        df_rrt <- df_sf %>%
           nest_by(id) %>%
           rowwise() %>%
-          mutate(pts = suppressWarnings(list(try(data %>% pathroutr::prt_trim(land_region), silent = TRUE))))
+          mutate(pts = suppressWarnings(list(try({
+            ## Exclude haulout locations from rerouting. prt_trim() identifies which
+            ## points are on land; if haulout points are included they would be flagged
+            ## and moved into water, which is incorrect -- the animal is genuinely on
+            ## land during haulout. By filtering them out here they are never touched
+            ## by prt_reroute() or prt_update_points() and stay at their SSM-estimated
+            ## positions.
+            ##
+            ## `ho` is present when the fit was produced with a haulout lookup (via
+            ## fit_ssm(haulout = ...) or smru_haulout()). If absent, d == data and
+            ## behaviour is identical to the original code.
+            d <- if ("ho" %in% names(data)) {
+              dplyr::filter(data, is.na(ho) | ho == 0L)
+            } else {
+              data
+            }
+            pathroutr::prt_trim(d, land_region)
+          }, silent = TRUE))))
         
         ## check for errors due to entire track on land & return message
         idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))

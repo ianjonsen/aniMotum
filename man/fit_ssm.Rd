@@ -21,6 +21,9 @@ fit_ssm(
   fit.to.subset = TRUE,
   control = ssm_control(),
   inner.control = NULL,
+  haulout = NULL,
+  ho.ref = "ref",
+  ho.id_fun = NULL,
   ...
 )
 }
@@ -71,6 +74,20 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
+
+\item{haulout}{optional. Either a path to an SMRU haulout CSV file or a
+pre-read data frame with columns \code{s_date} and \code{e_date} defining haulout
+intervals. When supplied, \link{smru_haulout} is called internally to
+stamp an \code{ho} indicator onto \code{x} before model fitting. Only applies to SMRU
+tag data. Default \code{NULL} (no haulout information used).}
+
+\item{ho.ref}{name of the individual ID column in the haulout file that
+corresponds to \code{id} in \code{x}. Passed to \link{smru_haulout} as the
+\code{ref} argument. Default \code{"ref"}.}
+
+\item{ho.id_fun}{optional function to transform individual IDs in the
+haulout file before matching against \code{x$id}. Passed to
+\link{smru_haulout} as the \code{id_fun} argument. Default \code{NULL}.}
 
 \item{...}{variable name arguments passed to format_data, see
 \link{format_data} for details}
