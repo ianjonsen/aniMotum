@@ -1,6 +1,6 @@
 Package: aniMotum
 Title: Fit Continuous-Time State-Space and Latent Variable Models for Quality Control of Argos Satellite (and Other) Telemetry Data and for Estimating Changes in Animal Movement
-Version: 1.2-17.9075
+Version: 1.2-17-9075
 Date: 2026-04-15
 Authors@R: 
     c(
@@ -60,8 +60,8 @@ Suggests:
     rnaturalearthdata,
     pathroutr (>= 0.2.1)
 Depends: 
-    R (>= 4.1.0)
-SystemRequirements: GDAL (>= 2.4.2), GEOS (>= 3.7.0), PROJ (>= 5.2.0), pandoc (>=2.7.3)
+    R (>= 4.5.2)
+SystemRequirements: GDAL (>= 3.8.5), GEOS (>= 3.13.0), PROJ (>= 9.5.1), pandoc (>=2.7.3)
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Remotes: 
