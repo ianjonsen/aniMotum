@@ -96,7 +96,7 @@ Type mp(objective_function<Type>* obj) {
   //    Uncertainty grows appropriately across the gap.
   //
   //  ho_flag(i) == 1  [haulout, not a gap]
-  //    Pure RW, tightened process variance (ho_scale * dt² * cov).
+  //    Pure RW, reduced process variance (ho_scale * dt * dt * cov).
   //    The correlated term is zeroed for the same reason as gap_flag, but
   //    the variance is also scaled down to prevent location drift when
   //    observations are imprecise (Argos) or sparse. ho_scale is small
@@ -116,10 +116,11 @@ Type mp(objective_function<Type>* obj) {
       cov_dt = dt(i) * dt(i) * cov;
 
     } else if(ho_flag(i) == 1) {
-      // Haulout: pure RW, tightened variance
+      // Haulout: pure RW, reduced process variance
       // ho_scale (e.g. 0.01) keeps locations nearly stationary regardless
-      // of observation precision or density. The first step after a haulout
-      // (i+1) naturally recovers normal behaviour: dt(i+1)/dt(i) ~ 1 for
+      // of observation precision. Might need to rethink ho_scale...
+      // The first step after a haulout
+      // (i+1) recovers normal behaviour: dt(i+1)/dt(i) ~ 1 for
       // regular data so the near-zero haulout displacement contributes
       // little to the post-haulout correlated term.
       mu     = X.col(i) - X.col(i-1);

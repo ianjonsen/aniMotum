@@ -301,13 +301,13 @@ mpfilter <-
       GLerr = cbind(d.all$x.sd, d.all$y.sd)
     ) 
     
-    ## IMPORTANT: gap_flag must be derived from *observation* gaps, not from the
-    ## dt vector of d.all. When a regular time.step is supplied, the prediction
+    ## IMPORTANT: gap_flag must be derived from *observation* gaps. When a regular
+    ## time.step is supplied, the prediction
     ## grid fills the gap with regular steps (all dt = time.step), so no row of
     ## d.all has a large dt during a data gap -- using dt > gap.thresh would never
     ## flag any prediction step and gap_flag would always be all zeros.
     ##
-    ## The correct approach: find consecutive observation pairs whose gap exceeds
+    ## Approach: Find consecutive observation pairs whose gap exceeds
     ## gap.thresh, then flag ALL rows of d.all whose date falls strictly within
     ## those observation gap intervals. The first prediction step within the gap
     ## is flagged, breaking directional persistence from the pre-gap direction.
