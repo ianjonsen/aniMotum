@@ -145,21 +145,75 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
-                   out[, c("id", "date", "x.se", "y.se", "geometry")]
+                   if("gap_flag" %in% names(out)) {
+                      out[, c("id", "date", "x.se", "y.se", "gap_flag", "geometry")]
+                   } else {
+                     out[, c("id", "date", "x.se", "y.se", "geometry")]
+                   }
                    },
                  crw = {
                    ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
-                   if(all(c("s","s.se") %in% names(out))) {
-                     out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
-                             "y.se", "s", "s.se", "gap_flag", "geometry")]
+                   if (all(c("s", "s.se") %in% names(out))) {
+                     if ("gap_flag" %in% names(out)) {
+                       out[, c(
+                         "id",
+                         "date",
+                         "u",
+                         "v",
+                         "u.se",
+                         "v.se",
+                         "x.se",
+                         "y.se",
+                         "s",
+                         "s.se",
+                         "gap_flag",
+                         "geometry"
+                       )]
                      } else {
-                       out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
-                             "y.se", "gap_flag", "geometry")]
-                       }
-                   },
-                 mp = {
+                       out[, c("id",
+                               "date",
+                               "u",
+                               "v",
+                               "u.se",
+                               "v.se",
+                               "x.se",
+                               "y.se",
+                               "s",
+                               "s.se",
+                               "geometry")]
+                     }
+                   } else {
+                     if ("gap_flag" %in% names(out)) {
+                     out[, c("id",
+                             "date",
+                             "u",
+                             "v",
+                             "u.se",
+                             "v.se",
+                             "x.se",
+                             "y.se",
+                             "gap_flag",
+                             "geometry")]
+                     } else {
+                       out[, c("id",
+                               "date",
+                               "u",
+                               "v",
+                               "u.se",
+                               "v.se",
+                               "x.se",
+                               "y.se",
+                               "geometry")]
+                     } 
+                   }
+                 }, mp = {
+                   if ("gap_flag" %in% names(out)) {
                    out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
-                           "g", "geometry")]
+                           "g", "gap_flag", "geometry")]
+                   } else {
+                     out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
+                                    "g", "geometry")]
+                   }
                    if(normalise & !group) {
                      out <- out |> 
                        group_by(id) |>
@@ -174,8 +228,13 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                
              } else if (what == "rerouted") {
                if("g" %in% names(out)) {
+                 if ("gap_flag" %in% names(out)) {
                  out <- out[, c("id", "date", "x.se", "y.se", "logit_g",
-                                "logit_g.se", "g", "geometry")]
+                                "logit_g.se", "g", "gap_flag", "geometry")]
+                 } else {
+                   out <- out[, c("id", "date", "x.se", "y.se", "logit_g",
+                                  "logit_g.se", "g", "geometry")]
+                 }
                  if(normalise & !group) {
                    out <- out |> 
                      group_by(id) |>
@@ -186,7 +245,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                      mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                  }
                } else {
-                 out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
+                 if ("gap_flag" %in% names(out)) {
+                  out <- out[, c("id", "date", "x.se", "y.se", "gap_flag", "geometry")]
+                 } else {
+                   out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
+                 }
                }
              } else if (what == "data") {
                out <- out[, c("id", "date", "lc", "smaj", "smin", "eor", "keep", 
@@ -226,8 +289,13 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                        }
                    },
                  mp = {
+                   if("gap_flag" %in% names(out)) {
                     out <- out[, c("id", "date", "lon", "lat", "x", "y", 
-                            "x.se", "y.se", "logit_g", "logit_g.se", "g")]
+                            "x.se", "y.se", "logit_g", "logit_g.se", "g", "gap_flag")]
+                   } else {
+                     out <- out[, c("id", "date", "lon", "lat", "x", "y", 
+                                    "x.se", "y.se", "logit_g", "logit_g.se", "g")]
+                   }
                     if(normalise & !group) {
                       out <- out |> 
                         group_by(id) |>
@@ -244,8 +312,13 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                
              } else if (what == "rerouted") {
                if("g" %in% names(out)) {
-                out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
-                               "logit_g.se", "g")]
+                 if("gap_flag" %in% names(out)) {
+                  out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
+                               "logit_g.se", "g", "gap_flag")]
+                 } else {
+                   out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
+                                  "logit_g.se", "g")]
+                 }
                 if(normalise & !group) {
                   out <- out |> 
                     group_by(id) |>
