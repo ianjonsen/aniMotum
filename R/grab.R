@@ -199,15 +199,30 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
-                   out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "gap_flag")]
+                   if("gap_flag" %in% names(out)) {
+                     out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "gap_flag")]  
+                   } else {
+                     out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                   }
+                   
                    },
                  crw = {
                    if(all(c("s","s.se") %in% names(out))) {
+                     if("gap_flag" %in% names(out)) {
                      out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
                              "y.se", "u", "v", "u.se", "v.se", "s", "s.se", "gap_flag")]
                      } else {
+                       out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
+                               "y.se", "u", "v", "u.se", "v.se", "s", "s.se")]
+                     }
+                     } else {
+                       if("gap_flag" %in% names(out)) {
+                          out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
+                               "y.se", "u", "v", "u.se", "v.se", "gap_flag")]
+                       } else {
                        out[, c("id", "date", "lon", "lat", "x", "y", 
                              "x.se", "y.se", "u", "v", "u.se", "v.se")]
+                       }
                        }
                    },
                  mp = {
@@ -241,7 +256,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                     mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                 }
                } else {
+                 if("gap_flag" %in% names(out)) {
                  out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "gap_flag")]
+                 } else {
+                   out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                 }
                }
                out <- as_tibble(out)
              } else if (what == "data") {

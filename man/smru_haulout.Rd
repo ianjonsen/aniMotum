@@ -9,7 +9,7 @@ smru_haulout(x, haulout, ref = "ref", tz = "UTC", id_fun = NULL)
 \arguments{
 \item{x}{a \code{data.frame}, \code{tibble} or \code{sf-tibble} of tracking observations
 with at least columns \code{id} and \code{date} (POSIXct or coercible to one).
-Typically the raw input to \link{fit_ssm}, before \link{format_data}
+Typically the raw input to fit_ssm, before format_data
 is called.}
 
 \item{haulout}{either a character string giving the path to the SMRU
@@ -39,7 +39,7 @@ column it is overwritten with a warning.
 reads an SMRU-format haulout data file (or accepts a
 pre-read data frame) and stamps a binary haulout indicator \code{ho} onto
 each row of the tracking data based on whether that observation's timestamp
-falls within any haulout interval \link{\code{s_date}, \code{e_date}} for the
+falls within any haulout interval \code{s_date}, \code{e_date} for the
 matching individual. The resulting \code{ho} column is recognised
 automatically by \code{fit_ssm()} when supplied via the \code{haulout}
 argument, and is used by the \code{mp}, \code{crw}, and \code{rw} process
@@ -53,10 +53,10 @@ both boundaries: an observation at exactly \code{s_date} or \code{e_date} is cod
 \code{ho = 1}.
 
 This function is intended to be called either directly by the user before
-\link{fit_ssm}, or internally via the \code{haulout} argument of
+fit_ssm, or internally via the \code{haulout} argument of
 \code{fit_ssm}. In either case, the \code{ho} column must be present in \code{x} before
-\code{fit_ssm} is called, as \code{ho} does not survive \link{format_data} or
-\link{prefilter}.
+\code{fit_ssm} is called, as \code{ho} does not survive format_data or
+prefilter.
 
 A warning is issued for any individual in \code{x} that has no matching records
 in the haulout file. All observations for that individual will have

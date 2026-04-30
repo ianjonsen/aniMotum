@@ -3,15 +3,15 @@
 ##' @description reads an SMRU-format haulout data file (or accepts a
 ##' pre-read data frame) and stamps a binary haulout indicator \code{ho} onto
 ##' each row of the tracking data based on whether that observation's timestamp
-##' falls within any haulout interval [\code{s_date}, \code{e_date}] for the
+##' falls within any haulout interval \code{s_date}, \code{e_date} for the
 ##' matching individual. The resulting \code{ho} column is recognised
-##' automatically by \code{fit_ssm()} when supplied via the \code{haulout}
+##' automatically by `fit_ssm()` when supplied via the \code{haulout}
 ##' argument, and is used by the \code{mp}, \code{crw}, and \code{rw} process
 ##' models to constrain location estimates during haulout periods.
 ##'
 ##' @param x a `data.frame`, `tibble` or `sf-tibble` of tracking observations
 ##' with at least columns `id` and `date` (POSIXct or coercible to one).
-##' Typically the raw input to [aniMotum::fit_ssm], before [aniMotum::format_data]
+##' Typically the raw input to fit_ssm, before format_data
 ##' is called.
 ##' @param haulout either a character string giving the path to the SMRU
 ##' haulout CSV file, or a pre-read data frame. Must contain columns matching
@@ -35,10 +35,10 @@
 ##' `ho = 1`.
 ##'
 ##' This function is intended to be called either directly by the user before
-##' [aniMotum::fit_ssm], or internally via the `haulout` argument of
+##' fit_ssm, or internally via the `haulout` argument of
 ##' `fit_ssm`. In either case, the `ho` column must be present in `x` before
-##' `fit_ssm` is called, as `ho` does not survive [aniMotum::format_data] or
-##' [aniMotum::prefilter].
+##' `fit_ssm` is called, as `ho` does not survive format_data or
+##' prefilter.
 ##'
 ##' A warning is issued for any individual in `x` that has no matching records
 ##' in the haulout file. All observations for that individual will have
