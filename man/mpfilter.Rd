@@ -12,7 +12,8 @@ mpfilter(
   map = NULL,
   fit.to.subset = TRUE,
   control = ssm_control(),
-  inner.control = NULL
+  inner.control = NULL,
+  ho_lookup = NULL
 )
 }
 \arguments{

@@ -151,10 +151,10 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
                    if(all(c("s","s.se") %in% names(out))) {
                      out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
-                             "y.se", "s", "s.se", "geometry")]
+                             "y.se", "s", "s.se", "gap_flag", "geometry")]
                      } else {
                        out[, c("id", "date", "u", "v", "u.se", "v.se", "x.se", 
-                             "y.se", "geometry")]
+                             "y.se", "gap_flag", "geometry")]
                        }
                    },
                  mp = {
@@ -163,11 +163,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    if(normalise & !group) {
                      out <- out |> 
                        group_by(id) |>
-                       mutate(g = (g - min(g))/(max(g) - min(g))) |>
+                       mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
                        ungroup()
                      } else if(normalise & group) {
                      out <- out |> 
-                       mutate(g = (g - min(g))/(max(g) - min(g)))
+                       mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                    }
                    out
                  })
@@ -179,11 +179,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  if(normalise & !group) {
                    out <- out |> 
                      group_by(id) |>
-                     mutate(g = (g - min(g))/(max(g) - min(g))) |>
+                     mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
                      ungroup()
                  } else if(normalise & group) {
                    out <- out |> 
-                     mutate(g = (g - min(g))/(max(g) - min(g)))
+                     mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                  }
                } else {
                  out <- out[, c("id", "date", "x.se", "y.se", "geometry")]
@@ -199,12 +199,12 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                out <- switch(
                  x$ssm[[1]]$pm,
                  rw = {
-                   out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                   out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "gap_flag")]
                    },
                  crw = {
                    if(all(c("s","s.se") %in% names(out))) {
                      out[, c("id", "date", "lon", "lat", "x", "y", "x.se", 
-                             "y.se", "u", "v", "u.se", "v.se", "s", "s.se")]
+                             "y.se", "u", "v", "u.se", "v.se", "s", "s.se", "gap_flag")]
                      } else {
                        out[, c("id", "date", "lon", "lat", "x", "y", 
                              "x.se", "y.se", "u", "v", "u.se", "v.se")]
@@ -216,11 +216,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                     if(normalise & !group) {
                       out <- out |> 
                         group_by(id) |>
-                        mutate(g = (g - min(g))/(max(g) - min(g))) |>
+                        mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
                         ungroup()
                     } else if(normalise & group) {
                       out <- out |> 
-                        mutate(g = (g - min(g))/(max(g) - min(g)))
+                        mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                     }
                     out
                  })
@@ -234,14 +234,14 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                 if(normalise & !group) {
                   out <- out |> 
                     group_by(id) |>
-                    mutate(g = (g - min(g))/(max(g) - min(g))) |>
+                    mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
                     ungroup()
                 } else if(normalise & group) {
                   out <- out |> 
-                    mutate(g = (g - min(g))/(max(g) - min(g)))
+                    mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
                 }
                } else {
-                 out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se")]
+                 out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "gap_flag")]
                }
                out <- as_tibble(out)
              } else if (what == "data") {
@@ -276,11 +276,11 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            if(normalise & !group) {
              out <- out |> 
                group_by(id) |>
-               mutate(g = (g - min(g))/(max(g) - min(g))) |>
+               mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
                ungroup()
            } else if(normalise & group) {
              out <- out |> 
-               mutate(g = (g - min(g))/(max(g) - min(g)))
+               mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
            }
            out
          })

@@ -44,7 +44,8 @@ mpfilter <-
            map = NULL,
            fit.to.subset = TRUE,
            control = ssm_control(),
-           inner.control = NULL) {
+           inner.control = NULL,
+           ho_lookup = NULL) {
     
     st <- proc.time()
     call <- match.call()
@@ -74,6 +75,23 @@ mpfilter <-
     d <- cbind(xx, loc)
     d$isd <- TRUE
     
+    ## ho_lookup is a plain data frame (id, date, ho) extracted from the raw input
+    ## in fit_ssm() before format_data()/prefilter() run. Joining by both id and
+    ## date is exact: observation timestamps are preserved through prefilter().
+    ## If ho_lookup is NULL (no ho column in the original data), d$ho defaults to
+    ## 0L for all rows -- the model behaves identically to the no-haulout case.
+    ## -----------------------------------------------------------------------------
+    
+    if (!is.null(ho_lookup)) {
+      ## Subset lookup to this individual only (sfilter/mpfilter sees one id at a time)
+      id_i      <- unique(d$id)
+      ho_i      <- ho_lookup[ho_lookup$id == id_i, c("date", "ho")]
+      d         <- dplyr::left_join(d, ho_i, by = "date")
+      ## Any obs not found in lookup (shouldn't happen, but be safe) -> 0
+      d$ho[is.na(d$ho)] <- 0L
+    } else {
+      d$ho <- 0L
+    }
     
     if (!inherits(time.step, "data.frame") & all(!is.na(time.step))) {
       ## prediction times - assume on time.step-multiple of the hour
@@ -133,6 +151,39 @@ mpfilter <-
     } else {
       d.all <- d
     }
+    
+    ## At this point:
+    ##   - time.step path:    observation rows have d.all$ho from d;
+    ##                        prediction rows have d.all$ho = NA (not in ts).
+    ##   - time.step = NA:    d.all <- d, so all rows already have d.all$ho.
+    ##
+    ## The forward/backward fill is a no-op in the time.step = NA case (no NAs),
+    ## so it is safe to run unconditionally after both paths.
+    ##
+    ## Interpolation rule: a prediction step is flagged as haulout (ho = 1) only
+    ## if it is bracketed by haulout observations on BOTH sides -- i.e. it falls
+    ## entirely within a haulout period. A step at a haulout boundary (one side
+    ## ho = 1, other side ho = 0) is conservatively left as 0.
+    if (any(is.na(d.all$ho))) {
+      ## Extract observed ho values; NA for prediction rows
+      ho_obs <- ifelse(d.all$isd, as.integer(d.all$ho), NA_integer_)
+      
+      ## Forward fill: carry last observed ho forward across prediction rows
+      ho_fwd <- ho_obs
+      for (k in seq_along(ho_fwd))
+        if (is.na(ho_fwd[k]) && k > 1L) ho_fwd[k] <- ho_fwd[k - 1L]
+      
+      ## Backward fill: carry next observed ho backward across prediction rows
+      ho_bwd <- ho_obs
+      for (k in rev(seq_along(ho_bwd)))
+        if (is.na(ho_bwd[k]) && k < length(ho_bwd)) ho_bwd[k] <- ho_bwd[k + 1L]
+      
+      ## Require agreement from both sides
+      d.all$ho <- as.integer(
+        !is.na(ho_fwd) & !is.na(ho_bwd) & ho_fwd == 1L & ho_bwd == 1L
+      )
+    }
+    
     
     ## calc delta times in hours for observations & interpolation points (states)
     dt <- as.numeric(difftime(d.all$date, c(as.POSIXct(NA),d.all$date[-nrow(d.all)]), 
@@ -249,6 +300,61 @@ mpfilter <-
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$x.sd, d.all$y.sd)
     ) 
+    
+    ## IMPORTANT: gap_flag must be derived from *observation* gaps, not from the
+    ## dt vector of d.all. When a regular time.step is supplied, the prediction
+    ## grid fills the gap with regular steps (all dt = time.step), so no row of
+    ## d.all has a large dt during a data gap -- using dt > gap.thresh would never
+    ## flag any prediction step and gap_flag would always be all zeros.
+    ##
+    ## The correct approach: find consecutive observation pairs whose gap exceeds
+    ## gap.thresh, then flag ALL rows of d.all whose date falls strictly within
+    ## those observation gap intervals. The first prediction step within the gap
+    ## is flagged, breaking directional persistence from the pre-gap direction.
+    ## Subsequent prediction steps within the gap are also flagged so directional
+    ## persistence does not rebuild from random within-gap displacements.
+    ##
+    ## When time.step = NA (observation times only, d.all = d): each row IS an
+    ## observation, so the interval-based approach still works correctly -- the
+    ## single step spanning the gap has its date = obs after gap, which falls
+    ## strictly within (obs before, obs after), so it is flagged.
+    ##
+    ## gap_flag takes precedence over ho_flag: a haulout period that also exceeds
+    ## gap.thresh is treated as a data gap (uncertainty inflates freely).
+    
+    gap_flag <- integer(nrow(d.all))
+    
+    if (is.finite(control$gap.thresh)) {
+      obs_dates <- d.all$date[d.all$isd]
+      
+      if (length(obs_dates) >= 2) {
+        obs_gaps <- as.numeric(difftime(obs_dates[-1],
+                                        obs_dates[-length(obs_dates)],
+                                        units = "hours"))
+        large_gaps <- which(obs_gaps > control$gap.thresh)
+        
+        for (g in large_gaps) {
+          t_before <- obs_dates[g]
+          t_after  <- obs_dates[g + 1L]
+          in_gap   <- d.all$date > t_before & d.all$date < t_after
+          gap_flag[in_gap] <- 1L
+        }
+      }
+    }
+    
+    ## -- ho_flag ------------------------------------------------------------------
+    ## Derived directly from d.all$ho (already interpolated in insertion 2).
+    ## gap_flag takes precedence: clear ho_flag wherever gap_flag is set so the
+    ## C++ template never sees both flags set on the same step.
+    
+    ho_flag              <- as.integer(d.all$ho)
+    ho_flag[gap_flag == 1L] <- 0L
+    
+    ## -- Append to TMB data list --------------------------------------------------
+    data$gap_flag <- gap_flag
+    data$ho_flag  <- ho_flag
+    data$ho_scale <- control$ho_scale   # from ssm_control(); default 0.01
+    
     
     ## TMB - create objective function
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
@@ -371,6 +477,22 @@ mpfilter <-
       rdm$date <- d.all$date
       rdm$isd <- d.all$isd  
       rdm <- rdm[, c("id","date","x","y","x.se","y.se", "logit_g", "logit_g.se", "g", "isd")]
+      
+      ## Mask g and logit_g estimates during haulout periods. The mp model estimates
+      ## lg continuously across haulout steps (required to connect pre- and post-
+      ## haulout gamma states through the likelihood chain), but those values are
+      ## not meaningful behavioural indicators -- they reflect the animal being
+      ## stationary, not at-sea movement behaviour. Setting them to NA prevents
+      ## confusion with genuinely low move persistence at sea, which is usually
+      ## the quantity of interest.
+      if (any(ho_flag == 1L)) {
+        rdm$g[ho_flag == 1L]          <- NA_real_
+        rdm$logit_g[ho_flag == 1L]    <- NA_real_
+        rdm$logit_g.se[ho_flag == 1L] <- NA_real_
+      }
+      
+      ## add `ho` column to rdm so it flows into fitted/predicted output
+      rdm$ho <- as.integer(d.all$ho)
       
       ## coerce x,y back to sf object
       rdm <- st_as_sf(rdm, coords = c("x","y"), remove = FALSE)

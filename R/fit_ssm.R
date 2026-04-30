@@ -42,6 +42,17 @@
 ##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
+##' @param haulout optional. Either a path to an SMRU haulout CSV file or a
+##' pre-read data frame with columns `s_date` and `e_date` defining haulout
+##' intervals. When supplied, [aniMotum::smru_haulout] is called internally to
+##' stamp an `ho` indicator onto `x` before model fitting. Only applies to SMRU
+##' tag data. Default `NULL` (no haulout information used).
+##' @param ho.ref name of the individual ID column in the haulout file that
+##' corresponds to `id` in `x`. Passed to [aniMotum::smru_haulout] as the
+##' `ref` argument. Default `"ref"`.
+##' @param ho.id_fun optional function to transform individual IDs in the
+##' haulout file before matching against `x$id`. Passed to
+##' [aniMotum::smru_haulout] as the `id_fun` argument. Default `NULL`.
 ##' @param ... variable name arguments passed to format_data, see 
 ##' [aniMotum::format_data] for details 
 ##'
@@ -144,6 +155,9 @@ fit_ssm <- function(x,
                     fit.to.subset = TRUE,
                     control = ssm_control(),
                     inner.control = NULL,
+                    haulout   = NULL,    # NEW
+                    ho.ref    = "ref",   # NEW
+                    ho.id_fun = NULL,    # NEW
                     ...
                     )
 {
@@ -181,6 +195,25 @@ fit_ssm <- function(x,
     warning("the `lpsi` arg is deprecated & will be removed in the next version, use `control = ssm_control(lower)` instead. See `?ssm_control for details",
             call. = FALSE, immediate. = TRUE, noBreaks. = TRUE)
     control$lower <- list(l_psi = dots$lpsi)
+  }
+
+  if (!is.null(haulout)) {
+    x <- smru_haulout(
+      x       = x,
+      haulout = haulout,
+      ref     = ho.ref,
+      id_fun  = ho.id_fun
+    )
+  }
+  
+  ## Extract ho lookup BEFORE format_data() or prefilter() touch the data.
+  ## Store as a plain data.frame keyed on id + date so it can be joined back
+  ## inside sfilter()/mpfilter() onto d.all after the prediction grid is built.
+  if ("ho" %in% names(x)) {
+    ho_lookup <- as.data.frame(x)[, c("id", "date", "ho")]
+    ho_lookup$date <- as.POSIXct(ho_lookup$date, tz = "UTC")
+  } else {
+    ho_lookup <- NULL
   }
   
   ## ensure data is in expected format
@@ -220,7 +253,8 @@ fit_ssm <- function(x,
                         map = map,
                         fit.to.subset = fit.to.subset,
                         control = control,
-                        inner.control = inner.control
+                        inner.control = inner.control,
+                        ho_lookup = ho_lookup
                       )
                     })
       
@@ -235,7 +269,8 @@ fit_ssm <- function(x,
                         map = map,
                         fit.to.subset = fit.to.subset,
                         control = control,
-                        inner.control = inner.control
+                        inner.control = inner.control,
+                        ho_lookup = ho_lookup
                       )
                     })
       
