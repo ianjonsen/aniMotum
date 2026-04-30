@@ -146,8 +146,8 @@ plot.sim <- function(x,
         
       }
     }
-    p <- p + xlab(element_blank()) + 
-      ylab(element_blank()) + 
+    p <- p + xlab("") + 
+      ylab("") + 
       theme_minimal() + 
       theme(legend.position = "bottom", 
             legend.key.height = unit(0.015, units = "npc")) +
@@ -185,7 +185,7 @@ plot.sim <- function(x,
              })
     }
     p <- p +
-      xlab(element_blank()) + 
+      xlab("") + 
       theme_minimal() + 
       theme(legend.position = "bottom", 
             legend.key.height = unit(0.015, units = "npc"))

@@ -97,8 +97,8 @@ plot.mpm_df <-
                                  limits = c(0,1),
                                  name = expression(gamma[t])
           ) +
+          xlab("") +
           ylab(expression(gamma[t])) +
-          xlab(element_blank()) +
           ylim(0,1) +
           labs(title = paste("id:", d[[i]]$id[1])) +
           theme_minimal()
@@ -151,8 +151,8 @@ plot.mpm_df <-
             name = expression(gamma[t])
           ) +
           labs(title = paste("id:", unique(x$id))) +
-          xlab(element_blank()) +
-          ylab(element_blank()) +
+          xlab("") +
+          ylab("") +
           coord_fixed() +
           theme_minimal()
         px

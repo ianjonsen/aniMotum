@@ -84,8 +84,8 @@ plot.osar <-
                geom_qq_line(colour = wpal[4]) +
                facet_grid(id ~ coord) +
                theme_minimal() +
-               xlab(element_blank()) + 
-               ylab(element_blank())
+               xlab("") + 
+               ylab("")
            })
          },
          acf = {

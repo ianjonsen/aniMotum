@@ -118,8 +118,8 @@ plot.sim_fit <- function(x,
         colour = "firebrick",
         size = 1
       ) + 
-      xlab(element_blank()) +
-      ylab(element_blank()) +
+      xlab("") +
+      ylab("") +
       theme_void()
     
   })

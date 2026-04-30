@@ -144,13 +144,13 @@ plot.sim_post <- function(x,
     
     if(zoom) {
       m <- m +
-        xlab(element_blank()) +
-        ylab(element_blank()) +
+        xlab("") +
+        ylab("") +
         theme_minimal()
     } else {
       m <- m +
-        xlab(element_blank()) +
-        ylab(element_blank()) +
+        xlab("") +
+        ylab("") +
         theme_void()
     }
     

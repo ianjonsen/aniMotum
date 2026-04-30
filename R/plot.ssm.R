@@ -249,8 +249,8 @@ plot.ssm_df <-
               ncol = 2
             ) +
             labs(title = paste("id:", x$id[i])) +
-            xlab(element_blank()) +
-            ylab(element_blank()) +
+            xlab("") +
+            ylab("") +
             theme_minimal()
           px
         })
@@ -338,8 +338,8 @@ plot.ssm_df <-
             labs(title = paste("id:", x[i, "id"]))
           
           m <- m +
-            xlab(element_blank()) +
-            ylab(element_blank()) +
+            xlab("") +
+            ylab("") +
             theme_minimal()
           m
         })
@@ -407,7 +407,7 @@ plot.ssm_df <-
           
           
           m <- m +
-            xlab(element_blank()) +
+            xlab("") +
             ylab(expression(gamma[t])) +
             theme_minimal()
           m
@@ -459,8 +459,8 @@ plot.ssm_df <-
             coord_fixed()
           
           m <- m +
-            xlab(element_blank()) +
-            ylab(element_blank()) +
+            xlab("") +
+            ylab("") +
             theme_minimal()
           m
         })
