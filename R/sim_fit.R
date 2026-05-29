@@ -153,7 +153,7 @@ sim_fit <-
                  st_transform(crs = prj.sim)
                }, 
              predicted = {
-               x$ssm[[k]]$fitted <- x$ssm[[k]]$fitted |>
+               x$ssm[[k]]$predicted <- x$ssm[[k]]$predicted |>
                  st_transform(crs = prj.sim)
              })
     }
