@@ -25,7 +25,7 @@
 ##' having greater uncertainty (size is proportional to `SE^-2`, if `se = TRUE`). 
 ##' Plots can be rendered all on a single page (pages = 1) or on separate pages.
 ##' 
-##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs 
+##' @importFrom ggplot2 ggplot geom_point geom_path theme_minimal labs theme
 ##' @importFrom ggplot2 element_blank xlab ylab geom_ribbon ylim coord_fixed scale_size
 ##' @importFrom stats qlogis
 ##' @importFrom patchwork wrap_plots
