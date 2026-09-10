@@ -22,8 +22,11 @@
 ##' differences > 0 are allowed.
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit a simple random walk (`rw`), correlated random walk
-##' (`crw`), or a time-varying move persistence model (`mp`), all as 
-##' continuous-time process models
+##' (`crw`), a time-varying move persistence model (`mp`), or a joint
+##' (hierarchical) correlated random walk fitted to all individuals at once
+##' (`jcrw`), all as continuous-time process models. The `jcrw` model shares
+##' parameters among individuals according to `share`; see
+##' [aniMotum::share_control]
 ##' @param time.step options: 1) the regular time interval, in hours, to predict to; 
 ##' 2) a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates; 3) NA - turns off 
@@ -42,6 +45,15 @@
 ##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
+##' @param share for `model = "jcrw"` only, a parameter sharing specification
+##' from [aniMotum::share_control] controlling which parameters are pooled
+##' across individuals, which are hierarchical, and which are estimated
+##' separately for each individual. Ignored by the other models
+##' @param init for `model = "jcrw"` only, how to initialise the joint fit.
+##' `"individual"` (default) first fits each track separately with the `crw`
+##' model and uses those estimates as starting values; `"moment"` uses
+##' moment-based starting values. Per-individual initialisation costs an extra
+##' pass over the data but substantially improves convergence
 ##' @param haulout optional. Either a path to an SMRU haulout CSV file or a
 ##' pre-read data frame with columns `s_date` and `e_date` defining haulout
 ##' intervals. When supplied, [aniMotum::smru_haulout] is called internally to
@@ -155,6 +167,8 @@ fit_ssm <- function(x,
                     fit.to.subset = TRUE,
                     control = ssm_control(),
                     inner.control = NULL,
+                    share = share_control(),
+                    init = c("individual", "moment"),
                     haulout   = NULL,    # NEW
                     ho.ref    = "ref",   # NEW
                     ho.id_fun = NULL,    # NEW
@@ -164,7 +178,8 @@ fit_ssm <- function(x,
 
   dots <- list(...)
   
-  stopifnot("model can only be 1 of `rw`, `crw`, or `mp`" = model %in% c("rw","crw","mp"))
+  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, or `jcrw`" = model %in% c("rw","crw","mp","jcrw"))
+  init <- match.arg(init)
   
 ## check args - most args handled by prefilter() & sfilter()
   if(!is.data.frame(x))  
@@ -216,6 +231,21 @@ fit_ssm <- function(x,
     ho_lookup <- NULL
   }
   
+  ## Extract the measurement-parameter grouping variable, if one was named in
+  ## share_control(). Like ho, it must be taken BEFORE format_data() and
+  ## prefilter() drop unknown columns. One row per individual.
+  if (!is.null(share$group)) {
+    if (!share$group %in% names(x))
+      stop("share_control(group = \"", share$group, "\") was specified but `",
+           share$group, "` is not a variable in x", call. = FALSE)
+    group_lookup <- unique(as.data.frame(x)[, c("id", share$group)])
+    if (anyDuplicated(group_lookup$id))
+      stop("the grouping variable `", share$group, "` must take a single value ",
+           "per individual", call. = FALSE)
+  } else {
+    group_lookup <- NULL
+  }
+  
   ## ensure data is in expected format
   if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
@@ -257,6 +287,23 @@ fit_ssm <- function(x,
                         ho_lookup = ho_lookup
                       )
                     })
+      
+    } else if (model == "jcrw") {
+      ## the joint model is fitted to all individuals at once, so the
+      ## prefiltered list is passed through rather than looped over
+      fit <- jsfilter(
+        x = fit,
+        time.step = time.step,
+        share = share,
+        parameters = parameters,
+        map = map,
+        fit.to.subset = fit.to.subset,
+        control = control,
+        inner.control = inner.control,
+        ho_lookup = ho_lookup,
+        group_lookup = group_lookup,
+        init = init
+      )
       
     } else if (model == "mp") {
       fit <- lapply(fit,

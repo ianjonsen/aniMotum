@@ -1,3 +1,43 @@
+# aniMotum (development version)
+
+## joint (hierarchical) state-space model
+
+* new `model = "jcrw"` in `fit_ssm()` fits a continuous-time correlated random
+walk to all individual tracks at once, sharing parameters among individuals.
+The measurement model (`tau`, `psi`, `rho_o`) and the process error correlation
+(`rho_p`) are pooled by default, while the diffusion coefficient `D` is
+hierarchical: each individual's `D` is drawn from an estimated population
+distribution, so short or sparse tracks are partially pooled toward the
+population mean. Written in R using RTMB rather than as a C++ template.
+
+* new `share_control()` specifies which parameters are pooled, hierarchical or
+estimated separately, and refuses combinations that are not identifiable. In
+particular it will not allow `D` and the measurement parameters to be
+hierarchical at the same time, since random effects on both sides of the
+process/measurement variance partition trade off against each other and leave
+the variance hyperparameters unidentified. `share_control(group = )` pools the
+measurement parameters within strata (tag type, species, deployment) rather
+than across all individuals.
+
+* `share_control(ho_scale = "pooled")` estimates the haulout process variance
+scale factor instead of asserting it. This is only possible in a joint fit: it
+is not identifiable from a single track, which is why `ssm_control()` supplies
+it as a constant.
+
+* `fit_ssm(model = "jcrw")` warns when individuals span a wide latitude range on
+a Mercator grid. Mercator is conformal, so the x,y anisotropy of `D` is
+unaffected, but the scale factor is `sec(latitude)` and `D` has units of
+distance squared per unit time, so apparent diffusion is inflated by
+`sec(latitude)^2`. Across individuals occupying different latitude bands that
+inflation is absorbed into the among-individual variance, where it cannot be
+told apart from biological variation.
+
+* new internal `ssm_prep()` factors out the prediction grid, time differences,
+gap and haulout flags and state initial values shared by all of the filters.
+It is used by the joint filter only for now; `sfilter()` and `mpfilter()`
+currently duplicate this logic between them and are intended to migrate onto
+`ssm_prep()` once it has been validated against their existing behaviour.
+
 # aniMotum 1.2-06 (05/06/2024)
 
 * various minor issues fixed including: build against TMB 1.9.11, fixes error when grad specified in `sim_fit()`.
