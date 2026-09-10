@@ -759,6 +759,21 @@ jsfilter <- function(x,
       fxd <- rbind(fxd, one)
     }
 
+    ## With a free anisotropy vector the orientation is not ADREPORTed - RTMB
+    ## has no atan2() for advectors - so it is recovered here from the reported
+    ## u1 and u2. No standard error: it is a nonlinear function of two
+    ## parameters whose covariance would need the delta method, and the
+    ## orientation is frame-dependent and descriptive rather than inferential.
+    if (crw && an_mode == 2L) {
+      rp_ <- try(obj$report(), silent = TRUE)
+      if (!inherits(rp_, "try-error") && length(rp_$u1) >= i) {
+        oi <- atan2(rp_$u2[i], rp_$u1[i]) / 2 * 180 / pi
+        orow <- matrix(c(oi, NA_real_), 1, 2,
+                       dimnames = list("orient", colnames(fxd)))
+        fxd <- rbind(fxd, orow)
+      }
+    }
+
     rn <- rownames(fxd)
     if (sum(rn == "sigma_pop") == 2)
       rn[rn == "sigma_pop"] <- c("sigma_pop_x", "sigma_pop_y")

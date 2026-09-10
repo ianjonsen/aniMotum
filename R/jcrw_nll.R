@@ -240,7 +240,6 @@ jcrw_nll <- function(dat) {
     D <- exp(m) / 2
     D_pop <- exp(m_pop[1]) / 2
     aniso <- exp(2 * rr_i)
-    orient <- atan2(u2, u1) / 2 * 180 / pi
 
     RTMB::ADREPORT(D_pop)
     RTMB::ADREPORT(D)
@@ -252,7 +251,15 @@ jcrw_nll <- function(dat) {
     if (m_mode == 1L) RTMB::ADREPORT(sd_m)
     if (an_mode > 0L) {
       RTMB::ADREPORT(aniso)
-      RTMB::ADREPORT(orient)
+      ## RTMB has no atan2() method for advectors, so the orientation is only
+      ## ADREPORTed where it is already a parameter in its own right. Under
+      ## aniso = "common.ratio" that is exactly what theta is, and its standard
+      ## error comes for free. With a free anisotropy vector the orientation is
+      ## recovered from u1 and u2 after the fit, in jsfilter(), without one.
+      if (an_mode == 1L) {
+        orient <- theta * 180 / pi
+        RTMB::ADREPORT(orient)
+      }
     }
     if (est_ho == 1L) RTMB::ADREPORT(hos)
 
@@ -261,7 +268,6 @@ jcrw_nll <- function(dat) {
     RTMB::REPORT(u2)
     RTMB::REPORT(D)
     RTMB::REPORT(aniso)
-    RTMB::REPORT(orient)
 
     jnll
   }
