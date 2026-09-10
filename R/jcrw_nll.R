@@ -21,13 +21,15 @@
 ##'
 ##' \strong{The parameterisation.} The same covariance is written
 ##'
-##' \deqn{V = e^{m} \exp(A), \quad A = \left[\begin{array}{cc} u_1 & u_2 \\
-##' u_2 & -u_1 \end{array}\right]}
+##' ```
+##'   V = exp(m) * expm(A)        A = [ u1   u2 ]
+##'                                   [ u2  -u1 ]
+##' ```
 ##'
 ##' `A` is symmetric with zero trace, so `exp(A)` has determinant one and
-##' `det(V) = exp(2m)` exactly. `A` has eigenvalues `+/- r` with
-##' `r = sqrt(u1^2 + u2^2)`, so `V` has eigenvalues `exp(m +/- r)` and its major
-##' axis lies at `theta = atan2(u2, u1) / 2`. That gives
+##' `det(V) = exp(2m)` exactly. `A` has eigenvalues `+/- r`, where `r` is
+##' \code{sqrt(u1^2 + u2^2)}, so `V` has eigenvalues `exp(m +/- r)` and its
+##' major axis lies at `theta = atan2(u2, u1) / 2`. That gives
 ##'
 ##' \describe{
 ##'   \item{`m`}{overall movement magnitude, half the log determinant. Rotation
