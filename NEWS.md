@@ -29,6 +29,22 @@ upstream - by `ArgosQC`, for example - reach the model exactly as prepared,
 * new vignette, `Projections`, on what the projection does to parameter
 estimates and how to tell whether it matters for your data.
 
+## bug fixes
+
+* `ellp.par()`, which generates Argos error ellipse parameters and the
+corresponding location errors for `sim()`, produced errors that did not match
+the ellipses recorded beside them. Two faults: `eor` was returned in degrees
+but passed to `sin()` and `cos()`, which take radians, so an ellipse recorded
+at 90 degrees received errors oriented at 0; and the covariance off-diagonal
+was half its correct value, `0.5 * (M2 - m2)` rather than `(M2 - m2)`, which
+broke the identity that a rotation of `diag(M2, m2)` has determinant exactly
+`M2 * m2`. Standardising each simulated error by its own ellipse gave variances
+of 0.59 and 51934 where both should be 1 - the y errors were roughly 228 times
+too large in standard deviation. Simulated tracks from `sim(..., error = "kf")`
+therefore carried errors inconsistent with their own ellipse parameters, and
+any model fitted to them would have been calibrated against data the model
+could not have generated. Now 1.008 and 1.000, with a correlation of 0.001.
+
 ## rotation-invariant joint correlated random walk
 
 * new `model = "jcrw"` in `fit_ssm()` fits a correlated random walk jointly to

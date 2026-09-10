@@ -55,20 +55,30 @@ ellp.par <- function(lc) {
                   })
                 ))
   
-  ## convert ellipse params to covar matrix
+  ## convert ellipse params to covar matrix.
+  ##
+  ## Two things to be careful about here, both of which were previously wrong.
+  ##
+  ## eor is drawn in radians, returned in degrees (the Argos convention, and
+  ## what fit_ssm expects - pf_obs_type() converts it back to radians before
+  ## the model sees it). sin() and cos() take radians, so it must be converted
+  ## here too. Without that, the simulated error was oriented unrelatedly to
+  ## the eor recorded beside it: an ellipse recorded at 90 degrees got errors
+  ## oriented at 0.
+  ##
+  ## The off-diagonal is (M2 - m2) * cos * sin, not half that. The covariance
+  ## is a rotation of diag(M2, m2), so its determinant must be exactly M2 * m2,
+  ## which only the full term gives - with the halved version the determinant
+  ## was out by two orders of magnitude. This matches crw.hpp, where the
+  ## corresponding line is 0.5 * (smaj^2 - (smin*psi)^2) * cos(c) * sin(c),
+  ## and 0.5 * smaj^2 is M2.
   psi <- 1 # keep this here for possible later use
-  s1 <- with(ellps, 
-             (smaj / sqrt(2))^2 * sin(eor)^2 + 
-               (smin * psi / sqrt(2))^2 * cos(eor)^2
-  )
-  s2 <- with(ellps,
-             (smaj / sqrt(2))^2 * cos(eor)^2 +
-               (smin * psi / sqrt(2))^2 * sin(eor)^2
-  )
-  s12 <- with(ellps,
-              (0.5 * ((smaj / sqrt(2))^2 - (smin * psi / sqrt(2))^2)) * 
-                cos(eor) * sin(eor)
-  )
+  eor.r <- ellps$eor * pi / 180
+  M2 <- (ellps$smaj / sqrt(2))^2
+  m2 <- (ellps$smin * psi / sqrt(2))^2
+  s1 <- M2 * sin(eor.r)^2 + m2 * cos(eor.r)^2
+  s2 <- M2 * cos(eor.r)^2 + m2 * sin(eor.r)^2
+  s12 <- (M2 - m2) * cos(eor.r) * sin(eor.r)
   
   ## return x,y errors + ellipse params
   errs <- lapply(1:n, function(i) {
