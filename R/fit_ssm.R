@@ -23,10 +23,11 @@
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit a simple random walk (`rw`), correlated random walk
 ##' (`crw`), a time-varying move persistence model (`mp`), or a joint
-##' (hierarchical) correlated random walk fitted to all individuals at once
-##' (`jcrw`), all as continuous-time process models. The `jcrw` model shares
-##' parameters among individuals according to `share`; see
-##' [aniMotum::share_control]
+##' (hierarchical) move persistence model fitted to all individuals at once
+##' (`jmp`), all as continuous-time process models. The `jmp` model shares
+##' parameters among individuals according to `share`; in particular it pools
+##' `sigma_g`, which is what makes the estimated move persistence `g_t`
+##' comparable between individuals. See [aniMotum::share_control]
 ##' @param time.step options: 1) the regular time interval, in hours, to predict to; 
 ##' 2) a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates; 3) NA - turns off 
@@ -45,11 +46,11 @@
 ##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
-##' @param share for `model = "jcrw"` only, a parameter sharing specification
+##' @param share for `model = "jmp"` only, a parameter sharing specification
 ##' from [aniMotum::share_control] controlling which parameters are pooled
 ##' across individuals, which are hierarchical, and which are estimated
 ##' separately for each individual. Ignored by the other models
-##' @param init for `model = "jcrw"` only, how to initialise the joint fit.
+##' @param init for `model = "jmp"` only, how to initialise the joint fit.
 ##' `"individual"` (default) first fits each track separately with the `crw`
 ##' model and uses those estimates as starting values; `"moment"` uses
 ##' moment-based starting values. Per-individual initialisation costs an extra
@@ -178,7 +179,7 @@ fit_ssm <- function(x,
 
   dots <- list(...)
   
-  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, or `jcrw`" = model %in% c("rw","crw","mp","jcrw"))
+  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, or `jmp`" = model %in% c("rw","crw","mp","jmp"))
   init <- match.arg(init)
   
 ## check args - most args handled by prefilter() & sfilter()
@@ -288,7 +289,7 @@ fit_ssm <- function(x,
                       )
                     })
       
-    } else if (model == "jcrw") {
+    } else if (model == "jmp") {
       ## the joint model is fitted to all individuals at once, so the
       ## prefiltered list is passed through rather than looped over
       fit <- jsfilter(

@@ -1,42 +1,56 @@
 # aniMotum (development version)
 
-## joint (hierarchical) state-space model
+## joint (hierarchical) move persistence model
 
-* new `model = "jcrw"` in `fit_ssm()` fits a continuous-time correlated random
-walk to all individual tracks at once, sharing parameters among individuals.
-The measurement model (`tau`, `psi`, `rho_o`) and the process error correlation
-(`rho_p`) are pooled by default, while the diffusion coefficient `D` is
-hierarchical: each individual's `D` is drawn from an estimated population
-distribution, so short or sparse tracks are partially pooled toward the
-population mean. Written in R using RTMB rather than as a C++ template.
+* new `model = "jmp"` in `fit_ssm()` fits the time-varying move persistence
+model to all individual tracks at once, sharing parameters among individuals.
+`sigma_g` is pooled by default, which is the point of the model: with an
+individual-specific `sigma_g` each animal's `g_t` is smoothed on its own scale
+and the series are not comparable between animals. This follows Jonsen et al.
+(2019) and the existing `jmpm` model in `fit_mpm()`. The measurement model
+(`tau`, `psi`, `rho_o`) is pooled, the process innovation scale is
+hierarchical, and `rho_p` is estimated per individual. Written in R using RTMB
+rather than as a C++ template.
+
+* `rho_p` is individual by default, deliberately. It sets the tilt of the
+process covariance ellipse relative to the projected coordinate axes, so it
+records the animal's direction of travel rather than a property of its
+movement. Animals heading different ways are not exchangeable in it, and
+pooling averages correlations that may differ in sign.
 
 * new `share_control()` specifies which parameters are pooled, hierarchical or
-estimated separately, and refuses combinations that are not identifiable. In
-particular it will not allow `D` and the measurement parameters to be
-hierarchical at the same time, since random effects on both sides of the
-process/measurement variance partition trade off against each other and leave
-the variance hyperparameters unidentified. `share_control(group = )` pools the
-measurement parameters within strata (tag type, species, deployment) rather
-than across all individuals.
+estimated separately, and refuses combinations that are not identifiable. It
+will not allow `sigma` and the measurement parameters to be hierarchical at
+once, since random effects on both sides of the process/measurement variance
+partition trade off against each other. `share_control(group = )` pools the
+measurement parameters within strata (tag type, species, deployment).
 
 * `share_control(ho_scale = "pooled")` estimates the haulout process variance
-scale factor instead of asserting it. This is only possible in a joint fit: it
-is not identifiable from a single track, which is why `ssm_control()` supplies
-it as a constant.
+scale factor instead of asserting it. This is only possible in a joint fit.
 
-* `fit_ssm(model = "jcrw")` warns when individuals span a wide latitude range on
-a Mercator grid. Mercator is conformal, so the x,y anisotropy of `D` is
-unaffected, but the scale factor is `sec(latitude)` and `D` has units of
-distance squared per unit time, so apparent diffusion is inflated by
-`sec(latitude)^2`. Across individuals occupying different latitude bands that
-inflation is absorbed into the among-individual variance, where it cannot be
-told apart from biological variation.
+* `fit_ssm(model = "jmp")` warns when individuals span a wide latitude range on
+a Mercator grid, where the `sec(latitude)` scale factor inflates apparent
+movement scale and is absorbed into the among-individual variance of `sigma`.
+`g_t` and `sigma_g` are unaffected, being scale-free.
+
+* the joint fit uses tightened optimiser tolerances by default. `ssm_control()`'s
+defaults (`rel.tol = 1e-3`, `x.tol = 1.5e-2`) are tuned for fast per-individual
+quality control and are too loose for a variance parameter in a low-curvature
+direction, where they can produce a spurious among-individual variance while
+reporting `convergence = 0`.
 
 * new internal `ssm_prep()` factors out the prediction grid, time differences,
 gap and haulout flags and state initial values shared by all of the filters.
 It is used by the joint filter only for now; `sfilter()` and `mpfilter()`
 currently duplicate this logic between them and are intended to migrate onto
 `ssm_prep()` once it has been validated against their existing behaviour.
+
+* a joint correlated random walk (`jcrw`) was prototyped and set aside; see
+commit "joint (hierarchical) CRW prototype in RTMB - set aside". The diffusion
+tensor is frame-dependent, so pooling its components across animals travelling
+on different bearings averages incommensurable quantities. A rotation-invariant
+reparameterisation is the way back to it.
+
 
 # aniMotum 1.2-06 (05/06/2024)
 

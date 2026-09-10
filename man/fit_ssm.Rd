@@ -21,6 +21,8 @@ fit_ssm(
   fit.to.subset = TRUE,
   control = ssm_control(),
   inner.control = NULL,
+  share = share_control(),
+  init = c("individual", "moment"),
   haulout = NULL,
   ho.ref = "ref",
   ho.id_fun = NULL,
@@ -47,8 +49,12 @@ differences > 0 are allowed.}
 \item{pf}{just pre-filter the data, do not fit the SSM (default is FALSE)}
 
 \item{model}{fit a simple random walk (\code{rw}), correlated random walk
-(\code{crw}), or a time-varying move persistence model (\code{mp}), all as
-continuous-time process models}
+(\code{crw}), a time-varying move persistence model (\code{mp}), or a joint
+(hierarchical) move persistence model fitted to all individuals at once
+(\code{jmp}), all as continuous-time process models. The \code{jmp} model shares
+parameters among individuals according to \code{share}; in particular it pools
+\code{sigma_g}, which is what makes the estimated move persistence \code{g_t}
+comparable between individuals. See \link{share_control}}
 
 \item{time.step}{options: 1) the regular time interval, in hours, to predict to;
 2) a vector of prediction times, possibly not regular, must be
@@ -74,6 +80,17 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
+
+\item{share}{for \code{model = "jmp"} only, a parameter sharing specification
+from \link{share_control} controlling which parameters are pooled
+across individuals, which are hierarchical, and which are estimated
+separately for each individual. Ignored by the other models}
+
+\item{init}{for \code{model = "jmp"} only, how to initialise the joint fit.
+\code{"individual"} (default) first fits each track separately with the \code{crw}
+model and uses those estimates as starting values; \code{"moment"} uses
+moment-based starting values. Per-individual initialisation costs an extra
+pass over the data but substantially improves convergence}
 
 \item{haulout}{optional. Either a path to an SMRU haulout CSV file or a
 pre-read data frame with columns \code{s_date} and \code{e_date} defining haulout

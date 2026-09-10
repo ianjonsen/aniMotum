@@ -1,20 +1,18 @@
-##' @title Fit a joint (hierarchical) continuous-time correlated random walk
+##' @title Fit a joint (hierarchical) move persistence state-space model
 ##'
-##' @description Fits a `crw` state-space model to several individual tracks at
+##' @description Fits an `mp` state-space model to several individual tracks at
 ##' once, sharing parameters among individuals according to a
 ##' [aniMotum::share_control] specification. Called by [aniMotum::fit_ssm] when
-##' `model = "jcrw"`.
+##' `model = "jmp"`.
 ##'
-##' @details The model is written in R using RTMB rather than as a C++ template.
-##' A joint fit builds one AD object for the whole data set, so RTMB's taping
-##' cost is paid once rather than once per individual, and the ability to step
-##' into the likelihood matters most exactly where a hierarchical model is
-##' hardest: diagnosing whether the among-individual variance is identifiable.
+##' @details The model is written in R using RTMB rather than as a C++
+##' template. A joint fit builds one AD object for the whole data set, so
+##' RTMB's taping cost is paid once rather than once per individual.
 ##'
-##' Individuals are fitted with a common set of measurement parameters and
-##' individual-level diffusion coefficients drawn from an estimated population
-##' distribution. See [aniMotum::share_control] for the reasoning, and for the
-##' parameter combinations that are refused.
+##' By default the measurement model and `sigma_g` are pooled, the process
+##' innovation scale is hierarchical, and `rho_p` is estimated separately per
+##' individual. See [aniMotum::share_control] for the reasoning behind each of
+##' those choices, and for the combinations that are refused.
 ##'
 ##' @param x a named list of prefiltered sf-tibbles, one per individual, as
 ##' produced by [aniMotum::prefilter]
@@ -28,18 +26,18 @@
 ##' @param control a list of control values from [aniMotum::ssm_control]
 ##' @param inner.control control settings for the inner optimiser
 ##' @param ho_lookup optional haulout lookup assembled by [aniMotum::fit_ssm]
-##' @param group_lookup optional data.frame with `id` and a grouping variable,
-##' assembled by [aniMotum::fit_ssm]
-##' @param init one of `"individual"` (default) to initialise the joint fit
-##' from separate per-individual `crw` fits, or `"moment"` to use moment-based
-##' starting values. Per-individual initialisation costs an extra pass over the
-##' data but substantially improves convergence of the joint model
+##' @param group_lookup optional data.frame with `id` and a grouping variable
+##' @param init one of `"individual"` (default) to initialise from separate
+##' per-individual `mp` fits, or `"moment"` for moment-based starting values.
+##' Per-individual initialisation costs an extra pass over the data but
+##' substantially improves convergence, because it supplies starting states
+##' that are consistent with the starting parameters
 ##'
-##' @return a named list of `ssm` objects, one per individual, all sharing the
-##' single joint fit's optimiser output, TMB object and sdreport
+##' @return a named list of `mp_ssm` objects, one per individual, all sharing
+##' the single joint fit's optimiser output, TMB object and sdreport
 ##'
 ##' @importFrom sf st_as_sf st_set_crs st_crs st_transform st_coordinates
-##' @importFrom stats nlminb optim setNames
+##' @importFrom stats nlminb optim setNames plogis median sd
 ##'
 ##' @keywords internal
 
@@ -68,11 +66,10 @@ jsfilter <- function(x,
 
   if (share$tau == "hierarchical" || share$psi == "hierarchical")
     stop("hierarchical measurement parameters are not implemented.\n",
-         "  This is deliberate rather than an oversight: a random effect on the\n",
-         "  measurement model is only identifiable when the process model is\n",
-         "  pooled, and in that configuration the model has little to recommend\n",
-         "  it over pooling the measurement model directly. See ?share_control.",
-         call. = FALSE)
+         "  This is deliberate: a random effect on the measurement model is\n",
+         "  only identifiable when the process model is pooled, and in that\n",
+         "  configuration it has little to recommend it over pooling the\n",
+         "  measurement model directly. See ?share_control.", call. = FALSE)
 
   A <- length(x)
   ids <- names(x)
@@ -86,26 +83,20 @@ jsfilter <- function(x,
 
   ni <- sapply(prep, function(p) ncol(p$Y))
   i2 <- cumsum(ni)
-  i1 <- c(1L, i2[-A] + 1L)   ## head() would need utils in Imports
+  i1 <- c(1L, i2[-A] + 1L)
   N <- sum(ni)
-  ind <- rep(seq_len(A), ni)          ## individual index for every row
+  ind <- rep(seq_len(A), ni)
 
   ## ------------------------------------------------------------------
   ## projection check
   ##
   ## prefilter() projects to a global Mercator grid in km by default. Mercator
   ## is conformal, so x and y are scaled equally at a point and the anisotropy
-  ## of D is unaffected. But the scale factor is sec(latitude), and D carries
-  ## units of distance squared per unit time, so apparent diffusion is inflated
-  ## by sec(latitude)^2. Across individuals occupying different latitude bands
-  ## that inflation varies substantially, and a hierarchical model will absorb
-  ## it into the among-individual variance, where it is indistinguishable from
-  ## biological variation.
+  ## of the process covariance is unaffected. But the scale factor is
+  ## sec(latitude), and sigma has units of distance per unit time, so apparent
+  ## movement scale is inflated by sec(latitude). Both the span across
+  ## individuals and the span within an individual matter.
   ## ------------------------------------------------------------------
-  ## Both the span across individuals and the span within an individual matter.
-  ## A single animal migrating across 20 degrees of latitude has its own D
-  ## averaged over a scale factor that varies several-fold along its own track,
-  ## which the individual filters are subject to as well.
   chk <- try({
     lapply(x, function(xx) {
       g <- st_coordinates(st_transform(xx, 4326))
@@ -119,32 +110,30 @@ jsfilter <- function(x,
     if (all(is.finite(lat.rng))) {
       is.merc <- grepl("merc", tolower(paste(st_crs(x[[1]])$proj4string,
                                              st_crs(x[[1]])$wkt)))
-      sec2 <- 1 / cos(lat.rng * pi / 180) ^ 2
-      ratio <- sec2[2] / sec2[1]
-
-      ## largest span within any single individual
+      sec <- 1 / cos(lat.rng * pi / 180)
+      ratio <- sec[2] / sec[1]
       w.ratio <- max(sapply(chk, function(r) {
-        s2 <- 1 / cos(r * pi / 180) ^ 2
-        s2[2] / s2[1]
+        s <- 1 / cos(r * pi / 180)
+        s[2] / s[1]
       }))
 
-      if (is.merc && ratio > 1.5) {
+      if (is.merc && ratio > 1.3) {
         warning("these data span ", round(lat.rng[1], 1), " to ",
                 round(lat.rng[2], 1), " degrees absolute latitude on a ",
                 "Mercator grid.\n",
-                "  Mercator is conformal, so the x,y anisotropy of D is ",
-                "unaffected, but the scale\n  factor is sec(latitude) and D ",
-                "has units of distance squared per unit time, so\n  apparent ",
-                "diffusion is inflated by sec(latitude)^2. That inflation ",
-                "varies by a factor\n  of ", round(ratio, 1), " across the ",
-                "data set", if (w.ratio > 1.5)
+                "  The scale factor is sec(latitude), so apparent movement ",
+                "scale differs by a factor\n  of ", round(ratio, 1),
+                " across the data set",
+                if (w.ratio > 1.3)
                   paste0(", and by up to ", round(w.ratio, 1),
                          " within a single track") else "", ".\n",
-                "  Across individuals it is absorbed into the ",
-                "among-individual variance of D, where\n  it cannot be told ",
-                "apart from biological variation. Supply the data as an sf\n",
-                "  object in an equal-area projection if the population-level ",
-                "D or its variance\n  is to be interpreted.",
+                "  Across individuals this is absorbed into the ",
+                "among-individual variance of sigma,\n  where it cannot be ",
+                "told apart from biological variation. Supply the data as an\n",
+                "  sf object in an equal-area projection if the ",
+                "population-level sigma or its\n  variance is to be ",
+                "interpreted. g_t and sigma_g are unaffected, being ",
+                "scale-free.",
                 call. = FALSE, immediate. = TRUE)
       }
     }
@@ -155,7 +144,6 @@ jsfilter <- function(x,
   ## ------------------------------------------------------------------
   if (is.null(share$group)) {
     grp <- rep(1L, A)
-    grp.levels <- "all"
   } else {
     if (is.null(group_lookup))
       stop("share_control(group = \"", share$group, "\") was specified but the ",
@@ -164,31 +152,21 @@ jsfilter <- function(x,
     if (any(is.na(gl)))
       stop("the grouping variable `", share$group, "` is missing for: ",
            paste(ids[is.na(gl)], collapse = ", "), call. = FALSE)
-    gf <- factor(as.character(gl))
-    grp <- as.integer(gf)
-    grp.levels <- levels(gf)
+    grp <- as.integer(factor(as.character(gl)))
   }
-  G <- length(unique(grp))
 
-  ## individual-level indices for each measurement parameter. "pooled" uses the
-  ## group index, "individual" gives every animal its own value, so both are the
-  ## same code path in the likelihood with a different index vector.
+  ## individual-level index for each shared parameter. "pooled" uses the group
+  ## index, "individual" gives every animal its own value, so both are the same
+  ## code path in the likelihood with a different index vector.
   idx_for <- function(mode) if (mode == "individual") seq_len(A) else grp
-  g_tau <- idx_for(share$tau)
-  g_psi <- idx_for(share$psi)
-  g_rho_o <- idx_for(share$rho_o)
-  g_rho_p <- idx_for(share$rho_p)
+  g_tau <- as.integer(factor(idx_for(share$tau)))
+  g_psi <- as.integer(factor(idx_for(share$psi)))
+  g_rho_o <- as.integer(factor(idx_for(share$rho_o)))
+  g_rho_p <- as.integer(factor(idx_for(share$rho_p)))
+  g_sg <- as.integer(factor(idx_for(share$sigma_g)))
 
-  G_tau <- length(unique(g_tau))
-  G_psi <- length(unique(g_psi))
-  G_rho_o <- length(unique(g_rho_o))
-  G_rho_p <- length(unique(g_rho_p))
-
-  ## re-index to 1..G in case of gaps
-  g_tau <- as.integer(factor(g_tau))
-  g_psi <- as.integer(factor(g_psi))
-  g_rho_o <- as.integer(factor(g_rho_o))
-  g_rho_p <- as.integer(factor(g_rho_p))
+  G_tau <- max(g_tau); G_psi <- max(g_psi); G_rho_o <- max(g_rho_o)
+  G_rho_p <- max(g_rho_p); G_sg <- max(g_sg)
 
   ## ------------------------------------------------------------------
   ## concatenate model data
@@ -198,7 +176,6 @@ jsfilter <- function(x,
   Y <- do.call(cbind, lapply(prep, function(p) p$Y))
   K <- do.call(rbind, lapply(prep, function(p) p$K))
   GLerr <- do.call(rbind, lapply(prep, function(p) p$GLerr))
-  state0 <- do.call(rbind, lapply(prep, function(p) p$state0))
 
   dt <- cat_v(function(p) p$dt)
   isd <- cat_v(function(p) p$isd)
@@ -209,16 +186,11 @@ jsfilter <- function(x,
   M <- cat_v(function(p) p$M)
   c_eor <- cat_v(function(p) p$c)
 
-  ## observation row indices by measurement model. Prediction rows contribute
-  ## nothing and carry NA coordinates, so they are excluded here rather than
-  ## being zeroed inside the likelihood.
   obs <- which(isd == 1L)
   i_ls <- obs[obs_mod[obs] == 0L]
   i_kf <- obs[obs_mod[obs] == 1L]
   i_gl <- obs[obs_mod[obs] == 2L]
 
-  ## NA-safety: the ellipse and generic-location variables are only defined for
-  ## their own observation types
   if (length(i_kf)) {
     bad <- !is.finite(m[i_kf]) | !is.finite(M[i_kf]) | !is.finite(c_eor[i_kf])
     if (any(bad)) i_kf <- i_kf[!bad]
@@ -234,29 +206,28 @@ jsfilter <- function(x,
   GLerr[!is.finite(GLerr)] <- 1
   Y[!is.finite(Y)] <- 0
 
-  D_mode <- switch(share$D,
-                   pooled = 0L,
-                   hierarchical = if (share$hier.D == "shared") 1L else 2L,
-                   individual = 3L)
-
-  dimnames(state0) <- NULL
   dimnames(K) <- NULL
   dimnames(GLerr) <- NULL
   dimnames(Y) <- NULL
+
+  sig_mode <- switch(share$sigma,
+                     pooled = 0L,
+                     hierarchical = if (share$hier.sigma == "shared") 1L else 2L,
+                     individual = 3L)
 
   dat <- list(
     A = A, N = N,
     i1 = as.integer(i1), i2 = as.integer(i2),
     zeroA = numeric(A),
-    Y = Y, dt = dt, state0 = state0,
+    Y = Y, dt = dt,
     gap_flag = gap_flag, ho_flag = ho_flag,
     K = K, m = m, M = M, c_eor = c_eor, GLerr = GLerr,
     i_ls = i_ls, i_kf = i_kf, i_gl = i_gl,
     n_ls = length(i_ls), n_kf = length(i_kf), n_gl = length(i_gl),
     r_tau = g_tau[ind], r_psi = g_psi[ind], r_rho_o = g_rho_o[ind],
-    g_rho_p = g_rho_p,
+    g_rho_p = g_rho_p, g_sg = g_sg,
     G_tau = G_tau,
-    D_mode = D_mode,
+    sig_mode = sig_mode,
     est_ho = if (share$ho_scale == "pooled") 1L else 0L,
     ho_scale_fixed = control$ho_scale
   )
@@ -266,84 +237,86 @@ jsfilter <- function(x,
   ## ------------------------------------------------------------------
   if (is.null(parameters)) {
 
-    lD0 <- matrix(1, A, 2)
+    lsig0 <- matrix(0, A, 2)
+    lsg0 <- numeric(A)
+    X0 <- lapply(prep, function(p) t(p$xs))
+    lg0 <- lapply(prep, function(p) rep(0, ncol(p$Y)))
 
-    ## crude starting states: linearly interpolated locations and the
-    ## corresponding finite-difference velocities
-    mu0 <- lapply(prep, function(p) t(p$xs))
-    v0 <- lapply(prep, function(p) t(p$v.init))
+    ## crude moment starting values for sigma: the covariance of the
+    ## first differences of the interpolated path
+    for (i in seq_len(A)) {
+      es <- prep[[i]]$xs[-1, , drop = FALSE] -
+        prep[[i]]$xs[-nrow(prep[[i]]$xs), , drop = FALSE]
+      sg <- sqrt(diag(stats::cov(es)))
+      lsig0[i, ] <- log(pmax(1e-8, sg))
+    }
 
     if (init == "individual") {
       if (control$verbose >= 1)
-        cat(paste0("initialising from ", A, " individual crw fits...\n"))
+        cat(paste0("initialising from ", A, " individual mp fits...\n"))
       for (i in seq_len(A)) {
-        fi <- try(sfilter(x = x[[i]], model = "crw", time.step = time.step,
-                          fit.to.subset = fit.to.subset,
-                          control = ssm_control(verbose = 0,
-                                                gap.thresh = control$gap.thresh,
-                                                ho_scale = control$ho_scale),
-                          ho_lookup = ho_lookup), silent = TRUE)
+        fi <- try(mpfilter(x = x[[i]], model = "mp", time.step = time.step,
+                           fit.to.subset = fit.to.subset,
+                           control = ssm_control(verbose = 0,
+                                                 gap.thresh = control$gap.thresh,
+                                                 ho_scale = control$ho_scale),
+                           ho_lookup = ho_lookup), silent = TRUE)
         if (!inherits(fi, "try-error") && length(fi) == 15) {
           pr <- fi$par
-          if (all(c("D_x", "D_y") %in% rownames(pr)))
-            lD0[i, ] <- log(pmax(1e-8, pr[c("D_x", "D_y"), "Estimate"]))
+          if (all(c("sigma_x", "sigma_y") %in% rownames(pr)))
+            lsig0[i, ] <- log(pmax(1e-8, pr[c("sigma_x", "sigma_y"),
+                                            "Estimate"]))
+          if ("sigma_g" %in% rownames(pr))
+            lsg0[i] <- log(pmax(1e-8, pr["sigma_g", "Estimate"]))
 
-          ## Take the smoothed states from the same fit.
-          ##
-          ## Initialising D from the individual fits while leaving mu and v at
-          ## their crude finite-difference values makes the starting point
-          ## internally inconsistent, and badly so. The finite-difference
-          ## velocities are far rougher than any fitted track, and a small
-          ## fitted D penalises that roughness in proportion to 1/D. With D at
-          ## its converged value rather than a loose default, the starting
-          ## objective can reach 1e12 and the inner Newton problem begins in a
-          ## region it cannot recover from, returning NaN rather than failing
-          ## visibly. Taking mu and v from the same fit that supplied D keeps
-          ## the whole starting point self-consistent.
+          ## Take the smoothed states from the same fit. Initialising the
+          ## parameters from a converged fit while leaving the states at their
+          ## crude interpolated values makes the starting point internally
+          ## inconsistent, and a tight fitted sigma then penalises the crude
+          ## path enormously - the objective can reach 1e12 and the inner
+          ## Newton problem starts where it cannot recover.
           rr <- try(summary(fi$rep, "random"), silent = TRUE)
           if (!inherits(rr, "try-error")) {
-            lo <- rr[rownames(rr) == "mu", 1]
-            ve <- rr[rownames(rr) == "v", 1]
-            if (length(lo) == 2 * ni[i] && length(ve) == 2 * ni[i]) {
-              mu0[[i]] <- matrix(lo, nrow = 2)
-              v0[[i]] <- matrix(ve, nrow = 2)
-            }
+            xx <- rr[rownames(rr) == "X", 1]
+            gg <- rr[rownames(rr) == "lg", 1]
+            if (length(xx) == 2 * ni[i]) X0[[i]] <- matrix(xx, nrow = 2)
+            if (length(gg) == ni[i]) lg0[[i]] <- gg
           }
         }
       }
     }
 
-    lD_pop0 <- colMeans(lD0)
-    sd0 <- apply(lD0, 2, stats::sd)
-    sd0[!is.finite(sd0) | sd0 <= 0] <- 0.5
+    lsig_pop0 <- colMeans(lsig0)
+    sd0 <- stats::sd(rowMeans(lsig0))
+    if (!is.finite(sd0) || sd0 <= 0) sd0 <- 0.5
 
-    lD_re0 <- switch(as.character(D_mode),
-                     "0" = numeric(A),
-                     "1" = rowMeans(lD0) - mean(rowMeans(lD0)),
-                     numeric(2 * A))
-    if (D_mode %in% c(2L, 3L))
-      lD_re0 <- c(lD0[, 1] - lD_pop0[1], lD0[, 2] - lD_pop0[2])
+    lsig_re0 <- switch(as.character(sig_mode),
+                       "0" = numeric(A),
+                       "1" = rowMeans(lsig0) - mean(rowMeans(lsig0)),
+                       numeric(2 * A))
+    if (sig_mode %in% c(2L, 3L))
+      lsig_re0 <- c(lsig0[, 1] - lsig_pop0[1], lsig0[, 2] - lsig_pop0[2])
 
     parameters <- list(
-      lD_pop = lD_pop0,
-      l_sd_lD = log(c(mean(sd0), sd0[2])),
-      lD_re = lD_re0,
+      lsig_pop = lsig_pop0,
+      l_sd_lsig = rep(log(sd0), 2),
+      lsig_re = lsig_re0,
       l_rho_p = rep(0.1, G_rho_p),
+      l_sigma_g = rep(mean(lsg0), G_sg),
       l_tau = rep(0, 2 * G_tau),
       l_psi = rep(0, G_psi),
       l_rho_o = rep(0, G_rho_o),
       l_ho_scale = 0,
-      mu = unname(do.call(cbind, mu0)),
-      v = unname(do.call(cbind, v0))
+      X = unname(do.call(cbind, X0)),
+      lg = unlist(lg0, use.names = FALSE)
     )
   }
 
   ## ------------------------------------------------------------------
-  ## map: switch off parameters that the data cannot inform
+  ## map: switch off parameters the data cannot inform
   ## ------------------------------------------------------------------
-  ## observation types present within each measurement group
   types_in <- function(gidx, ng) {
-    out <- matrix(FALSE, ng, 3)   ## LS/GPS, KF, GL
+    out <- matrix(FALSE, ng, 3)
     for (i in seq_len(A)) {
       om <- prep[[i]]$obs_mod[prep[[i]]$isd == 1L]
       g <- gidx[i]
@@ -365,24 +338,17 @@ jsfilter <- function(x,
   t_rho_o <- types_in(g_rho_o, G_rho_o)
 
   automap <- list()
-  ## tau scales the LS/GPS error multiplication factors only
-  need_tau <- t_tau[, 1]
-  automap$l_tau <- fac(rep(need_tau, 2))
-  ## psi scales the Argos error ellipse semi-minor axis only
-  need_psi <- t_psi[, 2]
-  automap$l_psi <- fac(need_psi)
-  ## rho_o applies to LS/GPS and GL observations, not to error ellipses
-  need_rho_o <- t_rho_o[, 1] | t_rho_o[, 3]
-  automap$l_rho_o <- fac(need_rho_o)
+  automap$l_tau <- fac(rep(t_tau[, 1], 2))
+  automap$l_psi <- fac(t_psi[, 2])
+  automap$l_rho_o <- fac(t_rho_o[, 1] | t_rho_o[, 3])
 
-  ## D random effects and their variance
-  if (D_mode == 0L) {
-    automap$lD_re <- factor(rep(NA, length(parameters$lD_re)))
-    automap$l_sd_lD <- factor(c(NA, NA))
-  } else if (D_mode == 1L) {
-    automap$l_sd_lD <- factor(c(1, NA))
-  } else if (D_mode == 3L) {
-    automap$l_sd_lD <- factor(c(NA, NA))
+  if (sig_mode == 0L) {
+    automap$lsig_re <- factor(rep(NA, length(parameters$lsig_re)))
+    automap$l_sd_lsig <- factor(c(NA, NA))
+  } else if (sig_mode == 1L) {
+    automap$l_sd_lsig <- factor(c(1, NA))
+  } else if (sig_mode == 3L) {
+    automap$l_sd_lsig <- factor(c(NA, NA))
   }
 
   if (share$ho_scale != "pooled" || !any(ho_flag == 1L))
@@ -398,35 +364,34 @@ jsfilter <- function(x,
   ## ------------------------------------------------------------------
   ## build and minimise
   ## ------------------------------------------------------------------
-  rnd <- c("mu", "v")
-  if (D_mode %in% c(1L, 2L)) rnd <- c(rnd, "lD_re")
+  rnd <- c("X", "lg")
+  if (sig_mode %in% c(1L, 2L)) rnd <- c(rnd, "lsig_re")
 
   if (is.null(inner.control) || !"smartsearch" %in% names(inner.control))
     inner.control <- list(smartsearch = TRUE)
 
-  ## The objective at the starting values, evaluated in plain R with no AD and
-  ## no Laplace approximation. A very large value means the starting states and
-  ## the starting parameters disagree with each other, which the inner Newton
-  ## problem will usually not survive.
-  nll0 <- try(as.numeric(jcrw_nll(dat)(parameters)), silent = TRUE)
+  ## The objective at the starting values, in plain R with no AD and no Laplace
+  ## approximation. A very large value means the starting states and starting
+  ## parameters disagree, which the inner Newton problem usually will not
+  ## survive.
+  nll0 <- try(as.numeric(jmp_nll(dat)(parameters)), silent = TRUE)
   if (!inherits(nll0, "try-error")) {
     if (control$verbose >= 1)
       cat(paste0("objective at starting values: ",
                  format(nll0, digits = 4), "\n"))
     if (!is.finite(nll0))
       warning("the objective is not finite at the starting values. The model ",
-              "cannot be fitted from here;\n  supply `parameters` directly, or ",
-              "try init = \"moment\".", call. = FALSE, immediate. = TRUE)
+              "cannot be fitted from here;\n  supply `parameters` directly.",
+              call. = FALSE, immediate. = TRUE)
     else if (nll0 > 1e8)
       warning("the objective at the starting values is ",
               format(nll0, digits = 3), ", which is very large.\n",
               "  The starting states and starting parameters are probably ",
-              "inconsistent with each other,\n  and the inner optimiser may ",
-              "return NaN. Try init = \"moment\".",
-              call. = FALSE, immediate. = TRUE)
+              "inconsistent, and the inner\n  optimiser may return NaN. Try ",
+              "init = \"individual\".", call. = FALSE, immediate. = TRUE)
   }
 
-  obj <- RTMB::MakeADFun(func = jcrw_nll(dat),
+  obj <- RTMB::MakeADFun(func = jmp_nll(dat),
                          parameters = parameters,
                          map = map,
                          random = rnd,
@@ -435,17 +400,19 @@ jsfilter <- function(x,
 
   obj$env$tracemgc <- control$verbose == 2
 
-  ## parameter bounds, built by name from the active parameter vector. Unlike
-  ## the individual filters this needs no positional repair, because the map
-  ## has already removed inactive parameters from obj$par.
+  ## parameter bounds, built by name from the active parameter vector. The map
+  ## has already removed inactive parameters from obj$par, so no positional
+  ## repair is needed.
   L <- setNames(rep(-Inf, length(obj$par)), names(obj$par))
   U <- setNames(rep(Inf, length(obj$par)), names(obj$par))
   L[names(L) %in% c("l_rho_p", "l_rho_o")] <- -7
   U[names(U) %in% c("l_rho_p", "l_rho_o")] <- 7
+  L[names(L) == "l_sigma_g"] <- -10
+  U[names(U) == "l_sigma_g"] <- 50
   L[names(L) == "l_ho_scale"] <- -9
   U[names(U) == "l_ho_scale"] <- 9
-  L[names(L) == "l_sd_lD"] <- -8
-  U[names(U) == "l_sd_lD"] <- 3
+  L[names(L) == "l_sd_lsig"] <- -8
+  U[names(U) == "l_sd_lsig"] <- 3
 
   if (!is.null(control$lower))
     for (nm in names(control$lower)) L[names(L) == nm] <- control$lower[[nm]]
@@ -453,14 +420,12 @@ jsfilter <- function(x,
     for (nm in names(control$upper)) U[names(U) == nm] <- control$upper[[nm]]
 
   ## Tighten the optimiser tolerances unless the user set their own.
-  ##
-  ## ssm_control()'s defaults (rel.tol = 1e-3, x.tol = 1.5e-2) are tuned for
-  ## fast per-individual quality control, where only the location states
-  ## matter. They are too loose for a hierarchical model: the among-individual
-  ## variance sits in a low-curvature direction of the likelihood, and at a
-  ## loosely converged point the numerical Hessian in that direction is easily
-  ## indefinite, which surfaces as convergence = 0 together with pdHess = FALSE
-  ## and NaN standard errors on the population parameters.
+  ## ssm_control()'s defaults (rel.tol 1e-3, x.tol 1.5e-2) are tuned for fast
+  ## per-individual quality control. They are too loose for a hierarchical
+  ## model: the among-individual variance sits in a low-curvature direction,
+  ## and at a loosely converged point the numerical Hessian there is easily
+  ## indefinite, which surfaces as convergence = 0 with pdHess = FALSE and NaN
+  ## standard errors on the population parameters.
   if (control$optim == "nlminb" &&
       identical(control$control, ssm_control()$control)) {
     control$control$rel.tol <- 1e-10
@@ -482,7 +447,7 @@ jsfilter <- function(x,
   opt <- switch(control$optim,
                 nlminb = try(nlminb(obj$par, fn, obj$gr,
                                     control = control$control,
-                                    lower = L, upper = U)),
+                                    lower = L, upper = U), silent = TRUE),
                 optim = try(do.call(optim,
                                     args = list(par = obj$par, fn = fn,
                                                 gr = obj$gr,
@@ -496,76 +461,61 @@ jsfilter <- function(x,
   options(warn = oldw)
 
   ## ------------------------------------------------------------------
-  ## assemble one ssm object per individual
+  ## assemble one mp_ssm object per individual
   ## ------------------------------------------------------------------
   if (inherits(opt, "try-error") || inherits(rep, "try-error")) {
     out <- lapply(seq_len(A), function(i) {
       o <- list(call = call, data = x[[i]], inits = parameters,
-                pm = "jcrw", ts = time.step, tmb = obj,
-                errmsg = opt)
-      ## the assembled data list is attached as an attribute rather than a list
-      ## element so that the length of the object is unchanged. It lets the
-      ## likelihood be called directly in plain R:
-      ##   jcrw_nll(attr(fit$ssm[[1]], "jdata"))(fit$ssm[[1]]$inits)
-      ## which evaluates with ordinary numerics, no AD and no Laplace
-      ## approximation - the quickest way to tell a broken likelihood from a
-      ## failed inner problem.
+                pm = "jmp", ts = time.step, tmb = obj, errmsg = opt)
       attr(o, "jdata") <- dat
-      class(o) <- append("ssm", class(o))
+      class(o) <- append("mp_ssm", class(o))
       o
     })
     names(out) <- ids
     warning("the optimiser or sdreport failed for the joint model. Try ",
-            "share_control(D = \"pooled\") to remove the among-individual ",
-            "variance, or fit fewer individuals.", call. = FALSE)
+            "share_control(sigma = \"pooled\"),\n  or fewer individuals.",
+            call. = FALSE)
     return(out)
   }
-
-  srep <- summary(rep, "report")
-  rdm.all <- summary(rep, "random")
-  loc.all <- rdm.all[rownames(rdm.all) == "mu", , drop = FALSE]
-  vel.all <- rdm.all[rownames(rdm.all) == "v", , drop = FALSE]
 
   ## Did the hierarchical model collapse to full pooling?
   ##
   ## When there is no detectable among-individual variation, the maximum
-  ## likelihood estimate of sd_lD is zero and the optimiser drives l_sd_lD to
-  ## its lower bound. The fit is then the pooled model with one extra
-  ## parameter, and two things follow that are easy to misread: the standard
-  ## error reported for sd_lD is not interpretable, because the estimate is on
-  ## a boundary rather than at an interior optimum; and AICc over-penalises,
-  ## because the usual penalty assumes an interior optimum (a boundary
-  ## parameter needs a mixture null distribution). Say so rather than leaving
-  ## the user to notice.
-  if (D_mode %in% c(1L, 2L) && "l_sd_lD" %in% names(opt$par)) {
-    l.bound <- L[names(L) == "l_sd_lD"][1]
-    if (any(abs(opt$par[names(opt$par) == "l_sd_lD"] - l.bound) < 1e-3))
-      warning("the among-individual standard deviation of D has gone to its ",
-              "lower bound.\n  There is no detectable among-individual ",
-              "variation in D in these data, and the fit has\n  collapsed to ",
-              "the pooled model. Its estimates should match ",
-              "share_control(D = \"pooled\")\n  closely. The standard error ",
-              "reported for sd_lD is not interpretable at a boundary,\n  and ",
-              "AICc over-penalises this fit relative to the pooled model. Use ",
-              "the pooled model.",
-              call. = FALSE, immediate. = TRUE)
+  ## likelihood estimate of sd_lsig is zero and the optimiser drives l_sd_lsig
+  ## to its lower bound. Two things follow that are easy to misread: the
+  ## standard error reported for sd_lsig is not interpretable, because the
+  ## estimate is on a boundary rather than at an interior optimum; and AICc
+  ## over-penalises, because the usual penalty assumes an interior optimum.
+  if (sig_mode %in% c(1L, 2L) && "l_sd_lsig" %in% names(opt$par)) {
+    l.bound <- L[names(L) == "l_sd_lsig"][1]
+    if (any(abs(opt$par[names(opt$par) == "l_sd_lsig"] - l.bound) < 1e-3))
+      warning("the among-individual standard deviation of sigma has gone to ",
+              "its lower bound.\n  There is no detectable among-individual ",
+              "variation in movement scale in these\n  data, and the fit has ",
+              "collapsed to the pooled model. The standard error\n  reported ",
+              "for sd_lsig is not interpretable at a boundary, and AICc ",
+              "over-penalises\n  this fit relative to share_control(sigma = ",
+              "\"pooled\").", call. = FALSE, immediate. = TRUE)
   }
 
-  ## report names corresponding to parameters the map switched off entirely.
-  ## NULL means the parameter has no map entry at all, i.e. it is fully
-  ## estimated - the opposite of switched off.
+  ## report names for parameters the map switched off entirely. A NULL map
+  ## entry means no map at all, i.e. fully estimated - not switched off.
   all_na <- function(f) !is.null(f) && all(is.na(suppressWarnings(
     as.integer(as.character(f)))))
   drop_rn <- character(0)
   if (all_na(map$l_psi)) drop_rn <- c(drop_rn, "psi")
   if (all_na(map$l_tau)) drop_rn <- c(drop_rn, "tau_x", "tau_y")
   if (all_na(map$l_rho_o)) drop_rn <- c(drop_rn, "rho_o")
-  if (all_na(map$l_rho_p)) drop_rn <- c(drop_rn, "rho_p")
+
+  srep <- summary(rep, "report")
+  rdm.all <- summary(rep, "random")
+  X.all <- rdm.all[rownames(rdm.all) == "X", , drop = FALSE]
+  lg.all <- rdm.all[rownames(rdm.all) == "lg", , drop = FALSE]
 
   npar <- length(opt[["par"]])
   nfit <- sum(isd == 1L)
   objv <- if (control$optim == "nlminb") opt[["objective"]] else opt[["value"]]
-  AICc <- 2 * npar + 2 * objv + 2 * npar * (npar + 1) / (nfit - npar - 1)
+  AICc <- 2 * npar + 2 * objv + (2 * npar ^ 2 + 2 * npar) / (nfit - npar)
 
   out <- vector("list", A)
 
@@ -576,71 +526,57 @@ jsfilter <- function(x,
     d.all <- p$d.all
     rr <- ((i1[i] - 1) * 2 + 1):(i2[i] * 2)
 
-    loc <- loc.all[rr, , drop = FALSE]
-    vel <- vel.all[rr, , drop = FALSE]
+    loc <- X.all[rr, , drop = FALSE]
+    lgi <- lg.all[k, , drop = FALSE]
 
-    loc <- as.data.frame(cbind(loc[seq(1, nrow(loc), by = 2), ],
+    rdm <- as.data.frame(cbind(loc[seq(1, nrow(loc), by = 2), ],
                                loc[seq(2, nrow(loc), by = 2), ]),
-                         row.names = seq_len(length(k)))
-    names(loc) <- c("x", "x.se", "y", "y.se")
+                         row.names = seq_len(length(k)))[, c(1, 3, 2, 4)]
+    names(rdm) <- c("x", "y", "x.se", "y.se")
 
-    vel <- as.data.frame(cbind(vel[seq(1, nrow(vel), by = 2), ],
-                               vel[seq(2, nrow(vel), by = 2), ]),
-                         row.names = seq_len(length(k)))
-    names(vel) <- c("u", "u.se", "v", "v.se")
+    rdm$logit_g <- lgi[, 1]
+    rdm$logit_g.se <- lgi[, 2]
+    rdm$g <- plogis(lgi[, 1])
 
-    rdm <- cbind(loc, vel)
     rdm$id <- ids[i]
     rdm$date <- d.all$date
     rdm$isd <- d.all$isd
+
+    ## Mask g during haulout. The model estimates lg continuously across
+    ## haulout steps, which is required to connect the pre- and post-haulout
+    ## gamma states through the likelihood, but those values reflect the animal
+    ## being stationary rather than at-sea movement behaviour and would be
+    ## confused with genuinely low move persistence at sea.
+    hoi <- p$ho_flag
+    if (any(hoi == 1L)) {
+      rdm$g[hoi == 1L] <- NA_real_
+      rdm$logit_g[hoi == 1L] <- NA_real_
+      rdm$logit_g.se[hoi == 1L] <- NA_real_
+    }
     rdm$ho <- as.integer(d.all$ho)
-    rdm <- rdm[, c("id", "date", "x", "y", "x.se", "y.se",
-                   "u", "v", "u.se", "v.se", "isd", "ho")]
 
     rdm <- st_as_sf(rdm, coords = c("x", "y"), remove = FALSE)
     rdm <- st_set_crs(rdm, p$prj)
-    rdm <- rdm[, c("id", "date", "x.se", "y.se", "u", "v",
-                   "u.se", "v.se", "isd")]
+    rdm <- rdm[, c("id", "date", "x.se", "y.se",
+                   "logit_g", "logit_g.se", "g", "isd")]
 
-    ## 2-D speed along track, calculated separately for fitted and predicted
-    ## states. Standard errors are not propagated here: the delta method for a
-    ## joint fit across all individuals is expensive and rarely wanted.
-    spd <- function(sub) {
-      xy <- st_coordinates(sub)
-      tt <- as.numeric(difftime(sub$date,
-                                c(as.POSIXct(NA), sub$date[-nrow(sub)]),
-                                units = "hours"))
-      s <- c(NA, sqrt(diff(xy[, 1]) ^ 2 + diff(xy[, 2]) ^ 2) / tt[-1])
-      s
-    }
-
-    fv <- subset(rdm, isd)[, -9]
-    fv$s <- spd(subset(rdm, isd))
-    fv$s.se <- NA
-    fv$gap_flag <- p$gap_flag[d.all$isd]
-
-    if (all(!is.na(time.step))) {
-      pv <- subset(rdm, !isd)[, -9]
-      pv$s <- spd(subset(rdm, !isd))
-      pv$s.se <- NA
-      pv$gap_flag <- p$gap_flag[!d.all$isd]
-    } else {
-      pv <- NULL
-    }
+    fv <- subset(rdm, isd)[, -8]
+    if (all(!is.na(time.step))) pv <- subset(rdm, !isd)[, -8] else pv <- NULL
 
     ## parameter table: the shared parameters, plus this individual's own
-    ## diffusion coefficient. Parameters switched off by the map are dropped
-    ## rather than reported as an estimate with a zero standard error.
-    keep <- !rownames(srep) %in% c("D1", "D2", drop_rn)
+    ## process innovation scale
+    keep <- !rownames(srep) %in% c("sigma_x", "sigma_y", drop_rn)
     fxd <- srep[keep, , drop = FALSE]
-    Di <- srep[rownames(srep) %in% c("D1", "D2"), , drop = FALSE]
-    if (nrow(Di) == 2 * A) {
-      di <- rbind(Di[i, , drop = FALSE], Di[A + i, , drop = FALSE])
-      rownames(di) <- c("D_x", "D_y")
-      fxd <- rbind(fxd, di)
+
+    Si <- srep[rownames(srep) %in% c("sigma_x", "sigma_y"), , drop = FALSE]
+    if (nrow(Si) == 2 * A) {
+      si <- rbind(Si[i, , drop = FALSE], Si[A + i, , drop = FALSE])
+      rownames(si) <- c("sigma_x", "sigma_y")
+      fxd <- rbind(fxd, si)
     }
     rn <- rownames(fxd)
-    rn[rn == "D_pop"] <- c("D_pop_x", "D_pop_y")[seq_len(sum(rn == "D_pop"))]
+    if (sum(rn == "sigma_pop") == 2)
+      rn[rn == "sigma_pop"] <- c("sigma_pop_x", "sigma_pop_y")
     rownames(fxd) <- make.unique(rn)
 
     o <- list(
@@ -651,7 +587,7 @@ jsfilter <- function(x,
       data = x[[i]],
       isd = d.all$isd,
       inits = parameters,
-      pm = "jcrw",
+      pm = "jmp",
       ts = time.step,
       opt = opt,
       tmb = obj,
@@ -661,7 +597,7 @@ jsfilter <- function(x,
       time = proc.time() - st
     )
     attr(o, "jdata") <- dat
-    class(o) <- append("ssm", class(o))
+    class(o) <- append("mp_ssm", class(o))
     out[[i]] <- o
   }
 
@@ -669,11 +605,10 @@ jsfilter <- function(x,
 
   if (!rep$pdHess)
     warning("the joint Hessian was not positive-definite, so some standard ",
-            "errors could not be calculated.\n",
-            "  With a hierarchical model this most often means the ",
-            "among-individual variance of D is\n  not identifiable from these ",
-            "data - too few individuals, or tracks too short. Try\n",
-            "  share_control(D = \"pooled\"), or map = list(psi = factor(NA)).",
+            "errors could not be\n  calculated. With a hierarchical model this ",
+            "most often means the among-individual\n  variance of sigma is not ",
+            "identifiable from these data - too few individuals, or\n  tracks ",
+            "too short. Try share_control(sigma = \"pooled\").",
             call. = FALSE)
 
   out
