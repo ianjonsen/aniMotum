@@ -42,6 +42,7 @@
 ##' @keywords internal
 
 jsfilter <- function(x,
+                     model = c("jmp", "jcrw"),
                      time.step = NA,
                      share = share_control(),
                      parameters = NULL,
@@ -56,6 +57,8 @@ jsfilter <- function(x,
   st <- proc.time()
   call <- match.call()
   init <- match.arg(init)
+  model <- match.arg(model)
+  crw <- identical(model, "jcrw")
 
   if (!requireNamespace("RTMB", quietly = TRUE))
     stop("the RTMB package is required to fit joint models.\n",
@@ -176,6 +179,7 @@ jsfilter <- function(x,
   Y <- do.call(cbind, lapply(prep, function(p) p$Y))
   K <- do.call(rbind, lapply(prep, function(p) p$K))
   GLerr <- do.call(rbind, lapply(prep, function(p) p$GLerr))
+  state0 <- do.call(rbind, lapply(prep, function(p) p$state0))
 
   dt <- cat_v(function(p) p$dt)
   isd <- cat_v(function(p) p$isd)
@@ -209,11 +213,18 @@ jsfilter <- function(x,
   dimnames(K) <- NULL
   dimnames(GLerr) <- NULL
   dimnames(Y) <- NULL
+  dimnames(state0) <- NULL
 
   sig_mode <- switch(share$sigma,
                      pooled = 0L,
                      hierarchical = if (share$hier.sigma == "shared") 1L else 2L,
                      individual = 3L)
+
+  ## jcrw uses a single magnitude per individual, so its mode has no "xy"
+  ## variant: 0 pooled, 1 hierarchical, 2 individual
+  m_mode <- switch(share$sigma, pooled = 0L, hierarchical = 1L, individual = 2L)
+  an_mode <- switch(share$aniso,
+                    isotropic = 0L, common.ratio = 1L, individual = 2L)
 
   dat <- list(
     A = A, N = N,
@@ -227,7 +238,11 @@ jsfilter <- function(x,
     r_tau = g_tau[ind], r_psi = g_psi[ind], r_rho_o = g_rho_o[ind],
     g_rho_p = g_rho_p, g_sg = g_sg,
     G_tau = G_tau,
-    sig_mode = sig_mode,
+    state0 = state0,
+    ## jcrw_nll uses `m` for the process magnitude, so the ellipse semi-minor
+    ## axis is supplied under a second name to avoid the collision
+    m_ax = m,
+    sig_mode = sig_mode, m_mode = m_mode, an_mode = an_mode,
     est_ho = if (share$ho_scale == "pooled") 1L else 0L,
     ho_scale_fixed = control$ho_scale
   )
@@ -241,6 +256,7 @@ jsfilter <- function(x,
     lsg0 <- numeric(A)
     X0 <- lapply(prep, function(p) t(p$xs))
     lg0 <- lapply(prep, function(p) rep(0, ncol(p$Y)))
+    V0s <- lapply(prep, function(p) t(p$v.init))
 
     ## crude moment starting values for sigma: the covariance of the
     ## first differences of the interpolated path
@@ -251,18 +267,46 @@ jsfilter <- function(x,
       lsig0[i, ] <- log(pmax(1e-8, sg))
     }
 
+    ## jcrw magnitude: m = 0.5 log det V. For crw.hpp's parameterisation
+    ## V = [[2Dx, 2 sqrt(Dx Dy) rho], [., 2Dy]], so det V = 4 Dx Dy (1 - rho^2)
+    m0 <- rep(log(2), A)
+    u0 <- matrix(0, A, 2)
+
     if (init == "individual") {
       if (control$verbose >= 1)
-        cat(paste0("initialising from ", A, " individual mp fits...\n"))
+        cat(paste0("initialising from ", A, " individual ",
+                   ifelse(crw, "crw", "mp"), " fits...\n"))
       for (i in seq_len(A)) {
-        fi <- try(mpfilter(x = x[[i]], model = "mp", time.step = time.step,
-                           fit.to.subset = fit.to.subset,
-                           control = ssm_control(verbose = 0,
-                                                 gap.thresh = control$gap.thresh,
-                                                 ho_scale = control$ho_scale),
-                           ho_lookup = ho_lookup), silent = TRUE)
+        fi <- try(
+          if (crw)
+            sfilter(x = x[[i]], model = "crw", time.step = time.step,
+                    fit.to.subset = fit.to.subset,
+                    control = ssm_control(verbose = 0,
+                                          gap.thresh = control$gap.thresh,
+                                          ho_scale = control$ho_scale),
+                    ho_lookup = ho_lookup)
+          else
+            mpfilter(x = x[[i]], model = "mp", time.step = time.step,
+                     fit.to.subset = fit.to.subset,
+                     control = ssm_control(verbose = 0,
+                                           gap.thresh = control$gap.thresh,
+                                           ho_scale = control$ho_scale),
+                     ho_lookup = ho_lookup), silent = TRUE)
         if (!inherits(fi, "try-error") && length(fi) == 15) {
           pr <- fi$par
+          if (crw && all(c("D_x", "D_y") %in% rownames(pr))) {
+            Dx <- max(1e-8, pr["D_x", "Estimate"])
+            Dy <- max(1e-8, pr["D_y", "Estimate"])
+            rp <- if ("rho_p" %in% rownames(pr)) pr["rho_p", "Estimate"] else 0
+            rp <- max(-0.99, min(0.99, rp))
+            V0 <- matrix(c(2 * Dx, 2 * sqrt(Dx * Dy) * rp,
+                           2 * sqrt(Dx * Dy) * rp, 2 * Dy), 2, 2)
+            m0[i] <- 0.5 * log(max(1e-12, det(V0)))
+            B <- V0 / exp(m0[i])
+            rr <- acosh(max(1, (B[1, 1] + B[2, 2]) / 2))
+            shh <- if (rr < 1e-8) 1 else sinh(rr) / rr
+            u0[i, ] <- c((B[1, 1] - B[2, 2]) / (2 * shh), B[1, 2] / shh)
+          }
           if (all(c("sigma_x", "sigma_y") %in% rownames(pr)))
             lsig0[i, ] <- log(pmax(1e-8, pr[c("sigma_x", "sigma_y"),
                                             "Estimate"]))
@@ -275,12 +319,19 @@ jsfilter <- function(x,
           ## inconsistent, and a tight fitted sigma then penalises the crude
           ## path enormously - the objective can reach 1e12 and the inner
           ## Newton problem starts where it cannot recover.
-          rr <- try(summary(fi$rep, "random"), silent = TRUE)
-          if (!inherits(rr, "try-error")) {
-            xx <- rr[rownames(rr) == "X", 1]
-            gg <- rr[rownames(rr) == "lg", 1]
-            if (length(xx) == 2 * ni[i]) X0[[i]] <- matrix(xx, nrow = 2)
-            if (length(gg) == ni[i]) lg0[[i]] <- gg
+          rs <- try(summary(fi$rep, "random"), silent = TRUE)
+          if (!inherits(rs, "try-error")) {
+            if (crw) {
+              xx <- rs[rownames(rs) == "mu", 1]
+              vv <- rs[rownames(rs) == "v", 1]
+              if (length(xx) == 2 * ni[i]) X0[[i]] <- matrix(xx, nrow = 2)
+              if (length(vv) == 2 * ni[i]) V0s[[i]] <- matrix(vv, nrow = 2)
+            } else {
+              xx <- rs[rownames(rs) == "X", 1]
+              gg <- rs[rownames(rs) == "lg", 1]
+              if (length(xx) == 2 * ni[i]) X0[[i]] <- matrix(xx, nrow = 2)
+              if (length(gg) == ni[i]) lg0[[i]] <- gg
+            }
           }
         }
       }
@@ -297,6 +348,30 @@ jsfilter <- function(x,
     if (sig_mode %in% c(2L, 3L))
       lsig_re0 <- c(lsig0[, 1] - lsig_pop0[1], lsig0[, 2] - lsig_pop0[2])
 
+    if (crw) {
+      m_pop0 <- mean(m0)
+      sdm0 <- stats::sd(m0)
+      if (!is.finite(sdm0) || sdm0 <= 0) sdm0 <- 0.5
+      a0 <- sqrt(mean(u0[, 1] ^ 2 + u0[, 2] ^ 2))
+      if (!is.finite(a0) || a0 <= 0) a0 <- 0.2
+      th0 <- atan2(u0[, 2], u0[, 1]) / 2
+
+      parameters <- list(
+        m_pop = m_pop0,
+        l_sd_m = log(sdm0),
+        m_re = if (m_mode == 0L) numeric(A) else m0 - m_pop0,
+        l_aniso = log(a0),
+        theta = th0,
+        u_re = c(u0[, 1], u0[, 2]),
+        l_tau = rep(0, 2 * G_tau),
+        l_psi = rep(0, G_psi),
+        l_rho_o = rep(0, G_rho_o),
+        l_ho_scale = 0,
+        mu = unname(do.call(cbind, X0)),
+        v = unname(do.call(cbind, V0s))
+      )
+    } else {
+
     parameters <- list(
       lsig_pop = lsig_pop0,
       l_sd_lsig = rep(log(sd0), 2),
@@ -310,6 +385,7 @@ jsfilter <- function(x,
       X = unname(do.call(cbind, X0)),
       lg = unlist(lg0, use.names = FALSE)
     )
+    }
   }
 
   ## ------------------------------------------------------------------
@@ -342,7 +418,29 @@ jsfilter <- function(x,
   automap$l_psi <- fac(t_psi[, 2])
   automap$l_rho_o <- fac(t_rho_o[, 1] | t_rho_o[, 3])
 
-  if (sig_mode == 0L) {
+  if (crw) {
+    ## magnitude
+    if (m_mode == 0L) {
+      automap$m_re <- factor(rep(NA, A))
+      automap$l_sd_m <- factor(NA)
+    } else if (m_mode == 2L) {
+      automap$l_sd_m <- factor(NA)
+    }
+    ## anisotropy. Only one of the two parameterisations is ever active: the
+    ## polar one (a shared amount, an orientation per individual) or the free
+    ## vector one. The other is switched off entirely.
+    if (an_mode == 0L) {
+      automap$l_aniso <- factor(NA)
+      automap$theta <- factor(rep(NA, A))
+      automap$u_re <- factor(rep(NA, 2 * A))
+    } else if (an_mode == 1L) {
+      automap$u_re <- factor(rep(NA, 2 * A))
+    } else {
+      automap$l_aniso <- factor(NA)
+      automap$theta <- factor(rep(NA, A))
+    }
+
+  } else if (sig_mode == 0L) {
     automap$lsig_re <- factor(rep(NA, length(parameters$lsig_re)))
     automap$l_sd_lsig <- factor(c(NA, NA))
   } else if (sig_mode == 1L) {
@@ -364,8 +462,15 @@ jsfilter <- function(x,
   ## ------------------------------------------------------------------
   ## build and minimise
   ## ------------------------------------------------------------------
-  rnd <- c("X", "lg")
-  if (sig_mode %in% c(1L, 2L)) rnd <- c(rnd, "lsig_re")
+  if (crw) {
+    rnd <- c("mu", "v")
+    if (m_mode == 1L) rnd <- c(rnd, "m_re")
+  } else {
+    rnd <- c("X", "lg")
+    if (sig_mode %in% c(1L, 2L)) rnd <- c(rnd, "lsig_re")
+  }
+
+  nll_fn <- if (crw) jcrw_nll(dat) else jmp_nll(dat)
 
   if (is.null(inner.control) || !"smartsearch" %in% names(inner.control))
     inner.control <- list(smartsearch = TRUE)
@@ -374,7 +479,7 @@ jsfilter <- function(x,
   ## approximation. A very large value means the starting states and starting
   ## parameters disagree, which the inner Newton problem usually will not
   ## survive.
-  nll0 <- try(as.numeric(jmp_nll(dat)(parameters)), silent = TRUE)
+  nll0 <- try(as.numeric(nll_fn(parameters)), silent = TRUE)
   if (!inherits(nll0, "try-error")) {
     if (control$verbose >= 1)
       cat(paste0("objective at starting values: ",
@@ -391,7 +496,7 @@ jsfilter <- function(x,
               "init = \"individual\".", call. = FALSE, immediate. = TRUE)
   }
 
-  obj <- RTMB::MakeADFun(func = jmp_nll(dat),
+  obj <- RTMB::MakeADFun(func = nll_fn,
                          parameters = parameters,
                          map = map,
                          random = rnd,
@@ -413,6 +518,13 @@ jsfilter <- function(x,
   U[names(U) == "l_ho_scale"] <- 9
   L[names(L) == "l_sd_lsig"] <- -8
   U[names(U) == "l_sd_lsig"] <- 3
+  L[names(L) == "l_sd_m"] <- -8
+  U[names(U) == "l_sd_m"] <- 3
+  ## anisotropy: exp(2 * exp(l_aniso)) is the ratio of the ellipse axes, so
+  ## l_aniso of 2 already means a ratio of about 3e6. Bounding it keeps the
+  ## optimiser out of a region where the covariance is numerically singular.
+  L[names(L) == "l_aniso"] <- -12
+  U[names(U) == "l_aniso"] <- 2
 
   if (!is.null(control$lower))
     for (nm in names(control$lower)) L[names(L) == nm] <- control$lower[[nm]]
@@ -466,10 +578,11 @@ jsfilter <- function(x,
   if (inherits(opt, "try-error") || inherits(rep, "try-error")) {
     out <- lapply(seq_len(A), function(i) {
       o <- list(call = call, data = x[[i]], inits = parameters,
-                pm = "jmp", ts = time.step, tmb = obj, errmsg = opt)
+                pm = model, ts = time.step, tmb = obj, errmsg = opt)
       attr(o, "jdata") <- dat
       attr(o, "n.track") <- A
-      class(o) <- append(c("jmp_ssm", "mp_ssm"), class(o))
+      class(o) <- append(if (crw) c("jcrw_ssm", "ssm") else
+                       c("jmp_ssm", "mp_ssm"), class(o))
       o
     })
     names(out) <- ids
@@ -487,9 +600,12 @@ jsfilter <- function(x,
   ## standard error reported for sd_lsig is not interpretable, because the
   ## estimate is on a boundary rather than at an interior optimum; and AICc
   ## over-penalises, because the usual penalty assumes an interior optimum.
-  if (sig_mode %in% c(1L, 2L) && "l_sd_lsig" %in% names(opt$par)) {
-    l.bound <- L[names(L) == "l_sd_lsig"][1]
-    if (any(abs(opt$par[names(opt$par) == "l_sd_lsig"] - l.bound) < 1e-3))
+  sd.nm <- if (crw) "l_sd_m" else "l_sd_lsig"
+  hier <- if (crw) m_mode == 1L else sig_mode %in% c(1L, 2L)
+
+  if (hier && sd.nm %in% names(opt$par)) {
+    l.bound <- L[names(L) == sd.nm][1]
+    if (any(abs(opt$par[names(opt$par) == sd.nm] - l.bound) < 1e-3))
       warning("the among-individual standard deviation of sigma has gone to ",
               "its lower bound.\n  There is no detectable among-individual ",
               "variation in movement scale in these\n  data, and the fit has ",
@@ -510,8 +626,9 @@ jsfilter <- function(x,
 
   srep <- summary(rep, "report")
   rdm.all <- summary(rep, "random")
-  X.all <- rdm.all[rownames(rdm.all) == "X", , drop = FALSE]
+  X.all <- rdm.all[rownames(rdm.all) == if (crw) "mu" else "X", , drop = FALSE]
   lg.all <- rdm.all[rownames(rdm.all) == "lg", , drop = FALSE]
+  V.all <- rdm.all[rownames(rdm.all) == "v", , drop = FALSE]
 
   npar <- length(opt[["par"]])
   nfit <- sum(isd == 1L)
@@ -535,9 +652,18 @@ jsfilter <- function(x,
                          row.names = seq_len(length(k)))[, c(1, 3, 2, 4)]
     names(rdm) <- c("x", "y", "x.se", "y.se")
 
-    rdm$logit_g <- lgi[, 1]
-    rdm$logit_g.se <- lgi[, 2]
-    rdm$g <- plogis(lgi[, 1])
+    if (crw) {
+      vel <- V.all[rr, , drop = FALSE]
+      vel <- as.data.frame(cbind(vel[seq(1, nrow(vel), by = 2), ],
+                                 vel[seq(2, nrow(vel), by = 2), ]),
+                           row.names = seq_len(length(k)))[, c(1, 3, 2, 4)]
+      names(vel) <- c("u", "v", "u.se", "v.se")
+      rdm <- cbind(rdm, vel)
+    } else {
+      rdm$logit_g <- lgi[, 1]
+      rdm$logit_g.se <- lgi[, 2]
+      rdm$g <- plogis(lgi[, 1])
+    }
 
     rdm$id <- ids[i]
     rdm$date <- d.all$date
@@ -549,7 +675,7 @@ jsfilter <- function(x,
     ## being stationary rather than at-sea movement behaviour and would be
     ## confused with genuinely low move persistence at sea.
     hoi <- p$ho_flag
-    if (any(hoi == 1L)) {
+    if (!crw && any(hoi == 1L)) {
       rdm$g[hoi == 1L] <- NA_real_
       rdm$logit_g[hoi == 1L] <- NA_real_
       rdm$logit_g.se[hoi == 1L] <- NA_real_
@@ -558,20 +684,53 @@ jsfilter <- function(x,
 
     rdm <- st_as_sf(rdm, coords = c("x", "y"), remove = FALSE)
     rdm <- st_set_crs(rdm, p$prj)
-    rdm <- rdm[, c("id", "date", "x.se", "y.se",
-                   "logit_g", "logit_g.se", "g", "isd")]
 
-    fv <- subset(rdm, isd)[, -8]
-    if (all(!is.na(time.step))) pv <- subset(rdm, !isd)[, -8] else pv <- NULL
+    if (crw) {
+      rdm <- rdm[, c("id", "date", "x.se", "y.se", "u", "v",
+                     "u.se", "v.se", "isd")]
+      ## 2-D speed along track, computed separately for fitted and predicted
+      ## states. Standard errors are not propagated: the delta method across a
+      ## joint fit is expensive and rarely wanted.
+      spd <- function(sub) {
+        xy <- st_coordinates(sub)
+        tt <- as.numeric(difftime(sub$date,
+                                  c(as.POSIXct(NA), sub$date[-nrow(sub)]),
+                                  units = "hours"))
+        c(NA, sqrt(diff(xy[, 1]) ^ 2 + diff(xy[, 2]) ^ 2) / tt[-1])
+      }
+      fv <- subset(rdm, isd)[, -9]
+      fv$s <- spd(subset(rdm, isd))
+      fv$s.se <- NA
+      fv$gap_flag <- p$gap_flag[d.all$isd]
+      if (all(!is.na(time.step))) {
+        pv <- subset(rdm, !isd)[, -9]
+        pv$s <- spd(subset(rdm, !isd))
+        pv$s.se <- NA
+        pv$gap_flag <- p$gap_flag[!d.all$isd]
+      } else {
+        pv <- NULL
+      }
+
+    } else {
+      rdm <- rdm[, c("id", "date", "x.se", "y.se",
+                     "logit_g", "logit_g.se", "g", "isd")]
+      fv <- subset(rdm, isd)[, -8]
+      if (all(!is.na(time.step))) pv <- subset(rdm, !isd)[, -8] else pv <- NULL
+    }
 
     ## Parameter table. Any parameter estimated per group - which includes
     ## every parameter when it is specified as "individual" - is reported only
     ## at this individual's own group, so each animal's table carries one value
     ## per parameter rather than the whole population's.
-    grouped <- list(sigma_x = i, sigma_y = i,
-                    rho_p = g_rho_p[i], sigma_g = g_sg[i],
-                    tau_x = g_tau[i], tau_y = g_tau[i],
-                    psi = g_psi[i], rho_o = g_rho_o[i])
+    grouped <- if (crw)
+      list(D = i, aniso = i, orient = i,
+           tau_x = g_tau[i], tau_y = g_tau[i],
+           psi = g_psi[i], rho_o = g_rho_o[i])
+    else
+      list(sigma_x = i, sigma_y = i,
+           rho_p = g_rho_p[i], sigma_g = g_sg[i],
+           tau_x = g_tau[i], tau_y = g_tau[i],
+           psi = g_psi[i], rho_o = g_rho_o[i])
 
     rn.all <- rownames(srep)
     keep <- !rn.all %in% c(names(grouped), drop_rn)
@@ -595,7 +754,8 @@ jsfilter <- function(x,
     rownames(fxd) <- make.unique(rn)
 
     ## keep a stable, readable order
-    ord <- c("sigma_pop_x", "sigma_pop_y", "sigma_pop", "sd_lsig",
+    ord <- c("D_pop", "sd_m", "D", "aniso", "orient",
+             "sigma_pop_x", "sigma_pop_y", "sigma_pop", "sd_lsig",
              "sd_lsig_x", "sd_lsig_y", "sigma_x", "sigma_y", "sigma_g",
              "rho_p", "tau_x", "tau_y", "psi", "rho_o", "hos")
     fxd <- fxd[order(match(rownames(fxd), ord), na.last = TRUE), , drop = FALSE]
@@ -605,6 +765,11 @@ jsfilter <- function(x,
     ## sigma_g and tau are the population's while sigma_x and rho_p are this
     ## animal's - the print and summary methods use it to separate them.
     varies <- character(0)
+    if (crw) {
+      if (m_mode != 0L) varies <- c(varies, "D")
+      if (an_mode > 0L) varies <- c(varies, "orient")
+      if (an_mode == 2L) varies <- c(varies, "aniso")
+    }
     if (sig_mode != 0L) varies <- c(varies, "sigma_x", "sigma_y")
     if (G_sg > 1L) varies <- c(varies, "sigma_g")
     if (G_rho_p > 1L) varies <- c(varies, "rho_p")
@@ -621,7 +786,7 @@ jsfilter <- function(x,
       data = x[[i]],
       isd = d.all$isd,
       inits = parameters,
-      pm = "jmp",
+      pm = model,
       ts = time.step,
       opt = opt,
       tmb = obj,
@@ -634,7 +799,8 @@ jsfilter <- function(x,
     attr(o, "n.track") <- A
     ## jmp_ssm ahead of mp_ssm so the joint fit gets its own print method while
     ## everything that dispatches on mp_ssm keeps working
-    class(o) <- append(c("jmp_ssm", "mp_ssm"), class(o))
+    class(o) <- append(if (crw) c("jcrw_ssm", "ssm") else
+                       c("jmp_ssm", "mp_ssm"), class(o))
     out[[i]] <- o
   }
 

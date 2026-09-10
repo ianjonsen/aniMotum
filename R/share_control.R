@@ -75,13 +75,37 @@
 ##' species all violate that. Use `group` to name a variable in the input data
 ##' defining strata within which the measurement parameters are pooled.
 ##'
-##' @param sigma treatment of the process innovation scale. One of
-##' `"hierarchical"` (default), `"pooled"` or `"individual"`
+##' @param sigma treatment of the process magnitude - the innovation scale
+##' `sigma` in `jmp`, and the diffusion magnitude `D` in `jcrw`. One of
+##' `"hierarchical"` (default), `"pooled"` or `"individual"`. In `jcrw` this is
+##' half the log determinant of the velocity innovation covariance, which does
+##' not depend on the animal's direction of travel, so an among-individual
+##' variance estimated from it is a statement about how much the animals move
+##' rather than about where they went
 ##' @param sigma_g treatment of the move persistence random walk scale. One of
 ##' `"pooled"` (default) or `"individual"`. Pooling is what makes `g_t`
-##' comparable among individuals
+##' comparable among individuals. `jmp` only
+##' @param aniso treatment of the anisotropy of the process covariance. `jcrw`
+##' only. One of:
+##' \describe{
+##'   \item{`"common.ratio"`}{(default) the amount of anisotropy is shared by
+##'   all individuals while each keeps its own orientation. This is the pooling
+##'   that the `jcrw` parameterisation exists to make possible: the shared
+##'   quantity does not depend on which way an animal travelled, and the free
+##'   one does.}
+##'   \item{`"isotropic"`}{no anisotropy at all. The process is described by
+##'   its magnitude alone, and there is no orientation to estimate. Often
+##'   adequate: fitted in a suitable projection, the `sese` elephant seals came
+##'   out very close to isotropic.}
+##'   \item{`"individual"`}{amount and orientation both free per individual.}
+##' }
+##' Note that pooling the anisotropy \emph{vector} outright is not offered,
+##' because that would force a common orientation as well as a common ratio,
+##' which is the mistake the parameterisation is designed to avoid
 ##' @param rho_p treatment of the process error correlation between x and y.
-##' One of `"individual"` (default) or `"pooled"`
+##' One of `"individual"` (default) or `"pooled"`. `jmp` only - `jcrw` has no
+##' `rho_p`, since the correlation is absorbed into the anisotropy vector along
+##' with the two variances
 ##' @param tau treatment of the LS/GPS measurement error dispersion. One of
 ##' `"pooled"` (default), `"individual"` or `"hierarchical"`
 ##' @param psi treatment of the Argos error ellipse semi-minor axis scaling.
@@ -123,6 +147,7 @@
 
 share_control <- function(sigma = c("hierarchical", "pooled", "individual"),
                           sigma_g = c("pooled", "individual"),
+                          aniso = c("common.ratio", "isotropic", "individual"),
                           rho_p = c("individual", "pooled"),
                           tau = c("pooled", "individual", "hierarchical"),
                           psi = c("pooled", "individual", "hierarchical"),
@@ -134,6 +159,7 @@ share_control <- function(sigma = c("hierarchical", "pooled", "individual"),
 
   sigma <- match.arg(sigma)
   sigma_g <- match.arg(sigma_g)
+  aniso <- match.arg(aniso)
   rho_p <- match.arg(rho_p)
   tau <- match.arg(tau)
   psi <- match.arg(psi)
@@ -182,6 +208,7 @@ share_control <- function(sigma = c("hierarchical", "pooled", "individual"),
 
   list(sigma = sigma,
        sigma_g = sigma_g,
+       aniso = aniso,
        rho_p = rho_p,
        tau = tau,
        psi = psi,

@@ -157,6 +157,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                      out[, c("id", "date", "x.se", "y.se", "geometry")]
                    }
                    },
+                 jcrw = ,
                  crw = {
                    ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
                    if (all(c("s", "s.se") %in% names(out))) {
@@ -275,6 +276,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    }
                    
                    },
+                 jcrw = ,
                  crw = {
                    if(all(c("s","s.se") %in% names(out))) {
                      if("gap_flag" %in% names(out)) {

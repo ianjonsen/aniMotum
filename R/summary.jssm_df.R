@@ -205,3 +205,14 @@ print.jmp_ssm <- function(x, ...) {
 
   invisible(x)
 }
+
+
+##' @title print one individual's part of a joint crw fit
+##'
+##' @method print jcrw_ssm
+##' @param x a single individual's component of a joint `jcrw` fit
+##' @param ... unused. For compatibility with the generic method.
+##'
+##' @export
+
+print.jcrw_ssm <- function(x, ...) print.jmp_ssm(x, ...)

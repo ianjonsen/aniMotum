@@ -29,6 +29,40 @@ upstream - by `ArgosQC`, for example - reach the model exactly as prepared,
 * new vignette, `Projections`, on what the projection does to parameter
 estimates and how to tell whether it matters for your data.
 
+## rotation-invariant joint correlated random walk
+
+* new `model = "jcrw"` in `fit_ssm()` fits a correlated random walk jointly to
+several tracks. It replaces `crw`'s `D_x`, `D_y` and `rho_p` with
+
+    V = exp(m) * expm(A),   A = [[u1, u2], [u2, -u1]]
+
+where `A` is symmetric and traceless, so `det(V) = exp(2m)` exactly, `V` has
+eigenvalues `exp(m +/- r)` with `r = |u|`, and its major axis lies at
+`atan2(u2, u1)/2`. That splits the covariance into a magnitude `m` and an
+anisotropy `r`, both unchanged by rotating the coordinate frame, and an
+orientation, which is not. The frame-dependent piece is never pooled.
+
+* this is what the earlier `jcrw` prototype lacked. Pooling `D_x`, `D_y` or
+`rho_p` across animals travelling on different bearings averages quantities
+that mean different things for each animal, so an among-individual variance
+estimated from them is partly a statement about heading.
+
+* `share_control(aniso = )` controls the anisotropy: `"common.ratio"`
+(default) shares the amount while each individual keeps its own orientation -
+the pooling the parameterisation exists to enable; `"isotropic"` drops it
+altogether; `"individual"` frees both. Pooling the anisotropy vector outright
+is deliberately not offered, since that would force a common orientation.
+
+* because `A` is traceless and symmetric, `expm(A) = cosh(r) I + sinh(r)/r A`,
+so the likelihood needs neither an eigendecomposition nor a matrix inverse:
+the log determinant is `2m` and the quadratic form is written out directly.
+
+* reported per individual: `D` (on the same scale as `crw`'s `D_x` and `D_y`),
+`aniso` (the ratio of the ellipse axes) and `orient` (degrees from the
+projection's x axis). `orient` is the only one that depends on the coordinate
+frame, and so the only one not comparable between fits made in different
+projections.
+
 ## joint (hierarchical) move persistence model
 
 * new `model = "jmp"` in `fit_ssm()` fits the time-varying move persistence

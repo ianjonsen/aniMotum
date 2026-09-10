@@ -24,7 +24,12 @@
 ##' @param model fit a simple random walk (`rw`), correlated random walk
 ##' (`crw`), a time-varying move persistence model (`mp`), or a joint
 ##' (hierarchical) move persistence model fitted to all individuals at once
-##' (`jmp`), all as continuous-time process models. The `jmp` model shares
+##' (`jmp`), or a joint correlated random walk (`jcrw`), all as
+##' continuous-time process models. `jcrw` parameterises the velocity
+##' innovation covariance by its magnitude, anisotropy and orientation rather
+##' than by `D_x`, `D_y` and `rho_p`, so that the quantities shared among
+##' individuals do not depend on which way each animal travelled. The `jmp`
+##' model shares
 ##' parameters among individuals according to `share`; in particular it pools
 ##' `sigma_g`, which is what makes the estimated move persistence `g_t`
 ##' comparable between individuals. See [aniMotum::share_control]
@@ -193,7 +198,7 @@ fit_ssm <- function(x,
 
   dots <- list(...)
   
-  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, or `jmp`" = model %in% c("rw","crw","mp","jmp"))
+  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, `jmp`, or `jcrw`" = model %in% c("rw","crw","mp","jmp","jcrw"))
   init <- match.arg(init)
   
 ## check args - most args handled by prefilter() & sfilter()
@@ -342,11 +347,12 @@ fit_ssm <- function(x,
                       )
                     })
       
-    } else if (model == "jmp") {
+    } else if (model %in% c("jmp", "jcrw")) {
       ## the joint model is fitted to all individuals at once, so the
       ## prefiltered list is passed through rather than looped over
       fit <- jsfilter(
         x = fit,
+        model = model,
         time.step = time.step,
         share = share,
         parameters = parameters,
@@ -403,7 +409,7 @@ fit_ssm <- function(x,
 
   ## jssm_df ahead of ssm_df so summary() and print() dispatch to the joint
   ## methods, while everything else inherits the ssm_df behaviour
-  if (!pf && identical(model, "jmp"))
+  if (!pf && model %in% c("jmp", "jcrw"))
     class(fit) <- append("jssm_df", class(fit))
 
   return(fit)
