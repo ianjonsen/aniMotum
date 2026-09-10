@@ -72,8 +72,12 @@ pf_sf_project <- function(x, prj = NULL) {
       message("Converting projection units from m to km for efficient optimization")
       prj <- sub("units=m", "units=km", prj, fixed = TRUE)
     }
+    ## drop the lon,lat columns added by `pf_sda_filter` when the speed filter
+    ##   is on. They are absent when `spdf = FALSE`, and `x[, -integer(0)]`
+    ##   would select NO columns, silently discarding id, date, lc and the
+    ##   error variables, so the emptiness has to be tested for.
     ll <- which(names(x) %in% c("lon","lat"))
-    sf_locs <- x[, -ll]
+    sf_locs <- if(length(ll) > 0) x[, -ll] else x
     sf_locs <- st_transform(sf_locs, prj)
   }
   
