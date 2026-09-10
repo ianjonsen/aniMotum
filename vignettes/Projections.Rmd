@@ -173,42 +173,82 @@ round(stretch, 2)          # least and most stretched
 round(max(stretch) / min(stretch), 2)   # how many times more one than the other
 ```
 
-As a rough guide, if that number is below about 1.2 the default is fine. Above
-about 1.5 it is worth fitting in a projection suited to your study region and
-comparing. `fit_ssm()` will warn you when a joint fit spans a wide enough band
-for this to bite.
+As a rough guide, if that number is below about 1.2 the default is fine - and
+that is the threshold `projection = "auto"` uses before it changes anything.
+Above about 1.5 it is worth fitting in a projection suited to your study region
+and comparing. `fit_ssm()` will also warn you when a joint fit spans a wide
+enough band for this to bite.
 
 The same check applies within a single animal. A seal that migrates from 50 to
 70 degrees south has this problem on its own, with no other animals involved.
 
 ## What to do about it
 
-Supply your data as an `sf` object in a projection that suits your study
-region, and `aniMotum` will respect it:
+### Let `fit_ssm()` choose
+
+```{r auto, eval = FALSE}
+fit <- fit_ssm(mydata, vmax = 4, model = "mp", time.step = 24,
+               projection = "auto")
+```
+
+`projection = "auto"` picks a projection from the geographic extent of your
+data. You can see what it would choose without fitting anything:
+
+```{r autocrs}
+auto_crs(sese$lon, sese$lat)
+```
+
+The choice is made once from all the tracks together, never one per animal.
+Fitting each animal in its own projection would leave their estimates in
+different frames, so you could not compare them - which is usually the reason
+for fitting a whole deployment.
+
+The rules are:
+
+- a **conformal conic** (`lcc`) for tracks within one hemisphere and below 80
+  degrees, with its two standard parallels placed to keep scale error small
+  across the band your animals occupy;
+- **polar stereographic** (`stere`) beyond 80 degrees, or for tracks that go
+  right around the pole;
+- **oblique stereographic** for tracks straddling the equator, where a conic
+  does not apply;
+- the **existing Mercator default**, unchanged, when the stretch varies by less
+  than 20 percent across your data and your animals stay below 60 degrees. For
+  most temperate and tropical studies `"auto"` therefore changes nothing.
+
+All of these keep shape undistorted - a step of a given length maps to the same
+coordinate length whichever way it points. That property matters more than it
+might seem, because these models are about movement *steps*, which have a
+direction as well as a length. A projection that distorts shape makes the
+east-west and north-south parts of the process differ for reasons that have
+nothing to do with the animal, and it changes move persistence.
+
+That last point is why an equal-area projection is not the obvious choice it
+first appears. Equal-area keeps areas honest but distorts shape away from its
+centre, which is exactly the wrong trade for a movement model. The equal-area
+fit in the table above is much better than the Mercator one, but a conformal
+projection is better still.
+
+### Or choose one yourself
+
+If you have a projection your study already uses, supply the data as an `sf`
+object and `aniMotum` will use it unchanged:
 
 ```{r howto, eval = FALSE}
 d <- sf::st_as_sf(mydata, coords = c("lon", "lat"), crs = 4326)
-d <- sf::st_transform(d, "+proj=laea +lat_0=-57 +lon_0=70 +units=km")
+d <- sf::st_transform(d, "+proj=stere +lat_0=-90 +lon_0=70 +units=km")
 
 fit <- fit_ssm(d, vmax = 4, model = "mp", time.step = 24)
 ```
 
 Note the `units=km`. `aniMotum` works in kilometres internally because it helps
-the models converge, and it will convert for you, but stating it avoids any
-doubt.
+the models converge, and it will convert for you, but stating it avoids doubt.
 
-Choosing a projection is a judgement about your study region rather than a
-rule. A few starting points:
-
-- **Equal-area, centred on your study region** (`laea`) is a reasonable default
-  when animals range widely. It keeps areas honest, which is what matters when
-  the parameter of interest is how far something moved.
-- **Polar stereographic** (`stere`) is the usual choice for high-latitude work
-  and is worth comparing against an equal-area fit.
-- **UTM** works well for a study confined to one zone, and poorly across
-  several.
-- **The default Mercator** is fine for animals staying within a narrow band of
-  latitude, and for anything near the equator.
+**An `sf` object is always respected.** `aniMotum` only chooses a projection
+for itself when the data arrive as plain longitude and latitude. If your data
+have already been prepared and projected somewhere else - by `ArgosQC`, for
+example - they reach the model exactly as prepared, and `projection` is
+ignored. Nothing is ever projected twice.
 
 If you are unsure, fit twice and compare. Estimates that hold steady across two
 sensible projections are ones you can report with some confidence. Estimates

@@ -5,11 +5,17 @@
 ##' 0,360 are shifted appropriately.
 ##'
 ##' @param x data from `pf_sda_filter`
+##' @param prj optional proj4 string to project unprojected data to, in place
+##' of the default Mercator grid. Supplied by `fit_ssm(projection = )`. It is
+##' used ONLY when the incoming data are NOT an sf object. Any sf object is
+##' respected exactly as supplied, longlat or projected, so data prepared
+##' upstream (by ArgosQC, for instance) reach the model in the projection they
+##' were prepared in and are never put through a second projection.
 ##' @importFrom sf st_as_sf st_crs st_transform st_is_longlat
 ##' @keywords internal
 ##' @md
 
-pf_sf_project <- function(x) {
+pf_sf_project <- function(x, prj = NULL) {
   
   if(!inherits(x, "sf")) {
     ##  if lon spans -180,180 then shift to
@@ -23,7 +29,12 @@ pf_sf_project <- function(x) {
       sf_locs <- st_as_sf(x, coords = coords, 
                           crs = st_crs("+proj=longlat +datum=WGS84 +no_defs"))
       
-      if (any(diff(wrap_lon(xx$lon, 0)) > 300)) {
+      if (!is.null(prj)) {
+        ## caller-supplied projection; longitude wrapping is handled by the
+        ## central meridian it carries
+        prj <- prj
+
+      } else if (any(diff(wrap_lon(xx$lon, 0)) > 300)) {
         prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
       } else if (any(diff(wrap_lon(xx$lon,-180)) < -300) ||
                  any(diff(wrap_lon(xx$lon,-180)) > 300)) {
@@ -45,6 +56,11 @@ pf_sf_project <- function(x) {
   } else {
     ## if input data projection is longlat then set prj merc, otherwise respect 
     ##     user-supplied projection
+    ## An sf object is always respected, whatever `prj` says. aniMotum only
+    ## chooses a projection for itself when the data arrive unprojected - that
+    ## is, not as an sf object at all. Data prepared upstream (by ArgosQC, for
+    ## instance) must reach the model in the projection they were prepared in,
+    ## and must never be put through a second projection.
     if(st_is_longlat(x)) {
       prj <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
     } else {

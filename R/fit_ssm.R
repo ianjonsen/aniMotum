@@ -46,6 +46,19 @@
 ##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
+##' @param projection how to project longitude and latitude to the x,y
+##' coordinates the models are fitted in. `"mercator"` (default) uses the
+##' global Mercator grid, as previous versions did. `"auto"` chooses a
+##' projection from the geographic extent of the data using
+##' [aniMotum::auto_crs], which matters when tracks span a wide band of
+##' latitude - see `vignette("Projections", package = "aniMotum")`. A proj4
+##' string may also be supplied directly.
+##'
+##' This argument applies ONLY when `x` is not an `sf` object. Any `sf` object
+##' is respected exactly as supplied, longlat or projected, so data prepared
+##' upstream reach the model in the projection they were prepared in and are
+##' never put through a second projection. `projection` is ignored, with a
+##' message, if `x` is an `sf` object
 ##' @param share for `model = "jmp"` only, a parameter sharing specification
 ##' from [aniMotum::share_control] controlling which parameters are pooled
 ##' across individuals, which are hierarchical, and which are estimated
@@ -170,6 +183,7 @@ fit_ssm <- function(x,
                     inner.control = NULL,
                     share = share_control(),
                     init = c("individual", "moment"),
+                    projection = "mercator",
                     haulout   = NULL,    # NEW
                     ho.ref    = "ref",   # NEW
                     ho.id_fun = NULL,    # NEW
@@ -250,6 +264,44 @@ fit_ssm <- function(x,
   ## ensure data is in expected format
   if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
+  ## -- projection -------------------------------------------------------------
+  ## aniMotum chooses a projection for itself ONLY when the data arrive
+  ## unprojected, that is, not as an sf object. Any sf object is respected
+  ## exactly as supplied, so data prepared upstream (by ArgosQC, for instance)
+  ## reach the model in the projection they were prepared in and are never put
+  ## through a second projection.
+  ##
+  ## The choice is made once, from all individuals together, never per
+  ## individual. Projecting each animal separately would leave their parameter
+  ## estimates in different, differently distorted frames, so they could not be
+  ## compared across a deployment - and for `jmp` it would make pooling
+  ## meaningless.
+  prj <- NULL
+
+  if (inherits(x, "sf")) {
+    if (!identical(projection, "mercator"))
+      message("`projection` ignored: x is an sf object, so its own projection ",
+              "is used")
+
+  } else if (!identical(projection, "mercator")) {
+    if (!"lon" %in% names(x)) {
+      warning("`projection` ignored: x does not carry lon,lat coordinates",
+              call. = FALSE)
+
+    } else if (identical(projection, "auto")) {
+      prj <- auto_crs(x$lon, x$lat)
+      if (control$verbose >= 1)
+        cat(paste0("projecting to: ", prj, "\n"))
+
+    } else if (is.character(projection) && length(projection) == 1) {
+      prj <- projection
+
+    } else {
+      stop("`projection` must be \"mercator\", \"auto\", or a single proj4 ",
+           "string", call. = FALSE)
+    }
+  }
+
   ## apply prefilter
   fit <- lapply(split(x, x$id),
                 function(xx) {
@@ -259,7 +311,8 @@ fit_ssm <- function(x,
                             distlim = distlim,
                             spdf = spdf,
                             min.dt = min.dt,
-                            emf = emf)
+                            emf = emf,
+                            prj = prj)
                 })
   
   ## if pf = TRUE then just prefilter & return result

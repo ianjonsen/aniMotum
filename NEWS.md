@@ -1,5 +1,34 @@
 # aniMotum (development version)
 
+## projection
+
+* new `fit_ssm(projection = )`. `"mercator"` (the default) is unchanged.
+`"auto"` chooses a projection from the geographic extent of the data with the
+new `auto_crs()`; a proj4 string may also be supplied directly.
+
+* `auto_crs()` chooses a conformal projection sized to the data: a Lambert
+conformal conic with standard parallels one sixth and five sixths through the
+latitude range for one hemisphere below 80 degrees, polar stereographic beyond
+80 degrees or for circumpolar data, oblique stereographic across the equator,
+and the existing Mercator grid where the stretch varies by less than 20 percent
+and the extremes are below 60 degrees. Conformal projections are chosen because
+these models are about movement steps, which have a direction as well as a
+length: a projection that distorts shape makes the x and y process variances
+differ for reasons unrelated to the animal, and changes move persistence.
+
+* the choice is made once from all individuals together, never per individual.
+Fitting each animal in its own projection would leave their parameter estimates
+in differently distorted frames and so not comparable across a deployment, and
+for `jmp` would make pooling meaningless.
+
+* **an `sf` object is always respected.** aniMotum chooses a projection for
+itself only when the data arrive as plain lon,lat. Data prepared and projected
+upstream - by `ArgosQC`, for example - reach the model exactly as prepared,
+`projection` is ignored with a message, and nothing is ever projected twice.
+
+* new vignette, `Projections`, on what the projection does to parameter
+estimates and how to tell whether it matters for your data.
+
 ## joint (hierarchical) move persistence model
 
 * new `model = "jmp"` in `fit_ssm()` fits the time-varying move persistence
