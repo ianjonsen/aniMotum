@@ -618,13 +618,15 @@ jsfilter <- function(x,
   if (hier && sd.nm %in% names(opt$par)) {
     l.bound <- L[names(L) == sd.nm][1]
     if (any(abs(opt$par[names(opt$par) == sd.nm] - l.bound) < 1e-3))
-      warning("the among-individual standard deviation of sigma has gone to ",
-              "its lower bound.\n  There is no detectable among-individual ",
-              "variation in movement scale in these\n  data, and the fit has ",
-              "collapsed to the pooled model. The standard error\n  reported ",
-              "for sd_lsig is not interpretable at a boundary, and AICc ",
-              "over-penalises\n  this fit relative to share_control(sigma = ",
-              "\"pooled\").", call. = FALSE, immediate. = TRUE)
+      warning("the among-individual standard deviation of ",
+              if (crw) "D" else "sigma", " has gone to its lower\n  bound. ",
+              "There is no detectable among-individual variation in movement ",
+              "scale in\n  these data, and the fit has collapsed to the ",
+              "pooled model. The standard error\n  reported for ",
+              sub("^l_", "", sd.nm), " is not interpretable at a boundary, ",
+              "and AICc\n  over-penalises this fit relative to ",
+              "share_control(sigma = \"pooled\").",
+              call. = FALSE, immediate. = TRUE)
   }
 
   ## report names for parameters the map switched off entirely. A NULL map
@@ -772,6 +774,19 @@ jsfilter <- function(x,
                        dimnames = list("orient", colnames(fxd)))
         fxd <- rbind(fxd, orow)
       }
+    }
+
+    ## An ellipse is unchanged by a half turn, so its orientation is defined
+    ## only modulo 180 degrees. theta is estimated as a free unbounded
+    ## parameter, so the optimiser is entitled to settle on any of the
+    ## equivalent values - 271.2 and -88.8 describe the same ellipse. Left as
+    ## estimated, two animals pointing the same way can appear to differ by
+    ## hundreds of degrees. Wrapped to (-90, 90] the values are comparable
+    ## between individuals, and the standard error is unaffected because the
+    ## shift is by an exact multiple of the period.
+    if ("orient" %in% rownames(fxd)) {
+      oi <- which(rownames(fxd) == "orient")
+      fxd[oi, 1] <- ((fxd[oi, 1] + 90) %% 180) - 90
     }
 
     rn <- rownames(fxd)
