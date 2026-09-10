@@ -563,21 +563,41 @@ jsfilter <- function(x,
     fv <- subset(rdm, isd)[, -8]
     if (all(!is.na(time.step))) pv <- subset(rdm, !isd)[, -8] else pv <- NULL
 
-    ## parameter table: the shared parameters, plus this individual's own
-    ## process innovation scale
-    keep <- !rownames(srep) %in% c("sigma_x", "sigma_y", drop_rn)
+    ## Parameter table. Any parameter estimated per group - which includes
+    ## every parameter when it is specified as "individual" - is reported only
+    ## at this individual's own group, so each animal's table carries one value
+    ## per parameter rather than the whole population's.
+    grouped <- list(sigma_x = i, sigma_y = i,
+                    rho_p = g_rho_p[i], sigma_g = g_sg[i],
+                    tau_x = g_tau[i], tau_y = g_tau[i],
+                    psi = g_psi[i], rho_o = g_rho_o[i])
+
+    rn.all <- rownames(srep)
+    keep <- !rn.all %in% c(names(grouped), drop_rn)
     fxd <- srep[keep, , drop = FALSE]
 
-    Si <- srep[rownames(srep) %in% c("sigma_x", "sigma_y"), , drop = FALSE]
-    if (nrow(Si) == 2 * A) {
-      si <- rbind(Si[i, , drop = FALSE], Si[A + i, , drop = FALSE])
-      rownames(si) <- c("sigma_x", "sigma_y")
-      fxd <- rbind(fxd, si)
+    for (nm in names(grouped)) {
+      rws <- which(rn.all == nm)
+      if (!length(rws) || nm %in% drop_rn) next
+      j <- grouped[[nm]]
+      if (j > length(rws)) j <- 1L
+      one <- srep[rws[j], , drop = FALSE]
+      rownames(one) <- nm
+      fxd <- rbind(fxd, one)
     }
+
     rn <- rownames(fxd)
     if (sum(rn == "sigma_pop") == 2)
       rn[rn == "sigma_pop"] <- c("sigma_pop_x", "sigma_pop_y")
+    if (sum(rn == "sd_lsig") == 2)
+      rn[rn == "sd_lsig"] <- c("sd_lsig_x", "sd_lsig_y")
     rownames(fxd) <- make.unique(rn)
+
+    ## keep a stable, readable order
+    ord <- c("sigma_pop_x", "sigma_pop_y", "sigma_pop", "sd_lsig",
+             "sd_lsig_x", "sd_lsig_y", "sigma_x", "sigma_y", "sigma_g",
+             "rho_p", "tau_x", "tau_y", "psi", "rho_o", "hos")
+    fxd <- fxd[order(match(rownames(fxd), ord), na.last = TRUE), , drop = FALSE]
 
     o <- list(
       call = call,

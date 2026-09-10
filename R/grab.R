@@ -206,7 +206,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                                "geometry")]
                      } 
                    }
-                 }, mp = {
+                 }, jmp = , mp = {
                    if ("gap_flag" %in% names(out)) {
                    out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
                            "g", "gap_flag", "geometry")]
@@ -288,7 +288,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                        }
                        }
                    },
-                 mp = {
+                 jmp = , mp = {
                    if("gap_flag" %in% names(out)) {
                     out <- out[, c("id", "date", "lon", "lat", "x", "y", 
                             "x.se", "y.se", "logit_g", "logit_g.se", "g", "gap_flag")]
