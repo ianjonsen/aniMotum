@@ -23,6 +23,7 @@ fit_ssm(
   inner.control = NULL,
   share = share_control(),
   init = c("individual", "moment"),
+  projection = "mercator",
   haulout = NULL,
   ho.ref = "ref",
   ho.id_fun = NULL,
@@ -91,6 +92,20 @@ separately for each individual. Ignored by the other models}
 model and uses those estimates as starting values; \code{"moment"} uses
 moment-based starting values. Per-individual initialisation costs an extra
 pass over the data but substantially improves convergence}
+
+\item{projection}{how to project longitude and latitude to the x,y
+coordinates the models are fitted in. \code{"mercator"} (default) uses the
+global Mercator grid, as previous versions did. \code{"auto"} chooses a
+projection from the geographic extent of the data using
+\link{auto_crs}, which matters when tracks span a wide band of
+latitude - see \code{vignette("Projections", package = "aniMotum")}. A proj4
+string may also be supplied directly.
+
+This argument applies ONLY when \code{x} is not an \code{sf} object. Any \code{sf} object
+is respected exactly as supplied, longlat or projected, so data prepared
+upstream reach the model in the projection they were prepared in and are
+never put through a second projection. \code{projection} is ignored, with a
+message, if \code{x} is an \code{sf} object}
 
 \item{haulout}{optional. Either a path to an SMRU haulout CSV file or a
 pre-read data frame with columns \code{s_date} and \code{e_date} defining haulout

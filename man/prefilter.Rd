@@ -11,7 +11,8 @@ prefilter(
   distlim = c(2500, 5000),
   spdf = TRUE,
   min.dt = 0,
-  emf = NULL
+  emf = NULL,
+  prj = NULL
 )
 }
 \arguments{
@@ -36,6 +37,10 @@ differences > 0 are allowed}
 
 \item{emf}{optionally supplied data.frame of error multiplication factors
 for Argos location quality classes. see Details}
+
+\item{prj}{optional proj4 string, passed to \code{pf_sf_project}. Used only when
+the data are unprojected; an sf object carrying a projected CRS is always
+respected}
 }
 \value{
 an sf object with all observations passed from \code{data} and the

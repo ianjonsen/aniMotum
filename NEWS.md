@@ -47,6 +47,17 @@ records the animal's direction of travel rather than a property of its
 movement. Animals heading different ways are not exchangeable in it, and
 pooling averages correlations that may differ in sign.
 
+* a joint fit no longer presents itself as several separate fits. `jmp` fits
+now carry class `jssm_df`, ahead of `ssm_df` so that `grab()`, `plot()` and
+`map()` are unaffected, with each individual's component classed `jmp_ssm`.
+`summary()` and `print()` report the objective, convergence and AICc once for
+the single fit rather than repeating them against every animal - the previous
+behaviour put the joint AICc in each row of the summary table, which invited it
+to be summed or compared animal by animal, neither of which is valid. The
+parameter tables now separate estimates shared by all individuals from those
+estimated separately, so it is clear that `sigma_g` and `tau` are the
+population's while `sigma_x` and `rho_p` are that animal's.
+
 * new `share_control()` specifies which parameters are pooled, hierarchical or
 estimated separately, and refuses combinations that are not identifiable. It
 will not allow `sigma` and the measurement parameters to be hierarchical at

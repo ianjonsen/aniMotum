@@ -468,7 +468,8 @@ jsfilter <- function(x,
       o <- list(call = call, data = x[[i]], inits = parameters,
                 pm = "jmp", ts = time.step, tmb = obj, errmsg = opt)
       attr(o, "jdata") <- dat
-      class(o) <- append("mp_ssm", class(o))
+      attr(o, "n.track") <- A
+      class(o) <- append(c("jmp_ssm", "mp_ssm"), class(o))
       o
     })
     names(out) <- ids
@@ -599,6 +600,19 @@ jsfilter <- function(x,
              "rho_p", "tau_x", "tau_y", "psi", "rho_o", "hos")
     fxd <- fxd[order(match(rownames(fxd), ord), na.last = TRUE), , drop = FALSE]
 
+    ## Flag which of these are one value shared by every individual and which
+    ## vary. Without this a user cannot tell, from the table alone, that
+    ## sigma_g and tau are the population's while sigma_x and rho_p are this
+    ## animal's - the print and summary methods use it to separate them.
+    varies <- character(0)
+    if (sig_mode != 0L) varies <- c(varies, "sigma_x", "sigma_y")
+    if (G_sg > 1L) varies <- c(varies, "sigma_g")
+    if (G_rho_p > 1L) varies <- c(varies, "rho_p")
+    if (G_tau > 1L) varies <- c(varies, "tau_x", "tau_y")
+    if (G_psi > 1L) varies <- c(varies, "psi")
+    if (G_rho_o > 1L) varies <- c(varies, "rho_o")
+    attr(fxd, "shared") <- !rownames(fxd) %in% varies
+
     o <- list(
       call = call,
       predicted = pv,
@@ -617,7 +631,10 @@ jsfilter <- function(x,
       time = proc.time() - st
     )
     attr(o, "jdata") <- dat
-    class(o) <- append("mp_ssm", class(o))
+    attr(o, "n.track") <- A
+    ## jmp_ssm ahead of mp_ssm so the joint fit gets its own print method while
+    ## everything that dispatches on mp_ssm keeps working
+    class(o) <- append(c("jmp_ssm", "mp_ssm"), class(o))
     out[[i]] <- o
   }
 

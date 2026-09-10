@@ -393,6 +393,18 @@ fit_ssm <- function(x,
 
   }
 
+  ## A joint fit is one model fitted to all the tracks at once, not one model
+  ## per track. The tibble keeps a row per individual because the states really
+  ## are per individual, but the fit-level quantities - objective, convergence,
+  ## AICc - belong to the whole thing. jssm_df exists so that summary() and
+  ## print() can say so; it inherits from ssm_df, so grab(), plot() and map()
+  ## dispatch exactly as before.
   class(fit) <- append("ssm_df", class(fit))
+
+  ## jssm_df ahead of ssm_df so summary() and print() dispatch to the joint
+  ## methods, while everything else inherits the ssm_df behaviour
+  if (!pf && identical(model, "jmp"))
+    class(fit) <- append("jssm_df", class(fit))
+
   return(fit)
 }

@@ -162,3 +162,87 @@ test_that("grab and plot methods work on a joint fit", {
   expect_true(all(c("id", "date", "g") %in% names(g)))
   expect_equal(length(unique(g$id)), nrow(f))
 })
+
+## a joint fit must not look like several separate fits ----------------------
+
+test_that("a joint fit carries its own classes", {
+  skip_on_cran()
+  skip_if_not_installed("RTMB")
+
+  f <- suppressWarnings(
+    fit_ssm(sese, vmax = 4, model = "jmp", time.step = 24,
+            control = ssm_control(verbose = 0))
+  )
+
+  ## jssm_df ahead of ssm_df, so summary() and print() dispatch to the joint
+  ## methods while grab(), plot() and map() inherit the ssm_df behaviour
+  expect_s3_class(f, "jssm_df")
+  expect_s3_class(f, "ssm_df")
+  expect_equal(class(f)[1], "jssm_df")
+  expect_true(all(sapply(f$ssm, function(x) inherits(x, "jmp_ssm"))))
+  expect_true(all(sapply(f$ssm, function(x) inherits(x, "mp_ssm"))))
+
+  ## a per-individual mp fit must NOT pick up the joint classes
+  fi <- fit_ssm(sese, vmax = 4, model = "mp", time.step = 24,
+                control = ssm_control(verbose = 0))
+  expect_false(inherits(fi, "jssm_df"))
+  expect_false(any(sapply(fi$ssm, function(x) inherits(x, "jmp_ssm"))))
+})
+
+test_that("the parameter table records which estimates are shared", {
+  skip_on_cran()
+  skip_if_not_installed("RTMB")
+
+  f <- suppressWarnings(
+    fit_ssm(sese, vmax = 4, model = "jmp", time.step = 24,
+            control = ssm_control(verbose = 0))
+  )
+  p <- f$ssm[[1]]$par
+  sh <- attr(p, "shared")
+
+  expect_type(sh, "logical")
+  expect_length(sh, nrow(p))
+
+  ## sigma_g and tau are pooled by default; rho_p is per individual
+  expect_true(sh[rownames(p) == "sigma_g"])
+  expect_true(sh[rownames(p) == "tau_x"])
+  expect_false(sh[rownames(p) == "rho_p"])
+
+  ## and the shared ones really are identical across animals
+  sg <- sapply(f$ssm, function(x) x$par["sigma_g", "Estimate"])
+  expect_equal(length(unique(round(sg, 12))), 1L)
+
+  ## while rho_p is not
+  rp <- sapply(f$ssm, function(x) x$par["rho_p", "Estimate"])
+  expect_gt(length(unique(round(rp, 8))), 1L)
+})
+
+test_that("summary reports the fit once, not once per animal", {
+  skip_on_cran()
+  skip_if_not_installed("RTMB")
+
+  f <- suppressWarnings(
+    fit_ssm(sese, vmax = 4, model = "jmp", time.step = 24,
+            control = ssm_control(verbose = 0))
+  )
+  s <- summary(f)
+
+  expect_s3_class(s, "summary.jssm_df")
+  expect_true(all(c("Fittab", "Stattab", "Shared") %in% names(s)))
+
+  ## the fit is described once
+  expect_equal(nrow(s$Fittab), 1L)
+  expect_true(all(c("neg.log.lik", "converged", "AICc") %in%
+                    colnames(s$Fittab)))
+
+  ## and NOT against each animal, which would invite summing or comparing it
+  expect_equal(nrow(s$Stattab), length(unique(sese$id)))
+  expect_false("AICc" %in% colnames(s$Stattab))
+  expect_false("converged" %in% colnames(s$Stattab))
+
+  ## shared parameters appear once rather than in every individual's table
+  expect_true("sigma_g" %in% s$Shared[, "Parameter"])
+  if (!is.null(s$Partab))
+    expect_false(any(sapply(s$Partab, function(p)
+      !is.null(p) && "sigma_g" %in% p[, "Parameter"])))
+})
