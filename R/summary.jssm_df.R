@@ -128,6 +128,15 @@ print.summary.jssm_df <- function(x, ...) {
                   digits = 2, right = TRUE, na.print = ".")
   }
 
+  ## orient is wrapped to (-90, 90]. Any wrapping of a circular quantity has a
+  ## branch cut somewhere, so two orientations that are close can print at
+  ## opposite ends of the range: -88.8 and +89.0 are 2.2 degrees apart, not
+  ## 178. Re-centring the cut on the data does not help when the orientations
+  ## span more than 90 degrees, so say it plainly instead.
+  has.orient <- !is.null(x$Partab) &&
+    any(vapply(x$Partab, function(p)
+      !is.null(p) && "orient" %in% p[, "Parameter"], logical(1)))
+
   if (!is.null(x$Partab)) {
     cat("\nparameters estimated separately\n")
     for (i in seq_along(x$Partab)) {
@@ -137,6 +146,15 @@ print.summary.jssm_df <- function(x, ...) {
       print.default(x$Partab[[i]], row.names = FALSE, quote = FALSE,
                     digits = 2, right = TRUE, na.print = ".")
     }
+  }
+
+  if (has.orient) {
+    cat("\norient is an ellipse axis, so it is defined modulo 180 degrees and\n")
+    cat("is reported on (-90, 90]. Compare orientations modulo 180: -88.8 and\n")
+    cat("+89.0 differ by 2.2 degrees, not 178. It is also measured from the x\n")
+    cat("axis of the projection the model was fitted in, so it is comparable\n")
+    cat("between these individuals but not with a fit made in another\n")
+    cat("projection.\n")
   }
 
   invisible(x)

@@ -88,17 +88,28 @@
 ##' @param aniso treatment of the anisotropy of the process covariance. `jcrw`
 ##' only. One of:
 ##' \describe{
-##'   \item{`"common.ratio"`}{(default) the amount of anisotropy is shared by
-##'   all individuals while each keeps its own orientation. This is the pooling
-##'   that the `jcrw` parameterisation exists to make possible: the shared
-##'   quantity does not depend on which way an animal travelled, and the free
-##'   one does.}
+##'   \item{`"individual"`}{(default) amount and orientation both free per
+##'   individual. This imposes no cross-individual structure, and on the `sese`
+##'   elephant seals it is strongly preferred: the individual ratios span 1.12
+##'   to 2.70, and a likelihood ratio test against a common ratio gives
+##'   17.2 on 3 degrees of freedom, p = 0.0007.}
+##'   \item{`"common.ratio"`}{the amount of anisotropy is shared by all
+##'   individuals while each keeps its own orientation. This is the pooling the
+##'   `jcrw` parameterisation makes possible - the shared quantity does not
+##'   depend on which way an animal travelled, the free one does - and it is a
+##'   testable restriction rather than an assumption, since the null is
+##'   interior and an ordinary likelihood ratio test applies. Worth trying, but
+##'   not worth assuming.}
 ##'   \item{`"isotropic"`}{no anisotropy at all. The process is described by
-##'   its magnitude alone, and there is no orientation to estimate. Often
-##'   adequate: fitted in a suitable projection, the `sese` elephant seals came
-##'   out very close to isotropic.}
-##'   \item{`"individual"`}{amount and orientation both free per individual.}
+##'   its magnitude alone, and there is no orientation to estimate.}
 ##' }
+##'
+##' A caution about `"common.ratio"`: it imposes the shared ratio on every
+##' individual and then finds the best orientation given it. An animal with
+##' little real anisotropy will still be handed a confident-looking
+##' orientation, because the reported standard error is conditional on the
+##' imposed ratio rather than reflecting whether there is any anisotropy to
+##' orient.
 ##' Note that pooling the anisotropy \emph{vector} outright is not offered,
 ##' because that would force a common orientation as well as a common ratio,
 ##' which is the mistake the parameterisation is designed to avoid
@@ -147,7 +158,7 @@
 
 share_control <- function(sigma = c("hierarchical", "pooled", "individual"),
                           sigma_g = c("pooled", "individual"),
-                          aniso = c("common.ratio", "isotropic", "individual"),
+                          aniso = c("individual", "common.ratio", "isotropic"),
                           rho_p = c("individual", "pooled"),
                           tau = c("pooled", "individual", "hierarchical"),
                           psi = c("pooled", "individual", "hierarchical"),
