@@ -1,0 +1,225 @@
+---
+title: "Map projections and your results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Map projections and your results}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+require(aniMotum)
+```
+
+## The short version
+
+`aniMotum` estimates locations and movement parameters in map coordinates, not
+in longitude and latitude. That means the map you use is part of the model. If
+your animals range across a wide band of latitude, the default map will stretch
+their movements by different amounts in different places, and the parameter
+estimates you get back will partly describe the map rather than the animal.
+
+For tracks that stay within a narrow band of latitude, this makes almost no
+difference and you can ignore it. For tracks that cross a wide band - polar and
+sub-polar animals especially - it can change the answers substantially.
+
+## What `aniMotum` does by default
+
+Tracking data usually arrive as longitude and latitude. Those are angles, not
+distances, so before fitting a model `aniMotum` converts them to x and y
+coordinates measured in kilometres. Unless you tell it otherwise, it uses a
+Mercator grid to do that.
+
+Mercator is a sensible general-purpose default. It is the map most people
+picture, it never distorts an animal's direction of travel at a point, and it
+works anywhere in the world without you having to choose anything.
+
+It has one property that matters here: it stretches distances by more and more
+as you move away from the equator. The amount of stretch is `1 / cos(latitude)`.
+
+```{r stretch}
+lat <- c(0, 30, 45, 50, 60, 70, 80)
+data.frame(latitude = lat,
+           stretch  = round(1 / cos(lat * pi / 180), 2))
+```
+
+So a 10 km move at 70 degrees south appears on a Mercator grid as roughly a
+29 km move, while the same 10 km move at 30 degrees south appears as about
+11.5 km. The animal did the same thing in both cases. The map did not.
+
+## Why that reaches the parameter estimates
+
+The models estimate how far an animal typically moves in a given time. In the
+`mp` and `rw` models that quantity is `sigma`; in the `crw` model it appears as
+the diffusion coefficient `D`. Either way it is measured in map units. If the
+map stretches distances, the estimate is stretched with them.
+
+Two things follow.
+
+**An animal that spends its time at high latitude looks faster than one at
+lower latitude, even if they move identically.** The difference is entirely the
+map.
+
+**A single animal that travels across a wide band of latitude has its own
+movements stretched by different amounts at different points of its own
+track.** The model fits one value of `sigma` to the whole track, so what you
+get is an average across all that stretching.
+
+The measurement error parameters are affected in the same way. `tau` scales the
+assumed Argos error, and that error is also expressed in map units.
+
+## A worked example
+
+The `sese` data are four southern elephant seals tagged at Iles Kerguelen. They
+leave from roughly the same place and then travel in very different directions:
+one east, one west, one almost due south, one southwest. Between them they
+cover 47 to 69 degrees south.
+
+```{r latrange}
+range(abs(sese$lat))
+
+## the average latitude each seal occupies, and the stretch that implies
+ll <- tapply(abs(sese$lat), sese$id, mean)
+round(1 / cos(ll * pi / 180), 2)
+```
+
+The four seals sit at stretch factors of roughly 1.6 to 2.2. So before any
+model is fitted, we should expect the seals that go furthest south to look like
+faster movers.
+
+Fitting the joint move persistence model on the default Mercator grid, and then
+again on an equal-area grid centred on the study region:
+
+```{r fits, eval = FALSE}
+## default: Mercator
+fm <- fit_ssm(sese, vmax = 4, model = "jmp", time.step = 24)
+
+## equal-area, centred on the deployment
+sese_ea <- sf::st_transform(
+  sf::st_as_sf(sese, coords = c("lon", "lat"), crs = 4326),
+  "+proj=laea +lat_0=-57 +lon_0=70 +datum=WGS84 +units=km +no_defs")
+
+fe <- fit_ssm(sese_ea, vmax = 4, model = "jmp", time.step = 24)
+```
+
+The estimates:
+
+| parameter | Mercator | equal-area |
+|---|---|---|
+| `sigma_pop_x` | 3.31 | 0.71 |
+| `sigma_pop_y` | 2.44 | 0.71 |
+| `sigma_g` | 0.023 | 0.042 |
+| `tau_x` | 0.046 | 0.087 |
+| `tau_y` | 0.071 | 0.080 |
+| `rho_o` | 0.51 | −0.04 |
+| `sd_lsig` | 0.25 | 0 |
+
+Three things are worth pulling out.
+
+**The seals only appear to differ on the Mercator grid.** `sd_lsig` is how much
+the seals differ from one another in movement scale. On the Mercator grid it
+comes out at 0.25. On the equal-area grid it goes to zero: once the map stops
+stretching the southern seals more than the northern ones, there is no
+difference left to find. The apparent variation between animals was the map.
+
+**The Mercator fit says the seals move differently east-west than north-south,
+and the equal-area fit says they do not.** On the Mercator grid `sigma_pop_x`
+and `sigma_pop_y` differ by about a third. On the equal-area grid they are
+equal to three decimal places. Mercator stretches north-south and east-west by
+the same amount at any single point, so this is not a direct distortion. It
+arises because the seals do their east-west travelling and their north-south
+travelling at different latitudes, so the two get stretched by different
+average amounts over a whole track.
+
+**The measurement error estimates give an independent check, and they favour
+the equal-area fit.** Argos location error has no reason to be larger
+east-west than north-south, and no reason for the error in one direction to be
+correlated with the error in the other. On the equal-area grid that is what we
+get: `tau_x` and `tau_y` are within 8% of each other, and `rho_o` is close to
+zero. On the Mercator grid they differ by more than half, and `rho_o` comes out
+at 0.51. The equal-area fit recovers a sensible measurement error model without
+being asked to; the Mercator fit does not.
+
+## Move persistence is affected too
+
+It is tempting to assume that move persistence, `g`, escapes all of this. It is
+a number between 0 and 1 with no units, so a change in map scale should not
+touch it.
+
+That reasoning does not hold. `g` measures how much of an animal's previous
+step carries over into its next one, and a step has a direction as well as a
+length. Any map that distorts shape, and any map whose stretch changes along
+the track, changes the relationship between one step and the next. In the
+example above `sigma_g` nearly doubled between the two fits.
+
+So `g` values are comparable between animals in the same fit, which is what
+fitting a joint model buys you, but they are not comparable across fits made on
+different maps. If you report move persistence, report the projection you used.
+
+## Does this matter for my data?
+
+A quick check:
+
+```{r check}
+## how much does the stretch vary across your data?
+lat.rng <- range(abs(sese$lat), na.rm = TRUE)
+stretch <- 1 / cos(lat.rng * pi / 180)
+
+round(stretch, 2)          # least and most stretched
+round(max(stretch) / min(stretch), 2)   # how many times more one than the other
+```
+
+As a rough guide, if that number is below about 1.2 the default is fine. Above
+about 1.5 it is worth fitting in a projection suited to your study region and
+comparing. `fit_ssm()` will warn you when a joint fit spans a wide enough band
+for this to bite.
+
+The same check applies within a single animal. A seal that migrates from 50 to
+70 degrees south has this problem on its own, with no other animals involved.
+
+## What to do about it
+
+Supply your data as an `sf` object in a projection that suits your study
+region, and `aniMotum` will respect it:
+
+```{r howto, eval = FALSE}
+d <- sf::st_as_sf(mydata, coords = c("lon", "lat"), crs = 4326)
+d <- sf::st_transform(d, "+proj=laea +lat_0=-57 +lon_0=70 +units=km")
+
+fit <- fit_ssm(d, vmax = 4, model = "mp", time.step = 24)
+```
+
+Note the `units=km`. `aniMotum` works in kilometres internally because it helps
+the models converge, and it will convert for you, but stating it avoids any
+doubt.
+
+Choosing a projection is a judgement about your study region rather than a
+rule. A few starting points:
+
+- **Equal-area, centred on your study region** (`laea`) is a reasonable default
+  when animals range widely. It keeps areas honest, which is what matters when
+  the parameter of interest is how far something moved.
+- **Polar stereographic** (`stere`) is the usual choice for high-latitude work
+  and is worth comparing against an equal-area fit.
+- **UTM** works well for a study confined to one zone, and poorly across
+  several.
+- **The default Mercator** is fine for animals staying within a narrow band of
+  latitude, and for anything near the equator.
+
+If you are unsure, fit twice and compare. Estimates that hold steady across two
+sensible projections are ones you can report with some confidence. Estimates
+that move a lot are telling you something about your map.
+
+## What this does not change
+
+Estimated locations are barely affected. The models are estimating where the
+animal was, and converting back to longitude and latitude at the end undoes
+most of the distortion. If all you want from `aniMotum` is a quality-controlled
+track, the default is fine.
+
+It is the *parameters* - how fast, how variable between animals, how persistent
+- that need the care, along with anything computed from them.
