@@ -61,7 +61,13 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
   if(inherits(x, "fG_ssm")) class(x)[1] <- "ssm_df"
   if(inherits(x, "fG_mpm")) class(x)[1] <- "mpm_df"
   
+  ## jssm_df is a joint (hierarchical) fit. It inherits from ssm_df and its
+  ## per-individual states have the same structure, so it is handled here
+  ## identically. The fall-through is needed because this switch keys on the
+  ## first class, and jssm_df has to sit ahead of ssm_df for summary() and
+  ## print() to dispatch to the joint methods.
   switch(class(x)[1],
+         jssm_df = ,
          ssm_df = {
            ## remove optimizer crash results from extraction
            nf <- which(sapply(x$ssm, length) < 15)

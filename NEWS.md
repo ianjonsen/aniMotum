@@ -56,7 +56,8 @@ behaviour put the joint AICc in each row of the summary table, which invited it
 to be summed or compared animal by animal, neither of which is valid. The
 parameter tables now separate estimates shared by all individuals from those
 estimated separately, so it is clear that `sigma_g` and `tau` are the
-population's while `sigma_x` and `rho_p` are that animal's.
+population's while `sigma_x` and `rho_p` are that animal's. `grab()` keys on
+the first class, so it gained a fall-through for `jssm_df`.
 
 * new `share_control()` specifies which parameters are pooled, hierarchical or
 estimated separately, and refuses combinations that are not identifiable. It

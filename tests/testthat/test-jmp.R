@@ -157,10 +157,32 @@ test_that("grab and plot methods work on a joint fit", {
     fit_ssm(sese, vmax = 4, model = "jmp", time.step = 24,
             control = ssm_control(verbose = 0))
   )
+
+  ## grab() switches on class(x)[1], and jssm_df has to sit ahead of ssm_df
+  ## for summary() and print() to dispatch to the joint methods. Without a
+  ## fall-through for it, no branch matched and grab() failed with
+  ## "object 'out' not found".
+  for (w in c("fitted", "predicted", "data")) {
+    for (sf in c(TRUE, FALSE)) {
+      g <- grab(f, what = w, as_sf = sf)
+      expect_true(nrow(g) > 0)
+      expect_true(all(c("id", "date") %in% names(g)))
+      expect_equal(length(unique(g$id)), nrow(f))
+    }
+  }
+
+  ## the abbreviated `what` used at the console must work too
+  expect_equal(nrow(grab(f, "p", as_sf = FALSE)),
+               nrow(grab(f, "predicted", as_sf = FALSE)))
+
   g <- grab(f, what = "predicted", as_sf = FALSE)
-  expect_s3_class(g, "data.frame")
-  expect_true(all(c("id", "date", "g") %in% names(g)))
-  expect_equal(length(unique(g$id)), nrow(f))
+  expect_true("g" %in% names(g))
+
+  ## and a joint fit must give the same state columns as a per-individual mp fit
+  fi <- fit_ssm(sese, vmax = 4, model = "mp", time.step = 24,
+                control = ssm_control(verbose = 0))
+  expect_setequal(names(grab(f, "predicted", as_sf = FALSE)),
+                  names(grab(fi, "predicted", as_sf = FALSE)))
 })
 
 ## a joint fit must not look like several separate fits ----------------------
