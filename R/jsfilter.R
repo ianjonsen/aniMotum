@@ -828,6 +828,12 @@ jsfilter <- function(x,
       par = fxd,
       data = x[[i]],
       isd = d.all$isd,
+      ## where this individual's location states sit in the joint random
+      ## effects vector (2 entries - x and y - per time step). A joint fit has
+      ## one random effects vector and one joint precision matrix for every
+      ## animal at once, so anything working from them - sim_post(), for
+      ## instance - needs to know which slice belongs to this individual.
+      ridx = rr,
       inits = parameters,
       pm = model,
       ts = time.step,

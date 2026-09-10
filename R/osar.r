@@ -46,6 +46,21 @@ osar <- function(x, method = "fullGaussian", ...)
                    ...)
   }
 
+  ## A joint fit stores the same TMB object on every row, holding all the
+  ## animals' observations at once, while $isd is one individual's. The subset
+  ## index below would then point at the wrong columns of Y and be too short,
+  ## so the residuals returned would be silently wrong rather than absent.
+  ## Beyond the indexing, TMB::oneStepPredict needs the objective function to
+  ## carry a per-observation data-term indicator; the RTMB templates behind the
+  ## joint models compute the observation likelihood as a single summed
+  ## quadratic form and do not yet declare one.
+  if(inherits(x, "jssm_df")) {
+    stop("one-step-ahead residuals are not available for joint fits (`model = ",
+         "\"jmp\"` or `\"jcrw\"`) yet.\n  To check goodness-of-fit for these ",
+         "data, fit the corresponding single-animal model\n  (`\"mp\"` or ",
+         "`\"crw\"`) and call osar() on that.", call. = FALSE)
+  }
+
   if(inherits(x, "ssm_df")) {
     if(nrow(x) > 3 & 
        requireNamespace("future", quietly = TRUE) &
