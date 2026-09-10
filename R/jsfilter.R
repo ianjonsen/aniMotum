@@ -120,23 +120,35 @@ jsfilter <- function(x,
         s[2] / s[1]
       }))
 
-      if (is.merc && ratio > 1.3) {
+      ## sigma has units of distance per unit time and so is inflated by
+      ## sec(latitude); D has units of distance squared per unit time and so is
+      ## inflated by its square. Report whichever applies.
+      pwr <- if (crw) 2 else 1
+      p.nm <- if (crw) "D" else "sigma"
+      p.rat <- ratio ^ pwr
+      w.rat <- w.ratio ^ pwr
+
+      if (is.merc && p.rat > 1.3) {
         warning("these data span ", round(lat.rng[1], 1), " to ",
                 round(lat.rng[2], 1), " degrees absolute latitude on a ",
                 "Mercator grid.\n",
-                "  The scale factor is sec(latitude), so apparent movement ",
-                "scale differs by a factor\n  of ", round(ratio, 1),
-                " across the data set",
-                if (w.ratio > 1.3)
-                  paste0(", and by up to ", round(w.ratio, 1),
-                         " within a single track") else "", ".\n",
+                "  The scale factor is sec(latitude)",
+                if (crw) "^2 for D" else " for sigma",
+                ", so apparent movement scale differs\n  by a factor of ",
+                round(p.rat, 1), " across the data set",
+                if (w.rat > 1.3)
+                  paste0(", and by up to ", round(w.rat, 1),
+                         " within a\n  single track") else "", ".\n",
                 "  Across individuals this is absorbed into the ",
-                "among-individual variance of sigma,\n  where it cannot be ",
-                "told apart from biological variation. Supply the data as an\n",
-                "  sf object in an equal-area projection if the ",
-                "population-level sigma or its\n  variance is to be ",
-                "interpreted. g_t and sigma_g are unaffected, being ",
-                "scale-free.",
+                "among-individual variance of ", p.nm, ",\n  where it cannot ",
+                "be told apart from biological variation. Supply the data as ",
+                "an\n  sf object in an equal-area projection if the ",
+                "population-level ", p.nm, " or its\n  variance is to be ",
+                "interpreted",
+                if (crw)
+                  ". The anisotropy ratio is unaffected, being a ratio of\n  eigenvalues; the orientation is not comparable across projections."
+                else
+                  ". g_t and sigma_g are unaffected, being scale-free.",
                 call. = FALSE, immediate. = TRUE)
       }
     }
@@ -645,7 +657,8 @@ jsfilter <- function(x,
     rr <- ((i1[i] - 1) * 2 + 1):(i2[i] * 2)
 
     loc <- X.all[rr, , drop = FALSE]
-    lgi <- lg.all[k, , drop = FALSE]
+    ## lg exists only in the move persistence model; for jcrw lg.all has no rows
+    lgi <- if (crw) NULL else lg.all[k, , drop = FALSE]
 
     rdm <- as.data.frame(cbind(loc[seq(1, nrow(loc), by = 2), ],
                                loc[seq(2, nrow(loc), by = 2), ]),
