@@ -6,6 +6,7 @@
 \usage{
 jsfilter(
   x,
+  model = c("jmp", "jcrw"),
   time.step = NA,
   share = share_control(),
   parameters = NULL,

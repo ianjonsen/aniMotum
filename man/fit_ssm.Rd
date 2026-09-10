@@ -52,7 +52,12 @@ differences > 0 are allowed.}
 \item{model}{fit a simple random walk (\code{rw}), correlated random walk
 (\code{crw}), a time-varying move persistence model (\code{mp}), or a joint
 (hierarchical) move persistence model fitted to all individuals at once
-(\code{jmp}), all as continuous-time process models. The \code{jmp} model shares
+(\code{jmp}), or a joint correlated random walk (\code{jcrw}), all as
+continuous-time process models. \code{jcrw} parameterises the velocity
+innovation covariance by its magnitude, anisotropy and orientation rather
+than by \code{D_x}, \code{D_y} and \code{rho_p}, so that the quantities shared among
+individuals do not depend on which way each animal travelled. The \code{jmp}
+model shares
 parameters among individuals according to \code{share}; in particular it pools
 \code{sigma_g}, which is what makes the estimated move persistence \code{g_t}
 comparable between individuals. See \link{share_control}}

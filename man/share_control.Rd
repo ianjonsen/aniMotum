@@ -7,6 +7,7 @@
 share_control(
   sigma = c("hierarchical", "pooled", "individual"),
   sigma_g = c("pooled", "individual"),
+  aniso = c("common.ratio", "isotropic", "individual"),
   rho_p = c("individual", "pooled"),
   tau = c("pooled", "individual", "hierarchical"),
   psi = c("pooled", "individual", "hierarchical"),
@@ -18,15 +19,40 @@ share_control(
 )
 }
 \arguments{
-\item{sigma}{treatment of the process innovation scale. One of
-\code{"hierarchical"} (default), \code{"pooled"} or \code{"individual"}}
+\item{sigma}{treatment of the process magnitude - the innovation scale
+\code{sigma} in \code{jmp}, and the diffusion magnitude \code{D} in \code{jcrw}. One of
+\code{"hierarchical"} (default), \code{"pooled"} or \code{"individual"}. In \code{jcrw} this is
+half the log determinant of the velocity innovation covariance, which does
+not depend on the animal's direction of travel, so an among-individual
+variance estimated from it is a statement about how much the animals move
+rather than about where they went}
 
 \item{sigma_g}{treatment of the move persistence random walk scale. One of
 \code{"pooled"} (default) or \code{"individual"}. Pooling is what makes \code{g_t}
-comparable among individuals}
+comparable among individuals. \code{jmp} only}
+
+\item{aniso}{treatment of the anisotropy of the process covariance. \code{jcrw}
+only. One of:
+\describe{
+\item{\code{"common.ratio"}}{(default) the amount of anisotropy is shared by
+all individuals while each keeps its own orientation. This is the pooling
+that the \code{jcrw} parameterisation exists to make possible: the shared
+quantity does not depend on which way an animal travelled, and the free
+one does.}
+\item{\code{"isotropic"}}{no anisotropy at all. The process is described by
+its magnitude alone, and there is no orientation to estimate. Often
+adequate: fitted in a suitable projection, the \code{sese} elephant seals came
+out very close to isotropic.}
+\item{\code{"individual"}}{amount and orientation both free per individual.}
+}
+Note that pooling the anisotropy \emph{vector} outright is not offered,
+because that would force a common orientation as well as a common ratio,
+which is the mistake the parameterisation is designed to avoid}
 
 \item{rho_p}{treatment of the process error correlation between x and y.
-One of \code{"individual"} (default) or \code{"pooled"}}
+One of \code{"individual"} (default) or \code{"pooled"}. \code{jmp} only - \code{jcrw} has no
+\code{rho_p}, since the correlation is absorbed into the anisotropy vector along
+with the two variances}
 
 \item{tau}{treatment of the LS/GPS measurement error dispersion. One of
 \code{"pooled"} (default), \code{"individual"} or \code{"hierarchical"}}
