@@ -384,16 +384,23 @@ fit_ssm <- function(x,
     }
     
     fit <- tibble(id = names(fit), ssm = fit)
+    ## Did this fit come back complete? sfilter(), mpfilter() and jsfilter()
+    ## return the full object on success and a short one carrying `errmsg` when
+    ## the optimiser fails. This used to be tested as `length(x) == 15`, which
+    ## silently made the number of elements in that list part of the package's
+    ## interface: adding a single field to a fit object turned every fit into a
+    ## failure, and `sapply` then returned a list of NULLs rather than a logical
+    ## vector, so the failure surfaced far away as "'list' object cannot be
+    ## coerced to type 'logical'". Test for what is actually needed instead.
+    ok <- vapply(fit$ssm,
+                 function(x) !is.null(x$opt) && !is.null(x$rep),
+                 logical(1))
+
     fit <- tibble(fit,
-                  converged = sapply(fit$ssm, function(x) 
-                    if(length(x) == 15) {
-                      x$opt$convergence == 0
-                    } else if(length(x) < 15) {
-                      FALSE
-                    }),
-                  pdHess = sapply(fit$ssm, function(x) 
-                    length(x) == 15
-                  ),
+                  converged = vapply(seq_along(fit$ssm), function(i)
+                    isTRUE(ok[i] &&
+                             fit$ssm[[i]]$opt$convergence == 0), logical(1)),
+                  pdHess = ok,
                   pmodel = sapply(fit$ssm, function(x) x$pm)
     )
 

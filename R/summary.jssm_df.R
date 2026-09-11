@@ -22,7 +22,11 @@ summary.jssm_df <- function(object, ...) {
 
   ssm <- object$ssm
   n <- length(ssm)
-  ok <- sapply(ssm, function(x) length(x) == 15)
+  ## a complete fit object, not a short one carrying `errmsg` from a failed
+  ## optimiser. Tested by the fields that are used below rather than by the
+  ## length of the list, which would make the number of elements in a fit
+  ## object part of the interface.
+  ok <- vapply(ssm, function(x) !is.null(x$opt) && !is.null(x$rep), logical(1))
 
   ## ---- the single fit ------------------------------------------------------
   if (any(ok)) {
