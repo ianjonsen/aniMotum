@@ -1,4 +1,4 @@
-# aniMotum (development version)
+# aniMotum 1.3-0 (03/11/2026)
 
 ## projection
 
@@ -44,6 +44,29 @@ too large in standard deviation. Simulated tracks from `sim(..., error = "kf")`
 therefore carried errors inconsistent with their own ellipse parameters, and
 any model fitted to them would have been calibrated against data the model
 could not have generated. Now 1.008 and 1.000, with a correlation of 0.001.
+
+* `osar()` assigned residuals to the wrong individuals when some individuals'
+residuals could not be calculated: retry results were recycled or shifted onto
+other individuals' ids and dates, and the warning could name the wrong
+individual. Results now stay with their own individuals (#91).
+
+* `fit_mpm(model = "jmpm")` took track boundaries from `table()`, which counts
+in string order, while the rows are sorted by the typed id. With numeric ids
+and unequal track lengths the boundaries fell mid-track and the fit failed
+with "NA/NaN gradient evaluation". `fit_mpm()` also dropped `id` and `date`
+from input with coordinates named `x`, `y`, and `grab()` errored on a crashed
+`jmpm` fit instead of reporting it. All three are fixed (#90).
+
+* `fit_ssm(model = "mp")` estimated the Argos LS error dispersion `tau` for GL
+observations, which carry their own error SDs; `tau` is now mapped off, as it
+already was for `rw` and `crw` (#82).
+
+* `sim_fit()` assumed world Mercator throughout. Tracks fitted in a projection
+supplied as an `sf` object were simulated with their movement parameters at
+the wrong scale, and tracks crossing the dateline were split. Each track is
+now simulated in the projection it was fitted in, and `x`, `y` are returned in
+the projection `grab()` uses, stored in the `prj` attribute. `sim_fit(model =
+"rw", cpf = TRUE)` also now returns tracks to their start (#76).
 
 ## rotation-invariant joint correlated random walk
 
