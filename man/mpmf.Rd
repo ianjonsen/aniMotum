@@ -20,12 +20,6 @@ mpmf(
 
 \item{inner.control}{list of control settings for the inner optimization
 (see ?TMB::MakeADFUN for additional details)}
-
-\item{verbose}{is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details}
-
-\item{optim}{is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details}
-
-\item{optMeth}{is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details}
 }
 \description{
 generates initial values for model parameters and unobserved gamma's;

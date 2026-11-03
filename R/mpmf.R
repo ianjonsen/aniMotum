@@ -13,9 +13,6 @@
 ##' @param control list of control settings for the outer optimizer (see \code{mpm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
-##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom dplyr count

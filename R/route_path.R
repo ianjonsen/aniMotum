@@ -26,6 +26,9 @@
 ##' @param barrier a user-supplied barrier simple feature `POLYGON` or
 ##' `MULTIPOLYGON` object. Default is NULL, in which case `rnaturalearth` data
 ##' are used.
+##' @param onland a data frame of intervals when individuals are known to be on
+##' land, with columns \code{id}, \code{start} and \code{end} (POSIXct).
+##' Locations within these intervals are not re-routed. Default is NULL.
 ##' @param ... additional arguments passed to \code{pathroutr::prt_visgraph}.
 ##' If the \code{ssm} fit was produced with haulout information (via the
 ##' \code{haulout} argument of [aniMotum::fit_ssm] or by calling
@@ -33,7 +36,6 @@
 ##' periods (\code{ho = 1}) are automatically exempt from rerouting. These
 ##' locations are known to be on land by design and should not be moved into
 ##' water.
-##' @param ... additional arguments passed to pathroutr::prt_visgraph
 ##' 
 ##' @details
 ##' `route_path` uses [rnaturalearth::ne_countries] at the medium (50)
@@ -76,7 +78,7 @@
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
-##' @importFrom sf st_coordinates st_drop_geometry st_is_valid
+##' @importFrom sf st_coordinates st_drop_geometry st_is_valid st_intersects
 ##' @importFrom rnaturalearth ne_countries
 ##' 
 ##' @export
