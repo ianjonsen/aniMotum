@@ -81,10 +81,10 @@ eigenvalues `exp(m +/- r)` with `r = |u|`, and its major axis lies at
 anisotropy `r`, both unchanged by rotating the coordinate frame, and an
 orientation, which is not. The frame-dependent piece is never pooled.
 
-* this is what the earlier `jcrw` prototype lacked. Pooling `D_x`, `D_y` or
-`rho_p` across animals travelling on different bearings averages quantities
-that mean different things for each animal, so an among-individual variance
-estimated from them is partly a statement about heading.
+* Pooling `D_x`, `D_y` or `rho_p` across animals travelling on different
+bearings averages quantities that mean different things for each animal,
+so an among-individual variance estimated from them is partly a statement
+about heading.
 
 * `share_control(aniso = )` controls the anisotropy: `"common.ratio"`
 (default) shares the amount while each individual keeps its own orientation -
@@ -158,12 +158,6 @@ gap and haulout flags and state initial values shared by all of the filters.
 It is used by the joint filter only for now; `sfilter()` and `mpfilter()`
 currently duplicate this logic between them and are intended to migrate onto
 `ssm_prep()` once it has been validated against their existing behaviour.
-
-* a joint correlated random walk (`jcrw`) was prototyped and set aside; see
-commit "joint (hierarchical) CRW prototype in RTMB - set aside". The diffusion
-tensor is frame-dependent, so pooling its components across animals travelling
-on different bearings averages incommensurable quantities. A rotation-invariant
-reparameterisation is the way back to it.
 
 
 # aniMotum 1.2-06 (05/06/2024)
