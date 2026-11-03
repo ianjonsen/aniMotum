@@ -46,6 +46,21 @@ osar <- function(x, method = "fullGaussian", ...)
                    ...)
   }
 
+  ## A joint fit stores the same TMB object on every row, holding all the
+  ## animals' observations at once, while $isd is one individual's. The subset
+  ## index below would then point at the wrong columns of Y and be too short,
+  ## so the residuals returned would be silently wrong rather than absent.
+  ## Beyond the indexing, TMB::oneStepPredict needs the objective function to
+  ## carry a per-observation data-term indicator; the RTMB templates behind the
+  ## joint models compute the observation likelihood as a single summed
+  ## quadratic form and do not yet declare one.
+  if(inherits(x, "jssm_df")) {
+    stop("one-step-ahead residuals are not available for joint fits (`model = ",
+         "\"jmp\"` or `\"jcrw\"`) yet.\n  To check goodness-of-fit for these ",
+         "data, fit the corresponding single-animal model\n  (`\"mp\"` or ",
+         "`\"crw\"`) and call osar() on that.", call. = FALSE)
+  }
+
   if(inherits(x, "ssm_df")) {
     if(nrow(x) > 3 & 
        requireNamespace("future", quietly = TRUE) &
@@ -73,7 +88,13 @@ osar <- function(x, method = "fullGaussian", ...)
     stop("a aniMotum ssm fit object with class `ssm_df` is required")
   }
   
+  ## r is a list with one element per row of x, and it stays that way: every
+  ## result is stored at the row of the individual it belongs to, and
+  ## individuals whose residuals cannot be calculated are recorded by row
+  ## number in `failed` instead of being removed from r. Compacting r would
+  ## shift every later result onto the wrong individual's id and dates.
   cr <- sapply(r, function(.) inherits(., "try-error"))
+  failed <- integer(0)
 
   ## if any try-errors then retry using oneStepGaussianOffMode but preserve successful results
   if (any(cr)) {
@@ -101,30 +122,32 @@ osar <- function(x, method = "fullGaussian", ...)
         try(map_fn(redo$ssm[[i]], method = "oneStepGaussianOffMode"), silent = TRUE)
       })
     }
-    ## check for repeat failures & throw warning but preserve all successful results
+    ## r.redo[[j]] belongs to row which(cr)[j] of x
     cr.redo <- sapply(r.redo, function(.) inherits(., "try-error"))
-    if (any(cr.redo)) {
+    redo.rows <- which(cr)
+
+    ## store the retry successes at their own rows
+    r[redo.rows[!cr.redo]] <- r.redo[!cr.redo]
+
+    ## individuals that failed both methods
+    failed <- redo.rows[cr.redo]
+    if (length(failed) > 0) {
       warning(
         sprintf(
           "\n failed to calculate OSA residuals for the following individuals: %s \n",
-          x$id[which(cr.redo)]
+          paste(x$id[failed], collapse = ", ")
         ), immediate. = TRUE, call. = FALSE
       )
-    r.redo <- r.redo[-which(cr.redo)]  
-    }
-    
-    ## combine original successes with redo successes
-    if(length(r.redo) > 0) r[which(cr)] <- r.redo
-    else {
-     r <- r[-which(cr)]
     }
   }
 
+  keep <- setdiff(seq_len(nrow(x)), failed)
+
   ## return error if no successful results, otherwise return OSA resid object
-  if (length(r) == 0) {
+  if (length(keep) == 0) {
     stop("no residuals calculated", call. = FALSE)
   } else {
-    out <- lapply(1:length(r), function(i) {
+    out <- lapply(keep, function(i) {
       z <- r[[i]] |>
         mutate(id = x$id[i]) |>
         select(id, everything())

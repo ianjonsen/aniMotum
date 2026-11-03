@@ -87,7 +87,11 @@ fit_mpm <- function(x,
   
   if(all(c("x","y") %in% names(x))) {
     # rescale x,y in km for better optimisation
-    x <- with(x, data.frame(x = x/max(x), y = y/max(y)))
+    # Rescale in place, so that the id and date columns are kept. Divide by
+    # the largest absolute value: projected coordinates are often negative,
+    # and max() of an all-negative column would reverse the sign of the axis.
+    x$x <- x$x / max(abs(x$x), na.rm = TRUE)
+    x$y <- x$y / max(abs(x$y), na.rm = TRUE)
   } else {
     # standardise coord names to x,y 
     names(x)[3:4] <- c("x","y")

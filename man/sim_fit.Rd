@@ -26,10 +26,10 @@ sim_fit(
 fit object}
 
 \item{start}{a 2-element vector for the simulated track start location
-(lon,lat or x,y)}
+(lon,lat)}
 
 \item{end}{a 2-element vector for the simulated track end location
-(lon,lat or x,y)}
+(lon,lat)}
 
 \item{grad}{a SpatRaster of x- and y-gradients as separate layers (see details)}
 
@@ -45,7 +45,9 @@ ie. no potential function; see details).}
 }
 \value{
 a \code{fG_sim_fit} object containing the paths simulated from a
-\code{ssm} fit object
+\code{ssm} fit object. The \code{x,y} coordinates are in the projection
+returned by \code{grab(x, what, as_sf = TRUE)}, stored in the \code{prj}
+attribute; \code{lon,lat} are WGS84.
 }
 \description{
 simulate from the \code{rw} or \code{crw} process models to generate
@@ -64,6 +66,17 @@ use of potential functions for simulating constrained animal movements.
 WARNING: This application of potential functions to constrain simulated
 paths is experimental, likely to change in future releases, and NOT guaranteed
 to work enitrely as intended, especially if \code{cpf = TRUE}!
+
+Each track is simulated in the projection its model was fitted in: the
+projection of an \code{sf} object supplied to \code{fit_ssm}, or otherwise
+the Mercator projection chosen by \code{fit_ssm} (centred on 180 for tracks
+that cross the dateline). The movement parameters are estimated in that
+projection, so simulating in it keeps them at the correct scale. Simulated
+x-coordinates are wrapped, and y-coordinates reflected, at the world limits
+only when that projection is Mercator. When \code{grad} is supplied, tracks
+are simulated in the projection of \code{grad}, with a warning for any fit
+made in a different projection. \code{start} and \code{end} are lon,lat
+coordinates.
 }
 \examples{
 fit <- fit_ssm(ellie, model = "crw", time.step = 24)

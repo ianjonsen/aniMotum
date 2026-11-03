@@ -4,10 +4,17 @@
 \alias{pf_sf_project}
 \title{handle spatial projection}
 \usage{
-pf_sf_project(x)
+pf_sf_project(x, prj = NULL)
 }
 \arguments{
 \item{x}{data from \code{pf_sda_filter}}
+
+\item{prj}{optional proj4 string to project unprojected data to, in place
+of the default Mercator grid. Supplied by \code{fit_ssm(projection = )}. It is
+used ONLY when the incoming data are NOT an sf object. Any sf object is
+respected exactly as supplied, longlat or projected, so data prepared
+upstream (by ArgosQC, for instance) reach the model in the projection they
+were prepared in and are never put through a second projection.}
 }
 \description{
 project from longlat to merc or respect user-supplied

@@ -30,6 +30,8 @@ navbar:
           href: articles/Mapping.html
         - text: Path_rerouting
           href: articles/Path_rerouting.html
+        - text: Projections
+          href: articles/Projections.html
     news:
       text: News
       href: news/index.html

@@ -158,3 +158,22 @@ test_that("fit_ssm multi-track returns aniMotum lists w 15 elements", {
   expect_equal(length(f$ssm[[1]]), 15)
   expect_s3_class(f, "ssm_df")
 })
+
+## issue #82: for GL observations the error SDs are supplied, so the mp model
+## must not estimate the LS error dispersion (tau) or the KF scaling (psi)
+test_that("mp model maps off tau and psi for GL observations", {
+  skip_on_cran()
+  d <- ellie
+  d$x.sd <- 2
+  d$y.sd <- 2
+  d$smaj <- NA
+  d$smin <- NA
+  d$eor <- NA
+  d$lc <- "GL"
+  f <- suppressWarnings(fit_ssm(d, model = "mp", time.step = 24,
+                                control = ssm_control(verbose = 0)))
+  pars <- names(f$ssm[[1]]$opt$par)
+  expect_false("l_tau" %in% pars)
+  expect_false("l_psi" %in% pars)
+  expect_true("l_rho_o" %in% pars)
+})

@@ -43,43 +43,72 @@ sim_post <- function(x,
   what <- match.arg(what, choices = c("predicted", "fitted"))
   model <- x$pmodel[1]
   X <- switch(model,
-              rw = {
-                "X"
-              },
-              crw = {
-                "mu"
-              }, 
-              mp = {
-                "X"
-              })
+              rw = "X",
+              crw = "mu",
+              mp = "X",
+              jmp = "X",
+              jcrw = "mu")
+  if (is.null(X))
+    stop("sim_post() does not know which random effects hold the locations ",
+         "of a `", model, "` fit", call. = FALSE)
+
+  ## A joint fit has ONE TMB object, ONE joint precision matrix and ONE
+  ## concatenated vector of random effects covering every individual, and the
+  ## same object is stored on every row of the fit. Sampling it once and then
+  ## slicing out each animal is both cheaper - by a factor of nrow(x) - and
+  ## more correct, because the individuals are drawn from a single joint
+  ## posterior and so retain the covariance the joint fit estimated between
+  ## them. Sampling per row would draw each animal independently.
+  jnt <- inherits(x, "jssm_df")
 
   n <- nrow(x)
 
+  if (jnt) {
+    sdp.j <- sdreport(x$ssm[[1]]$tmb, getJointPrecision = TRUE)
+    jp.j <- sdp.j$jointPrecision            # keep sparse
+    samples.j <- rgmrf0(reps, jp.j)         # no mean
+    sel.j <- which(rownames(jp.j) %in% X)   # every individual's locations
+    reMu.j <- sdp.j$par.random
+    reMu.j <- reMu.j[names(reMu.j) %in% X]
+  }
+
   ps <- lapply(1:n, function(k) {
-  
-    ## re-gen sdreport w jnt prec matrix
-    sdp <- sdreport(x$ssm[[k]]$tmb, getJointPrecision = TRUE)
-    
-    ## get random parameters & subset to just locations
-    reMu <- sdp$par.random
-    reMu <- reMu[names(reMu) %in% X]
-    
-    # Not inverting full precision and sampling using rmvnorm on margin
-    # but sampling full parameter vector (including fixed effects) using
-    # RTMB:::rgmrf0 (which is efficient when precision is sparse) and then only keeping the desired margin
-    
-    jp <- sdp$jointPrecision # keeping this sparse
-    
-    # directly sample using sparse joint precision
-    samples <- rgmrf0(reps, jp) # no mean
-    sel <- rownames(jp) %in% X # selector variable
-    
+
+    if (jnt) {
+      ## this individual's slice of the joint random effects vector
+      rr <- x$ssm[[k]]$ridx
+      if (is.null(rr))
+        stop("this fit was made before sim_post() supported joint models; ",
+             "re-fit with the current fit_ssm()", call. = FALSE)
+      reMu <- reMu.j[rr]
+      dev <- samples.j[sel.j[rr], , drop = FALSE]
+
+    } else {
+      ## re-gen sdreport w jnt prec matrix
+      sdp <- sdreport(x$ssm[[k]]$tmb, getJointPrecision = TRUE)
+
+      ## get random parameters & subset to just locations
+      reMu <- sdp$par.random
+      reMu <- reMu[names(reMu) %in% X]
+
+      # Not inverting full precision and sampling using rmvnorm on margin
+      # but sampling full parameter vector (including fixed effects) using
+      # RTMB:::rgmrf0 (which is efficient when precision is sparse) and then only keeping the desired margin
+
+      jp <- sdp$jointPrecision # keeping this sparse
+
+      # directly sample using sparse joint precision
+      samples <- rgmrf0(reps, jp) # no mean
+      sel <- rownames(jp) %in% X # selector variable
+      dev <- samples[sel, , drop = FALSE]
+    }
+
     # initialise with posterior mode
     rtracks <- matrix(rep(reMu, reps), nrow = reps, ncol = length(reMu), byrow = TRUE)
-    
-    # add random sampled deviations (only desired margin using sel)
-    rtracks <- rtracks + t(samples[sel, , drop = FALSE])
-    
+
+    # add random sampled deviations (only desired margin)
+    rtracks <- rtracks + t(dev)
+
     ## use full joint prec matrix
     # jp <- as.matrix(sdp$jointPrecision)
     # muCov <- solve(jp) ## matrix inverse, 1/prec = varcov
@@ -129,8 +158,17 @@ sim_post <- function(x,
       tmp$date <- rep(date, reps)
     }
     
-    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), 
-                         crs = "+proj=merc +units=km +datum=WGS84"), silent = TRUE)
+    ## Use the projection the model was actually fitted in. Hard-coding
+    ## Mercator was harmless while every fit was in Mercator, but fit_ssm() now
+    ## chooses a projection from the extent of the data, and respects any sf
+    ## object handed to it, so the simulated x,y can be in a Lambert conformal
+    ## conic or polar stereographic frame. Labelling those as Mercator puts the
+    ## back-transformed lon,lat in the wrong place entirely.
+    prj <- st_crs(x$ssm[[k]]$fitted)
+    if (is.na(prj))
+      prj <- st_crs("+proj=merc +units=km +datum=WGS84 +no_defs")
+
+    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), crs = prj), silent = TRUE)
     if(inherits(tmp1, "try-error")) {
       stop("oops something went wrong, try again", call. = FALSE)
     }
@@ -147,16 +185,14 @@ sim_post <- function(x,
   
   ps <- tibble(id = x$id, model = x$pmodel, psims = ps)
 
-  switch(unique(x$pmodel),
-         rw = { 
-           class(ps) <- append("rwps", class(ps))
-         },
-         crw = {
-           class(ps) <- append("crwps", class(ps))
-         },
-         mp = {
-           class(ps) <- append("mpps", class(ps))
-         })
+  ## the joint models take the class of the single-animal model they generalise
+  cls <- switch(model,
+                rw = "rwps",
+                crw = "crwps",
+                jcrw = "crwps",
+                mp = "mpps",
+                jmp = "mpps")
+  if (!is.null(cls)) class(ps) <- append(cls, class(ps))
   
   class(ps) <- append("sim_post", class(ps))
   

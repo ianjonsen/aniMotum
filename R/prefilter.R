@@ -30,6 +30,9 @@
 ##' differences > 0 are allowed
 ##' @param emf optionally supplied data.frame of error multiplication factors 
 ##' for Argos location quality classes. see Details
+##' @param prj optional proj4 string, passed to `pf_sf_project`. Used only when
+##' the data are unprojected; an sf object carrying a projected CRS is always
+##' respected
 ##'
 ##' @return an sf object with all observations passed from \code{data} and the 
 ##' following appended columns
@@ -50,7 +53,8 @@ prefilter <-
            distlim = c(2500, 5000),
            spdf = TRUE,
            min.dt = 0,
-           emf = NULL
+           emf = NULL,
+           prj = NULL
            ) {
 
     ## check args
@@ -80,7 +84,7 @@ prefilter <-
     ##  4. project from longlat to merc or respect user-supplied projection & 
     ##       ensure that longitudes straddling -180,180 or 0,360 are shifted 
     ##       appropriately
-    x <- pf_sf_project(x)
+    x <- pf_sf_project(x, prj = prj)
 
     ##  5. add location error multiplication factors and finalise data structure
     ##      for use by sfilter()

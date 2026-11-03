@@ -21,6 +21,9 @@ fit_ssm(
   fit.to.subset = TRUE,
   control = ssm_control(),
   inner.control = NULL,
+  share = share_control(),
+  init = c("individual", "moment"),
+  projection = "mercator",
   haulout = NULL,
   ho.ref = "ref",
   ho.id_fun = NULL,
@@ -47,8 +50,17 @@ differences > 0 are allowed.}
 \item{pf}{just pre-filter the data, do not fit the SSM (default is FALSE)}
 
 \item{model}{fit a simple random walk (\code{rw}), correlated random walk
-(\code{crw}), or a time-varying move persistence model (\code{mp}), all as
-continuous-time process models}
+(\code{crw}), a time-varying move persistence model (\code{mp}), or a joint
+(hierarchical) move persistence model fitted to all individuals at once
+(\code{jmp}), or a joint correlated random walk (\code{jcrw}), all as
+continuous-time process models. \code{jcrw} parameterises the velocity
+innovation covariance by its magnitude, anisotropy and orientation rather
+than by \code{D_x}, \code{D_y} and \code{rho_p}, so that the quantities shared among
+individuals do not depend on which way each animal travelled. The \code{jmp}
+model shares
+parameters among individuals according to \code{share}; in particular it pools
+\code{sigma_g}, which is what makes the estimated move persistence \code{g_t}
+comparable between individuals. See \link{share_control}}
 
 \item{time.step}{options: 1) the regular time interval, in hours, to predict to;
 2) a vector of prediction times, possibly not regular, must be
@@ -74,6 +86,31 @@ this if you know what you are doing}
 
 \item{inner.control}{list of control settings for the inner optimizer
 (see \link[TMB:MakeADFun]{TMB::MakeADFun} for additional details)}
+
+\item{share}{for \code{model = "jmp"} only, a parameter sharing specification
+from \link{share_control} controlling which parameters are pooled
+across individuals, which are hierarchical, and which are estimated
+separately for each individual. Ignored by the other models}
+
+\item{init}{for \code{model = "jmp"} only, how to initialise the joint fit.
+\code{"individual"} (default) first fits each track separately with the \code{crw}
+model and uses those estimates as starting values; \code{"moment"} uses
+moment-based starting values. Per-individual initialisation costs an extra
+pass over the data but substantially improves convergence}
+
+\item{projection}{how to project longitude and latitude to the x,y
+coordinates the models are fitted in. \code{"mercator"} (default) uses the
+global Mercator grid, as previous versions did. \code{"auto"} chooses a
+projection from the geographic extent of the data using
+\link{auto_crs}, which matters when tracks span a wide band of
+latitude - see \code{vignette("Projections", package = "aniMotum")}. A proj4
+string may also be supplied directly.
+
+This argument applies ONLY when \code{x} is not an \code{sf} object. Any \code{sf} object
+is respected exactly as supplied, longlat or projected, so data prepared
+upstream reach the model in the projection they were prepared in and are
+never put through a second projection. \code{projection} is ignored, with a
+message, if \code{x} is an \code{sf} object}
 
 \item{haulout}{optional. Either a path to an SMRU haulout CSV file or a
 pre-read data frame with columns \code{s_date} and \code{e_date} defining haulout

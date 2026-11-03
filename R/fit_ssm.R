@@ -22,8 +22,17 @@
 ##' differences > 0 are allowed.
 ##' @param pf just pre-filter the data, do not fit the SSM (default is FALSE)
 ##' @param model fit a simple random walk (`rw`), correlated random walk
-##' (`crw`), or a time-varying move persistence model (`mp`), all as 
-##' continuous-time process models
+##' (`crw`), a time-varying move persistence model (`mp`), or a joint
+##' (hierarchical) move persistence model fitted to all individuals at once
+##' (`jmp`), or a joint correlated random walk (`jcrw`), all as
+##' continuous-time process models. `jcrw` parameterises the velocity
+##' innovation covariance by its magnitude, anisotropy and orientation rather
+##' than by `D_x`, `D_y` and `rho_p`, so that the quantities shared among
+##' individuals do not depend on which way each animal travelled. The `jmp`
+##' model shares
+##' parameters among individuals according to `share`; in particular it pools
+##' `sigma_g`, which is what makes the estimated move persistence `g_t`
+##' comparable between individuals. See [aniMotum::share_control]
 ##' @param time.step options: 1) the regular time interval, in hours, to predict to; 
 ##' 2) a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates; 3) NA - turns off 
@@ -42,6 +51,28 @@
 ##' (see [aniMotum::ssm_control] for details)
 ##' @param inner.control list of control settings for the inner optimizer 
 ##' (see [TMB::MakeADFun] for additional details)
+##' @param projection how to project longitude and latitude to the x,y
+##' coordinates the models are fitted in. `"mercator"` (default) uses the
+##' global Mercator grid, as previous versions did. `"auto"` chooses a
+##' projection from the geographic extent of the data using
+##' [aniMotum::auto_crs], which matters when tracks span a wide band of
+##' latitude - see `vignette("Projections", package = "aniMotum")`. A proj4
+##' string may also be supplied directly.
+##'
+##' This argument applies ONLY when `x` is not an `sf` object. Any `sf` object
+##' is respected exactly as supplied, longlat or projected, so data prepared
+##' upstream reach the model in the projection they were prepared in and are
+##' never put through a second projection. `projection` is ignored, with a
+##' message, if `x` is an `sf` object
+##' @param share for `model = "jmp"` only, a parameter sharing specification
+##' from [aniMotum::share_control] controlling which parameters are pooled
+##' across individuals, which are hierarchical, and which are estimated
+##' separately for each individual. Ignored by the other models
+##' @param init for `model = "jmp"` only, how to initialise the joint fit.
+##' `"individual"` (default) first fits each track separately with the `crw`
+##' model and uses those estimates as starting values; `"moment"` uses
+##' moment-based starting values. Per-individual initialisation costs an extra
+##' pass over the data but substantially improves convergence
 ##' @param haulout optional. Either a path to an SMRU haulout CSV file or a
 ##' pre-read data frame with columns `s_date` and `e_date` defining haulout
 ##' intervals. When supplied, [aniMotum::smru_haulout] is called internally to
@@ -155,6 +186,9 @@ fit_ssm <- function(x,
                     fit.to.subset = TRUE,
                     control = ssm_control(),
                     inner.control = NULL,
+                    share = share_control(),
+                    init = c("individual", "moment"),
+                    projection = "mercator",
                     haulout   = NULL,    # NEW
                     ho.ref    = "ref",   # NEW
                     ho.id_fun = NULL,    # NEW
@@ -164,7 +198,8 @@ fit_ssm <- function(x,
 
   dots <- list(...)
   
-  stopifnot("model can only be 1 of `rw`, `crw`, or `mp`" = model %in% c("rw","crw","mp"))
+  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, `jmp`, or `jcrw`" = model %in% c("rw","crw","mp","jmp","jcrw"))
+  init <- match.arg(init)
   
 ## check args - most args handled by prefilter() & sfilter()
   if(!is.data.frame(x))  
@@ -216,9 +251,62 @@ fit_ssm <- function(x,
     ho_lookup <- NULL
   }
   
+  ## Extract the measurement-parameter grouping variable, if one was named in
+  ## share_control(). Like ho, it must be taken BEFORE format_data() and
+  ## prefilter() drop unknown columns. One row per individual.
+  if (!is.null(share$group)) {
+    if (!share$group %in% names(x))
+      stop("share_control(group = \"", share$group, "\") was specified but `",
+           share$group, "` is not a variable in x", call. = FALSE)
+    group_lookup <- unique(as.data.frame(x)[, c("id", share$group)])
+    if (anyDuplicated(group_lookup$id))
+      stop("the grouping variable `", share$group, "` must take a single value ",
+           "per individual", call. = FALSE)
+  } else {
+    group_lookup <- NULL
+  }
+  
   ## ensure data is in expected format
   if(!inherits(x, "fG_format")) x <- format_data(x, ...) 
   
+  ## -- projection -------------------------------------------------------------
+  ## aniMotum chooses a projection for itself ONLY when the data arrive
+  ## unprojected, that is, not as an sf object. Any sf object is respected
+  ## exactly as supplied, so data prepared upstream (by ArgosQC, for instance)
+  ## reach the model in the projection they were prepared in and are never put
+  ## through a second projection.
+  ##
+  ## The choice is made once, from all individuals together, never per
+  ## individual. Projecting each animal separately would leave their parameter
+  ## estimates in different, differently distorted frames, so they could not be
+  ## compared across a deployment - and for `jmp` it would make pooling
+  ## meaningless.
+  prj <- NULL
+
+  if (inherits(x, "sf")) {
+    if (!identical(projection, "mercator"))
+      message("`projection` ignored: x is an sf object, so its own projection ",
+              "is used")
+
+  } else if (!identical(projection, "mercator")) {
+    if (!"lon" %in% names(x)) {
+      warning("`projection` ignored: x does not carry lon,lat coordinates",
+              call. = FALSE)
+
+    } else if (identical(projection, "auto")) {
+      prj <- auto_crs(x$lon, x$lat)
+      if (control$verbose >= 1)
+        cat(paste0("projecting to: ", prj, "\n"))
+
+    } else if (is.character(projection) && length(projection) == 1) {
+      prj <- projection
+
+    } else {
+      stop("`projection` must be \"mercator\", \"auto\", or a single proj4 ",
+           "string", call. = FALSE)
+    }
+  }
+
   ## apply prefilter
   fit <- lapply(split(x, x$id),
                 function(xx) {
@@ -228,7 +316,8 @@ fit_ssm <- function(x,
                             distlim = distlim,
                             spdf = spdf,
                             min.dt = min.dt,
-                            emf = emf)
+                            emf = emf,
+                            prj = prj)
                 })
   
   ## if pf = TRUE then just prefilter & return result
@@ -258,6 +347,24 @@ fit_ssm <- function(x,
                       )
                     })
       
+    } else if (model %in% c("jmp", "jcrw")) {
+      ## the joint model is fitted to all individuals at once, so the
+      ## prefiltered list is passed through rather than looped over
+      fit <- jsfilter(
+        x = fit,
+        model = model,
+        time.step = time.step,
+        share = share,
+        parameters = parameters,
+        map = map,
+        fit.to.subset = fit.to.subset,
+        control = control,
+        inner.control = inner.control,
+        ho_lookup = ho_lookup,
+        group_lookup = group_lookup,
+        init = init
+      )
+      
     } else if (model == "mp") {
       fit <- lapply(fit,
                     function(x) {
@@ -277,21 +384,40 @@ fit_ssm <- function(x,
     }
     
     fit <- tibble(id = names(fit), ssm = fit)
+    ## Did this fit come back complete? sfilter(), mpfilter() and jsfilter()
+    ## return the full object on success and a short one carrying `errmsg` when
+    ## the optimiser fails. This used to be tested as `length(x) == 15`, which
+    ## silently made the number of elements in that list part of the package's
+    ## interface: adding a single field to a fit object turned every fit into a
+    ## failure, and `sapply` then returned a list of NULLs rather than a logical
+    ## vector, so the failure surfaced far away as "'list' object cannot be
+    ## coerced to type 'logical'". Test for what is actually needed instead.
+    ok <- vapply(fit$ssm,
+                 function(x) !is.null(x$opt) && !is.null(x$rep),
+                 logical(1))
+
     fit <- tibble(fit,
-                  converged = sapply(fit$ssm, function(x) 
-                    if(length(x) == 15) {
-                      x$opt$convergence == 0
-                    } else if(length(x) < 15) {
-                      FALSE
-                    }),
-                  pdHess = sapply(fit$ssm, function(x) 
-                    length(x) == 15
-                  ),
+                  converged = vapply(seq_along(fit$ssm), function(i)
+                    isTRUE(ok[i] &&
+                             fit$ssm[[i]]$opt$convergence == 0), logical(1)),
+                  pdHess = ok,
                   pmodel = sapply(fit$ssm, function(x) x$pm)
     )
 
   }
 
+  ## A joint fit is one model fitted to all the tracks at once, not one model
+  ## per track. The tibble keeps a row per individual because the states really
+  ## are per individual, but the fit-level quantities - objective, convergence,
+  ## AICc - belong to the whole thing. jssm_df exists so that summary() and
+  ## print() can say so; it inherits from ssm_df, so grab(), plot() and map()
+  ## dispatch exactly as before.
   class(fit) <- append("ssm_df", class(fit))
+
+  ## jssm_df ahead of ssm_df so summary() and print() dispatch to the joint
+  ## methods, while everything else inherits the ssm_df behaviour
+  if (!pf && model %in% c("jmp", "jcrw"))
+    class(fit) <- append("jssm_df", class(fit))
+
   return(fit)
 }

@@ -61,13 +61,20 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
   if(inherits(x, "fG_ssm")) class(x)[1] <- "ssm_df"
   if(inherits(x, "fG_mpm")) class(x)[1] <- "mpm_df"
   
+  ## jssm_df is a joint (hierarchical) fit. It inherits from ssm_df and its
+  ## per-individual states have the same structure, so it is handled here
+  ## identically. The fall-through is needed because this switch keys on the
+  ## first class, and jssm_df has to sit ahead of ssm_df for summary() and
+  ## print() to dispatch to the joint methods.
   switch(class(x)[1],
+         jssm_df = ,
          ssm_df = {
            ## remove optimizer crash results from extraction
            nf <- which(sapply(x$ssm, length) < 15)
            if (length(nf) > 0) {
-             sprintf("%d optimizer crashes removed from output", length(nf))
-             sprintf("ids: %s", x[nf, "id"])
+             warning(sprintf("%d optimiser crash(es) removed from output, ids: %s",
+                             length(nf), paste(x$id[nf], collapse = ", ")),
+                     call. = FALSE, immediate. = TRUE)
              x <- x[-nf,]
            }
          
@@ -151,6 +158,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                      out[, c("id", "date", "x.se", "y.se", "geometry")]
                    }
                    },
+                 jcrw = ,
                  crw = {
                    ## deal w fit objects from <= 0.6-9, which don't contain s, s.se
                    if (all(c("s", "s.se") %in% names(out))) {
@@ -206,7 +214,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                                "geometry")]
                      } 
                    }
-                 }, mp = {
+                 }, jmp = , mp = {
                    if ("gap_flag" %in% names(out)) {
                    out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
                            "g", "gap_flag", "geometry")]
@@ -269,6 +277,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    }
                    
                    },
+                 jcrw = ,
                  crw = {
                    if(all(c("s","s.se") %in% names(out))) {
                      if("gap_flag" %in% names(out)) {
@@ -288,7 +297,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                        }
                        }
                    },
-                 mp = {
+                 jmp = , mp = {
                    if("gap_flag" %in% names(out)) {
                     out <- out[, c("id", "date", "lon", "lat", "x", "y", 
                             "x.se", "y.se", "logit_g", "logit_g.se", "g", "gap_flag")]
@@ -355,8 +364,17 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            ## remove optimiser crash results from extraction
            nf <- which(sapply(x$mpm, length) < 8)
            if (length(nf) > 0) {
-             sprintf("%d optimiser crashes removed from output", length(nf))
-             sprintf("ids: %s", x[nf, "id"])
+             ## an mpm fit has one row per individual and an id column; a jmpm
+             ## fit is a single joint fit with no id column, so report the
+             ## crash without ids
+             if ("id" %in% names(x)) {
+               warning(sprintf("%d optimiser crash(es) removed from output, ids: %s",
+                               length(nf), paste(x$id[nf], collapse = ", ")),
+                       call. = FALSE, immediate. = TRUE)
+             } else {
+               warning("the joint move persistence model (jmpm) fit crashed; no fitted values to return",
+                       call. = FALSE, immediate. = TRUE)
+             }
              x <- x[-nf,]
            }
 

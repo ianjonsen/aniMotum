@@ -1,3 +1,171 @@
+# aniMotum 1.3-0 (03/11/2026)
+
+## projection
+
+* new `fit_ssm(projection = )`. `"mercator"` (the default) is unchanged.
+`"auto"` chooses a projection from the geographic extent of the data with the
+new `auto_crs()`; a proj4 string may also be supplied directly.
+
+* `auto_crs()` chooses a conformal projection sized to the data: a Lambert
+conformal conic with standard parallels one sixth and five sixths through the
+latitude range for one hemisphere below 80 degrees, polar stereographic beyond
+80 degrees or for circumpolar data, oblique stereographic across the equator,
+and the existing Mercator grid where the stretch varies by less than 20 percent
+and the extremes are below 60 degrees. Conformal projections are chosen because
+these models are about movement steps, which have a direction as well as a
+length: a projection that distorts shape makes the x and y process variances
+differ for reasons unrelated to the animal, and changes move persistence.
+
+* the choice is made once from all individuals together, never per individual.
+Fitting each animal in its own projection would leave their parameter estimates
+in differently distorted frames and so not comparable across a deployment, and
+for `jmp` would make pooling meaningless.
+
+* **an `sf` object is always respected.** aniMotum chooses a projection for
+itself only when the data arrive as plain lon,lat. Data prepared and projected
+upstream - by `ArgosQC`, for example - reach the model exactly as prepared,
+`projection` is ignored with a message, and nothing is ever projected twice.
+
+* new vignette, `Projections`, on what the projection does to parameter
+estimates and how to tell whether it matters for your data.
+
+## bug fixes
+
+* `ellp.par()`, which generates Argos error ellipse parameters and the
+corresponding location errors for `sim()`, produced errors that did not match
+the ellipses recorded beside them. Two faults: `eor` was returned in degrees
+but passed to `sin()` and `cos()`, which take radians, so an ellipse recorded
+at 90 degrees received errors oriented at 0; and the covariance off-diagonal
+was half its correct value, `0.5 * (M2 - m2)` rather than `(M2 - m2)`, which
+broke the identity that a rotation of `diag(M2, m2)` has determinant exactly
+`M2 * m2`. Standardising each simulated error by its own ellipse gave variances
+of 0.59 and 51934 where both should be 1 - the y errors were roughly 228 times
+too large in standard deviation. Simulated tracks from `sim(..., error = "kf")`
+therefore carried errors inconsistent with their own ellipse parameters, and
+any model fitted to them would have been calibrated against data the model
+could not have generated. Now 1.008 and 1.000, with a correlation of 0.001.
+
+* `osar()` assigned residuals to the wrong individuals when some individuals'
+residuals could not be calculated: retry results were recycled or shifted onto
+other individuals' ids and dates, and the warning could name the wrong
+individual. Results now stay with their own individuals (#91).
+
+* `fit_mpm(model = "jmpm")` took track boundaries from `table()`, which counts
+in string order, while the rows are sorted by the typed id. With numeric ids
+and unequal track lengths the boundaries fell mid-track and the fit failed
+with "NA/NaN gradient evaluation". `fit_mpm()` also dropped `id` and `date`
+from input with coordinates named `x`, `y`, and `grab()` errored on a crashed
+`jmpm` fit instead of reporting it. All three are fixed (#90).
+
+* `fit_ssm(model = "mp")` estimated the Argos LS error dispersion `tau` for GL
+observations, which carry their own error SDs; `tau` is now mapped off, as it
+already was for `rw` and `crw` (#82).
+
+* `sim_fit()` assumed world Mercator throughout. Tracks fitted in a projection
+supplied as an `sf` object were simulated with their movement parameters at
+the wrong scale, and tracks crossing the dateline were split. Each track is
+now simulated in the projection it was fitted in, and `x`, `y` are returned in
+the projection `grab()` uses, stored in the `prj` attribute. `sim_fit(model =
+"rw", cpf = TRUE)` also now returns tracks to their start (#76).
+
+## rotation-invariant joint correlated random walk
+
+* new `model = "jcrw"` in `fit_ssm()` fits a correlated random walk jointly to
+several tracks. It replaces `crw`'s `D_x`, `D_y` and `rho_p` with
+
+    V = exp(m) * expm(A),   A = [[u1, u2], [u2, -u1]]
+
+where `A` is symmetric and traceless, so `det(V) = exp(2m)` exactly, `V` has
+eigenvalues `exp(m +/- r)` with `r = |u|`, and its major axis lies at
+`atan2(u2, u1)/2`. That splits the covariance into a magnitude `m` and an
+anisotropy `r`, both unchanged by rotating the coordinate frame, and an
+orientation, which is not. The frame-dependent piece is never pooled.
+
+* this is what the earlier `jcrw` prototype lacked. Pooling `D_x`, `D_y` or
+`rho_p` across animals travelling on different bearings averages quantities
+that mean different things for each animal, so an among-individual variance
+estimated from them is partly a statement about heading.
+
+* `share_control(aniso = )` controls the anisotropy: `"common.ratio"`
+(default) shares the amount while each individual keeps its own orientation -
+the pooling the parameterisation exists to enable; `"isotropic"` drops it
+altogether; `"individual"` frees both. Pooling the anisotropy vector outright
+is deliberately not offered, since that would force a common orientation.
+
+* because `A` is traceless and symmetric, `expm(A) = cosh(r) I + sinh(r)/r A`,
+so the likelihood needs neither an eigendecomposition nor a matrix inverse:
+the log determinant is `2m` and the quadratic form is written out directly.
+
+* reported per individual: `D` (on the same scale as `crw`'s `D_x` and `D_y`),
+`aniso` (the ratio of the ellipse axes) and `orient` (degrees from the
+projection's x axis). `orient` is the only one that depends on the coordinate
+frame, and so the only one not comparable between fits made in different
+projections.
+
+## joint (hierarchical) move persistence model
+
+* new `model = "jmp"` in `fit_ssm()` fits the time-varying move persistence
+model to all individual tracks at once, sharing parameters among individuals.
+`sigma_g` is pooled by default, which is the point of the model: with an
+individual-specific `sigma_g` each animal's `g_t` is smoothed on its own scale
+and the series are not comparable between animals. This follows Jonsen et al.
+(2019) and the existing `jmpm` model in `fit_mpm()`. The measurement model
+(`tau`, `psi`, `rho_o`) is pooled, the process innovation scale is
+hierarchical, and `rho_p` is estimated per individual. Written in R using RTMB
+rather than as a C++ template.
+
+* `rho_p` is individual by default, deliberately. It sets the tilt of the
+process covariance ellipse relative to the projected coordinate axes, so it
+records the animal's direction of travel rather than a property of its
+movement. Animals heading different ways are not exchangeable in it, and
+pooling averages correlations that may differ in sign.
+
+* a joint fit no longer presents itself as several separate fits. `jmp` fits
+now carry class `jssm_df`, ahead of `ssm_df` so that `grab()`, `plot()` and
+`map()` are unaffected, with each individual's component classed `jmp_ssm`.
+`summary()` and `print()` report the objective, convergence and AICc once for
+the single fit rather than repeating them against every animal - the previous
+behaviour put the joint AICc in each row of the summary table, which invited it
+to be summed or compared animal by animal, neither of which is valid. The
+parameter tables now separate estimates shared by all individuals from those
+estimated separately, so it is clear that `sigma_g` and `tau` are the
+population's while `sigma_x` and `rho_p` are that animal's. `grab()` keys on
+the first class, so it gained a fall-through for `jssm_df`.
+
+* new `share_control()` specifies which parameters are pooled, hierarchical or
+estimated separately, and refuses combinations that are not identifiable. It
+will not allow `sigma` and the measurement parameters to be hierarchical at
+once, since random effects on both sides of the process/measurement variance
+partition trade off against each other. `share_control(group = )` pools the
+measurement parameters within strata (tag type, species, deployment).
+
+* `share_control(ho_scale = "pooled")` estimates the haulout process variance
+scale factor instead of asserting it. This is only possible in a joint fit.
+
+* `fit_ssm(model = "jmp")` warns when individuals span a wide latitude range on
+a Mercator grid, where the `sec(latitude)` scale factor inflates apparent
+movement scale and is absorbed into the among-individual variance of `sigma`.
+`g_t` and `sigma_g` are unaffected, being scale-free.
+
+* the joint fit uses tightened optimiser tolerances by default. `ssm_control()`'s
+defaults (`rel.tol = 1e-3`, `x.tol = 1.5e-2`) are tuned for fast per-individual
+quality control and are too loose for a variance parameter in a low-curvature
+direction, where they can produce a spurious among-individual variance while
+reporting `convergence = 0`.
+
+* new internal `ssm_prep()` factors out the prediction grid, time differences,
+gap and haulout flags and state initial values shared by all of the filters.
+It is used by the joint filter only for now; `sfilter()` and `mpfilter()`
+currently duplicate this logic between them and are intended to migrate onto
+`ssm_prep()` once it has been validated against their existing behaviour.
+
+* a joint correlated random walk (`jcrw`) was prototyped and set aside; see
+commit "joint (hierarchical) CRW prototype in RTMB - set aside". The diffusion
+tensor is frame-dependent, so pooling its components across animals travelling
+on different bearings averages incommensurable quantities. A rotation-invariant
+reparameterisation is the way back to it.
+
+
 # aniMotum 1.2-06 (05/06/2024)
 
 * various minor issues fixed including: build against TMB 1.9.11, fixes error when grad specified in `sim_fit()`.

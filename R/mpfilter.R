@@ -252,8 +252,11 @@ mpfilter <-
         l_tau = factor(c(NA, NA)),
         l_rho_o = factor(NA)
         ),
+      ## GL: the observation error SDs are supplied (x.sd, y.sd), so neither
+      ## the KF scaling (psi) nor the LS error dispersion (tau) is used
       list(
-        l_psi = factor(NA)
+        l_psi = factor(NA),
+        l_tau = factor(c(NA, NA))
         ),
       list(
         l_psi = factor(NA)
