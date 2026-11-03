@@ -64,7 +64,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libgdal-dev libproj-dev libgeos-dev libudunits2-dev libmkl-rt libglpk-dev libxml2 libgmp-dev
+          sudo apt-get install -y libgdal-dev libproj-dev libgeos-dev libudunits2-dev libmkl-rt libglpk-dev libxml2-dev libgmp-dev
       
       - name: "[Custom block] [macOS] Install spatial libraries"
         if: runner.os == 'macOS'
