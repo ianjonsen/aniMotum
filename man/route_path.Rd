@@ -11,6 +11,7 @@ route_path(
   dist = 2000,
   append = TRUE,
   barrier = NULL,
+  onland = NULL,
   ...
 )
 }
