@@ -71,8 +71,9 @@ test_that("ssm_prep rejects multiple individuals", {
 
 ## fit_ssm(model = "jmp") ----------------------------------------------------
 
-test_that("fit_ssm accepts jmp and rejects unknown models", {
-  expect_error(fit_ssm(sese, model = "jcrw"), "model can only be 1 of")
+test_that("fit_ssm rejects unknown models", {
+  ## jcrw is a valid model, so use a name that is not one
+  expect_error(fit_ssm(sese, model = "unknown"), "model can only be 1 of")
 })
 
 test_that("jmp requires more than one individual", {
