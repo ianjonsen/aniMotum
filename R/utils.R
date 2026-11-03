@@ -8,11 +8,11 @@
 ##'  
 ##' User-specified Error Multiplication Factors (emf). emf's must be provided as a data.frame with the following columns:
 ##'
-##' \code{emf.x} {emf values for the \code{x} direction}
+##' \code{emf.x}: emf values for the \code{x} direction
 ##'
-##' \code{emf.y} {emf values for \code{y} direction}
+##' \code{emf.y}: emf values for the \code{y} direction
 ##'
-##' \code{lc} {location class designations}
+##' \code{lc}: location class designations
 ##'
 ##' The location class designations can be the standard Argos lc values: 3, 2, 1, 0, A, B, Z or other values. 
 ##' The number of classes specified is flexible though may not be amenable to a large number of classes. 

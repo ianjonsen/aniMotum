@@ -42,7 +42,17 @@ distance is a constant 50000 m.}
 \code{MULTIPOLYGON} object. Default is NULL, in which case \code{rnaturalearth} data
 are used.}
 
-\item{...}{additional arguments passed to pathroutr::prt_visgraph}
+\item{onland}{a data frame of intervals when individuals are known to be on
+land, with columns \code{id}, \code{start} and \code{end} (POSIXct).
+Locations within these intervals are not re-routed. Default is NULL.}
+
+\item{...}{additional arguments passed to \code{pathroutr::prt_visgraph}.
+If the \code{ssm} fit was produced with haulout information (via the
+\code{haulout} argument of \link{fit_ssm} or by calling
+\link{smru_haulout} before fitting), locations within haulout
+periods (\code{ho = 1}) are automatically exempt from rerouting. These
+locations are known to be on land by design and should not be moved into
+water.}
 }
 \description{
 A wrapper function that uses the \code{pathroutr} package

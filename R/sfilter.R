@@ -23,10 +23,6 @@
 ##' @param control list of control parameters for the outer optimization (see \code{ssm_control} for details)
 ##' @param inner.control list of control settings for the inner optimization
 ##' (see ?TMB::MakeADFUN for additional details)
-##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, see \code{ssm_control} for details
-##' @param optim is deprecated, use ssm_control(optim = "optim") instead, see \code{ssm_control} for details
-##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, see \code{ssm_control} for details
-##' @param lpsi is deprecated, use ssm_control(lower = list(lpsi = -Inf)) instead, see \code{ssm_control} for details
 ##'
 ##' @importFrom TMB MakeADFun sdreport newtonOption FreeADFun
 ##' @importFrom stats approx cov sd predict nlminb optim na.omit
