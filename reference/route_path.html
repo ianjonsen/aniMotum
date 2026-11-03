@@ -144,8 +144,20 @@ distance is a constant 50000 m.</p></dd>
 are used.</p></dd>
 
 
+<dt id="arg-onland">onland<a class="anchor" aria-label="anchor" href="#arg-onland"></a></dt>
+<dd><p>a data frame of intervals when individuals are known to be on
+land, with columns <code>id</code>, <code>start</code> and <code>end</code> (POSIXct).
+Locations within these intervals are not re-routed. Default is NULL.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>additional arguments passed to pathroutr::prt_visgraph</p></dd>
+<dd><p>additional arguments passed to <code><a href="https://rdrr.io/pkg/pathroutr/man/prt_visgraph.html" class="external-link">pathroutr::prt_visgraph</a></code>.
+If the <code>ssm</code> fit was produced with haulout information (via the
+<code>haulout</code> argument of <a href="fit_ssm.html">fit_ssm</a> or by calling
+<a href="smru_haulout.html">smru_haulout</a> before fitting), locations within haulout
+periods (<code>ho = 1</code>) are automatically exempt from rerouting. These
+locations are known to be on land by design and should not be moved into
+water.</p></dd>
 
 </dl></div>
     <div id="details">
@@ -193,18 +205,18 @@ Barriers (Version v0.2.1) <a href="https://zenodo.org/record/5522909#.YnPxEy_b1q
  pars:   -0.38346 -0.4056 -0.04615 -3.85456      
  pars:   -1.23664 -1.20844 -0.10327 -3.65984      
  pars:   -2.25711 -2.16871 -0.17159 -3.42693      
- pars:   -3.07868 -3.34599 -0.26131 -1.24778      
- pars:   -4.4662 -1.62751 -0.49092 0.12578      
- pars:   -3.18442 -2.86245 -0.30197 -0.80151      
- pars:   -3.40953 -3.30582 -0.49918 -0.40195      
- pars:   -3.06896 -3.16415 -1.05454 -0.36587      
- pars:   -3.55145 -2.81435 -1.34624 -0.44033      
- pars:   -3.30087 -3.01948 -1.10394 -0.39263      
- pars:   -3.27832 -3.03827 -1.38142 -0.39632      
- pars:   -3.23175 -2.97176 -2.21691 -0.40477      
- pars:   -3.28773 -3.08262 -5.29084 -0.34232      
- pars:   -3.30222 -3.07092 -5.31889 -0.38304      
- pars:   -3.30222 -3.07092 -5.31889 -0.38304      </span>
+ pars:   -3.07869 -3.34599 -0.26131 -1.24778      
+ pars:   -4.46622 -1.62752 -0.49092 0.12577      
+ pars:   -3.18442 -2.86246 -0.30197 -0.80152      
+ pars:   -3.40949 -3.30584 -0.49915 -0.40195      
+ pars:   -3.06904 -3.1641 -1.05456 -0.36592      
+ pars:   -3.55185 -2.81433 -1.34577 -0.44032      
+ pars:   -3.30075 -3.01959 -1.10393 -0.39264      
+ pars:   -3.27829 -3.03843 -1.38115 -0.39634      
+ pars:   -3.2318 -2.97181 -2.21587 -0.40477      
+ pars:   -3.28781 -3.0824 -5.29383 -0.34231      
+ pars:   -3.30223 -3.07095 -5.32168 -0.38301      
+ pars:   -3.30223 -3.07095 -5.32168 -0.38301      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 113 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    id    date                  lon   lat      x      y        x.se        y.se</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
