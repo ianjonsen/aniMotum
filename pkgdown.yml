@@ -1,15 +1,16 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   Mapping: Mapping.html
   Move_persistence_models: Move_persistence_models.html
   Overview: Overview.html
   Path_rerouting: Path_rerouting.html
+  Projections: Projections.html
   SSM_fitting: SSM_fitting.html
   SSM_validation: SSM_validation.html
   Track_simulation: Track_simulation.html
-last_built: 2026-06-01T15:17Z
+last_built: 2026-11-03T22:47Z
 urls:
   reference: https://ianjonsen.github.io/aniMotum/reference
   article: https://ianjonsen.github.io/aniMotum/articles

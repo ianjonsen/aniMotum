@@ -7,6 +7,7 @@
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/Move_persistence_models.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/Overview.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/Path_rerouting.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/articles/Projections.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/SSM_fitting.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/SSM_validation.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/articles/Track_simulation.html</loc></url>
@@ -17,6 +18,7 @@
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/aes_lst.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/aniMotum-package.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/argos_lc.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/auto_crs.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/dummy.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/ellie.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/ellp.par.html</loc></url>
@@ -28,7 +30,10 @@
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/format_data.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/grab.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/index.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/jcrw_nll.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/jmp_nll.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/join.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/jsfilter.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/map.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/map_multi_track_base.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/map_multi_track_mp.html</loc></url>
@@ -50,7 +55,10 @@
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/plot.sim_post.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/plot.ssm_df.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/prefilter.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/print.jcrw_ssm.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/print.jmp_ssm.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/print.ssm.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/print.summary.jssm_df.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/route_path.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/rtnorm.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sda_int.html</loc></url>
@@ -58,15 +66,19 @@
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sese2.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sese2_n.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sfilter.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/share_control.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sim.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sim_filter.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sim_fit.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/sim_jcrw.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/sim_post.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/similarity_flag.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/similarity_var.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/smru_haulout.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/speedfilter_int.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/ssm_control.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/ssm_prep.html</loc></url>
+<url><loc>https://ianjonsen.github.io/aniMotum/reference/summary.jssm_df.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/summary.ssm_df.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/wese_sb.html</loc></url>
 <url><loc>https://ianjonsen.github.io/aniMotum/reference/wrap_lon.html</loc></url>
