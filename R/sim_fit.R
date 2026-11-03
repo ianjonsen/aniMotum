@@ -8,10 +8,10 @@
 ##' (typically regular in time) locations 
 ##' @param reps number of replicate tracks to simulate from an \code{ssm} model 
 ##' fit object
-##' @param start a 2-element vector for the simulated track start location 
-##' (lon,lat or x,y)
+##' @param start a 2-element vector for the simulated track start location
+##' (lon,lat)
 ##' @param end a 2-element vector for the simulated track end location 
-##' (lon,lat or x,y)
+##' (lon,lat)
 ##' @param grad a SpatRaster of x- and y-gradients as separate layers (see details)
 ##' @param beta a 2-element vector of parameters defining the potential function 
 ##' magnitude in x- and y-directions (ignored if \code{is.null(grad)}, 
@@ -32,9 +32,22 @@
 ##' WARNING: This application of potential functions to constrain simulated 
 ##' paths is experimental, likely to change in future releases, and NOT guaranteed 
 ##' to work enitrely as intended, especially if \code{cpf = TRUE}!
-##' 
-##' @return a \code{fG_sim_fit} object containing the paths simulated from a 
-##' \code{ssm} fit object
+##'
+##' Each track is simulated in the projection its model was fitted in: the
+##' projection of an \code{sf} object supplied to \code{fit_ssm}, or otherwise
+##' the Mercator projection chosen by \code{fit_ssm} (centred on 180 for tracks
+##' that cross the dateline). The movement parameters are estimated in that
+##' projection, so simulating in it keeps them at the correct scale. Simulated
+##' x-coordinates are wrapped, and y-coordinates reflected, at the world limits
+##' only when that projection is Mercator. When \code{grad} is supplied, tracks
+##' are simulated in the projection of \code{grad}, with a warning for any fit
+##' made in a different projection. \code{start} and \code{end} are lon,lat
+##' coordinates.
+##'
+##' @return a \code{fG_sim_fit} object containing the paths simulated from a
+##' \code{ssm} fit object. The \code{x,y} coordinates are in the projection
+##' returned by \code{grab(x, what, as_sf = TRUE)}, stored in the \code{prj}
+##' attribute; \code{lon,lat} are WGS84.
 ##' 
 ##' @references 
 ##' Brillinger DR, Preisler HK, Ager AA, Kie J (2012) The use of potential functions in modelling animal movement. In: Guttorp P., Brillinger D. (eds) Selected Works of David Brillinger. Selected Works in Probability and Statistics. Springer, New York. pp. 385-409.
@@ -78,9 +91,9 @@ sim_fit <-
   }
 
   if(all(!is.null(start), length(start) != 2)) 
-    stop("start location must be a single lon,lat or x,y coordinate")
+    stop("start location must be a single lon,lat coordinate")
   if(all(!is.null(end), length(end) != 2)) 
-    stop("end location must be a single lon,lat or x,y coordinate")
+    stop("end location must be a single lon,lat coordinate")
   
   if(length(beta) != 2) 
     stop("beta must be specified as a 2-element vector")
@@ -93,35 +106,48 @@ sim_fit <-
   if(any(sapply(x$ssm, function(m) m$pm) %in% c("mp", "jmp")))
     stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
   
-  ## get crs from ssm_df object (must assume all crs are the same if multiple fit objects exist)
-  prj.fit <- grab(x, what, as_sf = TRUE) |>
+  ## Projections
+  ## Each track is simulated in the projection its model was fitted in. The
+  ## movement parameters (D or sigma), and the crw velocities u, v, are
+  ## estimated in that projection's coordinates, so simulating in any other
+  ## projection would apply them at the wrong scale and orientation. That
+  ## projection is the user's own when an sf object was supplied to fit_ssm(),
+  ## otherwise the Mercator projection aniMotum chose, which is centred on 180
+  ## for tracks that cross the dateline.
+  ## The one exception is a potential function: grad's gradients are defined
+  ## in grad's coordinates, so with grad supplied the tracks are simulated in
+  ## grad's projection.
+  ## Simulated x, y are returned in the single projection grab() uses for
+  ## these fits (as_sf = TRUE), so that tracks of several individuals share
+  ## one coordinate system.
+  prj.out <- grab(x, what, as_sf = TRUE) |>
     st_crs()
-  prj.sim <- "+proj=merc +lon_0=0 +datum=WGS84 +units=km +no_defs"
+  prj.grad <- if(!is.null(grad)) st_crs(terra::crs(grad)) else NULL
 
-  if(!is.null(start)) {
-    start <- data.frame(lon = start[1], lat = start[2])
-    st1 <- st_as_sf(start, coords = c("lon","lat"), crs = 4326) |>
-      st_transform(crs = prj.sim) |>
-      st_coordinates() 
-    names(st1) <- c("x","y")
-  }
-  if(!is.null(end)) {
-    end <- data.frame(lon = end[1], lat = end[2])
-    ed1 <- st_as_sf(end, coords = c("lon","lat"), crs = 4326) |>
-      st_transform(crs = prj.sim) |>
+  ## world Mercator extents in km, for wrapping x and reflecting y
+  ## (relative to the central meridian, so they hold for any lon_0)
+  ex.merc <- c(-20077.51,20082.49,-19622.54,18437.46)
+
+  ## lon,lat start or end location to x,y in a given projection
+  ll_to_xy <- function(p, prj) {
+    xy <- st_as_sf(data.frame(lon = p[1], lat = p[2]),
+                   coords = c("lon","lat"), crs = 4326) |>
+      st_transform(crs = prj) |>
       st_coordinates()
-    names(ed1) <- c("x","y")
+    as.numeric(xy)
   }
-  
+
   ######################
   ## Helper functions ##    
   ######################
+  ## both return mu unchanged when no extents apply (x_rng, y_rng NULL)
   wrap_x <- function(mu, x_rng) {
+    if(is.null(x_rng)) return(mu)
     c((mu[1] - x_rng[1]) %% sum(abs(x_rng)) + x_rng[1], mu[2])
   }
-  
+
   reflect_y <- function(mu, y_rng) {
-#    if(is.na(mu[2])) browser()
+    if(is.null(y_rng)) return(mu)
     if(mu[2] < y_rng[1]) {
       c(mu[1], y_rng[1] * 2 - mu[2])
     } else if(mu[2] > y_rng[2]) {
@@ -131,32 +157,45 @@ sim_fit <-
     }
   }
 
-  ## set up simulation extents
-  if(!is.null(grad)) {
-    ex <- ext(grad)
-  } else {
-    ## approx extents of world mercator in km
-    ex <- c(-20077.51,20082.49,-19622.54,18437.46) 
-  }
-  
   ######################
   ## Simulate from a aniMotum model fit ##
   ########################################
   n <- nrow(x)
   d <- lapply(1:n, function(k) {
     model <- x$ssm[[k]]$pm
-    ## transform location projection if req'd
-    if(prj.fit[[1]] != prj.sim) {
-      switch(what, 
-             fitted = {
-               x$ssm[[k]]$fitted <- x$ssm[[k]]$fitted |>
-                 st_transform(crs = prj.sim)
-               }, 
-             predicted = {
-               x$ssm[[k]]$predicted <- x$ssm[[k]]$predicted |>
-                 st_transform(crs = prj.sim)
-             })
+
+    ## projection to simulate this track in
+    prj.fit <- st_crs(x$ssm[[k]][[what]])
+    if(!is.null(grad)) {
+      prj.sim <- prj.grad
+      if(prj.fit != prj.sim) {
+        warning(sprintf(paste0("%s: the model was fitted in a different projection ",
+                               "from `grad`; its movement parameters are applied in ",
+                               "`grad`'s projection, so the simulated movements ",
+                               "will be distorted"), x$id[k]),
+                call. = FALSE, immediate. = TRUE)
+        x$ssm[[k]][[what]] <- x$ssm[[k]][[what]] |>
+          st_transform(crs = prj.sim)
+      }
+    } else {
+      prj.sim <- prj.fit
     }
+
+    ## simulation extents: wrap x and reflect y only where the coordinates
+    ## are world Mercator or the potential function's raster; in any other
+    ## projection the world-Mercator limits do not apply
+    if(!is.null(grad)) {
+      ex <- as.vector(ext(grad))
+    } else if (isTRUE(grepl("+proj=merc", prj.sim$proj4string, fixed = TRUE))) {
+      ex <- ex.merc
+    } else {
+      ex <- NULL
+    }
+
+    ## start and end locations in the simulation projection
+    if(!is.null(start)) st1 <- ll_to_xy(start, prj.sim)
+    if(!is.null(end)) ed1 <- ll_to_xy(end, prj.sim)
+
     ## extract locations
     switch(what,
            fitted = {
@@ -295,8 +334,11 @@ sim_fit <-
                  y = mu[, 2]
                )
                if(cpf & is.null(end)) {
-                 df$x <- ((x - x[1]) - time * (x - x[1])[N]) + x[1]
-                 df$y <- ((y - y[1]) - time * (y - y[1])[N]) + y[1]
+                 df <- df |>
+                   mutate(x = ((x - x[1]) - time *
+                                 (x - x[1])[N]) + x[1]) |>
+                   mutate(y = ((y - y[1]) - time *
+                                 (y - y[1])[N]) + y[1])
                }
                df
              })
@@ -312,14 +354,14 @@ sim_fit <-
       tmp <- rbind(loc, tmp)
     }
     
-    ## lon,lat
-    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), 
-                         crs = "+proj=merc +units=km +datum=WGS84"), silent = TRUE)
+    ## simulated x,y are in the simulation projection; return x,y in the
+    ## common output projection and lon,lat from the simulation projection
+    tmp1 <- try(st_as_sf(tmp, coords = c("x","y"), crs = prj.sim), silent = TRUE)
     if(inherits(tmp1, "try-error")) {
       stop("oops something went wrong, try again", call. = FALSE)
     }
-    
-    xy <- as.data.frame(st_coordinates(tmp1))
+
+    xy <- as.data.frame(st_coordinates(st_transform(tmp1, crs = prj.out)))
     names(xy) <- c("x","y")
     ll <- st_transform(tmp1, crs = 4326)
     ll <- st_coordinates(ll)
@@ -341,7 +383,12 @@ sim_fit <-
          })
 
   class(d) <- append("sim_fit", class(d))
-  attr(d, "prj") <- prj.sim
+  ## projection of the returned x,y (used by route_path())
+  attr(d, "prj") <- if(!is.na(prj.out$proj4string) && nzchar(prj.out$proj4string)) {
+    prj.out$proj4string
+  } else {
+    prj.out$wkt
+  }
   
   return(d)
 }
