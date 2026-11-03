@@ -89,6 +89,7 @@ route_path <-
            dist = 2000,
            append = TRUE,
            barrier = NULL,
+           onland = NULL,
            ...){
     
     if(requireNamespace("pathroutr", quietly = TRUE)) {
@@ -197,66 +198,99 @@ route_path <-
       
       
       if (inherits(x, "ssm_df")) {
-        # create nested tibble grouped by individual track
-        # use rowwise to process each row in turn
+        ## Locations known to be on land are never moved or dropped:
+        ##  1) locations flagged as on land (ho = 1), from an `ho` column in the
+        ##     fitted or predicted locations, or from the on-land intervals in
+        ##     `onland`, stay at their SSM-estimated positions;
+        ##  2) locations on land at the start or end of the track, or next to
+        ##     flagged locations, stay at their SSM-estimated positions
+        ##     (prt_reroute() can only move locations that have water on both
+        ##     sides; pathroutr::prt_trim() would delete them).
+        ##  All other locations on land are re-routed, between the nearest
+        ##  water locations not separated by flagged locations. Every location
+        ##  is returned, with `on_land` = TRUE where it was kept on land.
+        ho_tab <- rp_ho(x, what, onland)
+        df_sf <- df_sf %>%
+          left_join(ho_tab, by = c("id", "date")) %>%
+          mutate(ho = ifelse(is.na(ho), 0L, as.integer(ho)))
+        if (output_unchanged_locations) {
+          df_sf$land <- FALSE
+        } else {
+          df_sf$land <- lengths(suppressMessages(st_intersects(df_sf, land_region))) > 0
+        }
+
         df_rrt <- df_sf %>%
           nest_by(id) %>%
           rowwise() %>%
-          mutate(pts = suppressWarnings(list(try({
-            ## Exclude haulout locations from rerouting. prt_trim() identifies which
-            ## points are on land; if haulout points are included they would be flagged
-            ## and moved into water, which is incorrect -- the animal is genuinely on
-            ## land during haulout. By filtering them out here they are never touched
-            ## by prt_reroute() or prt_update_points() and stay at their SSM-estimated
-            ## positions.
-            ##
-            ## `ho` is present when the fit was produced with a haulout lookup (via
-            ## fit_ssm(haulout = ...) or smru_haulout()). If absent, d == data and
-            ## behaviour is identical to the original code.
-            d <- if ("ho" %in% names(data)) {
-              dplyr::filter(data, is.na(ho) | ho == 0L)
-            } else {
-              data
+          mutate(pts_fix = list(try({
+            d <- data[order(data$date), ]
+            ## 1) flagged on land
+            fixed <- d$ho == 1L
+            ## 2) runs of locations between flagged ones: locations on land at
+            ##  the start or end of a run (the start or end of the track, or next
+            ##  to a haul-out) are on land; locations on land within a run are
+            ##  re-routed between the water locations of that run only
+            run <- cumsum(fixed)
+            run[fixed] <- NA
+            for (k in unique(stats::na.omit(run))) {
+              mv <- which(run == k)
+              wet <- mv[!d$land[mv]]
+              if (length(wet) == 0) {
+                fixed[mv] <- TRUE
+              } else {
+                fixed[mv[mv < min(wet) | mv > max(wet)]] <- TRUE
+              }
             }
-            pathroutr::prt_trim(d, land_region)
-          }, silent = TRUE))))
-        
-        ## check for errors due to entire track on land & return message
-        idx <- which(sapply(df_rrt$pts, function(x) inherits(x, "try-error")))
+            run[fixed] <- NA
+            move <- d[!fixed, ]
+            mrun <- run[!fixed]
+            if (nrow(move) > 0 && any(move$land) && !output_unchanged_locations) {
+              parts <- lapply(unique(mrun), function(k) {
+                m <- move[mrun == k, ]
+                if (any(m$land)) {
+                  rrt <- pathroutr::prt_reroute(m, land_region, vis_graph)
+                  m <- pathroutr::prt_update_points(rrt, m)
+                }
+                rp_geom(m)[, c("date", "x.se", "y.se")]
+              })
+              move <- do.call(rbind, parts)
+            }
+            move$on_land <- rep(FALSE, nrow(move))
+            keep <- d[fixed, ]
+            keep$on_land <- keep$land | keep$ho == 1L
+            out <- rbind(rp_geom(move)[, c("date", "x.se", "y.se", "on_land")],
+                         rp_geom(keep)[, c("date", "x.se", "y.se", "on_land")])
+            out[order(out$date), ]
+          }, silent = TRUE)))
+
+        ## re-routing errors: return the track unchanged
+        idx <- which(sapply(df_rrt$pts_fix, function(x) inherits(x, "try-error")))
         if(length(idx) > 0) {
-          message("The following track(s) are entirely on land:")
-          cat(as.character(df_rrt[idx,]$id))
-          message("\nIgnoring these and rerouting all others")
+          message("Re-routing failed for track(s): ",
+                  paste(paste0(as.character(df_rrt$id[idx]), " (",
+                               sapply(df_rrt$pts_fix[idx], function(e)
+                                 conditionMessage(attr(e, "condition"))), ")"),
+                        collapse = ", "),
+                  "; returning their SSM-estimated locations unchanged")
+          for (i in idx) {
+            d <- df_rrt$data[[i]]
+            d <- d[order(d$date), ]
+            d$on_land <- d$land | d$ho == 1L
+            df_rrt$pts_fix[[i]] <- rp_geom(d)[, c("date", "x.se", "y.se", "on_land")]
+          }
         }
-        
-        df_rrt$rrt_pts <- lapply(df_rrt$pts, function(x) {
-          ### when output_unchanged_locations is true, we want unchanged input locations,
-          ### but run through the rest of this script so they are packaged as usual as if prt_reroute had been run. 
-          if (output_unchanged_locations) { 
-            ### we cannot run prt_reroute here, because vis_graph is undefined, since land_region was empty.
-            ### so we simulate as if we had run prt_reroute and it found no conflicts, by returning an empty tibble, 
-            ### ?pathroutr::prt_reroute says "If trkpts and barrier do not spatially intersect and empty tibble is returned."
-            tibble()
-          } else {
-            if (!inherits(x, "try-error")) {
-              pathroutr::prt_reroute(x, land_region, vis_graph)
-            }
-          }
-        })
-        
-        df_rrt$pts_fix <- lapply(1:nrow(df_rrt), function(i) {
-          if(!inherits(df_rrt$pts[[i]], "try-error")) {
-            pathroutr::prt_update_points(df_rrt$rrt_pts[[i]], df_rrt$pts[[i]])
-          }
-        })
-        
+        idx <- integer(0)
+
         # pull the corrected points from the object and reformat for aniMotum
         df_rrt$pts_rrt <- lapply(df_rrt$pts_fix, function(x) {
           if(!is.null(x)) {
-            x |> select(date, x.se, y.se)
+            x |> select(date, x.se, y.se, on_land)
           }
-        }) 
+        })
         df_rrt <- df_rrt %>% select(id, pts_rrt) %>% ungroup()
+        ## same row order as x (nest_by() sorts by id)
+        df_rrt <- df_rrt[match(x$id, df_rrt$id), ]
+        df_rrt$id <- x$id
         
         ## append id to each sf tibble
         df_rrt$pts_rrt <- lapply(1:nrow(df_rrt), function(i) {
@@ -268,7 +302,7 @@ route_path <-
         })
         
         ## create empty sf_tibble to populate NULL list elements
-        st <- min(which(!1:nrow(df_rrt) %in% idx))
+        st <- min(which(!sapply(df_rrt$pts_rrt, is.null)))
         null.tibble <- df_rrt$pts_rrt[[st]]
         null.tibble <- null.tibble[-c(1:nrow(null.tibble)),]
         
@@ -280,7 +314,7 @@ route_path <-
                 x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
                                                    select(date, logit_g, logit_g.se, g),
                                                  by = "date") %>%
-                  select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry)
+                  select(id, date, x.se, y.se, on_land, logit_g, logit_g.se, g, geometry)
               } else {
                 x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
               }
@@ -299,14 +333,14 @@ route_path <-
               left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
                           select(date, logit_g, logit_g.se, g),
                         by = "date") %>%
-                select(id, date, x.se, y.se, logit_g, logit_g.se, g, geometry) %>%
+                select(id, date, x.se, y.se, on_land, logit_g, logit_g.se, g, geometry) %>%
                 mutate(x = st_coordinates(.)[,1], 
                        y = st_coordinates(.)[,2]) %>% 
                 st_transform(4326) %>% 
                 mutate(lon = st_coordinates(.)[,1], 
                        lat = st_coordinates(.)[,2]) %>% 
                 st_drop_geometry() %>%
-                select(id, date, lon, lat, x, y, x.se, y.se, logit_g, logit_g.se, g)
+                select(id, date, lon, lat, x, y, x.se, y.se, on_land, logit_g, logit_g.se, g)
             } else {
               df_rrt$pts_rrt[[i]] %>% 
                 mutate(x = st_coordinates(.)[,1], 
@@ -315,7 +349,7 @@ route_path <-
                 mutate(lon = st_coordinates(.)[,1], 
                        lat = st_coordinates(.)[,2]) %>% 
                 st_drop_geometry() %>%
-                select(id, date, lon, lat, x, y, x.se, y.se)
+                select(id, date, lon, lat, x, y, x.se, y.se, on_land)
             }
           }) %>%
             bind_rows()
@@ -405,3 +439,39 @@ route_path <-
   }
 
 
+
+
+## on-land flags (ho = 1) for the locations to be re-routed (internal): from an
+##  `ho` column in the ssm fit locations (`what`), and from `onland`, a data
+##  frame of on-land intervals with columns id, start, end (POSIXct). Returns a
+##  data frame with id, date, ho
+rp_ho <- function(x, what, onland = NULL) {
+  out <- lapply(seq_len(nrow(x)), function(i) {
+    s <- x$ssm[[i]]
+    if (length(s) < 15) return(NULL)
+    p <- s[[what]]
+    ho <- if ("ho" %in% names(p)) as.integer(p$ho) else rep(0L, nrow(p))
+    ho[is.na(ho)] <- 0L
+    data.frame(id = x$id[i], date = p$date, ho = ho)
+  })
+  out <- do.call(rbind, out)
+  if (!is.null(onland) && nrow(onland) > 0 && !is.null(out)) {
+    for (k in seq_len(nrow(onland))) {
+      j <- out$id == onland$id[k] & out$date >= onland$start[k] & out$date <= onland$end[k]
+      out$ho[j] <- 1L
+    }
+  }
+  if (is.null(out)) out <- data.frame(id = character(0), date = as.POSIXct(character(0)),
+                                      ho = integer(0))
+  out
+}
+
+## name the geometry column of an sf object "geometry" (internal)
+rp_geom <- function(d) {
+  g <- attr(d, "sf_column")
+  if (!identical(g, "geometry")) {
+    names(d)[names(d) == g] <- "geometry"
+    sf::st_geometry(d) <- "geometry"
+  }
+  d
+}
