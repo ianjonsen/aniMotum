@@ -72,8 +72,9 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            ## remove optimizer crash results from extraction
            nf <- which(sapply(x$ssm, length) < 15)
            if (length(nf) > 0) {
-             sprintf("%d optimizer crashes removed from output", length(nf))
-             sprintf("ids: %s", x[nf, "id"])
+             warning(sprintf("%d optimiser crash(es) removed from output, ids: %s",
+                             length(nf), paste(x$id[nf], collapse = ", ")),
+                     call. = FALSE, immediate. = TRUE)
              x <- x[-nf,]
            }
          
@@ -363,8 +364,17 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
            ## remove optimiser crash results from extraction
            nf <- which(sapply(x$mpm, length) < 8)
            if (length(nf) > 0) {
-             sprintf("%d optimiser crashes removed from output", length(nf))
-             sprintf("ids: %s", x[nf, "id"])
+             ## an mpm fit has one row per individual and an id column; a jmpm
+             ## fit is a single joint fit with no id column, so report the
+             ## crash without ids
+             if ("id" %in% names(x)) {
+               warning(sprintf("%d optimiser crash(es) removed from output, ids: %s",
+                               length(nf), paste(x$id[nf], collapse = ", ")),
+                       call. = FALSE, immediate. = TRUE)
+             } else {
+               warning("the joint move persistence model (jmpm) fit crashed; no fitted values to return",
+                       call. = FALSE, immediate. = TRUE)
+             }
              x <- x[-nf,]
            }
 

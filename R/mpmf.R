@@ -40,10 +40,17 @@ mpmf <-
     # ordering the data to make sure we have continuous tracks and ids are ordered
     x <- x[order(x$id, x$tid, x$date), ]
     
-    # get index of start and end of tracks
-    x$idtid <- paste(x$id, x$tid, sep="")
-    idx <- as.numeric(table(x$idtid))
-    idx <- c(0, cumsum(idx))
+    # get index of start and end of tracks, in row order
+    # The boundaries must come from the rows as sorted above. table() counts
+    # in string-sorted order of its argument, which differs from the row order
+    # whenever the id column is numeric (2 sorts before 10, but "10" before
+    # "2") or a factor whose levels are not alphabetical, so counts from
+    # table() would be attached to the wrong tracks. A track starts at every
+    # row whose (id, tid) pair has not been seen before; testing the pair
+    # directly, rather than a pasted string, also keeps distinct pairs such as
+    # (1, 10) and (11, 0) apart.
+    starts <- which(!duplicated(x[, c("id", "tid")]))
+    idx <- c(starts - 1, nrow(x))
 
     # Create dt vector
     # dt = t_i - t_{i-1} and include in data.tmb
