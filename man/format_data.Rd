@@ -12,6 +12,7 @@ format_data(
   coord = c("lon", "lat"),
   epar = c("smaj", "smin", "eor"),
   sderr = c("x.sd", "y.sd"),
+  error.radius = "error.radius",
   tz = "UTC"
 )
 }
@@ -44,6 +45,13 @@ errors for \verb{lon,lat} or \verb{x,y}: default names are \code{x.sd}, \code{y.
 these are only provided for generic location data such as processed light-level
 geolocations, or high-resolution acoustic detections. The argument is ignored
 if these variables are missing from the input data.}
+
+\item{error.radius}{the name (as a quoted character string) of the Kinéis
+error radius variable (m): default is "error.radius". Locations with a
+non-missing, positive error radius are fitted with the Kinéis (KI)
+observation model, which takes precedence over any error ellipse supplied
+for the same location (see \code{ssm_control()}). Ignored if the variable is
+missing from the input data.}
 
 \item{tz}{the timezone the applies to the data/time variable if they are not
 in \code{tz = 'UTC'}. A list of valid timezone names can be viewed via \code{OlsonNames()}}

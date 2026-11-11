@@ -2,7 +2,7 @@
 % Please edit documentation in R/pf_obs_type.R
 \name{pf_obs_type}
 \alias{pf_obs_type}
-\title{Determine observation type: LS, KF, GPS, or GLS}
+\title{Determine observation type: LS, KF, GPS, GLS, or KI (Kinéis)}
 \usage{
 pf_obs_type(x)
 }
@@ -10,6 +10,6 @@ pf_obs_type(x)
 \item{x}{data from \code{pf_dup_dates()}}
 }
 \description{
-Determine observation type: LS, KF, GPS, or GLS
+Determine observation type: LS, KF, GPS, GLS, or KI (Kinéis)
 }
 \keyword{internal}

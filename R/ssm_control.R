@@ -29,6 +29,23 @@
 ##' flagging (default).
 ##' @param ho_scale haulout process variance scale factor (0, 1];
 ##' 0.01 = nearly stationary; 1 = no constraint
+##' @param kineis a list controlling the Kinéis (KI) observation model, used
+##' only for locations supplied with an error radius (see `format_data()`).
+##' Each KI location has ground standard deviations
+##' `scale[1] * r^exponent` (east) and `scale[2] * r^exponent` (north), with
+##' `r` the error radius in km. Elements:
+##' \code{scale} the east and north error scales relative to the error radius
+##' (default \code{c(1.061, 0.739)});
+##' \code{exponent} the exponent on the error radius (default 1);
+##' \code{estimate} logical; estimate the two scales (default FALSE, fixed at
+##' \code{scale});
+##' \code{estimate.exponent} logical; estimate the exponent (default FALSE).
+##' The default scales are provisional: they are the root mean square east and
+##' north errors, relative to the error radius, of 1,700 Kinéis locations
+##' paired with Fastloc GPS fixes (21 olive ridley turtles, IMOS campaign
+##' tu126, 2026). Kinéis errors are serially correlated through CLS Kalman
+##' smoothing, which is not yet modelled, so estimating the scales without
+##' concurrent GPS locations is not advised.
 ##' @param ... control parameters for the chosen optimizer
 ##' @return Returns a list with components
 ##'   \item{\code{optim}}{the name of the numerical optimizer as a
@@ -59,6 +76,10 @@ ssm_control <-
            se = FALSE,
            gap.thresh = Inf,    
            ho_scale   = 0.01,   
+           kineis = list(scale = c(1.061, 0.739),
+                         exponent = 1,
+                         estimate = FALSE,
+                         estimate.exponent = FALSE),
            ...) {
     optim <- match.arg(optim)
     method <- match.arg(method)
@@ -78,6 +99,19 @@ ssm_control <-
     if(!(is.numeric(verbose) & verbose %in% c(0,1,2))) 
       stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
     
+    ## Kinéis observation model: fill in any elements not supplied
+    kineis.default <- list(scale = c(1.061, 0.739), exponent = 1,
+                           estimate = FALSE, estimate.exponent = FALSE)
+    if (!is.list(kineis)) stop("kineis must be a named list, see ?ssm_control")
+    kineis.default[names(kineis)] <- kineis
+    kineis <- kineis.default
+    if (!(is.numeric(kineis$scale) && length(kineis$scale) == 2 && all(kineis$scale > 0)))
+      stop("kineis$scale must be 2 positive values (east, north)")
+    if (!(is.numeric(kineis$exponent) && length(kineis$exponent) == 1))
+      stop("kineis$exponent must be a single numeric value")
+    if (!is.logical(kineis$estimate) || !is.logical(kineis$estimate.exponent))
+      stop("kineis$estimate and kineis$estimate.exponent must be TRUE or FALSE")
+
     dots <- list(...)
     
     ## Set default control values
@@ -107,5 +141,6 @@ ssm_control <-
          se = se,
          gap.thresh = gap.thresh,
          ho_scale = ho_scale,
+         kineis = kineis,
          control = pars)
   }

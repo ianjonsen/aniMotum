@@ -13,6 +13,8 @@ ssm_control(
   se = FALSE,
   gap.thresh = Inf,
   ho_scale = 0.01,
+  kineis = list(scale = c(1.061, 0.739), exponent = 1, estimate = FALSE,
+    estimate.exponent = FALSE),
   ...
 )
 }
@@ -44,6 +46,24 @@ flagging (default).}
 
 \item{ho_scale}{haulout process variance scale factor (0, 1];
 0.01 = nearly stationary; 1 = no constraint}
+
+\item{kineis}{a list controlling the Kinéis (KI) observation model, used
+only for locations supplied with an error radius (see \code{format_data()}).
+Each KI location has ground standard deviations
+\code{scale[1] * r^exponent} (east) and \code{scale[2] * r^exponent} (north), with
+\code{r} the error radius in km. Elements:
+\code{scale} the east and north error scales relative to the error radius
+(default \code{c(1.061, 0.739)});
+\code{exponent} the exponent on the error radius (default 1);
+\code{estimate} logical; estimate the two scales (default FALSE, fixed at
+\code{scale});
+\code{estimate.exponent} logical; estimate the exponent (default FALSE).
+The default scales are provisional: they are the root mean square east and
+north errors, relative to the error radius, of 1,700 Kinéis locations
+paired with Fastloc GPS fixes (21 olive ridley turtles, IMOS campaign
+tu126, 2026). Kinéis errors are serially correlated through CLS Kalman
+smoothing, which is not yet modelled, so estimating the scales without
+concurrent GPS locations is not advised.}
 
 \item{...}{control parameters for the chosen optimizer}
 }

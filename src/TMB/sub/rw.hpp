@@ -42,6 +42,9 @@ Type rw(objective_function<Type>* obj) {
   DATA_MATRIX(K);                 // error weighting factors for LS obs model
   // for GL observation model
   DATA_MATRIX(GLerr);             // error SD's in lon, lat for GL obs model
+  // for Kinéis (KI) observation model
+  DATA_VECTOR(KIrad);              //  Kinéis error radius (km)
+  DATA_MATRIX(KIjac);              //  projection Jacobian: dx/dE, dx/dN, dy/dE, dy/dN
   
   // PROCESS PARAMETERS
   // for RW
@@ -55,6 +58,9 @@ Type rw(objective_function<Type>* obj) {
   // for LS/GPS OBS MODEL
   PARAMETER_VECTOR(l_tau);     	// error dispersion for LS obs model (log scale)
   PARAMETER(l_rho_o);             // error correlation
+  // for Kinéis (KI) observation model
+  PARAMETER_VECTOR(l_kineis_scale); // log error scales (east, north) relative to the error radius
+  PARAMETER(l_kineis_exponent);     // exponent on the error radius (identity link)
 
   // Transform parameters
   vector<Type> sigma = exp(l_sigma);
@@ -62,6 +68,8 @@ Type rw(objective_function<Type>* obj) {
   vector<Type> tau = exp(l_tau);
   Type rho_o = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi = exp(l_psi);
+  vector<Type> kineis_scale = exp(l_kineis_scale);
+  Type kineis_exponent = l_kineis_exponent;
   
   /* Define likelihood */
   Type jnll = 0.0;
@@ -116,7 +124,8 @@ Type rw(objective_function<Type>* obj) {
   
   for(int i = 0; i < dt.size(); ++i) {
     if(isd(i) == 1) {
-      cov_obs = observation_covariance(obs_mod(i), i, tau, K, M, m, c, psi, GLerr, rho_o);
+      cov_obs = observation_covariance(obs_mod(i), i, tau, K, M, m, c, psi, GLerr, rho_o,
+                                       KIrad, KIjac, kineis_scale, kineis_exponent);
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));   // RW innovations
@@ -137,6 +146,8 @@ Type rw(objective_function<Type>* obj) {
   ADREPORT(rho_o);
   ADREPORT(tau);
   ADREPORT(psi);
+  ADREPORT(kineis_scale);
+  ADREPORT(kineis_exponent);
   
   return jnll;
 }

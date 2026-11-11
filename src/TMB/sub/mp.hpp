@@ -39,6 +39,9 @@ Type mp(objective_function<Type>* obj) {
   DATA_MATRIX(K);                 //  error weighting factors for LS obs model
   // for GL observation model
   DATA_MATRIX(GLerr);             //  error SD's in lon, lat for GL obs model
+  // for Kinéis (KI) observation model
+  DATA_VECTOR(KIrad);              //  Kinéis error radius (km)
+  DATA_MATRIX(KIjac);              //  projection Jacobian: dx/dE, dx/dN, dy/dE, dy/dN
   
   // PROCESS PARAMETERS
   PARAMETER_VECTOR(l_sigma);      //  Innovation variance (link scale)
@@ -50,6 +53,9 @@ Type mp(objective_function<Type>* obj) {
   PARAMETER(l_psi);               //  error SD scaling parameter (KF obs model)
   PARAMETER_VECTOR(l_tau);        //  error dispersion for LS obs model (log scale)
   PARAMETER(l_rho_o);             //  observation error correlation b/w x,y
+  // for Kinéis (KI) observation model
+  PARAMETER_VECTOR(l_kineis_scale); // log error scales (east, north) relative to the error radius
+  PARAMETER(l_kineis_exponent);     // exponent on the error radius (identity link)
   
   // Transform parameters
   vector<Type> sigma = exp(l_sigma);
@@ -57,6 +63,8 @@ Type mp(objective_function<Type>* obj) {
   vector<Type> tau = exp(l_tau);
   Type rho_o   = Type(2.0) / (Type(1.0) + exp(-l_rho_o)) - Type(1.0);
   Type psi     = exp(l_psi);
+  vector<Type> kineis_scale = exp(l_kineis_scale);
+  Type kineis_exponent = l_kineis_exponent;
   Type sigma_g = exp(l_sigma_g);
   vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg)); 
   
@@ -150,7 +158,8 @@ Type mp(objective_function<Type>* obj) {
   
   for(int i = 0; i < dt.size(); ++i) {
     if(isd(i) == 1) {
-      cov_obs = observation_covariance(obs_mod(i), i, tau, K, M, m, c, psi, GLerr, rho_o);
+      cov_obs = observation_covariance(obs_mod(i), i, tau, K, M, m, c, psi, GLerr, rho_o,
+                                       KIrad, KIjac, kineis_scale, kineis_exponent);
       
       nll_obs.setSigma(cov_obs);
       jnll += nll_obs((Y.col(i) - X.col(i)), keep.col(i));
@@ -171,6 +180,8 @@ Type mp(objective_function<Type>* obj) {
   ADREPORT(rho_o);
   ADREPORT(tau);
   ADREPORT(psi);
+  ADREPORT(kineis_scale);
+  ADREPORT(kineis_exponent);
   ADREPORT(sigma_g);
   
   return jnll;

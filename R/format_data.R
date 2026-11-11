@@ -28,6 +28,12 @@
 ##' these are only provided for generic location data such as processed light-level
 ##' geolocations, or high-resolution acoustic detections. The argument is ignored
 ##' if these variables are missing from the input data.
+##' @param error.radius the name (as a quoted character string) of the Kinéis
+##' error radius variable (m): default is "error.radius". Locations with a
+##' non-missing, positive error radius are fitted with the Kinéis (KI)
+##' observation model, which takes precedence over any error ellipse supplied
+##' for the same location (see `ssm_control()`). Ignored if the variable is
+##' missing from the input data.
 ##' @param tz the timezone the applies to the data/time variable if they are not 
 ##' in `tz = 'UTC'`. A list of valid timezone names can be viewed via `OlsonNames()`
 ##' 
@@ -59,6 +65,7 @@ format_data <- function(x,
                         coord = c("lon","lat"),
                         epar = c("smaj","smin","eor"),
                         sderr = c("x.sd","y.sd"),
+                        error.radius = "error.radius",
                         tz = "UTC") {
   
   ## check that all variable names are character strings
@@ -72,6 +79,7 @@ format_data <- function(x,
   stopifnot("coord must be a character vector with 1 or 2 elements" = all(is.character(coord)))
   stopifnot("epar must be a character vector with 3 elements" = all(is.character(epar)))
   stopifnot("sderr must be a character vector with 2 elements" = all(is.character(sderr)))
+  stopifnot("error.radius must be a character string" = is.character(error.radius) & length(error.radius) == 1)
   
   ## if "lonerr", "laterr" exist in x then rename "x.sd", "y.sd"
   ## return warning that "lonerr", "laterr" are deprecated
@@ -144,7 +152,7 @@ format_data <- function(x,
   xx <- x
   
   ## determine if there are extra variables in x
-  xt.vars <- names(x)[!names(x) %in% c(id, date, lc, coord, epar, sderr)]
+  xt.vars <- names(x)[!names(x) %in% c(id, date, lc, coord, epar, sderr, error.radius)]
 
   if(all(!c("lon","lat") %in% coord, coord != "geometry")) {
     pos1 <- grepl("lon", coord, ignore.case = TRUE)
@@ -196,6 +204,11 @@ format_data <- function(x,
     } else if (inherits(x, "sf")) {
       names(xx)[c(1:4, 8:9)] <- c("id","date","lc",coord,"x.sd","y.sd")
     }
+  }
+
+  ## Kinéis error radius (m), carried as `error.radius`
+  if (error.radius %in% names(x)) {
+    xx$error.radius <- as.numeric(as.data.frame(x)[[error.radius]])
   }
 
   ## in cases where user supplies id as a factor, drop any unused factor levels 

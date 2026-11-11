@@ -180,6 +180,10 @@ ssm_prep <- function(x,
 
   ## observation types present, used to decide which measurement parameters
   ## can be estimated
+  if (any(d$obs.type == "KI", na.rm = TRUE))
+    stop("Kinéis (KI) observations are not yet supported by the joint models ",
+         "(jmp, jcrw); fit them with model = \"crw\", \"rw\" or \"mp\"",
+         call. = FALSE)
   d <- mutate(d, obs.type = factor(obs.type,
                                    levels = c("LS", "KF", "GL", "GPS"),
                                    labels = c("LS", "KF", "GL", "GPS")))

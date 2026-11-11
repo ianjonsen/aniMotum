@@ -1,3 +1,11 @@
+# aniMotum (development version)
+
+* adds a Kinéis (KI) observation model. Locations supplied with a CLS error radius (`format_data(error.radius = )`, default column name `error.radius`, in m) have ground standard deviations `scale_east * r^exponent` and `scale_north * r^exponent`, with `r` the error radius in km. The KI model takes precedence over any error ellipse supplied for the same location, and is available for the `rw`, `crw` and `mp` models (not yet the joint models)
+* the KI ground standard deviations are mapped to the model's projected coordinates through the local Jacobian of the projection (computed numerically on the WGS84 ellipsoid), so the observation covariance is correct in any projection, conformal or not
+* adds `ssm_control(kineis = )` to set the KI error scales and exponent and whether they are estimated. The provisional defaults (`scale = c(1.061, 0.739)`, `exponent = 1`, fixed) are the root mean square east and north errors, relative to the error radius, of 1,700 Kinéis locations paired with Fastloc GPS fixes (21 olive ridley turtles, IMOS campaign tu126, 2026). Kinéis errors are serially correlated through CLS Kalman smoothing, which is not yet modelled
+* the observation error covariance is now computed by one function shared by the `rw`, `crw` and `mp` models (`src/TMB/sub/observation_covariance.hpp`); results are unchanged
+* fixes uninitialised memory in the `crw` along-track speeds: the first speed of each track (fitted and predicted) is now `NA` whether or not `ssm_control(se = TRUE)`
+
 # aniMotum 1.3-0 (03/11/2026)
 
 * adds a joint (hierarchical) move persistence SSM via `fit_ssm(model = "jmp")`, fitting the time-varying move persistence model to all tracks at once (Jonsen et al. 2019). By default, `sigma_g` and the measurement error parameters are pooled, the process variance is hierarchical, and `rho_p` is estimated separately for each individual

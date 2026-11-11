@@ -1,4 +1,4 @@
-##' @title Determine observation type: LS, KF, GPS, or GLS
+##' @title Determine observation type: LS, KF, GPS, GLS, or KI (Kinéis)
 ##'
 ##' @param x data from `pf_dup_dates()`
 ##' @keywords internal
@@ -32,6 +32,14 @@ pf_obs_type <- function(x) {
                                  (obs.type != "GL" & obs.type != "GPS"), 
                                "LS", obs.type))
   
+  ## Kinéis observations: a non-missing, positive error radius takes
+  ##  precedence over any other error information; convert from m to km
+  if ("error.radius" %in% names(x)) {
+    x$error.radius <- with(x, ifelse(!is.na(error.radius) & error.radius > 0,
+                                     error.radius, NA)) / 1000
+    x$obs.type <- with(x, ifelse(!is.na(error.radius), "KI", obs.type))
+  }
+
   if(all("lon" %in% names(x), "lat" %in% names(x), "lonerr" %in% names(x), "laterr" %in% names(x))) {
     ## if GL SD's are loneer/laterr then convert from deg to km
     x$x.sd <- with(x, x.sd * 6378.137 / 180 * pi)  

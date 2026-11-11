@@ -75,7 +75,7 @@ prefilter <-
     ##  1. flag duplicate date (delta(date) < min.dt) records
     x <- pf_dup_dates(x, min.dt)
     
-    ##  2. determine observation type: LS, KF, GPS or GLS
+    ##  2. determine observation type: LS, KF, GPS, GLS or KI (Kinéis)
     x <- pf_obs_type(x)
 
     ##  3. identify extreme locations with a speed/distance/angle filter
@@ -85,6 +85,10 @@ prefilter <-
     ##       ensure that longitudes straddling -180,180 or 0,360 are shifted 
     ##       appropriately
     x <- pf_sf_project(x, prj = prj)
+
+    ##  4b. local Jacobian of the projection at Kinéis observations, to map
+    ##       their ground error standard deviations to projected coordinates
+    x <- pf_kineis_jacobian(x)
 
     ##  5. add location error multiplication factors and finalise data structure
     ##      for use by sfilter()

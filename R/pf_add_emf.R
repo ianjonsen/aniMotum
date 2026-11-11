@@ -22,18 +22,21 @@ pf_add_emf <- function(x, emf) {
   x$lc <- with(x, as.character(lc))
   x <- merge(x, tmp, by = "lc", all.x = TRUE, sort = FALSE)
   
+  ## Kinéis error radius and projection Jacobian, where present
+  ki.vars <- intersect(kineis_columns(), names(x))
+
   if(all("lonerr" %in% names(x), "laterr" %in% names(x))) {
     x <- x[order(x$date), c("id","date","lc","smaj","smin","eor",
                             "lonerr","laterr","keep","obs.type",
-                            "emf.x","emf.y","geometry")]  
+                            "emf.x","emf.y", ki.vars, "geometry")]  
   } else {
     x <- x[order(x$date), c("id","date","lc","smaj","smin","eor",
                             "x.sd","y.sd","keep","obs.type",
-                            "emf.x","emf.y","geometry")]
+                            "emf.x","emf.y", ki.vars, "geometry")]
   }
   
-  x$emf.x <- with(x, ifelse(obs.type %in% c("KF","GL"), NA, emf.x))
-  x$emf.y <- with(x, ifelse(obs.type %in% c("KF","GL"), NA, emf.y))
+  x$emf.x <- with(x, ifelse(obs.type %in% c("KF","GL","KI"), NA, emf.x))
+  x$emf.y <- with(x, ifelse(obs.type %in% c("KF","GL","KI"), NA, emf.y))
   
   if (sum(is.na(x$lc)) > 0)
     stop(

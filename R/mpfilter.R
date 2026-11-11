@@ -228,12 +228,18 @@ mpfilter <-
         l_tau = c(0, 0),
         l_rho_o = 0
       )
+      parameters <- c(parameters, kineis_parameters(control))
     } 
     
+    ## Kinéis (KI) parameters, if not supplied by the user
+    ki.par <- kineis_parameters(control)
+    parameters[setdiff(names(ki.par), names(parameters))] <-
+      ki.par[setdiff(names(ki.par), names(parameters))]
+
     ## start to work out which obs_mod to use for each observation
     d <- mutate(d, obs.type = factor(obs.type, 
-                                        levels = c("LS","KF","GL","GPS"), 
-                                        labels = c("LS","KF","GL","GPS"))
+                                        levels = c("LS","KF","GL","GPS","KI"), 
+                                        labels = c("LS","KF","GL","GPS","KI"))
                       )
     p.obst <- table(d$obs.type) / nrow(d)
     obst <- which(table(d$obs.type) > 0)
@@ -259,6 +265,12 @@ mpfilter <-
         )
       )
 
+
+    ## KI (Kinéis): error from the error radius and fixed or estimated KI
+    ##  scales, so neither psi, tau nor rho_o is used
+    automap[[5]] <- list(l_psi = factor(NA),
+                         l_tau = factor(c(NA, NA)),
+                         l_rho_o = factor(NA))
     mm <- unlist(automap[obst], recursive = FALSE)
     mm[which(duplicated(names(mm)))] <- NULL
     automap <- mm
@@ -277,10 +289,16 @@ mpfilter <-
       }
     }    
     
+    ## Kinéis (KI) parameters: fixed unless KI observations are present and
+    ##  their estimation is requested in ssm_control(kineis = ...)
+    ki.map <- kineis_map(d.all$obs.type, control)
+    map[setdiff(names(ki.map), names(map))] <- ki.map[setdiff(names(ki.map), names(map))]
+
     ## TMB - data list
     ## convert from string to integer for C++
     obs_mod <- ifelse(d.all$obs.type %in% c("LS","GPS"), 0, 
-                      ifelse(d.all$obs.type == "KF", 1, 2)
+                      ifelse(d.all$obs.type == "KF", 1,
+                             ifelse(d.all$obs.type == "KI", 3, 2))
                       )
     ## where is.na(obs_mod) - prediction points - set to "LS" (obs_mod = 0) so
     ##  NA's don't create an int overflow situation in C++ code. This won't matter 
@@ -299,6 +317,7 @@ mpfilter <-
       K = cbind(d.all$emf.x, d.all$emf.y),
       GLerr = cbind(d.all$x.sd, d.all$y.sd)
     ) 
+    data <- c(data, kineis_data(d.all))
     
     ## IMPORTANT: gap_flag must be derived from *observation* gaps. When a regular
     ## time.step is supplied, the prediction
@@ -389,13 +408,17 @@ mpfilter <-
           l_sigma_g=-10,
           l_psi=-Inf,
           l_tau=c(-Inf,-Inf),
-          l_rho_o=-7) ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
+          l_rho_o=-7, ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
+          l_kineis_scale=c(-Inf,-Inf),
+          l_kineis_exponent=-Inf)
     U = c(l_sigma=c(Inf,Inf),
           l_rho_p=7,
           l_sigma_g=50,
           l_psi=Inf,
           l_tau=c(Inf,Inf),
-          l_rho_o=7)
+          l_rho_o=7,
+          l_kineis_scale=c(Inf,Inf),
+          l_kineis_exponent=Inf)
     
     if(any(!is.null(control$lower))) {
       L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
@@ -406,6 +429,8 @@ mpfilter <-
     
     names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
     names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
+    names(L)[grepl("^l_kineis_scale", names(L))] <- "l_kineis_scale"
+    names(U)[grepl("^l_kineis_scale", names(U))] <- "l_kineis_scale"
     
     # Remove inactive parameters from bounds
     L <- L[!names(L) %in% names(map)]
@@ -454,6 +479,7 @@ mpfilter <-
                            sapply(strsplit(names(map), "_"), function(.)
                              .[2])),]
       }
+      fxd <- kineis_report(fxd, map)
       if("sigma" %in% row.names(fxd)) {
         row.names(fxd)[which(row.names(fxd) == "sigma")] <- c("sigma_x","sigma_y")
       } 
