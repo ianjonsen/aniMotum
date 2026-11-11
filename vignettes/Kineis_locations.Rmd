@@ -1,0 +1,101 @@
+---
+title: "Kinéis locations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Kinéis locations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Kinéis data
+CLS now estimates Argos Doppler locations with a new Kalman filter that combines messages received by the Kinéis and Argos-Classic satellites. Two things differ from Argos Kalman filter (KF) locations:
+
+1. each location comes with a single error radius, not an error ellipse. CLS define the radius as the semi-major axis of the filter's covariance ellipse plus a 50% margin (CLS 2025);
+2. locations are smoothed (Rauch-Tung-Striebel smoother) and re-issued as revisions up to 12 h after the first estimate (CLS 2025).
+
+How the radius arrives depends on the tag manufacturer:
+
+1. SMRU: the radius is written to both the semi-major and semi-minor axis variables, with ellipse orientation 0;
+2. Wildlife Computers: Kinéis locations are labelled "Kineis" in the `Type` column of the Locations file.
+
+### Why not use the KF error model
+Supplied as a circular ellipse, Kinéis locations are fitted with the KF error model. That has two problems. The KF model sets each axis standard deviation to the semi-axis / √2, so the error scale is set by the ellipse convention, not by the error itself. And `psi`, which rescales the semi-minor axis, is not identifiable. Smoothing makes Kinéis errors serially correlated: in tu126 (below) the correlation between east errors of successive locations was 0.93 within 1 h, 0.66 at 1-3 h and ~0 beyond 6 h. The SSM treats correlated error as movement. Fitted to tu126, `psi` was estimated at 0.15 (median of 21 tracks) and only 23% of concurrent GPS locations fell within the SSM's 95% confidence regions.
+
+### The KI error model
+Locations with an error radius are given observation type `KI`. Each `KI` location has ground standard deviations:  
+
+```
+sd_east  = scale_east  * r^exponent
+sd_north = scale_north * r^exponent
+```
+
+where `r` is the error radius (km). These are mapped to the projected coordinates of the SSM with the local Jacobian of the projection, `J`, so the observation covariance is `J %*% diag(c(sd_east^2, sd_north^2)) %*% t(J)`. This gives the correct error in any projection. On a Mercator grid, `J` scales errors by `1 / cos(latitude)`; in a non-conformal projection, such as an equidistant conic, it also rotates them. `psi`, `tau` and `rho_o` are not used for `KI` locations.
+
+### Default error scales
+The defaults, `scale_east = 1.061`, `scale_north = 0.739` and `exponent = 1`, are from 1,700 Kinéis locations paired, within 5 min, with Fastloc GPS locations from 21 olive ridley turtles (IMOS campaign tu126, northern Australia, 2026). They are the root mean square east and north errors, each divided by the error radius. The tu126 data showed:
+
+1. the radius understates the error. It contained 57% of errors, not the ≥ 67.5% implied by the CLS definition;
+2. east errors are ~1.5 times north errors. The same pattern has been found in other GPS - Kinéis data (pers. comm.);
+3. the radius only partly ranks the errors (Spearman correlation 0.47).
+
+These values are provisional. They come from one species, one tag model and one region at low latitude.
+
+### Fitting
+Supply the radius (m) in a variable named `error.radius`, or name your variable via the `error.radius` argument:
+```{r fit KI, eval=FALSE}
+fit <- fit_ssm(locs,
+               model = "crw",
+               time.step = 6)
+
+fit <- fit_ssm(locs,
+               error.radius = "ERROR_RADIUS",
+               model = "crw",
+               time.step = 6)
+```
+
+A location with a positive `error.radius` is fitted as `KI`, whatever else is supplied for it. GPS locations can be included in the same data, with `lc = "G"` and `error.radius = NA`.
+
+The error scales and exponent are set with `ssm_control(kineis = )`:
+```{r ssm_control kineis, eval=FALSE}
+fit <- fit_ssm(locs,
+               model = "crw",
+               time.step = 6,
+               control = ssm_control(kineis = list(scale = c(1.061, 0.739),
+                                                   exponent = 1,
+                                                   estimate = FALSE,
+                                                   estimate.exponent = FALSE)))
+```
+
+The `KI` model is available for the `rw`, `crw` and `mp` models, but not yet for the joint models (`jmp`, `jcrw`).
+
+### Estimating the error scales
+Not recommended. The scales can be estimated (`estimate = TRUE`) but they are confounded with the movement process because the serial correlation in Kinéis errors is not modelled. Fitted to tu126 Kinéis and GPS locations together, the estimated scales were 0.43-0.73 (east) and 0.31-0.57 (north), well below the values measured directly against GPS, while `D` increased 3 to 10 fold. Without GPS locations, the scales should always be fixed.
+
+### What to expect
+Results from the tu126 turtles (`crw` model, default `KI` error scales), with GPS locations used for validation:  
+
+1. **Kinéis only**: the SSM does not improve on the Kinéis locations. Median error was 789 m for the Kinéis locations and 842 m for the SSM-estimated locations. Between Kinéis locations, the SSM (990 m) was no more accurate than linear interpolation (932 m). Kinéis locations are already smoothed by CLS, so there is little independent error left for the SSM to remove;  
+2. **Kinéis + GPS**: the SSM does improve locations. With half the GPS locations withheld, median error was 809 m for the SSM, 859 m for linear interpolation through the GPS and Kinéis locations, 2,069 m for linear interpolation between GPS locations alone, and 2,298 m for an SSM fitted to the GPS locations alone;  
+3. **uncertainty**: SSM standard errors are too small. 61-68% of GPS locations fell within the SSM's 95% confidence regions.  
+
+Use SSM fits to Kinéis data for consistent quality control, regular time-step predictions and combining Kinéis with GPS locations. Do not treat the SSM standard errors as calibrated.
+
+### Limitations
+1. Serial correlation in Kinéis errors is not modelled, so SSM standard errors are underestimated;
+2. all Kinéis locations are assumed to have been revised (smoothed). Unrevised locations occur at the end of near real-time tracks and before long gaps;
+3. the default error scales are from one data set.
+
+## References
+
+CLS (2025) Argos goniometry and Kinéis: Kalman filtering, RTS smoothing and the Kinéis error radius. Presentation, Ponta Delgada, 12 May 2025.
+
+Jonsen ID, Patterson TA, Costa DP, Doherty PD, Godley BJ, Grecian WJ, Guinet C, Hoenner X, Kienle SS, Robinson PW, Votier SC, Whiting S, Witt MJ, Hindell MA, Harcourt RG, McMahon CR (2020) A continuous-time state-space model for rapid quality control of Argos locations from animal-borne tags. _Movement Ecology_ 8:31.
+
+McClintock BT, London JM, Cameron MF, Boveng PL (2015) Modelling animal movement using the Argos satellite telemetry location error ellipse. _Methods in Ecology and Evolution_ 6:266–77.
