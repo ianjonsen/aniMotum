@@ -618,6 +618,9 @@ sfilter <-
                } else {
                  sf <- as.vector(obj$report()$sf)
                  sp <- as.vector(obj$report()$sp)
+                 ## first speed of each track has no preceding state
+                 sf[1] <- NA
+                 if(length(sp) > 0) sp[1] <- NA
                  sf.se <- NA
                  sp.se <- NA
                }

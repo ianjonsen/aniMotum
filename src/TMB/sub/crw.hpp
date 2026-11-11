@@ -2,6 +2,8 @@
 #ifndef crw_hpp
 #define crw_hpp 1
 
+#include "observation_covariance.hpp"
+
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
 
@@ -63,6 +65,10 @@ Type crw(objective_function<Type>* obj) {
   
   vector<Type> sf = fidx.size();
   vector<Type> sp = pidx.size();
+  // initialise: the first element of each speed vector has no preceding
+  // state and is never assigned below (set to NA on the R side)
+  sf.setZero();
+  sp.setZero();
   
   // Setup object for evaluating multivariate normal likelihood
   matrix<Type> cov(4,4);
@@ -141,40 +147,7 @@ Type crw(objective_function<Type>* obj) {
   
   for(int i = 0; i < dt.size(); ++i) {
     if(isd(i) == 1) {
-      if(obs_mod(i) == 0) {
-        // Argos Least Squares & GPS observations
-        Type s = tau(0) * K(i,0);
-        Type q = tau(1) * K(i,1);
-        cov_obs(0,0) = s * s;
-        cov_obs(1,1) = q * q;
-        cov_obs(0,1) = s * q * rho_o;
-        cov_obs(1,0) = cov_obs(0,1);
-        
-      } else if(obs_mod(i) == 1) {
-        // Argos Kalman Filter (or Kalman Filtered & Smoothed) observations
-        double z = sqrt(2.);
-        double h = 0.5;
-        Type s2c = sin(c(i)) * sin(c(i));
-        Type c2c = cos(c(i)) * cos(c(i));
-        Type M2  = (M(i) / z) * (M(i) / z);
-        Type m2 = (m(i) * psi / z) * (m(i) * psi / z);
-        cov_obs(0,0) = (M2 * s2c + m2 * c2c);
-        cov_obs(1,1) = (M2 * c2c + m2 * s2c);
-        cov_obs(0,1) = (h * (M(i) * M(i) - (m(i) * psi * m(i) * psi))) * cos(c(i)) * sin(c(i));
-        cov_obs(1,0) = cov_obs(0,1);
-        
-      } else if(obs_mod(i) == 2) {
-        // GL observations
-        Type sdLon = GLerr(i,0);
-        Type sdLat = GLerr(i,1);
-        cov_obs(0,0) = sdLon * sdLon;
-        cov_obs(1,1) = sdLat * sdLat;
-        cov_obs(0,1) = sdLon * sdLat * rho_o;
-        cov_obs(1,0) = cov_obs(0,1);
-        
-      } else{
-        Rf_error ("C++: unexpected obs_mod value");
-      }
+      cov_obs = observation_covariance(obs_mod(i), i, tau, K, M, m, c, psi, GLerr, rho_o);
       
       nll_obs.setSigma(cov_obs);   // set up i-th obs cov matrix
       jnll += nll_obs((Y.col(i) - mu.col(i)), keep.col(i));   // CRW innovations
