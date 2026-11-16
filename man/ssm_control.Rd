@@ -60,13 +60,23 @@ Each KI location has ground standard deviations
 \code{estimate.exponent} logical; estimate the exponent (default FALSE);
 \code{se.inflation} factor multiplying the fitted and predicted standard
 errors of tracks made up only of KI observations: \code{"default"} (crw
-2.5, rw 1.65, none for mp), a single positive number, or 1 to turn it off.
-Point estimates are unchanged. Tracks that mix KI with other observation
-types (e.g. GPS) are not inflated. The default factors give 95\\% coverage
-of withheld Fastloc GPS locations in tu126 (coverage averaged 0.93 across
-tags held out one at a time; lower in about the first month after release
-and for short deployments). Simulations from the fit (\code{sim_post()},
-\code{sim_fit()}) do not include the inflation.
+1.8, rw 1.15, mp 1.75), a single positive number, or 1 to turn it off.
+For mp, only location standard errors are inflated (not g). Point
+estimates are unchanged. Tracks that mix KI with other observation types
+(e.g. GPS) are not inflated. The default factors are calibrated at 1
+standard error: 68.3\\% of x and y errors, relative to withheld Fastloc GPS
+locations in tu126, fall within 1 inflated standard error. Coverage was
+lower in about the first month after release and varied between tracks.
+Kinéis errors are heavier-tailed than normal, so intervals of 1.96
+standard errors contain about 90\\%, not 95\\%, of errors. For this reason,
+with the default factors, the 95\\% confidence regions drawn by
+\code{map()} and \code{plot()} for Kinéis-only tracks use separate 95\\%
+factors, stored in each fit: for ellipses, crw 2.5, rw 1.65, mp 2.35; for
+the time-series intervals of \code{plot(type = 1)}, crw 2.4, rw 1.55,
+mp 2.25. No refit is needed. With a user-specified factor, confidence
+regions are drawn from the inflated standard errors. Simulations from
+the fit (\code{sim_post()}, \code{sim_fit()}) do not include the
+inflation. See \code{kineis_inflation()} to estimate a factor from GPS.
 The default scales are provisional: they are the root mean square east and
 north errors, relative to the error radius, of 1,700 Kinéis locations
 paired with Fastloc GPS fixes (21 olive ridley turtles, IMOS campaign

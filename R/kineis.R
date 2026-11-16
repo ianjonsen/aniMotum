@@ -127,17 +127,40 @@ kineis_report <- function(fxd, map) {
 ## only of KI observations are multiplied by a constant factor; the point
 ## estimates are unchanged.
 ##
-## Default factors, by process model, give 95% coverage of Fastloc GPS
-## locations withheld from SSM fits to Kinéis locations only (21 olive ridley
-## turtles, IMOS campaign tu126, 2026; GPS residual <= 30, >= 6 satellites,
-## spikes removed). Estimated factors (95% interval across tags): crw 2.47
-## (2.25-2.70), rw 1.63 (1.50-1.79); rounded up to 2.5 and 1.65. With these
-## factors, coverage averaged 0.93 across tags held out one at a time, but was
-## lower (0.87-0.91) in about the first month after release and for short
-## deployments. There is no default for the mp model.
+## Default factors, by process model, are calibrated at 1 standard error:
+## 68.3% of the x and y errors of SSM fits to Kinéis locations only, relative
+## to withheld Fastloc GPS locations, fall within 1 inflated standard error
+## (21 olive ridley turtles, IMOS campaign tu126, 2026; GPS residual <= 30,
+## >= 6 satellites, spikes removed). Estimated factors (95% interval across
+## tags): crw 1.78 (1.59-1.96), rw 1.14 (1.05-1.27), mp 1.74 (1.62-1.93, 20
+## tags: one mp fit did not converge); rounded up to 1.8, 1.15 and 1.75.
+## Coverage within 1 standard error varied widely between tags (held out one
+## at a time: mean 0.64, range 0.24-0.84) and was lower in the first 30 days
+## after release (0.60) than later (0.73). Kinéis errors are heavier-tailed
+## than normal: with these factors, about 89-90% (not 95%) of errors fell
+## within 1.96 standard errors. For mp, only x.se and y.se are inflated (not
+## g.se).
+##
+## Two 95% factors are stored with each fit, so that map() and plot() can
+## draw 95% confidence regions for Kinéis-only tracks without refitting; the
+## stored (1-SE) standard errors are multiplied by the 95% factor / factor:
+##  1. ellipse95, for 95% confidence ellipses (elps(), semi-axes
+##     sqrt(qchisq(0.95, 2)) standard errors): 95% of GPS locations inside
+##     the ellipse. crw 2.47 (2.28-2.71), rw 1.64 (1.51-1.81), mp 2.34
+##     (2.16-2.60); rounded up to 2.5, 1.65 and 2.35;
+##  2. interval95, for 95% intervals on each coordinate (plot() ribbons):
+##     95% of x and y errors within 1.96 standard errors. crw 2.37
+##     (2.13-2.56), rw 1.54 (1.45-1.70), mp 2.22 (2.07-2.42); rounded up to
+##     2.4, 1.55 and 2.25.
+## Standard errors are in projected coordinates; the factor is a scalar, so
+## inflation does not depend on the projection. The KI observation covariance
+## itself is mapped to the projection through the local Jacobian
+## (pf_kineis_jacobian()) in all three models.
 ## -----------------------------------------------------------------------------
 
-kineis_se_inflation_default <- c(crw = 2.5, rw = 1.65)
+kineis_se_inflation_default <- c(crw = 1.8, rw = 1.15, mp = 1.75)
+kineis_ellipse95_inflation_default <- c(crw = 2.5, rw = 1.65, mp = 2.35)
+kineis_interval95_inflation_default <- c(crw = 2.4, rw = 1.55, mp = 2.25)
 
 ## factor for one track: obs.type are the types of the observations fitted
 kineis_se_inflation <- function(obs.type, model, control) {
@@ -145,20 +168,45 @@ kineis_se_inflation <- function(obs.type, model, control) {
   ## a control list built without se.inflation gets the default
   if (is.null(k)) k <- "default"
   obs.type <- as.character(obs.type)
+  ## factor: applied to the standard errors (calibrated at 1 standard error);
+  ##  ellipse95, interval95: used only for 95% confidence ellipses and
+  ##  intervals drawn by map() and plot()
+  none <- function(note) list(factor = 1, ellipse95 = 1, interval95 = 1, note = note)
   if (length(obs.type) == 0 || !any(obs.type == "KI", na.rm = TRUE)) {
-    return(list(factor = 1, note = "no KI observations"))
+    return(none("no KI observations"))
   }
   if (!all(obs.type == "KI", na.rm = TRUE)) {
-    return(list(factor = 1, note = "KI mixed with other observation types: not inflated"))
+    return(none("KI mixed with other observation types: not inflated"))
   }
   if (identical(k, "default")) {
     if (!model %in% names(kineis_se_inflation_default)) {
-      return(list(factor = 1,
-                  note = paste0("no default inflation for the ", model, " model: not inflated")))
+      return(none(paste0("no default inflation for the ", model, " model: not inflated")))
     }
-    return(list(factor = unname(kineis_se_inflation_default[model]), note = "default"))
+    return(list(factor = unname(kineis_se_inflation_default[model]),
+                ellipse95 = unname(kineis_ellipse95_inflation_default[model]),
+                interval95 = unname(kineis_interval95_inflation_default[model]),
+                note = "default"))
   }
-  list(factor = k, note = "user-specified")
+  ## a user-specified factor has no separate 95% factors: confidence regions
+  ##  are drawn from the inflated standard errors, assuming normal errors
+  list(factor = k, ellipse95 = k, interval95 = k, note = "user-specified")
+}
+
+## multiplier for the standard errors used in 95% confidence ellipses
+##  (type = "ellipse") or intervals (type = "interval"), by track id: the 95%
+##  factor / factor for Kinéis-only tracks, 1 otherwise (including fits made
+##  before the 95% factors were stored)
+kineis_ci_scale <- function(x, id, type = c("ellipse", "interval")) {
+  type <- match.arg(type)
+  element <- paste0(type, "95")
+  scale <- vapply(x$ssm, function(f) {
+    si <- if (is.list(f)) f$se.inflation else NULL
+    if (is.null(si) || is.null(si[[element]]) || !isTRUE(si$factor > 0)) 1 else si[[element]] / si$factor
+  }, numeric(1))
+  names(scale) <- as.character(x$id)
+  out <- unname(scale[as.character(id)])
+  out[is.na(out)] <- 1
+  out
 }
 
 ## multiply the standard-error columns of fitted or predicted states

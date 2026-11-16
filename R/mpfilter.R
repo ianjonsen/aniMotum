@@ -531,7 +531,7 @@ mpfilter <-
       #fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
 
       ## Kinéis (KI) standard-error inflation, for tracks of KI observations
-      ##  only; no default factor for the mp model (see ssm_control())
+      ##  only: location standard errors (x.se, y.se), not g (see ssm_control())
       se.inflation <- kineis_se_inflation(d.all$obs.type[d.all$isd], "mp", control)
       fv <- kineis_apply_se_inflation(fv, se.inflation$factor)
       pv <- kineis_apply_se_inflation(pv, se.inflation$factor)

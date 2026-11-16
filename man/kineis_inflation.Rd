@@ -7,8 +7,8 @@
 kineis_inflation(
   argos,
   gps,
-  model = c("crw", "rw"),
-  coverage = 0.95,
+  model = c("crw", "rw", "mp"),
+  coverage = pnorm(1) - pnorm(-1),
   nboot = 1000,
   control = ssm_control(verbose = 0),
   ...
@@ -26,10 +26,13 @@ to a .csv file: an SMRU gps file (columns \code{REF}, \code{D_DATE}, \code{LAT},
 or a data frame with columns \code{id}, \code{date}, \code{lon} and \code{lat}. Filter GPS
 locations before calling \code{kineis_inflation()} (see details).}
 
-\item{model}{the process model, \code{"crw"} or \code{"rw"}.}
+\item{model}{the process model, \code{"crw"}, \code{"rw"} or \code{"mp"}.}
 
-\item{coverage}{the target coverage of the confidence regions (default
-0.95).}
+\item{coverage}{the target proportion of x and y errors within
+\code{qnorm((1 + coverage) / 2)} inflated standard errors. The default,
+\code{pnorm(1) - pnorm(-1)} (0.683), calibrates the standard errors themselves
+(1 standard error), as for the default factors in \code{\link[=ssm_control]{ssm_control()}}. Use
+0.95 to calibrate intervals of 1.96 standard errors.}
 
 \item{nboot}{number of bootstrap resamples of tracks, used to compute a
 95\% interval for the factor (default 1000; 0 for none). Needs at least 2
@@ -49,11 +52,12 @@ a list with:
 resampling tracks (\code{NA} with fewer than 2 tracks or \code{nboot = 0});
 \item \code{model}, \code{coverage}: as supplied;
 \item \code{tracks}: a tibble with, for each track, the number of GPS locations
-used, the coverage without inflation, the coverage with \code{factor}, and the
-factor estimated from that track alone;
+used, the coverage of x and y errors without inflation and with \code{factor},
+and the factor estimated from that track alone;
 \item \code{scores}: a tibble with, for each GPS location used, the predicted and
 GPS coordinates (km, in the projection used for the fit), the predicted
-standard errors, and \code{d2}, the squared standardised distance between them;
+standard errors (uninflated), and the standardised errors
+\code{z.x = (x - x.gps) / x.se} and \code{z.y = (y - y.gps) / y.se};
 \item \code{data}: the Kinéis and GPS locations merged into one data frame
 (\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}, \code{error.radius}), ordered by date within
 id. GPS locations have \code{lc = "G"} and \code{error.radius = NA}.
@@ -64,10 +68,12 @@ Estimates the factor by which the standard errors of SSM fits
 to Kinéis (KI) locations should be multiplied, using GPS locations from
 the same tracks as truth. The SSM is fitted to the Kinéis locations only,
 without inflation, and locations are predicted at the GPS times. The
-factor is the one that puts a proportion \code{coverage} of GPS locations
-inside the inflated \code{coverage} confidence regions. Pass the result to
-\code{ssm_control(kineis = list(se.inflation = ))} when fitting Kinéis-only
-tracks.
+factor is the one that puts a proportion \code{coverage} of the x and y errors
+(predicted minus GPS) within the matching multiple of the inflated
+standard errors. By default, 68.3\\% of errors fall within 1 standard
+error, so \code{x.se} and \code{y.se} keep their meaning as standard errors. Pass
+the result to \code{ssm_control(kineis = list(se.inflation = ))} when fitting
+Kinéis-only tracks.
 }
 \details{
 Column names are matched ignoring case. Dates may be POSIXct or text in
@@ -79,10 +85,25 @@ within a track, are dropped.
 Kinéis errors are serially correlated through CLS Kalman smoothing, but
 the KI observation model treats them as independent, so SSM standard
 errors are too small. The factor is
-\code{sqrt(quantile(d2, coverage) / qchisq(coverage, 2))}, where
-\code{d2 = ((x - x.gps) / x.se)^2 + ((y - y.gps) / y.se)^2}. Only GPS locations
+\code{quantile(c(abs(z.x), abs(z.y)), coverage) / qnorm((1 + coverage) / 2)},
+pooling the x and y errors. Only GPS locations
 within each track's Kinéis time span are used. Tracks whose SSM fit does
-not converge are dropped with a warning.
+not converge are dropped with a warning, as are GPS locations without SSM
+standard errors (Hessian not positive-definite). For \code{mp}, only the
+location standard errors are used.
+
+If standardised errors were normal, a factor calibrated at one coverage
+would hold at all others. Kinéis errors are heavier-tailed than normal: on
+tu126, factors calibrated at 1 standard error gave about 89-90\\% of errors
+within 1.96 inflated standard errors, not 95\\%. Use \code{coverage = 0.95} if
+wide intervals matter more than the standard errors themselves.
+
+The Kinéis observation covariance is mapped to the projection through its
+local Jacobian, and the standardised errors are computed in projected
+coordinates. For conformal projections (the default Mercator, and those
+chosen by \code{projection = "auto"}) the local scale is the same in x and y,
+so the standardised errors do not depend on the projection. For
+non-conformal projections they are approximate.
 
 GPS location error is ignored. GPS locations should be quality-filtered
 beforehand (e.g. on residual and number of satellites, and removing

@@ -6,11 +6,18 @@
 ##' @param a ellipse semi-major axis (km)
 ##' @param b ellipse semi-minor axis (km)
 ##' @param theta ellipse orientation from north (degrees)
+##' @param conf logical; if TRUE (default) the 95\% confidence ellipse, with
+##' semi-axes `sqrt(qchisq(0.95, 2))` (2.448) times `a` and `b`, which
+##' contains 95\% of a bivariate normal distribution; if FALSE the 1 standard
+##' error ellipse (semi-axes `a` and `b`, 39\%)
 ##'
+##' @importFrom stats qchisq
 ##' @keywords internal
 
 elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
-  m <- ifelse(!conf, 1, 1.96)
+  ## 95% of a bivariate normal lies within sqrt(qchisq(0.95, 2)) = 2.448
+  ##  standard errors (1.96, the univariate multiplier, gives only 85%)
+  m <- ifelse(!conf, 1, sqrt(qchisq(0.95, 2)))
   ln <- seq(0, 2*pi, l = 50)
   theta <- (-1 * theta + 90) / 180 * pi   ## req'd rotation to get 0 deg pointing N
   x1 <- m * a * cos(theta) * cos(ln) - m * b * sin(theta) * sin(ln)
@@ -158,6 +165,15 @@ plot.ssm_df <-
         d <- subset(d, keep)
       }
       
+      ## Kinéis-only tracks: widen ribbons (per-coordinate 95% intervals) and
+      ##  ellipses (joint 95% regions) from the 1-standard-error calibration
+      ##  to the matching 95% calibration (heavy-tailed errors)
+      if (all(c("x.se", "y.se") %in% names(ssm))) {
+        ci.scale <- kineis_ci_scale(x, ssm$id, type = ifelse(type == 1, "interval", "ellipse"))
+        ssm$x.se <- ssm$x.se * ci.scale
+        ssm$y.se <- ssm$y.se * ci.scale
+      }
+
       if (type == 1) {
         foo <- ssm[, c("id","x","y")]
         foo <- gather(foo, key = "coord", value = "value", x, y)

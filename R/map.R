@@ -137,6 +137,12 @@ map <- function(x,
   if(aes$conf) {
     locs <- st_coordinates(loc_sf)
     locs <- data.frame(id = loc_sf$id, x = locs[,1], y = locs[,2], x.se = loc_sf$x.se, y.se = loc_sf$y.se)
+    ## Kinéis-only tracks: widen from the 1-standard-error calibration to the
+    ##  joint 95% ellipse calibration (heavy-tailed errors); 1 for all other
+    ##  tracks
+    ci.scale <- kineis_ci_scale(x, locs$id, type = "ellipse")
+    locs$x.se <- locs$x.se * ci.scale
+    locs$y.se <- locs$y.se * ci.scale
     ## check for NA's in se estimates
     if(any(is.na(locs$x.se),is.na(locs$y.se))) {
       aes$conf <- FALSE

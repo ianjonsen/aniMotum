@@ -4,10 +4,12 @@
 ##' to Kinéis (KI) locations should be multiplied, using GPS locations from
 ##' the same tracks as truth. The SSM is fitted to the Kinéis locations only,
 ##' without inflation, and locations are predicted at the GPS times. The
-##' factor is the one that puts a proportion `coverage` of GPS locations
-##' inside the inflated `coverage` confidence regions. Pass the result to
-##' `ssm_control(kineis = list(se.inflation = ))` when fitting Kinéis-only
-##' tracks.
+##' factor is the one that puts a proportion `coverage` of the x and y errors
+##' (predicted minus GPS) within the matching multiple of the inflated
+##' standard errors. By default, 68.3\% of errors fall within 1 standard
+##' error, so `x.se` and `y.se` keep their meaning as standard errors. Pass
+##' the result to `ssm_control(kineis = list(se.inflation = ))` when fitting
+##' Kinéis-only tracks.
 ##'
 ##' @param argos Argos locations, as a data frame or the path to a .csv file:
 ##' an SMRU diag file (columns `REF`, `D_DATE`, `LQ`, `LAT`, `LON`,
@@ -18,9 +20,12 @@
 ##' to a .csv file: an SMRU gps file (columns `REF`, `D_DATE`, `LAT`, `LON`),
 ##' or a data frame with columns `id`, `date`, `lon` and `lat`. Filter GPS
 ##' locations before calling `kineis_inflation()` (see details).
-##' @param model the process model, `"crw"` or `"rw"`.
-##' @param coverage the target coverage of the confidence regions (default
-##' 0.95).
+##' @param model the process model, `"crw"`, `"rw"` or `"mp"`.
+##' @param coverage the target proportion of x and y errors within
+##' `qnorm((1 + coverage) / 2)` inflated standard errors. The default,
+##' `pnorm(1) - pnorm(-1)` (0.683), calibrates the standard errors themselves
+##' (1 standard error), as for the default factors in [ssm_control()]. Use
+##' 0.95 to calibrate intervals of 1.96 standard errors.
 ##' @param nboot number of bootstrap resamples of tracks, used to compute a
 ##' 95% interval for the factor (default 1000; 0 for none). Needs at least 2
 ##' tracks. Use `set.seed()` beforehand for a reproducible interval.
@@ -35,11 +40,12 @@
 ##' resampling tracks (`NA` with fewer than 2 tracks or `nboot = 0`);
 ##' 3. `model`, `coverage`: as supplied;
 ##' 4. `tracks`: a tibble with, for each track, the number of GPS locations
-##' used, the coverage without inflation, the coverage with `factor`, and the
-##' factor estimated from that track alone;
+##' used, the coverage of x and y errors without inflation and with `factor`,
+##' and the factor estimated from that track alone;
 ##' 5. `scores`: a tibble with, for each GPS location used, the predicted and
 ##' GPS coordinates (km, in the projection used for the fit), the predicted
-##' standard errors, and `d2`, the squared standardised distance between them;
+##' standard errors (uninflated), and the standardised errors
+##' `z.x = (x - x.gps) / x.se` and `z.y = (y - y.gps) / y.se`;
 ##' 6. `data`: the Kinéis and GPS locations merged into one data frame
 ##' (`id`, `date`, `lc`, `lon`, `lat`, `error.radius`), ordered by date within
 ##' id. GPS locations have `lc = "G"` and `error.radius = NA`.
@@ -54,10 +60,25 @@
 ##' Kinéis errors are serially correlated through CLS Kalman smoothing, but
 ##' the KI observation model treats them as independent, so SSM standard
 ##' errors are too small. The factor is
-##' `sqrt(quantile(d2, coverage) / qchisq(coverage, 2))`, where
-##' `d2 = ((x - x.gps) / x.se)^2 + ((y - y.gps) / y.se)^2`. Only GPS locations
+##' `quantile(c(abs(z.x), abs(z.y)), coverage) / qnorm((1 + coverage) / 2)`,
+##' pooling the x and y errors. Only GPS locations
 ##' within each track's Kinéis time span are used. Tracks whose SSM fit does
-##' not converge are dropped with a warning.
+##' not converge are dropped with a warning, as are GPS locations without SSM
+##' standard errors (Hessian not positive-definite). For `mp`, only the
+##' location standard errors are used.
+##'
+##' If standardised errors were normal, a factor calibrated at one coverage
+##' would hold at all others. Kinéis errors are heavier-tailed than normal: on
+##' tu126, factors calibrated at 1 standard error gave about 89-90\% of errors
+##' within 1.96 inflated standard errors, not 95\%. Use `coverage = 0.95` if
+##' wide intervals matter more than the standard errors themselves.
+##'
+##' The Kinéis observation covariance is mapped to the projection through its
+##' local Jacobian, and the standardised errors are computed in projected
+##' coordinates. For conformal projections (the default Mercator, and those
+##' chosen by `projection = "auto"`) the local scale is the same in x and y,
+##' so the standardised errors do not depend on the projection. For
+##' non-conformal projections they are approximate.
 ##'
 ##' GPS location error is ignored. GPS locations should be quality-filtered
 ##' beforehand (e.g. on residual and number of satellites, and removing
@@ -84,7 +105,7 @@
 ##'                control = ssm_control(kineis = list(se.inflation = k$factor)))
 ##' }
 ##'
-##' @importFrom stats qchisq quantile
+##' @importFrom stats pnorm qnorm quantile
 ##' @importFrom utils read.csv
 ##' @importFrom sf st_as_sf st_transform st_coordinates st_crs
 ##' @importFrom dplyr tibble
@@ -93,8 +114,8 @@
 ##' @md
 kineis_inflation <- function(argos,
                              gps,
-                             model = c("crw", "rw"),
-                             coverage = 0.95,
+                             model = c("crw", "rw", "mp"),
+                             coverage = pnorm(1) - pnorm(-1),
                              nboot = 1000,
                              control = ssm_control(verbose = 0),
                              ...) {
@@ -156,21 +177,31 @@ kineis_inflation <- function(argos,
   s <- merge(as.data.frame(pred)[, c("id", "date", "x", "y", "x.se", "y.se")],
              gps[, c("id", "date", "x.gps", "y.gps")],
              by = c("id", "date"))
-  s <- s[!is.na(s$x.se) & !is.na(s$y.se), ]
+  missing.se <- is.na(s$x.se) | is.na(s$y.se)
+  if (any(missing.se)) {
+    warning(sum(missing.se), " GPS location(s) dropped: no SSM standard errors at their times ",
+            "(Hessian not positive-definite) in track(s) ",
+            paste(unique(s$id[missing.se]), collapse = ", "))
+  }
+  s <- s[!missing.se, ]
   if (nrow(s) == 0) stop("no predicted locations with standard errors at the GPS times")
-  s$d2 <- ((s$x - s$x.gps) / s$x.se)^2 + ((s$y - s$y.gps) / s$y.se)^2
+  s$z.x <- (s$x - s$x.gps) / s$x.se
+  s$z.y <- (s$y - s$y.gps) / s$y.se
   s <- s[order(s$id, s$date), ]
 
-  q <- qchisq(coverage, 2)
-  inflation_factor <- function(d2) sqrt(quantile(d2, coverage, names = FALSE) / q)
-  k <- inflation_factor(s$d2)
+  ## x and y standardised errors pooled; q standard errors for the coverage
+  ##  (q = 1 for the default coverage)
+  q <- qnorm((1 + coverage) / 2)
+  inflation_factor <- function(z) quantile(z, coverage, names = FALSE) / q
+  z <- c(abs(s$z.x), abs(s$z.y))
+  k <- inflation_factor(z)
 
   ## per track
-  by.track <- split(s$d2, s$id)
+  by.track <- split(z, c(s$id, s$id))
   tracks <- tibble(id = names(by.track),
-                   n.gps = vapply(by.track, length, numeric(1)),
+                   n.gps = vapply(by.track, length, numeric(1)) / 2,
                    coverage.uninflated = vapply(by.track, function(d) mean(d <= q), numeric(1)),
-                   coverage.inflated = vapply(by.track, function(d) mean(d / k^2 <= q), numeric(1)),
+                   coverage.inflated = vapply(by.track, function(d) mean(d / k <= q), numeric(1)),
                    factor = vapply(by.track, inflation_factor, numeric(1)))
 
   ## 95% interval for the factor, resampling tracks
