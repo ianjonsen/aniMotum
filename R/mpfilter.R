@@ -529,6 +529,12 @@ mpfilter <-
       #pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
       fv <- subset(rdm, isd)[, -8]
       #fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
+
+      ## Kinéis (KI) standard-error inflation, for tracks of KI observations
+      ##  only; no default factor for the mp model (see ssm_control())
+      se.inflation <- kineis_se_inflation(d.all$obs.type[d.all$isd], "mp", control)
+      fv <- kineis_apply_se_inflation(fv, se.inflation$factor)
+      pv <- kineis_apply_se_inflation(pv, se.inflation$factor)
     
       if (control$optim == "nlminb") {
         AICc <- 2 * length(opt[["par"]]) + 2 * opt[["objective"]] + 
@@ -553,6 +559,7 @@ mpfilter <-
         rep = rep,
         AICc = AICc,
         optimiser = control$optim,
+        se.inflation = se.inflation,
         time = proc.time() - st
       )
       

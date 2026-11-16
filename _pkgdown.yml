@@ -32,6 +32,8 @@ navbar:
           href: articles/Path_rerouting.html
         - text: Projections
           href: articles/Projections.html
+        - text: Kineis_locations
+          href: articles/Kineis_locations.html
     news:
       text: News
       href: news/index.html

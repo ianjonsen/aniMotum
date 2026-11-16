@@ -117,3 +117,55 @@ kineis_report <- function(fxd, map) {
   if (length(i) == 2) row.names(fxd)[i] <- c("kineis_scale_east", "kineis_scale_north")
   fxd
 }
+
+## -----------------------------------------------------------------------------
+## Standard-error inflation for Kinéis (KI) tracks
+##
+## Kinéis errors are serially correlated through CLS Kalman smoothing. The KI
+## observation model treats them as independent, so the SSM standard errors
+## are too small. The fitted and predicted standard errors of tracks made up
+## only of KI observations are multiplied by a constant factor; the point
+## estimates are unchanged.
+##
+## Default factors, by process model, give 95% coverage of Fastloc GPS
+## locations withheld from SSM fits to Kinéis locations only (21 olive ridley
+## turtles, IMOS campaign tu126, 2026; GPS residual <= 30, >= 6 satellites,
+## spikes removed). Estimated factors (95% interval across tags): crw 2.47
+## (2.25-2.70), rw 1.63 (1.50-1.79); rounded up to 2.5 and 1.65. With these
+## factors, coverage averaged 0.93 across tags held out one at a time, but was
+## lower (0.87-0.91) in about the first month after release and for short
+## deployments. There is no default for the mp model.
+## -----------------------------------------------------------------------------
+
+kineis_se_inflation_default <- c(crw = 2.5, rw = 1.65)
+
+## factor for one track: obs.type are the types of the observations fitted
+kineis_se_inflation <- function(obs.type, model, control) {
+  k <- control$kineis$se.inflation
+  ## a control list built without se.inflation gets the default
+  if (is.null(k)) k <- "default"
+  obs.type <- as.character(obs.type)
+  if (length(obs.type) == 0 || !any(obs.type == "KI", na.rm = TRUE)) {
+    return(list(factor = 1, note = "no KI observations"))
+  }
+  if (!all(obs.type == "KI", na.rm = TRUE)) {
+    return(list(factor = 1, note = "KI mixed with other observation types: not inflated"))
+  }
+  if (identical(k, "default")) {
+    if (!model %in% names(kineis_se_inflation_default)) {
+      return(list(factor = 1,
+                  note = paste0("no default inflation for the ", model, " model: not inflated")))
+    }
+    return(list(factor = unname(kineis_se_inflation_default[model]), note = "default"))
+  }
+  list(factor = k, note = "user-specified")
+}
+
+## multiply the standard-error columns of fitted or predicted states
+kineis_apply_se_inflation <- function(states, factor) {
+  if (is.null(states) || factor == 1) return(states)
+  for (column in intersect(c("x.se", "y.se", "u.se", "v.se", "s.se"), names(states))) {
+    states[[column]] <- states[[column]] * factor
+  }
+  states
+}

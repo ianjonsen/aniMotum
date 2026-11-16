@@ -562,11 +562,16 @@ sfilter <-
       }
       ## separate speed+se if present
       if("sf" %in% row.names(fxd)) {
-        sf <- fxd[which(row.names(fxd) == "sf"), ]
+        ## drop = FALSE keeps a matrix when a track has a single fitted or
+        ##  predicted state
+        sf <- fxd[which(row.names(fxd) == "sf"), , drop = FALSE]
         sf[1,] <- c(NA,NA)
         if("sp" %in% row.names(fxd)) {
-          sp <- fxd[which(row.names(fxd) == "sp"), ]
+          sp <- fxd[which(row.names(fxd) == "sp"), , drop = FALSE]
           sp[1,] <- c(NA,NA)
+        } else {
+          ## no prediction times for this track
+          sp <- matrix(numeric(0), nrow = 0, ncol = 2)
         }
         fxd <- fxd[!row.names(fxd) %in% c("sf","sp"),]
       }
@@ -647,8 +652,10 @@ sfilter <-
                  ## first speed of each track has no preceding state
                  sf[1] <- NA
                  if(length(sp) > 0) sp[1] <- NA
-                 sf.se <- NA
-                 sp.se <- NA
+                 ## NA standard errors, one per speed: a track with no prediction
+                 ##  times gives a 0-row predicted data frame and a 0-length sp
+                 sf.se <- rep(NA_real_, length(sf))
+                 sp.se <- rep(NA_real_, length(sp))
                }
                rdm <- rdm[, c("id", "date", "x.se", "y.se", 
                               "u", "v", "u.se", "v.se", "isd")]
@@ -686,6 +693,12 @@ sfilter <-
       if(model == "crw") {
         fxd <- fxd[which(row.names(fxd) != "sv"), ]
       }
+
+      ## Kinéis (KI) standard-error inflation, for tracks of KI observations
+      ##  only; point estimates are unchanged (see ssm_control())
+      se.inflation <- kineis_se_inflation(d.all$obs.type[d.all$isd], model, control)
+      fv <- kineis_apply_se_inflation(fv, se.inflation$factor)
+      pv <- kineis_apply_se_inflation(pv, se.inflation$factor)
     
       out <- list(
         call = call,
@@ -702,6 +715,7 @@ sfilter <-
         rep = rep,
         AICc = AICc,
         optimiser = control$optim,
+        se.inflation = se.inflation,
         time = proc.time() - st
       )
       if(!rep$pdHess & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) warning("Hessian was not positive-definite so some standard errors could not be calculated. Try simplifying the model by adding the following argument:

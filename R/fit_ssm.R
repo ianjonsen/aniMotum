@@ -384,6 +384,17 @@ fit_ssm <- function(x,
     }
     
     fit <- tibble(id = names(fit), ssm = fit)
+
+    ## Kinéis tracks whose standard errors were not inflated (mixed observation
+    ##  types, or no default factor for the model); see ssm_control()
+    ki.notes <- vapply(fit$ssm, function(x)
+      if (is.null(x$se.inflation)) NA_character_ else x$se.inflation$note, character(1))
+    not.inflated <- !is.na(ki.notes) & grepl("not inflated", ki.notes)
+    if (any(not.inflated)) {
+      message("Kineis standard errors not inflated for ", sum(not.inflated), " track(s): ",
+              paste(unique(ki.notes[not.inflated]), collapse = "; "),
+              ". See ?ssm_control (kineis$se.inflation).")
+    }
     ## Did this fit come back complete? sfilter(), mpfilter() and jsfilter()
     ## return the full object on success and a short one carrying `errmsg` when
     ## the optimiser fails. This used to be tested as `length(x) == 15`, which

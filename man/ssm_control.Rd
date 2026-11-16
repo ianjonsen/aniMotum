@@ -14,7 +14,7 @@ ssm_control(
   gap.thresh = Inf,
   ho_scale = 0.01,
   kineis = list(scale = c(1.061, 0.739), exponent = 1, estimate = FALSE,
-    estimate.exponent = FALSE),
+    estimate.exponent = FALSE, se.inflation = "default"),
   ...
 )
 }
@@ -57,7 +57,16 @@ Each KI location has ground standard deviations
 \code{exponent} the exponent on the error radius (default 1);
 \code{estimate} logical; estimate the two scales (default FALSE, fixed at
 \code{scale});
-\code{estimate.exponent} logical; estimate the exponent (default FALSE).
+\code{estimate.exponent} logical; estimate the exponent (default FALSE);
+\code{se.inflation} factor multiplying the fitted and predicted standard
+errors of tracks made up only of KI observations: \code{"default"} (crw
+2.5, rw 1.65, none for mp), a single positive number, or 1 to turn it off.
+Point estimates are unchanged. Tracks that mix KI with other observation
+types (e.g. GPS) are not inflated. The default factors give 95\\% coverage
+of withheld Fastloc GPS locations in tu126 (coverage averaged 0.93 across
+tags held out one at a time; lower in about the first month after release
+and for short deployments). Simulations from the fit (\code{sim_post()},
+\code{sim_fit()}) do not include the inflation.
 The default scales are provisional: they are the root mean square east and
 north errors, relative to the error radius, of 1,700 Kinéis locations
 paired with Fastloc GPS fixes (21 olive ridley turtles, IMOS campaign

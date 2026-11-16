@@ -13,6 +13,6 @@ test_that("f has s3 classes `ssm_df`, `sf`, `data.frame`", {
                      )
                )
   expect_s3_class(f$ssm[[1]], "ssm")
-  expect_equal(length(f$ssm[[1]]), 15)
+  expect_equal(length(f$ssm[[1]]), 16)
   expect_s3_class(f, "ssm_df")
 })

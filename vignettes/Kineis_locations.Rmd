@@ -83,14 +83,59 @@ Results from the tu126 turtles (`crw` model, default `KI` error scales), with GP
 
 1. **Kinéis only**: the SSM does not improve on the Kinéis locations. Median error was 789 m for the Kinéis locations and 842 m for the SSM-estimated locations. Between Kinéis locations, the SSM (990 m) was no more accurate than linear interpolation (932 m). Kinéis locations are already smoothed by CLS, so there is little independent error left for the SSM to remove;  
 2. **Kinéis + GPS**: the SSM does improve locations. With half the GPS locations withheld, median error was 809 m for the SSM, 859 m for linear interpolation through the GPS and Kinéis locations, 2,069 m for linear interpolation between GPS locations alone, and 2,298 m for an SSM fitted to the GPS locations alone;  
-3. **uncertainty**: SSM standard errors are too small. 61-68% of GPS locations fell within the SSM's 95% confidence regions.  
+3. **uncertainty**: without inflation, SSM standard errors are too small. Only 59% (`crw`) and 80% (`rw`) of GPS locations fell within the SSM's 95% confidence regions.  
 
-Use SSM fits to Kinéis data for consistent quality control, regular time-step predictions and combining Kinéis with GPS locations. Do not treat the SSM standard errors as calibrated.
+Use SSM fits to Kinéis data for consistent quality control, regular time-step predictions and combining Kinéis with GPS locations.
+
+### Standard error inflation
+The `KI` model treats Kinéis errors as independent. They are not, so the SSM standard errors are too small. For tracks made up only of `KI` observations, `fit_ssm()` multiplies the fitted and predicted standard errors by a constant factor:  
+
+1. `crw`: 2.5 (`x.se`, `y.se`, `u.se`, `v.se`, `s.se`);  
+2. `rw`: 1.65 (`x.se`, `y.se`);  
+3. `mp`: none.  
+
+Point estimates are unchanged. The factors give 95% coverage of Fastloc GPS locations withheld from SSM fits to tu126 Kinéis locations (GPS residual <= 30, >= 6 satellites, spikes removed). Estimated factors were 2.47 (2.25-2.70) for `crw` and 1.63 (1.50-1.79) for `rw`. With tags held out one at a time, mean coverage was 0.93 for both models. Coverage was lower (0.87-0.91) in about the first month after release and for short deployments.
+
+Tracks that mix `KI` with other observation types (e.g. GPS) are not inflated; `fit_ssm()` lists any. The factor used is stored in each fit and reported by `summary()`. Set it with `ssm_control()`:
+```{r se inflation, eval=FALSE}
+## user-specified factor
+fit <- fit_ssm(locs, model = "crw", time.step = 6,
+               control = ssm_control(kineis = list(se.inflation = 3)))
+
+## no inflation
+fit <- fit_ssm(locs, model = "crw", time.step = 6,
+               control = ssm_control(kineis = list(se.inflation = 1)))
+
+## factor used for each track
+summary(fit)
+sapply(fit$ssm, function(x) x$se.inflation$factor)
+```
+
+Simulations from the fit (`sim_post()`, `sim_fit()`) and `route_path()` use the uninflated covariances.
+
+### Estimating your own inflation factor
+The default factors are from one data set. With GPS locations for some tracks, estimate the factor with `kineis_inflation()`. It fits the SSM to the Kinéis locations only, without inflation, predicts at the GPS times and finds the factor giving 95% coverage of the GPS locations. Filter GPS locations first: erroneous GPS locations inflate the factor.
+```{r kineis_inflation, eval=FALSE}
+## locs: Kinéis locations (error.radius > 0) and quality-filtered GPS locations (lc = "G")
+set.seed(1)
+k <- kineis_inflation(locs, model = "crw")
+k$factor     # inflation factor
+k$interval   # 95% interval, resampling tracks
+k$tracks     # coverage and factor by track
+
+## apply to Kinéis-only tracks
+fit <- fit_ssm(subset(locs, lc != "G"), model = "crw", time.step = 6,
+               control = ssm_control(kineis = list(se.inflation = k$factor)))
+```
+
+On tu126 (strict GPS filter), `kineis_inflation()` gives 2.48 (2.28-2.71) for `crw` and 1.64 (1.50-1.81) for `rw`. The factor applies to Kinéis-only tracks; tracks mixing Kinéis and GPS are not inflated.
+
+Modelling the serial correlation directly, with random walk or Ornstein-Uhlenbeck Kinéis errors, was less accurate than the independent `KI` model (median error 1.48-1.56 times linear interpolation, versus 1.06-1.07) and, at equal confidence region widths, gave lower coverage than inflated standard errors.
 
 ### Limitations
-1. Serial correlation in Kinéis errors is not modelled, so SSM standard errors are underestimated;
+1. serial correlation in Kinéis errors is not modelled. Standard errors of Kinéis-only tracks are inflated by a constant factor, which under-covers early in deployments and is not applied to tracks mixing Kinéis and GPS;
 2. all Kinéis locations are assumed to have been revised (smoothed). Unrevised locations occur at the end of near real-time tracks and before long gaps;
-3. the default error scales are from one data set.
+3. the default error scales and standard error inflation factors are from one data set.
 
 ## References
 

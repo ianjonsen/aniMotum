@@ -25,17 +25,19 @@ summary.ssm_df <- function(object, ...) {
       else NA
     })
     conv <- sapply(object$ssm, function(x) ifelse(x$opt$conv == 0, TRUE, FALSE))
+    se.infl <- sapply(object$ssm, function(x)
+      if (is.null(x$se.inflation)) NA else x$se.inflation$factor)
     
     ## req'd to handle old fG_ssm format
     if ("AICc" %in% names(object$ssm[[1]])) {
       AICc <- round(sapply(object$ssm, function(x) x$AICc), 1)
-      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, AICc)
-      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "AICc")
+      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, se.infl, AICc)
+      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "SE.inflation", "AICc")
       
     } else if ("aic" %in% names(object$ssm[[1]])) {
       AIC <- round(sapply(object$ssm, function(x) x$aic), 1)
-      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, AIC)
-      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "AIC")
+      Stattab <- cbind(ids, pm, p.int, nobs.tot, nfilt, nfit, npred, nrr, conv, se.infl, AIC)
+      colnames(Stattab) <- c("Animal id", "Model", "Time", "n.obs", "n.filt", "n.fit", "n.pred", "n.rr", "converged", "SE.inflation", "AIC")
     }
     row.names(Stattab) <- rep("", dim(Stattab)[1])
     Stattab
