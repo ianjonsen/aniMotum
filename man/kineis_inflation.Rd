@@ -5,7 +5,8 @@
 \title{Estimate the Kinéis standard-error inflation factor from GPS}
 \usage{
 kineis_inflation(
-  x,
+  argos,
+  gps,
   model = c("crw", "rw"),
   coverage = 0.95,
   nboot = 1000,
@@ -14,10 +15,16 @@ kineis_inflation(
 )
 }
 \arguments{
-\item{x}{a data frame of Kinéis and GPS locations for one or more tracks,
-with columns \code{id}, \code{date} (POSIXct), \code{lc}, \code{lon}, \code{lat} and
-\code{error.radius} (m). Kinéis locations have a positive \code{error.radius}. GPS
-locations have \code{lc = "G"}. Other location types are ignored.}
+\item{argos}{Argos locations, as a data frame or the path to a .csv file:
+an SMRU diag file (columns \code{REF}, \code{D_DATE}, \code{LQ}, \code{LAT}, \code{LON},
+\code{ERROR_RADIUS}), or a data frame with columns \code{id}, \code{date}, \code{lc}, \code{lon},
+\code{lat} and \code{error.radius} (m). Kinéis locations are those with a positive
+error radius; other Argos locations are ignored.}
+
+\item{gps}{GPS locations for the same tracks, as a data frame or the path
+to a .csv file: an SMRU gps file (columns \code{REF}, \code{D_DATE}, \code{LAT}, \code{LON}),
+or a data frame with columns \code{id}, \code{date}, \code{lon} and \code{lat}. Filter GPS
+locations before calling \code{kineis_inflation()} (see details).}
 
 \item{model}{the process model, \code{"crw"} or \code{"rw"}.}
 
@@ -46,7 +53,10 @@ used, the coverage without inflation, the coverage with \code{factor}, and the
 factor estimated from that track alone;
 \item \code{scores}: a tibble with, for each GPS location used, the predicted and
 GPS coordinates (km, in the projection used for the fit), the predicted
-standard errors, and \code{d2}, the squared standardised distance between them.
+standard errors, and \code{d2}, the squared standardised distance between them;
+\item \code{data}: the Kinéis and GPS locations merged into one data frame
+(\code{id}, \code{date}, \code{lc}, \code{lon}, \code{lat}, \code{error.radius}), ordered by date within
+id. GPS locations have \code{lc = "G"} and \code{error.radius = NA}.
 }
 }
 \description{
@@ -60,6 +70,12 @@ inside the inflated \code{coverage} confidence regions. Pass the result to
 tracks.
 }
 \details{
+Column names are matched ignoring case. Dates may be POSIXct or text in
+one of the formats \code{"\\\%Y-\\\%m-\\\%dT\\\%H:\\\%M:\\\%SZ"} (IMOS/AODN), \code{"\\\%Y-\\\%m-\\\%d \\\%H:\\\%M:\\\%S"} or
+\code{"\\\%m/\\\%d/\\\%y \\\%H:\\\%M:\\\%S"} (SMRU database export), and are taken to be UTC.
+Locations with missing dates or coordinates, and duplicated GPS dates
+within a track, are dropped.
+
 Kinéis errors are serially correlated through CLS Kalman smoothing, but
 the KI observation model treats them as independent, so SSM standard
 errors are too small. The factor is
@@ -77,16 +93,19 @@ tracks that mix Kinéis and GPS locations (see \code{\link[=ssm_control]{ssm_con
 }
 \examples{
 \dontrun{
-## locs: Kinéis (error.radius > 0) and quality-filtered GPS (lc = "G")
-##  locations
+## SMRU diag and gps files; filter the GPS locations first
+diag <- read.csv("diag.csv")
+gps <- read.csv("gps.csv")
+gps <- subset(gps, RESIDUAL <= 30 & NSATS_DETECTED >= 6)
+
 set.seed(1)
-k <- kineis_inflation(locs, model = "crw")
+k <- kineis_inflation(diag, gps, model = "crw")
 k$factor
 k$interval
 k$tracks
 
 ## apply to Kinéis-only tracks
-fit <- fit_ssm(subset(locs, lc != "G"), model = "crw", time.step = 6,
+fit <- fit_ssm(subset(k$data, lc != "G"), model = "crw", time.step = 6,
                control = ssm_control(kineis = list(se.inflation = k$factor)))
 }
 

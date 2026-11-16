@@ -115,16 +115,21 @@ Simulations from the fit (`sim_post()`, `sim_fit()`) and `route_path()` use the 
 
 ### Estimating your own inflation factor
 The default factors are from one data set. With GPS locations for some tracks, estimate the factor with `kineis_inflation()`. It fits the SSM to the Kinéis locations only, without inflation, predicts at the GPS times and finds the factor giving 95% coverage of the GPS locations. Filter GPS locations first: erroneous GPS locations inflate the factor.
+Argos and GPS locations are supplied separately, as SMRU diag and gps files or data frames, or in aniMotum format.
 ```{r kineis_inflation, eval=FALSE}
-## locs: Kinéis locations (error.radius > 0) and quality-filtered GPS locations (lc = "G")
+diag <- read.csv("diag.csv")
+gps <- read.csv("gps.csv")
+gps <- subset(gps, RESIDUAL <= 30 & NSATS_DETECTED >= 6)
+
 set.seed(1)
-k <- kineis_inflation(locs, model = "crw")
+k <- kineis_inflation(diag, gps, model = "crw")
 k$factor     # inflation factor
 k$interval   # 95% interval, resampling tracks
 k$tracks     # coverage and factor by track
+k$data       # Kinéis and GPS locations merged, ordered by date within id
 
 ## apply to Kinéis-only tracks
-fit <- fit_ssm(subset(locs, lc != "G"), model = "crw", time.step = 6,
+fit <- fit_ssm(subset(k$data, lc != "G"), model = "crw", time.step = 6,
                control = ssm_control(kineis = list(se.inflation = k$factor)))
 ```
 

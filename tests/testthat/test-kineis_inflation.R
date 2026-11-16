@@ -42,9 +42,28 @@ test_that("non-Kinéis fits are not inflated", {
 })
 
 test_that("kineis_inflation checks its input", {
-  d <- data.frame(id = "a", date = as.POSIXct("2026-01-01", tz = "UTC") + 0:1 * 3600,
-                  lc = "G", lon = 130, lat = -12, error.radius = NA)
-  expect_error(kineis_inflation(d), "no Kin")
-  expect_error(kineis_inflation(d[, -6]), "missing column")
-  expect_error(kineis_inflation(d, coverage = 1.2), "coverage")
+  argos <- data.frame(id = "a", date = as.POSIXct("2026-01-01", tz = "UTC") + 0:1 * 3600,
+                      lc = "A", lon = 130, lat = -12, error.radius = NA)
+  gps <- argos[, c("id", "date", "lon", "lat")]
+  expect_error(kineis_inflation(argos, gps), "no Kin")
+  expect_error(kineis_inflation(argos[, -6], gps), "missing column")
+  expect_error(kineis_inflation(argos, gps[, -4]), "missing column")
+  expect_error(kineis_inflation(argos, gps, coverage = 1.2), "coverage")
+  expect_error(kineis_inflation(argos, "no_such_file.csv"), "not found")
+})
+
+test_that("SMRU and aniMotum formats give the same locations", {
+  diag <- data.frame(REF = c("b", "a", "a"),
+                     D_DATE = c("05/21/26 07:13:21", "05/21/26 09:00:00", "05/21/26 08:00:00"),
+                     LQ = c(3, -2, -9), LAT = c(-11.7, -11.8, -11.9), LON = 135,
+                     ERROR_RADIUS = c(162, 457, NA))
+  smru <- aniMotum:::kineis_inflation_locations(diag, "argos")
+  expect_equal(smru$lc, c("3", "B", "Z"))
+  expect_equal(smru$date[1], as.POSIXct("2026-05-21 07:13:21", tz = "UTC"))
+  std <- aniMotum:::kineis_inflation_locations(
+    data.frame(id = smru$id, date = format(smru$date, "%Y-%m-%dT%H:%M:%SZ"),
+               lc = smru$lc, lon = smru$lon, lat = smru$lat,
+               error.radius = smru$error.radius), "argos")
+  expect_equal(std, smru)
+  expect_error(aniMotum:::kineis_inflation_dates("21 May 2026", "argos"), "could not be read")
 })

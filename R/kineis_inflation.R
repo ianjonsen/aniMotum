@@ -9,10 +9,15 @@
 ##' `ssm_control(kineis = list(se.inflation = ))` when fitting Kinéis-only
 ##' tracks.
 ##'
-##' @param x a data frame of Kinéis and GPS locations for one or more tracks,
-##' with columns `id`, `date` (POSIXct), `lc`, `lon`, `lat` and
-##' `error.radius` (m). Kinéis locations have a positive `error.radius`. GPS
-##' locations have `lc = "G"`. Other location types are ignored.
+##' @param argos Argos locations, as a data frame or the path to a .csv file:
+##' an SMRU diag file (columns `REF`, `D_DATE`, `LQ`, `LAT`, `LON`,
+##' `ERROR_RADIUS`), or a data frame with columns `id`, `date`, `lc`, `lon`,
+##' `lat` and `error.radius` (m). Kinéis locations are those with a positive
+##' error radius; other Argos locations are ignored.
+##' @param gps GPS locations for the same tracks, as a data frame or the path
+##' to a .csv file: an SMRU gps file (columns `REF`, `D_DATE`, `LAT`, `LON`),
+##' or a data frame with columns `id`, `date`, `lon` and `lat`. Filter GPS
+##' locations before calling `kineis_inflation()` (see details).
 ##' @param model the process model, `"crw"` or `"rw"`.
 ##' @param coverage the target coverage of the confidence regions (default
 ##' 0.95).
@@ -34,9 +39,18 @@
 ##' factor estimated from that track alone;
 ##' 5. `scores`: a tibble with, for each GPS location used, the predicted and
 ##' GPS coordinates (km, in the projection used for the fit), the predicted
-##' standard errors, and `d2`, the squared standardised distance between them.
+##' standard errors, and `d2`, the squared standardised distance between them;
+##' 6. `data`: the Kinéis and GPS locations merged into one data frame
+##' (`id`, `date`, `lc`, `lon`, `lat`, `error.radius`), ordered by date within
+##' id. GPS locations have `lc = "G"` and `error.radius = NA`.
 ##'
 ##' @details
+##' Column names are matched ignoring case. Dates may be POSIXct or text in
+##' one of the formats `"\%Y-\%m-\%dT\%H:\%M:\%SZ"` (IMOS/AODN), `"\%Y-\%m-\%d \%H:\%M:\%S"` or
+##' `"\%m/\%d/\%y \%H:\%M:\%S"` (SMRU database export), and are taken to be UTC.
+##' Locations with missing dates or coordinates, and duplicated GPS dates
+##' within a track, are dropped.
+##'
 ##' Kinéis errors are serially correlated through CLS Kalman smoothing, but
 ##' the KI observation model treats them as independent, so SSM standard
 ##' errors are too small. The factor is
@@ -54,26 +68,31 @@
 ##'
 ##' @examples
 ##' \dontrun{
-##' ## locs: Kinéis (error.radius > 0) and quality-filtered GPS (lc = "G")
-##' ##  locations
+##' ## SMRU diag and gps files; filter the GPS locations first
+##' diag <- read.csv("diag.csv")
+##' gps <- read.csv("gps.csv")
+##' gps <- subset(gps, RESIDUAL <= 30 & NSATS_DETECTED >= 6)
+##'
 ##' set.seed(1)
-##' k <- kineis_inflation(locs, model = "crw")
+##' k <- kineis_inflation(diag, gps, model = "crw")
 ##' k$factor
 ##' k$interval
 ##' k$tracks
 ##'
 ##' ## apply to Kinéis-only tracks
-##' fit <- fit_ssm(subset(locs, lc != "G"), model = "crw", time.step = 6,
+##' fit <- fit_ssm(subset(k$data, lc != "G"), model = "crw", time.step = 6,
 ##'                control = ssm_control(kineis = list(se.inflation = k$factor)))
 ##' }
 ##'
 ##' @importFrom stats qchisq quantile
+##' @importFrom utils read.csv
 ##' @importFrom sf st_as_sf st_transform st_coordinates st_crs
 ##' @importFrom dplyr tibble
 ##' @importFrom tibble as_tibble
 ##' @export
 ##' @md
-kineis_inflation <- function(x,
+kineis_inflation <- function(argos,
+                             gps,
                              model = c("crw", "rw"),
                              coverage = 0.95,
                              nboot = 1000,
@@ -86,19 +105,19 @@ kineis_inflation <- function(x,
     stop("coverage must be a single number between 0 and 1")
   if (!is.numeric(nboot) || length(nboot) != 1 || !isTRUE(nboot >= 0))
     stop("nboot must be a single number >= 0")
-  required <- c("id", "date", "lc", "lon", "lat", "error.radius")
-  missing.columns <- setdiff(required, names(x))
-  if (length(missing.columns) > 0)
-    stop("x is missing column(s): ", paste(missing.columns, collapse = ", "))
-  if (!inherits(x$date, "POSIXct")) stop("x$date must be POSIXct")
 
-  x <- as.data.frame(x)
-  is.gps <- x$lc %in% "G"
-  is.ki <- !is.gps & !is.na(x$error.radius) & x$error.radius > 0
-  ki <- x[is.ki, ]
-  gps <- x[is.gps & !is.na(x$lon) & !is.na(x$lat), c("id", "date", "lon", "lat")]
+  argos <- kineis_inflation_locations(argos, "argos")
+  gps <- kineis_inflation_locations(gps, "gps")
   gps <- gps[!duplicated(gps[, c("id", "date")]), ]
-  if (nrow(ki) == 0) stop("x has no Kinéis locations (positive error.radius)")
+
+  ## Argos and GPS merged, ordered by date within id
+  locations <- rbind(argos, gps)
+  locations <- locations[order(locations$id, locations$date), ]
+  row.names(locations) <- NULL
+
+  ki <- argos[!is.na(argos$error.radius) & argos$error.radius > 0, ]
+  if (nrow(ki) == 0) stop("argos has no Kinéis locations (positive error radius)")
+  gps <- gps[, c("id", "date", "lon", "lat")]
 
   ## GPS times strictly inside each track's Kinéis time span
   ki.seconds <- as.numeric(ki$date)
@@ -110,7 +129,7 @@ kineis_inflation <- function(x,
   inside[inside] <- gps.seconds[inside] > first.ki[gps.id[inside]] &
     gps.seconds[inside] < last.ki[gps.id[inside]]
   gps <- gps[inside, ]
-  if (nrow(gps) == 0) stop("x has no GPS locations (lc = \"G\") within the time span of the Kinéis locations")
+  if (nrow(gps) == 0) stop("gps has no locations within the time span of the Kinéis locations")
   ki <- ki[ki$id %in% unique(gps$id), ]
 
   ## fit to Kinéis locations only, without inflation, predicting at GPS times
@@ -168,5 +187,65 @@ kineis_inflation <- function(x,
        model = model,
        coverage = coverage,
        tracks = tracks,
-       scores = as_tibble(s))
+       scores = as_tibble(s),
+       data = locations)
+}
+
+## read and standardise the argos or gps locations supplied to
+##  kineis_inflation(): returns id, date, lc, lon, lat, error.radius
+kineis_inflation_locations <- function(d, type = c("argos", "gps")) {
+  type <- match.arg(type)
+  if (is.character(d) && length(d) == 1) {
+    if (!file.exists(d)) stop(type, " file not found: ", d)
+    d <- read.csv(d, stringsAsFactors = FALSE)
+  }
+  if (inherits(d, "sf")) stop(type, " must be a data frame or a .csv file path, not an sf object")
+  if (!is.data.frame(d)) stop(type, " must be a data frame or a .csv file path")
+  d <- as.data.frame(d)
+  names(d) <- tolower(names(d))
+
+  ## SMRU (diag or gps file) or aniMotum column names
+  if (all(c("ref", "d_date") %in% names(d))) {
+    columns <- c(id = "ref", date = "d_date", lon = "lon", lat = "lat",
+                 lc = "lq", error.radius = "error_radius")
+  } else {
+    columns <- c(id = "id", date = "date", lon = "lon", lat = "lat",
+                 lc = "lc", error.radius = "error.radius")
+  }
+  if (type == "gps") columns <- columns[c("id", "date", "lon", "lat")]
+  missing.columns <- setdiff(columns, names(d))
+  if (length(missing.columns) > 0)
+    stop(type, " is missing column(s): ", paste(missing.columns, collapse = ", "))
+
+  out <- data.frame(id = as.character(d[[columns["id"]]]),
+                    date = kineis_inflation_dates(d[[columns["date"]]], type),
+                    lc = "G",
+                    lon = as.numeric(d[[columns["lon"]]]),
+                    lat = as.numeric(d[[columns["lat"]]]),
+                    error.radius = NA_real_,
+                    stringsAsFactors = FALSE)
+  if (type == "argos") {
+    lc <- as.character(d[[columns["lc"]]])
+    ## SMRU numeric location classes
+    smru.lc <- c("-9" = "Z", "-2" = "B", "-1" = "A", "0" = "0", "1" = "1", "2" = "2", "3" = "3")
+    recode <- lc %in% names(smru.lc)
+    lc[recode] <- smru.lc[lc[recode]]
+    out$lc <- lc
+    out$error.radius <- as.numeric(d[[columns["error.radius"]]])
+  }
+  out[!is.na(out$date) & !is.na(out$lon) & !is.na(out$lat), ]
+}
+
+## POSIXct dates (UTC) from POSIXct or text in an IMOS/AODN, ISO or SMRU
+##  database export format
+kineis_inflation_dates <- function(x, type) {
+  if (inherits(x, "POSIXct")) return(x)
+  x <- as.character(x)
+  formats <- c("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d %H:%M:%S", "%m/%d/%y %H:%M:%S")
+  for (f in formats) {
+    out <- as.POSIXct(x, format = f, tz = "UTC")
+    if (all(is.na(out) == is.na(x) | x == "")) return(out)
+  }
+  stop(type, " dates could not be read; expected POSIXct or text in one of the formats ",
+       paste(formats, collapse = ", "))
 }
