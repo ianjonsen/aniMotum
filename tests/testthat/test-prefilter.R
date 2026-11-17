@@ -65,3 +65,18 @@ test_that("prefilter converts m to km for projected data", {
   expect_s3_class(f, "sf")
   expect_true(grepl("units=km", sf::st_crs(f)$input, fixed = TRUE))
 })
+
+## Kinéis (KI) observations: prefilter adds the projection Jacobian columns,
+##  for KI rows only
+test_that("prefilter adds Kinéis Jacobian columns only for KI data", {
+  data(ellie)
+  d <- ellie[1:30, ]
+  d$error.radius <- c(rep(NA, 10), rep(800, 20))
+  f <- prefilter(format_data(d), vmax = 10, ang = c(15, 25), min.dt = 120)
+  expect_true(all(c("KIjac.xe", "KIjac.xn", "KIjac.ye", "KIjac.yn") %in% names(f)))
+  ki <- f$obs.type == "KI"
+  expect_true(all(is.finite(f$KIjac.xe[ki])) && all(is.na(f$KIjac.xe[!ki])))
+  ## no KI observations: no Jacobian columns
+  f <- prefilter(format_data(ellie), vmax = 10, ang = c(15, 25), min.dt = 120)
+  expect_false(any(grepl("^KIjac", names(f))))
+})

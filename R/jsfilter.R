@@ -304,7 +304,7 @@ jsfilter <- function(x,
                                            gap.thresh = control$gap.thresh,
                                            ho_scale = control$ho_scale),
                      ho_lookup = ho_lookup), silent = TRUE)
-        if (!inherits(fi, "try-error") && length(fi) == 15) {
+        if (ssm_fit_complete(fi)) {
           pr <- fi$par
           if (crw && all(c("D_x", "D_y") %in% rownames(pr))) {
             Dx <- max(1e-8, pr["D_x", "Estimate"])

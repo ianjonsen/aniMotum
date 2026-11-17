@@ -17,6 +17,8 @@
 * fixes the 95% confidence ellipses drawn by `map()` and `plot(type = 2)`: their semi-axes were 1.96 standard errors, which contain only 85% of a bivariate normal distribution. They are now `sqrt(qchisq(0.95, 2))` = 2.448 standard errors, so the ellipses are 25% larger than before. This applies to all data types
 * fixes an error in `fit_ssm(model = "crw")` when a track has no prediction times (e.g. `time.step` supplied as a data frame without times for that track)
 * fixes uninitialised memory in the `crw` along-track speeds: the first speed of each track (fitted and predicted) is now `NA` whether or not `ssm_control(se = TRUE)`
+* fixes `fit_ssm(model = "jmp")` and `"jcrw"`: since the Kinéis standard-error inflation added a field to SSM fit objects, `jsfilter()` no longer recognised its per-individual starting fits as complete (it tested `length(fit) == 15`), silently fell back to crude starting values, and the joint fit could fail with an NaN gradient. `jsfilter()`, `grab()` and `route_path()` now test for the optimiser result and `sdreport` instead of the number of list elements, as `fit_ssm()` already did
+* `prefilter()` adds the Kinéis projection Jacobian columns (`KIjac.*`) only when there are Kinéis observations, so its output for other data is unchanged
 
 # aniMotum 1.3-0 (03/11/2026)
 

@@ -70,7 +70,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
          jssm_df = ,
          ssm_df = {
            ## remove optimizer crash results from extraction
-           nf <- which(sapply(x$ssm, length) < 15)
+           nf <- which(!vapply(x$ssm, ssm_fit_complete, logical(1)))
            if (length(nf) > 0) {
              warning(sprintf("%d optimiser crash(es) removed from output, ids: %s",
                              length(nf), paste(x$id[nf], collapse = ", ")),
