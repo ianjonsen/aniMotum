@@ -61,6 +61,9 @@ test_that("fit_mrm pools the movement rate across imputations", {
   expect_equal(nrow(m$fitted), nrow(grab(f, "predicted")))
   expect_true(all(m$fitted$lower <= m$fitted$rate & m$fitted$rate <= m$fitted$upper))
   expect_setequal(m$par$parameter, c("sigma_rate", "rho_p"))
+  ## speed (km/h) at the time step: rate * sqrt(2 / time.step)
+  expect_equal(m$fitted$speed, m$fitted$rate * sqrt(2 / 24))
+  expect_equal(m$fitted$speed_upper, m$fitted$upper * sqrt(2 / 24))
 })
 
 test_that("fit_mpm with reps pools move persistence across imputations", {

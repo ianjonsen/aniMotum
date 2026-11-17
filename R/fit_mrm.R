@@ -23,9 +23,10 @@
 ##' 1. `fitted`: a tibble with, for each id and time, the point-estimate track
 ##' (`lon`, `lat`), the pooled log movement rate (`log_rate`), its total
 ##' standard error (`log_rate.se`), the movement rate (`rate`, km h^-1/2) and
-##' its 95% interval (`lower`, `upper`), and the fraction of missing
-##' information (`fraction_missing`: the share of the variance due to location
-##' uncertainty);
+##' its 95% interval (`lower`, `upper`), the speed (`speed`, km/h; see
+##' details) and its 95% interval (`speed_lower`, `speed_upper`), and the
+##' fraction of missing information (`fraction_missing`: the share of the
+##' variance due to location uncertainty);
 ##' 2. `par`: pooled estimates of `sigma_rate` (SD of the random walk on the
 ##' log rate, per h^1/2) and `rho_p` (correlation between east and north
 ##' displacements), by id;
@@ -41,6 +42,15 @@
 ##' along each axis per square root of hour; `rate * sqrt(24)` is the SD of a
 ##' 24 h displacement. Low rates indicate area-restricted movement, high rates
 ##' travel. The rate does not separate speed from tortuosity.
+##'
+##' The rate is not a speed: under a Brownian random walk, displacement grows
+##' with the square root of time. `speed` converts it to km/h at the time step
+##' of the fit, `time.step` (h): the root-mean-square net displacement over
+##' one time step, divided by the time step, `rate * sqrt(2 / time.step)`.
+##' This holds for any correlation between east and north displacements. The
+##' speed depends on the time step (halving it raises the speed by a factor
+##' of sqrt(2)), so speeds from fits at different time steps are not
+##' comparable. It is a net-displacement speed, not a path speed.
 ##'
 ##' Within each imputation the locations are treated as data, which keeps the
 ##' likelihood bounded. Each individual is fitted separately. Rubin's rules
@@ -102,9 +112,15 @@ fit_mrm <- function(x,
     e <- estimate[estimate$id == i, ]
     lr <- pool_rubin(do.call(cbind, lapply(f, function(z) z$log_rate)),
                      do.call(cbind, lapply(f, function(z) z$log_rate.se)))
+    ## speed (km/h): root-mean-square net displacement over one time step,
+    ##  divided by the time step: rate * sqrt(2 * dt) / dt
+    to_speed <- mrm_speed_factor(attr(imp, "time.step"))
     fitted[[i]] <- tibble(id = i, date = e$date, lon = e$lon, lat = e$lat,
                           log_rate = lr$estimate, log_rate.se = lr$se,
                           rate = exp(lr$estimate), lower = exp(lr$lower), upper = exp(lr$upper),
+                          speed = exp(lr$estimate) * to_speed,
+                          speed_lower = exp(lr$lower) * to_speed,
+                          speed_upper = exp(lr$upper) * to_speed,
                           fraction_missing = lr$fraction_missing)
     p <- pool_rubin(do.call(cbind, lapply(f, function(z) z$par[, 1])),
                     do.call(cbind, lapply(f, function(z) z$par[, 2])))
@@ -172,3 +188,7 @@ mrm_fit_one <- function(s, control) {
   fxd <- summary(rep, "fixed")
   list(log_rate = rdm[, 1], log_rate.se = rdm[, 2], par = fxd[, 1:2, drop = FALSE])
 }
+
+## multiplier converting the movement rate (km h^-1/2) to a speed (km/h) at
+##  time step dt (h): root-mean-square net displacement over dt, divided by dt
+mrm_speed_factor <- function(dt) sqrt(2 / dt)

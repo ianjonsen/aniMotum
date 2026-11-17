@@ -38,9 +38,10 @@ a list with class \code{mrm_mi}:
 \item \code{fitted}: a tibble with, for each id and time, the point-estimate track
 (\code{lon}, \code{lat}), the pooled log movement rate (\code{log_rate}), its total
 standard error (\code{log_rate.se}), the movement rate (\code{rate}, km h^-1/2) and
-its 95\% interval (\code{lower}, \code{upper}), and the fraction of missing
-information (\code{fraction_missing}: the share of the variance due to location
-uncertainty);
+its 95\% interval (\code{lower}, \code{upper}), the speed (\code{speed}, km/h; see
+details) and its 95\% interval (\code{speed_lower}, \code{speed_upper}), and the
+fraction of missing information (\code{fraction_missing}: the share of the
+variance due to location uncertainty);
 \item \code{par}: pooled estimates of \code{sigma_rate} (SD of the random walk on the
 log rate, per h^1/2) and \code{rho_p} (correlation between east and north
 displacements), by id;
@@ -65,6 +66,15 @@ correlation matrix of east and north displacements (km, on the ground), and
 along each axis per square root of hour; \code{rate * sqrt(24)} is the SD of a
 24 h displacement. Low rates indicate area-restricted movement, high rates
 travel. The rate does not separate speed from tortuosity.
+
+The rate is not a speed: under a Brownian random walk, displacement grows
+with the square root of time. \code{speed} converts it to km/h at the time step
+of the fit, \code{time.step} (h): the root-mean-square net displacement over
+one time step, divided by the time step, \code{rate * sqrt(2 / time.step)}.
+This holds for any correlation between east and north displacements. The
+speed depends on the time step (halving it raises the speed by a factor
+of sqrt(2)), so speeds from fits at different time steps are not
+comparable. It is a net-displacement speed, not a path speed.
 
 Within each imputation the locations are treated as data, which keeps the
 likelihood bounded. Each individual is fitted separately. Rubin's rules

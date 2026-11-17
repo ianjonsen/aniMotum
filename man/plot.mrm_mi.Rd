@@ -41,8 +41,8 @@ directly). Set to FALSE to return the ggplot objects}
 \item{land}{logical; add land polygons to track plots (default TRUE;
 requires the \code{rnaturalearth} data)}
 
-\item{log}{logical; plot the movement rate on a log scale (default TRUE),
-on which its intervals are symmetric}
+\item{log}{logical; plot the speed on a log scale (default TRUE), on which
+its intervals are symmetric}
 
 \item{...}{unused}
 }
@@ -50,12 +50,15 @@ on which its intervals are symmetric}
 as for \code{\link[=plot.mpm_mi]{plot.mpm_mi()}}
 }
 \description{
-Plots of the movement rate from \code{\link[=fit_mrm]{fit_mrm()}}:
+Plots of the movement rate from \code{\link[=fit_mrm]{fit_mrm()}}, shown as a
+speed (km/h) at the fit's time step: the root-mean-square net
+displacement over one time step, divided by the time step (see
+\code{\link[=fit_mrm]{fit_mrm()}}):
 \enumerate{
-\item \code{type = "timeseries"}: movement rate against time for each track, with
-the pooled 95\% interval;
+\item \code{type = "timeseries"}: speed against time for each track, with the
+pooled 95\% interval;
 \item \code{type = "track"}: tracks (point-estimate locations) with locations
-coloured by movement rate.
+coloured by speed.
 }
 }
 \examples{

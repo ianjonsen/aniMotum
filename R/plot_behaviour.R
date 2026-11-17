@@ -70,16 +70,19 @@ plot.mpm_mi <- function(x,
 
 ##' @title Plot movement rate estimates from [fit_mrm()]
 ##'
-##' @description Plots of the movement rate from [fit_mrm()]:
-##' 1. `type = "timeseries"`: movement rate against time for each track, with
-##' the pooled 95% interval;
+##' @description Plots of the movement rate from [fit_mrm()], shown as a
+##' speed (km/h) at the fit's time step: the root-mean-square net
+##' displacement over one time step, divided by the time step (see
+##' [fit_mrm()]):
+##' 1. `type = "timeseries"`: speed against time for each track, with the
+##' pooled 95% interval;
 ##' 2. `type = "track"`: tracks (point-estimate locations) with locations
-##' coloured by movement rate.
+##' coloured by speed.
 ##'
 ##' @inheritParams plot.mpm_mi
 ##' @param x an `mrm_mi` object from [fit_mrm()]
-##' @param log logical; plot the movement rate on a log scale (default TRUE),
-##' on which its intervals are symmetric
+##' @param log logical; plot the speed on a log scale (default TRUE), on which
+##' its intervals are symmetric
 ##'
 ##' @return as for [plot.mpm_mi()]
 ##'
@@ -108,19 +111,28 @@ plot.mrm_mi <- function(x,
   type <- match.arg(type)
   behav_check_pal(pal)
   d <- as.data.frame(x$fitted)
-  ## one colour scale for all tracks, so a colour means the same rate in every
-  ##  panel and the legends combine
+  ## plot the speed (km/h) at the fit's time step; fits made before the speed
+  ##  columns existed get them from the rate
+  if (!"speed" %in% names(d)) {
+    to_speed <- mrm_speed_factor(x$time.step)
+    d$speed <- d$rate * to_speed
+    d$speed_lower <- d$lower * to_speed
+    d$speed_upper <- d$upper * to_speed
+  }
+  d$lower <- d$speed_lower
+  d$upper <- d$speed_upper
+  label <- paste0("speed (km/h)\nnet displacement over ", format(x$time.step), " h")
+  ## one colour scale for all tracks, so a colour means the same speed in
+  ##  every panel and the legends combine
   scale <- scale_colour_gradientn(colours = hcl.colors(100, pal, rev = rev),
                                   trans = if (log) "log10" else "identity",
-                                  limits = range(d$rate, na.rm = TRUE),
-                                  name = expression(paste("rate (km ", h^{-1/2}, ")")))
+                                  limits = range(d$speed, na.rm = TRUE),
+                                  name = label)
   if (type == "timeseries") {
-    p <- behav_timeseries(d, "rate", scale,
-                          ylab = expression(paste("movement rate (km ", h^{-1/2}, ")")),
-                          log = log)
+    p <- behav_timeseries(d, "speed", scale, ylab = label, log = log)
     behav_output(p, pages, ncol, ask)
   } else {
-    behav_tracks(d, "rate", scale, pages, ask, land)
+    behav_tracks(d, "speed", scale, pages, ask, land)
   }
 }
 
@@ -223,7 +235,8 @@ plot.hmm_mi <- function(x,
       labs(x = xlab, y = "density") +
       theme_minimal()
   }
-  p_step <- panel(step, sd_step, "step length (km)", c(0, max(grid)))
+  p_step <- panel(step, sd_step, paste0("step length (km per ", format(x$time.step), " h)"),
+                  c(0, max(grid)))
   p_angle <- panel(angle, sd_angle, "turning angle (radians)", c(-pi, pi))
   wrap_plots(p_step, p_angle, ncol = 2, guides = "collect") +
     plot_annotation(caption = "dashed line: sum of the state densities, each weighted by the proportion of time in that state")
