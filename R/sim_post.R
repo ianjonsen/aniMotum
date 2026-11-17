@@ -13,14 +13,22 @@ rgmrf0 <- function (n, Q)
 ##' @title simulate from the posterior of a \code{ssm} fit.
 ##'
 ##' @description simulates track locations from the joint precision matrix of a 
-##' \code{ssm} model fit. Currently, the joint precision of the SSM movement 
-##' parameters is not included (ie. a full posterior simulation).
+##' \code{ssm} model fit. The joint precision covers both the random effects
+##' (locations) and the fixed effects (SSM movement and observation
+##' parameters), so the simulated locations include uncertainty in the SSM
+##' parameters, to the order of the Laplace approximation.
 ##' @param x a \code{ssm} fit object with class `ssm_df`
 ##' @param what simulate fitted or predicted locations
 ##' @param reps number of replicate tracks to simulate from the \code{ssm} model 
 ##' fit object
 ##' @param sim_only logical, do not include \code{ssm} estimated locations in 
 ##' output (default is FALSE)
+##' @param inflate logical; if TRUE (default), the simulated deviations of
+##' Kinéis-only tracks are multiplied by the standard-error inflation factor
+##' stored with the fit (see the `kineis` argument of [ssm_control()]), so the
+##' spread of the simulated tracks matches the inflated `x.se` and `y.se`. Has
+##' no effect on other tracks (factor 1).
+##' @md
 ##' 
 ##' @return a \code{fG_sim_post} object containing the paths simulated from a 
 ##' \code{ssm} fit object
@@ -37,7 +45,8 @@ rgmrf0 <- function (n, Q)
 sim_post <- function(x, 
                      what = "predicted",
                      reps = 1,
-                     sim_only = FALSE
+                     sim_only = FALSE,
+                     inflate = TRUE
                      ) {
   
   what <- match.arg(what, choices = c("predicted", "fitted"))
@@ -102,6 +111,12 @@ sim_post <- function(x,
       sel <- rownames(jp) %in% X # selector variable
       dev <- samples[sel, , drop = FALSE]
     }
+
+    ## Kinéis-only tracks: scale the deviations by the standard-error
+    ##  inflation factor, so the simulated spread matches x.se and y.se
+    infl <- if (isTRUE(inflate) && !jnt && !is.null(x$ssm[[k]]$se.inflation$factor))
+      x$ssm[[k]]$se.inflation$factor else 1
+    dev <- dev * infl
 
     # initialise with posterior mode
     rtracks <- matrix(rep(reMu, reps), nrow = reps, ncol = length(reMu), byrow = TRUE)

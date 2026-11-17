@@ -1,17 +1,24 @@
-##' @title Fit a hidden Markov model to SSM-predicted tracks, by multiple imputation
+##' @title Fit a hidden Markov model to tracks, by multiple imputation
 ##'
 ##' @description Fits an \code{n_states}-state hidden Markov model (HMM) to
-##' step lengths and turning angles of the regular-interval locations predicted
-##' by an SSM fit. Location uncertainty is carried into the HMM by multiple
-##' imputation: \code{reps} tracks are simulated from the SSM fit's joint
-##' posterior with [sim_post()], an HMM is fitted to each with
-##' \code{hmmTMB}, and the results are pooled across imputations.
+##' step lengths and turning angles of regular-interval tracks. Location
+##' uncertainty is carried into the HMM by multiple imputation: \code{reps}
+##' tracks are imputed with [impute_tracks()], from an SSM fit or directly from
+##' Kinéis locations, an HMM is fitted to each with \code{hmmTMB}, and the
+##' results are pooled across imputations.
 ##'
-##' @param x an `ssm_df` fit object from a `crw` or `rw` model, with regular
-##' predicted locations (`time.step` a positive number). The time step should
-##' be long enough that movement between predicted locations is large relative
-##' to location error (e.g. 6-24 h for Kinéis or Argos data).
+##' @param x an `ssm_df` fit object (`rw`, `crw` or `mp`) with regular
+##' predicted locations, or a data frame of Kinéis locations (see
+##' [impute_tracks()]). The time step should be long enough that movement
+##' between locations is large relative to location error (e.g. 6-24 h for
+##' Kinéis or Argos data).
 ##' @param reps number of imputed tracks (default 20).
+##' @param time.step for Kinéis locations, the time step (h) of the regular grid
+##' (see [impute_tracks()]).
+##' @param max_gap for Kinéis locations, the longest gap (h) interpolated
+##' across (see [impute_tracks()]).
+##' @param kineis for Kinéis locations, the Kinéis error model (see
+##' [impute_tracks()]).
 ##' @param n_states number of behavioural states (default 2).
 ##' @param step_par optional list of starting values for the step-length
 ##' distribution (`mean`, `sd`, each of length `n_states`, km). By default,
@@ -20,10 +27,14 @@
 ##' distribution (`mu`, `kappa`, each of length `n_states`). By default
 ##' `mu = 0` and `kappa` increasing from 0.5 to 5 across states.
 ##' @param silent logical; suppress hmmTMB fitting output (default TRUE).
+##' @param progress logical; show a progress bar over imputations (default
+##' TRUE).
 ##'
 ##' @return a list with class `hmm_mi`:
-##' 1. `states`: a tibble of the SSM-predicted locations (`id`, `date`, `lon`,
-##' `lat`), the step length (km) and turning angle (radians; positive for a
+##' 1. `states`: a tibble of the point-estimate track (`id`, `segment`,
+##' `date`, `lon`, `lat`: the SSM-predicted locations, or the Kinéis locations
+##' interpolated without perturbation), the step length (km) and turning angle
+##' (radians; positive for a
 ##' left, counter-clockwise turn) of the predicted track, the
 ##' probability of each state averaged across imputations (`p1`, `p2`, ...),
 ##' the most probable state (`state`), and the proportion of imputations whose
@@ -31,25 +42,36 @@
 ##' 2. `par`: a tibble of the estimated parameters for each imputation:
 ##' step-length mean and SD (km), turning-angle mean and concentration, and the
 ##' transition probability matrix (`tpm_ij`, from state i to state j);
-##' 3. `par_summary`: the mean and 2.5\% and 97.5\% quantiles of each parameter
-##' across imputations;
-##' 4. `reps`, `n_states`, `n_failed`: the number of imputations, states and
-##' imputations whose HMM fit failed.
+##' 3. `par_summary`: the pooled estimate of each parameter and its 95\%
+##' interval, from Rubin's rules on the working (link) scale, back-transformed
+##' with hmmTMB's inverse links; `fraction_missing` is the share of the
+##' working-scale variance due to location uncertainty. Transition
+##' probabilities have intervals for 2 states only (with more states, each
+##' probability depends on several working parameters; see `par_working`);
+##' 4. `par_working`: the pooled working-scale coefficients (observation
+##' parameters, and transition parameters `Si>Sj` = log(p_ij / p_ii)), with
+##' their total standard errors, degrees of freedom and 95\% intervals;
+##' 5. `reps`, `n_states`, `n_failed`, `n_pooled`: the number of imputations,
+##' states, imputations whose HMM fit failed, and imputations pooled for the
+##' parameters (those with finite working-scale standard errors); `source`
+##' (`"ssm"` or `"kineis"`) and `time.step`.
 ##'
 ##' @details The HMM has gamma-distributed step lengths, von Mises turning
 ##' angles, a stationary initial state distribution, and no covariates. All
-##' tracks in `x` share one set of HMM parameters.
+##' tracks in `x` share one set of HMM parameters. Each track segment (see
+##' [impute_tracks()]) is a separate series, so no step spans a data gap.
 ##'
 ##' States are ordered by mean step length, so state 1 has the
 ##' shortest steps (e.g. area-restricted movement) and state `n_states` the
 ##' longest (e.g. travel), in every imputation. This prevents label switching
 ##' when results are pooled.
 ##'
-##' The spread of the parameter estimates across imputations reflects location
-##' uncertainty only. It does not include the HMM's own estimation
-##' uncertainty, so the intervals in `par_summary` are not full confidence
-##' intervals. [sim_post()] also does not include uncertainty in the SSM's
-##' movement parameters.
+##' Parameters are pooled with Rubin's rules: for each working-scale
+##' coefficient, the total variance is the mean within-imputation variance
+##' (from hmmTMB's `sdreport`) plus (1 + 1/m) times the between-imputation
+##' variance, with Rubin's degrees of freedom. Imputations whose working-scale
+##' standard errors are not all finite (Hessian not positive-definite) are
+##' excluded from parameter pooling but contribute state probabilities.
 ##'
 ##' Requires the `hmmTMB` package.
 ##'
@@ -59,6 +81,9 @@
 ##' h <- fit_hmm(fit, reps = 20)
 ##' h$par_summary
 ##' h$states
+##'
+##' ## directly from Kinéis locations, without an SSM
+##' h <- fit_hmm(kineis_locations, time.step = 12)
 ##' }
 ##'
 ##' @importFrom dplyr tibble bind_rows group_by summarise
@@ -68,32 +93,34 @@
 fit_hmm <- function(x,
                     reps = 20,
                     n_states = 2,
+                    time.step = NULL,
+                    max_gap = NULL,
+                    kineis = ssm_control()$kineis,
                     step_par = NULL,
                     angle_par = NULL,
-                    silent = TRUE) {
+                    silent = TRUE,
+                    progress = TRUE) {
 
   if (!requireNamespace("hmmTMB", quietly = TRUE))
     stop("fit_hmm() requires the hmmTMB package: install.packages(\"hmmTMB\")", call. = FALSE)
-  if (!inherits(x, "ssm_df"))
-    stop("x must be an ssm_df fit object from fit_ssm()", call. = FALSE)
-  if (!all(x$pmodel %in% c("crw", "rw")))
-    stop("x must be a `crw` or `rw` SSM fit", call. = FALSE)
-  if (!all(x$converged))
-    stop("all SSM fits must have converged; drop non-converged fits first, e.g. x[x$converged, ]",
-         call. = FALSE)
-  if (any(vapply(x$ssm, function(s) !is.numeric(s$ts) || is.na(s$ts), logical(1))))
-    stop("x must have regular predicted locations: fit with a positive numeric time.step",
-         call. = FALSE)
-  if (!is.numeric(reps) || length(reps) != 1 || reps < 1)
-    stop("reps must be a single number >= 1", call. = FALSE)
   if (!is.numeric(n_states) || length(n_states) != 1 || n_states < 2)
     stop("n_states must be a single number >= 2", call. = FALSE)
 
-  ## SSM-predicted (estimated) track: step lengths, turning angles, and
-  ##  starting values for the HMM
-  est <- grab(x, "predicted", as_sf = FALSE)
-  est <- as.data.frame(est)[, c("id", "date", "lon", "lat")]
-  est <- hmm_moves(est)
+  imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
+                       kineis = kineis)
+
+  ## segments need >= 3 locations (one turning angle) to enter the HMM
+  seg <- paste(imp$id, imp$segment)
+  n.seg <- table(seg[imp$rep == 0])
+  short <- names(n.seg)[n.seg < 3]
+  if (length(short) > 0) {
+    message(length(short), " track segment(s) with fewer than 3 locations dropped")
+    imp <- imp[!seg %in% short, ]
+  }
+
+  ## point-estimate track: step lengths, turning angles, and starting values
+  ##  for the HMM
+  est <- hmm_moves(as.data.frame(imp[imp$rep == 0, c("id", "segment", "date", "lon", "lat")]))
 
   if (is.null(step_par)) {
     q <- quantile(est$step, seq(0.25, 0.75, length.out = n_states), na.rm = TRUE, names = FALSE)
@@ -105,18 +132,15 @@ fit_hmm <- function(x,
                       kappa = seq(0.5, 5, length.out = n_states))
   }
 
-  ## imputed tracks
-  sims <- sim_post(x, what = "predicted", reps = reps, sim_only = TRUE)
-  sims <- bind_rows(lapply(seq_len(nrow(sims)), function(i) {
-    s <- as.data.frame(sims$psims[[i]])
-    s$id <- sims$id[i]
-    s
-  }))
-
+  sims <- as.data.frame(imp[imp$rep > 0, ])
+  pb <- progress_bar(reps, progress)
   fits <- lapply(sort(unique(sims$rep)), function(r) {
-    d <- hmm_moves(sims[sims$rep == r, c("id", "date", "lon", "lat")])
-    hmm_fit_one(d, n_states, step_par, angle_par, silent)
+    d <- hmm_moves(sims[sims$rep == r, c("id", "segment", "date", "lon", "lat")])
+    f <- hmm_fit_one(d, n_states, step_par, angle_par, silent)
+    pb$tick()
+    f
   })
+  pb$close()
   ok <- !vapply(fits, is.null, logical(1))
   if (!any(ok)) stop("the HMM fit failed for every imputation", call. = FALSE)
   fits <- fits[ok]
@@ -128,37 +152,41 @@ fit_hmm <- function(x,
   viterbi <- do.call(cbind, lapply(fits, function(f) f$viterbi))
   agreement <- rowMeans(viterbi == state)
 
-  states <- tibble(est[, c("id", "date", "lon", "lat", "step", "angle")],
+  states <- tibble(est[, c("id", "segment", "date", "lon", "lat", "step", "angle")],
                    as.data.frame(probs),
                    state = state,
                    agreement = agreement)
 
   par <- bind_rows(lapply(seq_along(fits), function(i) tibble(rep = i, fits[[i]]$par)))
-  long <- data.frame(parameter = rep(names(par)[-1], each = nrow(par)),
-                     value = unlist(par[, -1], use.names = FALSE))
-  par_summary <- summarise(group_by(long, parameter),
-                           mean = mean(value),
-                           lower = quantile(value, 0.025, names = FALSE),
-                           upper = quantile(value, 0.975, names = FALSE))
-  par_summary <- par_summary[match(names(par)[-1], par_summary$parameter), ]
+
+  ## Rubin's rules on the working scale, using imputations whose working-scale
+  ##  standard errors are all finite
+  pooled <- hmm_pool(fits, n_states)
+  par_summary <- pooled$natural
+  par_working <- pooled$working
 
   out <- list(states = states,
               par = par,
               par_summary = par_summary,
+              par_working = par_working,
+              n_pooled = pooled$n_pooled,
               reps = reps,
               n_states = n_states,
-              n_failed = sum(!ok))
+              n_failed = sum(!ok),
+              source = attr(imp, "source"),
+              time.step = attr(imp, "time.step"))
   class(out) <- append("hmm_mi", class(out))
   out
 }
 
 ## step lengths (km, great circle) and turning angles (radians, -pi to pi;
-##  positive = left, counter-clockwise turn) along each track, ordered by date
-##  within id
+##  positive = left, counter-clockwise turn) along each track segment, ordered
+##  by date within id and segment
 hmm_moves <- function(d) {
-  d <- d[order(d$id, d$date), ]
+  if (!"segment" %in% names(d)) d$segment <- 1L
+  d <- d[order(d$id, d$segment, d$date), ]
   rad <- pi / 180
-  out <- lapply(split(d, d$id), function(s) {
+  out <- lapply(split(d, list(d$id, d$segment), drop = TRUE, lex.order = TRUE), function(s) {
     n <- nrow(s)
     lon <- s$lon * rad
     lat <- s$lat * rad
@@ -174,6 +202,7 @@ hmm_moves <- function(d) {
     s
   })
   out <- do.call(rbind, out)
+  out <- out[order(out$id, out$segment, out$date), ]
   row.names(out) <- NULL
   out
 }
@@ -181,7 +210,10 @@ hmm_moves <- function(d) {
 ## fit one HMM with hmmTMB; states ordered by mean step length. Returns NULL
 ##  if the fit fails.
 hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
-  data <- data.frame(ID = factor(d$id), time = d$date, step = d$step, angle = d$angle)
+  ## each track segment is a separate series
+  data <- data.frame(ID = factor(paste(d$id, d$segment, sep = "_segment_"),
+                                 levels = unique(paste(d$id, d$segment, sep = "_segment_"))),
+                     time = d$date, step = d$step, angle = d$angle)
   ## gamma step lengths must be positive
   data$step[!is.na(data$step) & data$step <= 0] <- 1e-6
   res <- try({
@@ -194,8 +226,10 @@ hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
                                    n_states = n_states,
                                    par = list(step = step_par, angle = angle_par))
     hmm <- hmmTMB::HMM$new(obs = obs, hid = hid)
+    ## NaN standard-error warnings (Hessian not positive-definite) are
+    ##  handled below: such fits are excluded from parameter pooling
     if (silent) {
-      utils::capture.output(hmm$fit(silent = TRUE))
+      utils::capture.output(suppressWarnings(hmm$fit(silent = TRUE)))
     } else {
       hmm$fit(silent = FALSE)
     }
@@ -204,14 +238,17 @@ hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
   if (inherits(res, "try-error")) return(NULL)
   hmm <- res
 
+  decoded <- try(list(probs = hmm$state_probs(), viterbi = hmm$viterbi()), silent = TRUE)
+  if (inherits(decoded, "try-error")) return(NULL)
+
   p <- hmm$par()
   obspar <- p$obspar[, , 1]
   tpm <- p$tpm[, , 1]
   step_mean <- obspar["step.mean", ]
   ord <- order(step_mean)
 
-  probs <- hmm$state_probs()[, ord, drop = FALSE]
-  viterbi <- match(hmm$viterbi(), ord)
+  probs <- decoded$probs[, ord, drop = FALSE]
+  viterbi <- match(decoded$viterbi, ord)
   tpm <- tpm[ord, ord, drop = FALSE]
 
   par <- c(stats::setNames(obspar["step.mean", ord], paste0("step_mean_", seq_len(n_states))),
@@ -221,5 +258,93 @@ hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
   tpm_names <- outer(seq_len(n_states), seq_len(n_states), function(i, j) paste0("tpm_", i, j))
   par <- c(par, stats::setNames(as.vector(tpm), as.vector(tpm_names)))
 
-  list(probs = probs, viterbi = viterbi, par = as.data.frame(as.list(par)))
+  ## working-scale coefficients and standard errors, relabelled so state k
+  ##  is the k-th shortest-step state: observation coefficients are named
+  ##  variable.parameter.stateK.(Intercept), transition coefficients Si>Sj
+  ##  (log(p_ij / p_ii)); a state's new label is its rank in ord
+  cf <- hmm$coeff_fe()
+  est <- c(cf$obs[, 1], cf$hid[, 1])
+  nm <- c(rownames(cf$obs), rownames(cf$hid))
+  rep <- try(hmm$tmb_rep(), silent = TRUE)
+  se <- if (inherits(rep, "try-error")) rep(NA_real_, length(est)) else
+    suppressWarnings(sqrt(diag(rep$cov.fixed)))[seq_along(est)]
+  new_label <- match(seq_len(n_states), ord)
+  nm <- vapply(nm, function(z) {
+    if (grepl("^S[0-9]+>S[0-9]+", z)) {
+      ij <- as.integer(regmatches(z, gregexpr("[0-9]+", sub("\\..*$", "", z)))[[1]])
+      paste0("S", new_label[ij[1]], ">S", new_label[ij[2]])
+    } else {
+      k <- as.integer(sub("^.*\\.state([0-9]+)\\..*$", "\\1", z))
+      sub("\\.state[0-9]+\\.", paste0(".state", new_label[k], "."), z)
+    }
+  }, character(1), USE.NAMES = FALSE)
+  nm <- sub("\\.\\(Intercept\\)$", "", nm)
+  working <- data.frame(name = nm, estimate = unname(est), se = unname(se))
+  working <- working[order(working$name), ]
+
+  ## inverse links of the observation parameters, by variable and parameter
+  dists <- hmm$obs()$dists()
+  invlink <- lapply(dists, function(dd) dd$invlink())
+
+  list(probs = probs, viterbi = viterbi, par = as.data.frame(as.list(par)),
+       working = working, invlink = invlink)
+}
+
+## pool HMM parameters across imputations with Rubin's rules on the working
+##  scale, and back-transform to the natural scale
+hmm_pool <- function(fits, n_states) {
+  ok <- vapply(fits, function(f) all(is.finite(f$working$se)), logical(1))
+  n_pooled <- sum(ok)
+  if (n_pooled == 0) {
+    warning("no imputation has finite working-scale standard errors; parameters not pooled",
+            call. = FALSE)
+    return(list(natural = NULL, working = NULL, n_pooled = 0))
+  }
+  f <- fits[ok]
+  nm <- f[[1]]$working$name
+  est <- do.call(cbind, lapply(f, function(z) z$working$estimate[match(nm, z$working$name)]))
+  se <- do.call(cbind, lapply(f, function(z) z$working$se[match(nm, z$working$name)]))
+  w <- pool_rubin(est, se)
+  working <- tibble(parameter = nm, estimate = w$estimate, se = w$se, df = w$df,
+                    lower = w$lower, upper = w$upper, fraction_missing = w$fraction_missing)
+
+  ## observation parameters: variable.parameter.stateK, through the inverse
+  ##  links (monotone, so interval ends transform directly)
+  invlink <- f[[1]]$invlink
+  obs <- !grepl("^S[0-9]+>S[0-9]+$", nm)
+  parts <- strsplit(nm[obs], ".", fixed = TRUE)
+  natural <- lapply(seq_along(parts), function(i) {
+    v <- parts[[i]][1]; p <- parts[[i]][2]; k <- sub("state", "", parts[[i]][3])
+    g <- invlink[[v]][[p]]
+    r <- working[obs, ][i, ]
+    tibble(parameter = paste0(v, "_", p, "_", k),
+           estimate = g(r$estimate), lower = g(r$lower), upper = g(r$upper),
+           fraction_missing = r$fraction_missing)
+  })
+
+  ## transition probabilities: multinomial logit with the diagonal as reference
+  wt <- matrix(0, n_states, n_states)
+  for (z in which(!obs)) {
+    ij <- as.integer(regmatches(nm[z], gregexpr("[0-9]+", nm[z]))[[1]])
+    wt[ij[1], ij[2]] <- working$estimate[z]
+  }
+  tpm <- exp(wt) / rowSums(exp(wt))
+  tp <- lapply(seq_len(n_states), function(i) lapply(seq_len(n_states), function(j) {
+    lower <- upper <- fm <- NA_real_
+    if (n_states == 2) {
+      ## p_ij = plogis(w_ij) for i != j; p_ii = 1 - p_ij
+      z <- which(nm == paste0("S", i, ">S", if (i == j) 3 - i else j))
+      b <- stats::plogis(c(working$lower[z], working$upper[z]))
+      if (i == j) b <- rev(1 - b)
+      lower <- b[1]; upper <- b[2]; fm <- working$fraction_missing[z]
+    }
+    tibble(parameter = paste0("tpm_", i, j), estimate = tpm[i, j],
+           lower = lower, upper = upper, fraction_missing = fm)
+  }))
+  natural <- bind_rows(c(natural, unlist(tp, recursive = FALSE)))
+  ## same parameter order as the per-imputation table
+  natural <- natural[order(match(sub("_[0-9]+$", "", natural$parameter),
+                                 c("step_mean", "step_sd", "angle_mu", "angle_kappa", "tpm")),
+                           natural$parameter), ]
+  list(natural = natural, working = working, n_pooled = n_pooled)
 }

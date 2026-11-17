@@ -18,8 +18,8 @@ test_that("fit_hmm checks its input", {
   data(ellie)
   f <- fit_ssm(ellie, model = "crw", time.step = NA, control = ssm_control(verbose = 0))
   expect_error(fit_hmm(f), "regular predicted locations")
-  f <- fit_ssm(ellie, model = "mp", time.step = 24, control = ssm_control(verbose = 0))
-  expect_error(fit_hmm(f), "`crw` or `rw`")
+  expect_error(fit_hmm(1), "ssm_df fit object or a data frame")
+  expect_error(fit_hmm(f, n_states = 1), "n_states")
 })
 
 test_that("fit_hmm returns pooled states and parameters", {
@@ -34,4 +34,25 @@ test_that("fit_hmm returns pooled states and parameters", {
   expect_equal(rowSums(as.matrix(h$states[, c("p1", "p2")])), rep(1, nrow(h$states)), tolerance = 1e-6)
   expect_true(all(h$par$step_mean_1 <= h$par$step_mean_2))
   expect_equal(nrow(h$par), 3 - h$n_failed)
+  ## Rubin pooling on the working scale
+  expect_true(h$n_pooled >= 1)
+  ps <- h$par_summary
+  expect_true(all(c("step_mean_1", "step_mean_2", "tpm_12", "tpm_21") %in% ps$parameter))
+  expect_true(all(ps$lower <= ps$estimate & ps$estimate <= ps$upper, na.rm = TRUE))
+  tpm <- ps$estimate[grepl("^tpm", ps$parameter)]
+  expect_equal(tpm[1] + tpm[2], 1, tolerance = 1e-8)     # tpm_11 + tpm_12
+  expect_equal(nrow(h$par_working), 2 * 4 + 2)           # 4 observation parameters x 2 states, 2 transitions
+})
+
+test_that("hmm_pool relabels and pools working-scale coefficients", {
+  mk <- function(e) list(working = data.frame(name = c("S1>S2", "S2>S1", "step.mean.state1", "step.mean.state2"),
+                                              estimate = e, se = rep(0.1, 4)),
+                         invlink = list(step = list(mean = exp)))
+  fits <- list(mk(c(-3, -2, log(2), log(10))), mk(c(-3.2, -2.2, log(2.2), log(11))))
+  p <- aniMotum:::hmm_pool(fits, 2)
+  expect_equal(p$n_pooled, 2)
+  sm <- p$natural[p$natural$parameter == "step_mean_1", ]
+  expect_equal(sm$estimate, exp(mean(log(c(2, 2.2)))))
+  t12 <- p$natural$estimate[p$natural$parameter == "tpm_12"]
+  expect_equal(t12, plogis(-3.1))
 })

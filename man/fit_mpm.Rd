@@ -13,11 +13,18 @@ fit_mpm(
   inner.control = NULL,
   optim = NULL,
   optMeth = NULL,
-  verbose = NULL
+  verbose = NULL,
+  reps = NULL,
+  time.step = NULL,
+  max_gap = NULL,
+  kineis = ssm_control()$kineis
 )
 }
 \arguments{
-\item{x}{a \code{ssm_df} fit object or a data frame of observations (see details)}
+\item{x}{a \code{ssm_df} fit object or a data frame of observations (see details).
+With \code{reps}, an \code{ssm_df} fit object (\code{rw}, \code{crw} or \code{mp}) with regular
+predicted locations, or a data frame of Kinéis locations (see
+\code{\link[=impute_tracks]{impute_tracks()}})}
 
 \item{what}{if a \code{ssm_df} fit object is supplied then \code{what} determines
 whether fitted, predicted (default), or rerouted values are mapped; ignored if
@@ -30,7 +37,9 @@ pooled random variance parameter (\code{sigma_g})}
 \item{coords}{column numbers of the location coordinates (default = 3:4)}
 
 \item{control}{list of control settings for the outer optimizer
-(see \link{mpm_control} for details)}
+(see \link{mpm_control} for details). With \code{model = "mpm"} and more than one
+individual, \code{verbose = 1} shows a progress bar over individuals instead of
+the parameter trace; with \code{reps}, a progress bar over the imputation fits}
 
 \item{inner.control}{list of control parameters for the inner optimization}
 
@@ -42,6 +51,20 @@ see \link{ssm_control} for details}
 
 \item{verbose}{is deprecated, use ssm_control(verbose = 1) instead,
 see \link{ssm_control} for details}
+
+\item{reps}{if NULL (default), the model is fitted once, treating the
+locations as data. If a number, the model is fitted to \code{reps} tracks
+imputed with \code{\link[=impute_tracks]{impute_tracks()}}, and the estimates are pooled with Rubin's
+rules, so the results carry location uncertainty (see details).}
+
+\item{time.step}{with \code{reps} and Kinéis locations, the time step (h) of
+the regular grid (see \code{\link[=impute_tracks]{impute_tracks()}})}
+
+\item{max_gap}{with \code{reps} and Kinéis locations, the longest gap (h)
+interpolated across (see \code{\link[=impute_tracks]{impute_tracks()}})}
+
+\item{kineis}{with \code{reps} and Kinéis locations, the Kinéis error model (see
+\code{\link[=impute_tracks]{impute_tracks()}})}
 }
 \value{
 a list with components
@@ -52,16 +75,47 @@ a list with components
 \item \code{tmb} the \code{TMB} object
 \item \code{opt} the object returned by the optimizer
 }
+
+With \code{reps}, a list with class \code{mpm_mi}:
+\itemize{
+\item \code{fitted} a tibble with, for each id, track segment and time, the
+point-estimate track (\code{lon}, \code{lat}), the pooled \code{logit_g} and its total
+standard error (\code{logit_g.se}), move persistence \code{g} and its 95\% interval
+(\code{lower}, \code{upper}), and the fraction of missing information
+(\code{fraction_missing}: the share of the variance due to location
+uncertainty)
+\item \code{par} pooled estimates of \code{sigma_g}, \code{sigma_x} and \code{sigma_y} (\code{sigma_x},
+\code{sigma_y} in coordinates divided by the largest absolute x or y), by
+track segment (\code{mpm}) or joint
+(\code{jmpm})
+\item \code{model}, \code{reps}, \code{n_failed} (imputed-track fits that failed or did not
+converge), \code{source} (\code{"ssm"} or \code{"kineis"}) and \code{time.step}
+}
 }
 \description{
 fit a random walk with time-varying move persistence to
 temporally regular or irregular location data
+}
+\details{
+With \code{reps}, the move persistence model is fitted to each imputed
+track, treating its locations as data, and Rubin's rules pool \code{logit_g} at
+each time and the log of each parameter. This replaces treating the SSM
+point estimates as data, which ignores location uncertainty. Imputed
+tracks are split into segments at long data gaps (Kinéis locations); with
+\code{mpm} each segment is fitted separately, and with \code{jmpm} each segment is a
+track.
 }
 \examples{
 ## fit jmpm to two southern elephant seal tracks
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 
 fmpm <- fit_mpm(xs, model = "jmpm")
+
+## with location uncertainty, by multiple imputation
+\dontrun{
+fmi <- fit_mpm(xs, model = "jmpm", reps = 20)
+plot(fmi)
+}
 
 }
 \references{

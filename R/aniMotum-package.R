@@ -114,7 +114,7 @@ NULL
 NULL
 
 ## stop R CMD check generating NOTES about global variables
-globalVariables(c(".", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se", "y.se",
+globalVariables(c(".", "rate", "lower", "upper", "logit_g", "id", "tid", "ssm", "converged", "keep", "y", "x", "x.se", "y.se",
                   "geometry", "u", "v", "u.se", "v.se", "lc", "smaj", "smin", "eor",
                   "obs.type", "emf.x", "emf.y", "lon", "lat", "rename", "X", "Y", 
                   "y.z", "x.z",  "z", "out", "r", "sub", "isd", "digits", "map",

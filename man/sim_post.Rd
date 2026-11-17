@@ -4,7 +4,7 @@
 \alias{sim_post}
 \title{simulate from the posterior of a \code{ssm} fit.}
 \usage{
-sim_post(x, what = "predicted", reps = 1, sim_only = FALSE)
+sim_post(x, what = "predicted", reps = 1, sim_only = FALSE, inflate = TRUE)
 }
 \arguments{
 \item{x}{a \code{ssm} fit object with class \code{ssm_df}}
@@ -16,6 +16,12 @@ fit object}
 
 \item{sim_only}{logical, do not include \code{ssm} estimated locations in
 output (default is FALSE)}
+
+\item{inflate}{logical; if TRUE (default), the simulated deviations of
+Kinéis-only tracks are multiplied by the standard-error inflation factor
+stored with the fit (see the \code{kineis} argument of \code{\link[=ssm_control]{ssm_control()}}), so the
+spread of the simulated tracks matches the inflated \code{x.se} and \code{y.se}. Has
+no effect on other tracks (factor 1).}
 }
 \value{
 a \code{fG_sim_post} object containing the paths simulated from a
@@ -23,8 +29,10 @@ a \code{fG_sim_post} object containing the paths simulated from a
 }
 \description{
 simulates track locations from the joint precision matrix of a
-\code{ssm} model fit. Currently, the joint precision of the SSM movement
-parameters is not included (ie. a full posterior simulation).
+\code{ssm} model fit. The joint precision covers both the random effects
+(locations) and the fixed effects (SSM movement and observation
+parameters), so the simulated locations include uncertainty in the SSM
+parameters, to the order of the Laplace approximation.
 }
 \examples{
 fit <- fit_ssm(ellie, model = "crw", time.step = 24)

@@ -2,26 +2,40 @@
 % Please edit documentation in R/fit_hmm.R
 \name{fit_hmm}
 \alias{fit_hmm}
-\title{Fit a hidden Markov model to SSM-predicted tracks, by multiple imputation}
+\title{Fit a hidden Markov model to tracks, by multiple imputation}
 \usage{
 fit_hmm(
   x,
   reps = 20,
   n_states = 2,
+  time.step = NULL,
+  max_gap = NULL,
+  kineis = ssm_control()$kineis,
   step_par = NULL,
   angle_par = NULL,
-  silent = TRUE
+  silent = TRUE,
+  progress = TRUE
 )
 }
 \arguments{
-\item{x}{an \code{ssm_df} fit object from a \code{crw} or \code{rw} model, with regular
-predicted locations (\code{time.step} a positive number). The time step should
-be long enough that movement between predicted locations is large relative
-to location error (e.g. 6-24 h for Kinéis or Argos data).}
+\item{x}{an \code{ssm_df} fit object (\code{rw}, \code{crw} or \code{mp}) with regular
+predicted locations, or a data frame of Kinéis locations (see
+\code{\link[=impute_tracks]{impute_tracks()}}). The time step should be long enough that movement
+between locations is large relative to location error (e.g. 6-24 h for
+Kinéis or Argos data).}
 
 \item{reps}{number of imputed tracks (default 20).}
 
 \item{n_states}{number of behavioural states (default 2).}
+
+\item{time.step}{for Kinéis locations, the time step (h) of the regular grid
+(see \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{max_gap}{for Kinéis locations, the longest gap (h) interpolated
+across (see \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{kineis}{for Kinéis locations, the Kinéis error model (see
+\code{\link[=impute_tracks]{impute_tracks()}}).}
 
 \item{step_par}{optional list of starting values for the step-length
 distribution (\code{mean}, \code{sd}, each of length \code{n_states}, km). By default,
@@ -32,12 +46,17 @@ distribution (\code{mu}, \code{kappa}, each of length \code{n_states}). By defau
 \code{mu = 0} and \code{kappa} increasing from 0.5 to 5 across states.}
 
 \item{silent}{logical; suppress hmmTMB fitting output (default TRUE).}
+
+\item{progress}{logical; show a progress bar over imputations (default
+TRUE).}
 }
 \value{
 a list with class \code{hmm_mi}:
 \enumerate{
-\item \code{states}: a tibble of the SSM-predicted locations (\code{id}, \code{date}, \code{lon},
-\code{lat}), the step length (km) and turning angle (radians; positive for a
+\item \code{states}: a tibble of the point-estimate track (\code{id}, \code{segment},
+\code{date}, \code{lon}, \code{lat}: the SSM-predicted locations, or the Kinéis locations
+interpolated without perturbation), the step length (km) and turning angle
+(radians; positive for a
 left, counter-clockwise turn) of the predicted track, the
 probability of each state averaged across imputations (\code{p1}, \code{p2}, ...),
 the most probable state (\code{state}), and the proportion of imputations whose
@@ -45,35 +64,46 @@ Viterbi state equals \code{state} (\code{agreement});
 \item \code{par}: a tibble of the estimated parameters for each imputation:
 step-length mean and SD (km), turning-angle mean and concentration, and the
 transition probability matrix (\code{tpm_ij}, from state i to state j);
-\item \code{par_summary}: the mean and 2.5\\% and 97.5\\% quantiles of each parameter
-across imputations;
-\item \code{reps}, \code{n_states}, \code{n_failed}: the number of imputations, states and
-imputations whose HMM fit failed.
+\item \code{par_summary}: the pooled estimate of each parameter and its 95\\%
+interval, from Rubin's rules on the working (link) scale, back-transformed
+with hmmTMB's inverse links; \code{fraction_missing} is the share of the
+working-scale variance due to location uncertainty. Transition
+probabilities have intervals for 2 states only (with more states, each
+probability depends on several working parameters; see \code{par_working});
+\item \code{par_working}: the pooled working-scale coefficients (observation
+parameters, and transition parameters \code{Si>Sj} = log(p_ij / p_ii)), with
+their total standard errors, degrees of freedom and 95\\% intervals;
+\item \code{reps}, \code{n_states}, \code{n_failed}, \code{n_pooled}: the number of imputations,
+states, imputations whose HMM fit failed, and imputations pooled for the
+parameters (those with finite working-scale standard errors); \code{source}
+(\code{"ssm"} or \code{"kineis"}) and \code{time.step}.
 }
 }
 \description{
 Fits an \code{n_states}-state hidden Markov model (HMM) to
-step lengths and turning angles of the regular-interval locations predicted
-by an SSM fit. Location uncertainty is carried into the HMM by multiple
-imputation: \code{reps} tracks are simulated from the SSM fit's joint
-posterior with \code{\link[=sim_post]{sim_post()}}, an HMM is fitted to each with
-\code{hmmTMB}, and the results are pooled across imputations.
+step lengths and turning angles of regular-interval tracks. Location
+uncertainty is carried into the HMM by multiple imputation: \code{reps}
+tracks are imputed with \code{\link[=impute_tracks]{impute_tracks()}}, from an SSM fit or directly from
+Kinéis locations, an HMM is fitted to each with \code{hmmTMB}, and the
+results are pooled across imputations.
 }
 \details{
 The HMM has gamma-distributed step lengths, von Mises turning
 angles, a stationary initial state distribution, and no covariates. All
-tracks in \code{x} share one set of HMM parameters.
+tracks in \code{x} share one set of HMM parameters. Each track segment (see
+\code{\link[=impute_tracks]{impute_tracks()}}) is a separate series, so no step spans a data gap.
 
 States are ordered by mean step length, so state 1 has the
 shortest steps (e.g. area-restricted movement) and state \code{n_states} the
 longest (e.g. travel), in every imputation. This prevents label switching
 when results are pooled.
 
-The spread of the parameter estimates across imputations reflects location
-uncertainty only. It does not include the HMM's own estimation
-uncertainty, so the intervals in \code{par_summary} are not full confidence
-intervals. \code{\link[=sim_post]{sim_post()}} also does not include uncertainty in the SSM's
-movement parameters.
+Parameters are pooled with Rubin's rules: for each working-scale
+coefficient, the total variance is the mean within-imputation variance
+(from hmmTMB's \code{sdreport}) plus (1 + 1/m) times the between-imputation
+variance, with Rubin's degrees of freedom. Imputations whose working-scale
+standard errors are not all finite (Hessian not positive-definite) are
+excluded from parameter pooling but contribute state probabilities.
 
 Requires the \code{hmmTMB} package.
 }
@@ -83,6 +113,9 @@ fit <- fit_ssm(ellie, model = "crw", time.step = 12)
 h <- fit_hmm(fit, reps = 20)
 h$par_summary
 h$states
+
+## directly from Kinéis locations, without an SSM
+h <- fit_hmm(kineis_locations, time.step = 12)
 }
 
 }
