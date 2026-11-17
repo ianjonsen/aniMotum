@@ -111,26 +111,3 @@ fit_mpm_mi <- function(x, model, reps, time.step, max_gap, kineis,
   class(out) <- append("mpm_mi", class(out))
   out
 }
-
-##' @title Plot move persistence estimates from [fit_mpm()] with multiple
-##' imputation
-##'
-##' @param x an `mpm_mi` object from `fit_mpm(reps = )`
-##' @param ... unused
-##'
-##' @return a ggplot of move persistence (g) over time, with 95% intervals,
-##' for each id
-##'
-##' @importFrom ggplot2 ggplot aes geom_ribbon geom_line facet_wrap labs theme_minimal ylim
-##' @method plot mpm_mi
-##' @export
-##' @md
-plot.mpm_mi <- function(x, ...) {
-  ggplot(x$fitted, aes(date, g, group = segment)) +
-    geom_ribbon(aes(ymin = lower, ymax = upper), fill = "grey70", alpha = 0.5) +
-    geom_line(colour = "dodgerblue4") +
-    facet_wrap(~ id, scales = "free_x") +
-    ylim(0, 1) +
-    labs(x = NULL, y = "move persistence (g)") +
-    theme_minimal()
-}

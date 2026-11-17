@@ -172,24 +172,3 @@ mrm_fit_one <- function(s, control) {
   fxd <- summary(rep, "fixed")
   list(log_rate = rdm[, 1], log_rate.se = rdm[, 2], par = fxd[, 1:2, drop = FALSE])
 }
-
-##' @title Plot movement rate estimates from [fit_mrm()]
-##'
-##' @param x an `mrm_mi` object from [fit_mrm()]
-##' @param ... unused
-##'
-##' @return a ggplot of the movement rate over time, with 95% intervals, for
-##' each id
-##'
-##' @importFrom ggplot2 ggplot aes geom_ribbon geom_line facet_wrap labs theme_minimal
-##' @method plot mrm_mi
-##' @export
-##' @md
-plot.mrm_mi <- function(x, ...) {
-  ggplot(x$fitted, aes(date, rate)) +
-    geom_ribbon(aes(ymin = lower, ymax = upper), fill = "grey70", alpha = 0.5) +
-    geom_line(colour = "dodgerblue4") +
-    facet_wrap(~ id, scales = "free_x") +
-    labs(x = NULL, y = expression(paste("movement rate (km ", h^{-1/2}, ")"))) +
-    theme_minimal()
-}

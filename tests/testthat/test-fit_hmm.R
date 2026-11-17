@@ -16,7 +16,10 @@ test_that("hmm_moves computes step lengths and turning angles", {
 test_that("fit_hmm checks its input", {
   skip_if_not_installed("hmmTMB")
   data(ellie)
-  f <- fit_ssm(ellie, model = "crw", time.step = NA, control = ssm_control(verbose = 0))
+  ## psi is fixed: estimating it for ellie without prediction times gives a
+  ##  non-positive-definite Hessian and a warning unrelated to fit_hmm()
+  f <- fit_ssm(ellie, model = "crw", time.step = NA, map = list(psi = factor(NA)),
+               control = ssm_control(verbose = 0))
   expect_error(fit_hmm(f), "regular predicted locations")
   expect_error(fit_hmm(1), "ssm_df fit object or a data frame")
   expect_error(fit_hmm(f, n_states = 1), "n_states")

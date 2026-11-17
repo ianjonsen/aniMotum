@@ -285,3 +285,32 @@ speedfilter_int <- function (x, max.speed = NULL, test = FALSE)
 ssm_fit_complete <- function(x) {
   is.list(x) && !inherits(x, "try-error") && !is.null(x$opt) && !is.null(x$rep)
 }
+
+##' @title generate error ellipses
+##' 
+##' @description generate error ellipses from x,y coordinates, semi-major, semi-minor axes 
+##' and ellipse orientation
+##' 
+##' @param x x-coordinate, usually in projected units (km)
+##' @param y y-coordinate, usually in projected units (km)
+##' @param a ellipse semi-major axis (km)
+##' @param b ellipse semi-minor axis (km)
+##' @param theta ellipse orientation from north (degrees)
+##' @param conf logical; if TRUE (default) the 95\% confidence ellipse, with
+##' semi-axes `sqrt(qchisq(0.95, 2))` (2.448) times `a` and `b`, which
+##' contains 95\% of a bivariate normal distribution; if FALSE the 1 standard
+##' error ellipse (semi-axes `a` and `b`, 39\%)
+##'
+##' @importFrom stats qchisq
+##' @keywords internal
+elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
+  ## 95% of a bivariate normal lies within sqrt(qchisq(0.95, 2)) = 2.448
+  ##  standard errors (1.96, the univariate multiplier, gives only 85%)
+  m <- ifelse(!conf, 1, sqrt(qchisq(0.95, 2)))
+  ln <- seq(0, 2*pi, l = 50)
+  theta <- (-1 * theta + 90) / 180 * pi   ## req'd rotation to get 0 deg pointing N
+  x1 <- m * a * cos(theta) * cos(ln) - m * b * sin(theta) * sin(ln)
+  y1 <- m * a * sin(theta) * cos(ln) + m * b * cos(theta) * sin(ln)
+  
+  cbind(c(x+x1, x+x1[1]), c(y+y1, y+y1[1]))
+}
