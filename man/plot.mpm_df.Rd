@@ -13,6 +13,8 @@
   ask = TRUE,
   pal = "Plasma",
   rev = FALSE,
+  land = TRUE,
+  type = NULL,
   ...
 )
 }
@@ -20,14 +22,15 @@
 \item{x}{a \code{aniMotum} \code{mpm} fit object with class \code{mpm_df}}
 
 \item{y}{optional \code{ssm} fit object with class \code{ssm_df} corresponding to x.
-If absent, 1-d plots of \code{gamma_t} time series are rendered
-otherwise, 2-d track plots with locations coloured by `gamma_t`` are rendered.}
+Required for \code{type = "track"}, as the \code{mpm} fit does not hold locations.}
 
 \item{se}{logical (default = FALSE); should points be scaled by \code{gamma_t}
 uncertainty (ignored if y is not supplied)}
 
-\item{pages}{plots of all individuals on a single page (pages = 1; default)
-or each individual on a separate page (pages = 0)}
+\item{pages}{for \code{type = "timeseries"}, one plot per individual on
+separate pages (\code{pages = 0}, default) or all plots on one page
+(\code{pages = 1}); for \code{type = "track"}, one map per individual (\code{pages = 0})
+or all tracks on one map (\code{pages = 1})}
 
 \item{ncol}{number of columns to use for faceting. Default is ncol = 1 but
 this may be increased for multi-individual objects. Ignored if pages = 0}
@@ -36,10 +39,16 @@ this may be increased for multi-individual objects. Ignored if pages = 0}
 plot is rendered (not for a single track, which is drawn directly). set to
 FALSE to return ggplot objects}
 
-\item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Plasma";
-see \link[grDevices:palettes]{grDevices::hcl.pals} for options)}
+\item{pal}{\link[grDevices:hcl.colors]{grDevices::hcl.colors} palette to use (default: "Plasma";
+see \link[grDevices:hcl.pals]{grDevices::hcl.pals} for options)}
 
 \item{rev}{reverse colour palette (logical)}
+
+\item{land}{logical; for \code{type = "track"}, draw land (default TRUE)}
+
+\item{type}{\code{"timeseries"} (1-d plots of \code{gamma_t} against time) or
+\code{"track"} (tracks with locations coloured by \code{gamma_t}; needs \code{y}). If NULL
+(default), \code{"track"} when \code{y} is supplied, otherwise \code{"timeseries"}.}
 
 \item{...}{additional arguments to be ignored}
 }
@@ -63,6 +72,9 @@ xm <- fit_mpm(xs, model = "jmpm")
 
 # plot 1-D mp timeseries on 1 page
 plot(xm, pages = 1)
+
+# all tracks, coloured by move persistence, on one map
+plot(xm, xs, type = "track", pages = 1)
 
 
 }

@@ -41,3 +41,15 @@ test_that("plot completes silently - predicted", {
 })
 
 system("rm Rplots.pdf")
+
+
+## move persistence from an mp fit: types 3 and 4 use the fit_mpm() plot code
+test_that("mp fit plots move persistence (types 3 and 4)", {
+  xmp <- fit_ssm(ellie, spdf = FALSE, model = "mp", time.step = 72,
+                 control = ssm_control(verbose = 0))
+  tp <- plot(xmp, what = "predicted", type = 3, pages = 0, ask = FALSE)
+  expect_type(tp, "list")
+  expect_equal(tp[[1]]$labels$y, "move persistence (g), normalised")
+  tp <- plot(xmp, what = "predicted", type = 4, pages = 1)
+  expect_s3_class(tp, c("gg","ggplot"))
+})

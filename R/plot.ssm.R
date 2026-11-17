@@ -7,8 +7,10 @@
 ##' fitted, predicted, or rerouted
 ##' @param type of plot to generate: 1-d time series for lon and lat separately 
 ##' (type = 1, default); 2-d track plot (type = 2); 1-d time series of move
-##' persistence estimates (type = 3; if fitted model was `mp`); 2-d track plot 
-##' with locations coloured by move persistence (type = 4; if fitted model was `mp`)
+##' persistence estimates (type = 3; if fitted model was `mp`); track map 
+##' with locations coloured by move persistence (type = 4; if fitted model was
+##' `mp`). Types 3 and 4 are drawn as by [plot.mpm_mi()] (`type = "timeseries"`
+##' and `type = "track"`); for type 4, `pages = 1` draws all tracks on one map
 ##' @param outlier include outlier locations dropped by prefilter 
 ##' (outlier = TRUE, default)
 ##' @param alpha opacity of standard errors. Lower opacity can ease visualization
@@ -22,7 +24,8 @@
 ##' @param pal [grDevices::hcl.colors] palette to use (see [grDevices::hcl.pals()]
 ##' for options)
 ##' @param normalise logical; if plotting move persistence estimates from an `mp`
-##' model fit, should estimates be normalised to 0,1 (default = TRUE).
+##' model fit, should estimates be normalised to 0,1 (default = TRUE). The 95%
+##' interval is rescaled with them and truncated to 0,1.
 ##' @param group logical; should `g` be normalised among individuals as a group, 
 ##' a 'relative g', or to individuals separately to highlight regions of lowest 
 ##' and highest move persistence along single tracks (default = FALSE).
@@ -93,23 +96,23 @@ plot.ssm_df <-
       
       switch(what,
              fitted = {
-               ssm <- grab(x, "fitted", as_sf = FALSE, normalise = normalise, group = group)
+               ssm <- grab(x, "fitted", as_sf = FALSE, normalise = FALSE)
              },
              predicted = {
                if (any(sapply(x$ssm, function(.)
                  is.na(.$ts)))) {
-                 ssm <- grab(x, "fitted", as_sf = FALSE, normalise = normalise, group = group)
+                 ssm <- grab(x, "fitted", as_sf = FALSE, normalise = FALSE)
                  warning(
                    "there are no predicted locations because you used time.step = NA when calling `fit_ssm`, plotting fitted locations instead",
                    call. = FALSE
                  )
                } else {
-                 ssm <- grab(x, "predicted", as_sf = FALSE, normalise = normalise, group = group)
+                 ssm <- grab(x, "predicted", as_sf = FALSE, normalise = FALSE)
                }
              },
              rerouted = {
                if (any(sapply(x$ssm, function(.) "rerouted" %in% names(.)))) {
-                 ssm <- grab(x, "rerouted", as_sf = FALSE, normalise = normalise, group = group)
+                 ssm <- grab(x, "rerouted", as_sf = FALSE, normalise = FALSE)
                } else {
                  stop(
                    "there are no rerouted locations present",
@@ -342,130 +345,14 @@ plot.ssm_df <-
         } else if (pages) {
           wrap_plots(p, ncol = ncol, heights = rep(1, ceiling(length(p) / ncol)))
         }
-      } else if (type == 3) {
+      } else {
+        ## types 3 and 4: move persistence, drawn by the same code as plot()
+        ##  for fit_mpm() output
         stopifnot("This plot type not applicable for `rw` and `crw` model fits" = 
                     "g" %in% names(ssm))
-        ssm.lst <- split(ssm, ssm$id)
-        p <- lapply(1:nrow(x), function(i) {
-          if(normalise) {
-            ## rescale CI's naively
-            ymin <- plogis(ifelse(
-              qlogis(ssm.lst[[i]]$g) == Inf,
-              6,
-              ifelse(qlogis(ssm.lst[[i]]$g) == -Inf,-6, qlogis(ssm.lst[[i]]$g))
-            )
-            - 1.96 * ssm.lst[[i]]$logit_g.se)
-            ymax <- plogis(ifelse(
-              qlogis(ssm.lst[[i]]$g) == Inf,
-              6,
-              ifelse(qlogis(ssm.lst[[i]]$g) == -Inf,-6, qlogis(ssm.lst[[i]]$g))
-            )
-            + 1.96 * ssm.lst[[i]]$logit_g.se)
-          } else {
-            ymin <- plogis(ssm.lst[[i]]$logit_g - 1.96 * ssm.lst[[i]]$logit_g.se)
-            ymax <- plogis(ssm.lst[[i]]$logit_g + 1.96 * ssm.lst[[i]]$logit_g.se)
-          }
-          m <- ggplot() +
-            geom_ribbon(
-              data = ssm.lst[[i]],
-              aes(date,
-              ymin = ymin,
-              ymax = ymax),
-              fill = grey(0.35),
-              alpha = 0.25) +
-            geom_line(
-              data = ssm.lst[[i]],
-              aes(date, g, col = g),
-              linewidth = 0.3
-            ) +
-            geom_point(
-              data = ssm.lst[[i]],
-              aes(date, g, col = g),
-              shape = 20,
-              size = 1.5
-            ) +
-            scale_colour_gradientn(
-              colours = hcl.colors(n = 100, palette = pal),
-              limits = c(0,1),
-              name = expression(gamma[t]),
-              na.value = grey(0.5)
-            ) +
-            labs(title = paste("id:", x[i, "id"]))
-          
-          
-          m <- m +
-            xlab("") +
-            ylab(expression(gamma[t])) +
-            theme_minimal()
-          m
-        })
-        names(p) <- x$id
-        if (!pages) {
-          if(ask & nrow(x) > 1) {
-            devAskNewPage(ask = TRUE)
-            print(p)
-            devAskNewPage(ask = FALSE)
-          } else {
-            return(p)
-          }
-        } else if (pages) {
-          wrap_plots(p, ncol = ncol, byrow = TRUE, guides = "collect") 
-            
-        }
-      } else if (type == 4) {
-        stopifnot("This plot type not applicable for `rw` and `crw` model fits" = 
-                    "g" %in% names(ssm))
-        ssm.lst <- split(ssm, ssm$id)
-        p <- lapply(1:nrow(x), function(i) {
-          g.33 <- subset(ssm.lst[[i]], g <= quantile(ssm.lst[[i]]$g, 0.33, na.rm = TRUE))
-          m <- ggplot() +
-            geom_path(
-              data = ssm.lst[[i]],
-              aes(x, y), 
-              col = grey(0.7),
-              linewidth = 0.2
-            ) +
-            geom_point(
-              data = ssm.lst[[i]],
-              aes(x, y, col = g),
-              shape = 20,
-              size = 2
-            ) +
-            geom_point(data = g.33,
-                       aes(x, y, col = g),
-                       shape = 20,
-                       size = 2
-            ) +
-            scale_colour_gradientn(
-              colours = hcl.colors(n=100, palette = pal),
-              limits = c(0,1),
-              name = expression(gamma[t]),
-              na.value = grey(0.5)
-              ) +
-            labs(title = paste("id:", x[i, "id"])) +
-            coord_fixed()
-          
-          m <- m +
-            xlab("") +
-            ylab("") +
-            theme_minimal()
-          m
-        })
-        names(p) <- x$id
-        if (!pages) {
-          if(ask & nrow(x) > 1) {
-            devAskNewPage(ask = TRUE)
-            print(p)
-            devAskNewPage(ask = FALSE)
-          } else {
-            return(p)
-          }
-        } else if (pages) {
-          wrap_plots(p, 
-                     ncol = ncol, 
-                     heights = rep(1, ceiling(length(p) / ncol)),
-                     guides = "collect")
-        }
+        mpm_plot(ssm, type = if (type == 3) "timeseries" else "track",
+                 pages = pages, ncol = ncol, ask = ask, pal = pal, rev = FALSE,
+                 land = TRUE, normalise = normalise, group = group)
       }
     } else {
       stop("x must be an `ssm_df` tibble")

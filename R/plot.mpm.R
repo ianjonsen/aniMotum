@@ -3,13 +3,17 @@
 ##' @description visualize fits from an mpm object
 ##'
 ##' @param x a `aniMotum` `mpm` fit object with class `mpm_df`
-##' @param y optional `ssm` fit object with class `ssm_df` corresponding to x. 
-##' If absent, 1-d plots of `gamma_t` time series are rendered 
-##' otherwise, 2-d track plots with locations coloured by `gamma_t`` are rendered.
+##' @param y optional `ssm` fit object with class `ssm_df` corresponding to x.
+##' Required for `type = "track"`, as the `mpm` fit does not hold locations.
+##' @param type `"timeseries"` (1-d plots of `gamma_t` against time) or
+##' `"track"` (tracks with locations coloured by `gamma_t`; needs `y`). If NULL
+##' (default), `"track"` when `y` is supplied, otherwise `"timeseries"`.
 ##' @param se logical (default = FALSE); should points be scaled by `gamma_t` 
 ##' uncertainty (ignored if y is not supplied)
-##' @param pages plots of all individuals on a single page (pages = 1; default) 
-##' or each individual on a separate page (pages = 0) 
+##' @param pages for `type = "timeseries"`, one plot per individual on
+##' separate pages (`pages = 0`, default) or all plots on one page
+##' (`pages = 1`); for `type = "track"`, one map per individual (`pages = 0`)
+##' or all tracks on one map (`pages = 1`)
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but 
 ##' this may be increased for multi-individual objects. Ignored if pages = 0
 ##' @param ask logical; if TRUE (default) user is asked for input before each 
@@ -18,6 +22,7 @@
 ##' @param pal [grDevices::hcl.colors] palette to use (default: "Plasma"; 
 ##' see [grDevices::hcl.pals] for options)
 ##' @param rev reverse colour palette (logical)
+##' @param land logical; for `type = "track"`, draw land (default TRUE)
 ##' @param ... additional arguments to be ignored
 ##' 
 ##' @return a ggplot object with either: 1-d time series of `gamma_t` estimates 
@@ -43,6 +48,9 @@
 ##' 
 ##' # plot 1-D mp timeseries on 1 page
 ##' plot(xm, pages = 1)
+##'
+##' # all tracks, coloured by move persistence, on one map
+##' plot(xm, xs, type = "track", pages = 1)
 ##' 
 ##'
 ##' @export
@@ -57,6 +65,8 @@ plot.mpm_df <-
            ask = TRUE,
            pal = "Plasma",
            rev = FALSE,
+           land = TRUE,
+           type = NULL,
            ...
   )
 {
@@ -67,7 +77,15 @@ plot.mpm_df <-
   stopifnot("palette is not an hcl.palette, type 'hcl.pals()' to see the list of palettes" = 
               pal %in% hcl.pals())
   
-  cpal <- hcl.colors(n = 5, pal)
+  ## default type: track plots when the ssm fit is supplied (as before)
+  type <- if (is.null(type)) {
+    if (is.null(y)) "timeseries" else "track"
+  } else {
+    match.arg(type, c("timeseries", "track"))
+  }
+  if (type == "track" && is.null(y))
+    stop("type = \"track\" needs the ssm fit for the locations: plot(x, y = <ssm fit>, type = \"track\")",
+         call. = FALSE)
   
   if(inherits(x, "mpm_df") & (inherits(y, "ssm_df") | is.null(y))) {
     d <- grab(x)
@@ -83,7 +101,7 @@ plot.mpm_df <-
     }
     d <- split(d, d$id)
     
-    if(is.null(y)) {
+    if(type == "timeseries") {
       p <- lapply(1:length(d), function(i) {
         ggplot(d[[i]]) +
           geom_ribbon(aes(
@@ -120,66 +138,25 @@ plot.mpm_df <-
       } else if (pages) {
         wrap_plots(p, ncol = ncol, byrow = TRUE, guides = "collect")
       }  
-    } else if(!is.null(y)) {
+    } else {
       if(nrow(grab(y, "predicted")) != nrow(grab(x, "fitted"))) {
         if(nrow(grab(y, "fitted")) != nrow(grab(x, "fitted"))) {
           stop("x and y have unequal numbers of estimated values")
         } else {
           xy <- join(y, x, what.ssm = "fitted", as_sf = FALSE)
-          xy <- split(xy, xy$id)
         }
       } else {
         xy <- join(y, x, as_sf = FALSE)
-        xy <- split(xy, xy$id)
       }
-      
-      p <- lapply(xy, function(x) {
-        px <- ggplot(x) +
-          geom_path(aes(lon, lat),
-                    linewidth = 0.25,
-                    col = cpal[1],
-                    alpha = 0.75)
-        if(se) {
-          ## SE inidicative only
-          px <- px + 
-            geom_point(aes(lon, lat, colour = g, size = logit_g.se ^ -2),
-                     show.legend = c("colour" = TRUE, "size" = FALSE)) +
-            scale_size(range = c(0.1, 2.5))
-        } else if(!se) {
-          px <- px +
-            geom_point(aes(lon, lat, colour = g), size = 1)
-        }
-        px <- px + scale_colour_gradientn(
-            breaks = c(0, 0.25, 0.5, 0.75, 1),
-            colours = hcl.colors(n = 100, palette = pal, rev = rev),
-            limits = c(0, 1),
-            name = expression(gamma[t])
-          ) +
-          labs(title = paste("id:", unique(x$id))) +
-          xlab("") +
-          ylab("") +
-          coord_fixed() +
-          theme_minimal()
-        px
-      })
-      names(p) <- y$id
-      
-      if (!pages) {
-        if(ask && length(p) > 1) {
-          devAskNewPage(ask = TRUE)
-          print(p)
-          devAskNewPage(ask = FALSE)
-        } else if(ask) {
-          ## a single track: draw it without asking for input
-          print(p[[1]])
-          return(invisible(p))
-        } else {
-          return(p)
-        }
-      } else if (pages) {
-        wrap_plots(p, ncol = ncol, heights = rep(2, ceiling(length(p)/ncol)), 
-                   guides = "collect")
-      }
+      xy <- as.data.frame(xy)
+      ## point size proportional to SE^-2 (indicative only)
+      if (se) xy$se_weight <- xy$logit_g.se^-2
+      scale <- scale_colour_gradientn(breaks = c(0, 0.25, 0.5, 0.75, 1),
+                                      colours = hcl.colors(n = 100, palette = pal, rev = rev),
+                                      limits = c(0, 1),
+                                      name = expression(gamma[t]))
+      behav_tracks(xy, "g", scale, pages, ask, land,
+                   size = if (se) "se_weight" else NULL)
     }
     
   } else {

@@ -1,18 +1,27 @@
-## Plot methods for the behavioural models fitted by multiple imputation:
-##  fit_mpm(reps = ) (class mpm_mi), fit_mrm() (mrm_mi) and fit_hmm() (hmm_mi).
-##  They share the arguments of plot.mpm_df() and the helpers below.
+## Plot methods for the behavioural models: fit_mpm() (classes mpm_mi and
+##  mpm_df; also used by plot.ssm_df() for mp fits), fit_mrm() (mrm_mi) and
+##  fit_hmm() (hmm_mi). They share the helpers below.
 
-##' @title Plot move persistence estimates from [fit_mpm()] with multiple
-##' imputation
+##' @title Plot move persistence estimates from [fit_mpm()]
 ##'
-##' @description Plots of move persistence (g) from `fit_mpm(reps = )`:
-##' 1. `type = "timeseries"`: g against time for each track, with the pooled
-##' 95% interval;
-##' 2. `type = "track"`: tracks (point-estimate locations) with locations
-##' coloured by g.
+##' @description Plots of move persistence (g) from [fit_mpm()], with or
+##' without multiple imputation (`reps`):
+##' 1. `type = "timeseries"`: g against time for each track, with its 95%
+##' interval;
+##' 2. `type = "track"`: tracks with locations coloured by g.
 ##'
-##' @param x an `mpm_mi` object from `fit_mpm(reps = )`
-##' @param type `"timeseries"` (default) or `"track"`
+##' The same plots are drawn for `mp` model fits from [fit_ssm()] by
+##' `plot(x, type = 3)` (time series) and `plot(x, type = 4)` (tracks); see
+##' [plot.ssm_df()].
+##'
+##' @param x an `mpm_mi` object from `fit_mpm(reps = )`, or an `mpm_df` object
+##' from `fit_mpm()` without `reps`, including fits from earlier versions of
+##' aniMotum
+##' @param y for an `mpm_df` object, the `ssm_df` fit that `x` was fitted to.
+##' Required for `type = "track"`, because an `mpm_df` object holds no
+##' locations. Ignored for an `mpm_mi` object, which holds its locations
+##' @param type `"timeseries"` or `"track"`. If NULL (default), `"track"` when
+##' `y` is supplied, otherwise `"timeseries"`
 ##' @param pages for `type = "timeseries"`, one plot per track on separate
 ##' pages (`pages = 0`, default) or all plots on one page (`pages = 1`); for
 ##' `type = "track"`, one map per track (`pages = 0`) or all tracks on one map
@@ -26,15 +35,31 @@
 ##' @param rev logical; reverse the colour palette
 ##' @param land logical; add land polygons to track plots (default TRUE;
 ##' requires the `rnaturalearth` data)
+##' @param se logical; for `type = "track"`, scale point size by the inverse
+##' squared standard error of logit(g) (default FALSE; indicative only)
+##' @param normalise logical; rescale g to the range 0 to 1 (default FALSE).
+##' The interval is rescaled with g and truncated to 0 to 1
+##' @param group logical; with `normalise = TRUE`, rescale g over all tracks
+##' together (TRUE) or over each track separately (FALSE, default)
 ##' @param ... unused
 ##'
 ##' @return a list of ggplot objects (`pages = 0`, `ask = FALSE`), a patchwork
 ##' or ggplot object (`pages = 1`), or plots rendered one at a time
 ##' (`pages = 0`, `ask = TRUE`)
 ##'
+##' @details The 95% interval is the pooled (Rubin's rules) interval for an
+##' `mpm_mi` object, and `plogis(logit_g -/+ 1.96 * logit_g.se)` otherwise.
+##'
 ##' @examples
+##' ## move persistence model fitted to ssm-estimated locations
+##' xs <- fit_ssm(sese2, spdf = FALSE, model = "rw", time.step = 72,
+##'               control = ssm_control(verbose = 0))
+##' xm <- fit_mpm(xs, model = "jmpm")
+##' plot(xm, pages = 1)
+##' plot(xm, xs, type = "track", pages = 1)
+##'
 ##' \dontrun{
-##' xs <- fit_ssm(sese2, model = "rw", time.step = 72, control = ssm_control(verbose = 0))
+##' ## with multiple imputation of the locations
 ##' m <- fit_mpm(xs, model = "jmpm", reps = 20)
 ##' plot(m, pages = 1)
 ##' plot(m, type = "track", pages = 1)
@@ -43,29 +68,114 @@
 ##' @importFrom ggplot2 ggplot aes geom_ribbon geom_line geom_point geom_path
 ##' @importFrom ggplot2 scale_colour_gradientn labs xlab ylab ylim theme_minimal
 ##' @importFrom grDevices hcl.colors hcl.pals
+##' @importFrom stats plogis qlogis qnorm
 ##' @method plot mpm_mi
 ##' @export
 ##' @md
 plot.mpm_mi <- function(x,
-                        type = c("timeseries", "track"),
+                        y = NULL,
+                        type = NULL,
                         pages = 0,
                         ncol = 1,
                         ask = TRUE,
                         pal = "Plasma",
                         rev = FALSE,
                         land = TRUE,
+                        se = FALSE,
+                        normalise = FALSE,
+                        group = FALSE,
                         ...) {
-  type <- match.arg(type)
+  if (length(list(...)) > 0) warning("additional arguments ignored", call. = FALSE)
   behav_check_pal(pal)
-  d <- as.data.frame(x$fitted)
+  ## default type: track plots when the ssm fit is supplied (as in earlier
+  ##  versions of plot() for fit_mpm() output)
+  type <- if (is.null(type)) {
+    if (is.null(y)) "timeseries" else "track"
+  } else {
+    match.arg(type, c("timeseries", "track"))
+  }
+  if (inherits(x, "mpm_mi") && !is.null(y)) {
+    warning("`y` ignored: fit_mpm(reps = ) output holds its own locations", call. = FALSE)
+    y <- NULL
+  }
+  if (type == "track" && !inherits(x, "mpm_mi") && is.null(y))
+    stop("type = \"track\" needs the ssm fit for the locations: plot(x, y = <ssm fit>, type = \"track\")",
+         call. = FALSE)
+  mpm_plot(mpm_plot_data(x, y), type, pages, ncol, ask, pal, rev, land,
+           se = se, normalise = normalise, group = group)
+}
+
+##' @rdname plot.mpm_mi
+##' @method plot mpm_df
+##' @export
+plot.mpm_df <- function(x, y = NULL, ...) plot.mpm_mi(x, y = y, ...)
+
+## move persistence estimates in one layout for plotting: id, date, g,
+##  logit_g, logit_g.se, and lon, lat when the locations are available
+mpm_plot_data <- function(x, y = NULL) {
+  if (inherits(x, "mpm_mi")) return(as.data.frame(x$fitted))
+  if (!inherits(x, c("mpm_df", "fG_mpm")))
+    stop("x must be a fit_mpm() object", call. = FALSE)
+  if (is.null(y)) {
+    d <- as.data.frame(grab(x, "fitted"))
+    ## earlier layout: g and g.se, with g.se on the logit scale
+    if (!"logit_g" %in% names(d)) {
+      d$logit_g <- qlogis(pmin(pmax(d$g, 0.001), 0.999))
+      d$logit_g.se <- d$g.se
+    }
+    return(d)
+  }
+  if (!inherits(y, "ssm_df"))
+    stop("y must be the ssm fit (class `ssm_df`) that x was fitted to", call. = FALSE)
+  ## x may have been fitted to the predicted or the fitted locations
+  nx <- nrow(grab(x, "fitted"))
+  np <- tryCatch(nrow(grab(y, "predicted")), error = function(e) NA)
+  what.ssm <- if (isTRUE(np == nx)) {
+    "predicted"
+  } else if (nrow(grab(y, "fitted")) == nx) {
+    "fitted"
+  } else {
+    stop("x and y have unequal numbers of estimated values", call. = FALSE)
+  }
+  as.data.frame(join(y, x, what.ssm = what.ssm, as_sf = FALSE))
+}
+
+## draw the move persistence plots from data in the mpm_plot_data() layout;
+##  shared by plot.mpm_mi(), plot.mpm_df() and plot.ssm_df() (types 3 and 4)
+mpm_plot <- function(d, type, pages, ncol, ask, pal, rev, land,
+                     se = FALSE, normalise = FALSE, group = FALSE) {
+  d <- as.data.frame(d)
+  ## 95% interval from the standard error of logit(g), unless pooled
+  if (!all(c("lower", "upper") %in% names(d))) {
+    d$lower <- plogis(d$logit_g - qnorm(0.975) * d$logit_g.se)
+    d$upper <- plogis(d$logit_g + qnorm(0.975) * d$logit_g.se)
+  }
+  if (normalise) d <- mpm_normalise(d, group)
+  label <- if (normalise) "move persistence (g), normalised" else "move persistence (g)"
   scale <- scale_colour_gradientn(colours = hcl.colors(100, pal, rev = rev),
-                                  limits = c(0, 1), name = "g")
+                                  limits = c(0, 1), breaks = seq(0, 1, 0.25),
+                                  name = "g", na.value = "grey50")
   if (type == "timeseries") {
-    p <- behav_timeseries(d, "g", scale, ylab = "move persistence (g)", limits = c(0, 1))
+    p <- behav_timeseries(d, "g", scale, ylab = label, limits = c(0, 1))
     behav_output(p, pages, ncol, ask)
   } else {
-    behav_tracks(d, "g", scale, pages, ask, land)
+    ## point size proportional to SE^-2 (indicative only)
+    if (se) d$se_weight <- d$logit_g.se^-2
+    behav_tracks(d, "g", scale, pages, ask, land,
+                 size = if (se) "se_weight" else NULL)
   }
+}
+
+## rescale g, and its interval, to 0 to 1 over each track (group = FALSE) or
+##  over all tracks (group = TRUE)
+mpm_normalise <- function(d, group) {
+  rescale <- function(s) {
+    lo <- min(s$g, na.rm = TRUE)
+    hi <- max(s$g, na.rm = TRUE)
+    for (v in c("g", "lower", "upper")) s[[v]] <- pmin(pmax((s[[v]] - lo) / (hi - lo), 0), 1)
+    s
+  }
+  if (group) rescale(d) else do.call(rbind, lapply(split(d, d$id), rescale))
 }
 
 ##' @title Plot movement rate estimates from [fit_mrm()]
@@ -81,6 +191,7 @@ plot.mpm_mi <- function(x,
 ##'
 ##' @inheritParams plot.mpm_mi
 ##' @param x an `mrm_mi` object from [fit_mrm()]
+##' @param type `"timeseries"` (default) or `"track"`
 ##' @param log logical; plot the speed on a log scale (default TRUE), on which
 ##' its intervals are symmetric
 ##'
@@ -269,8 +380,8 @@ behav_timeseries <- function(d, value, scale, ylab, limits = NULL, log = FALSE) 
 }
 
 ## tracks with locations coloured by value: one map per id, or all ids on
-##  one map (pages = 1)
-behav_tracks <- function(d, value, scale, pages, ask, land) {
+##  one map (pages = 1); size optionally names a column for point size
+behav_tracks <- function(d, value, scale, pages, ask, land, size = NULL) {
   map_one <- function(s, title) {
     p <- ggplot()
     if (land) {
@@ -280,7 +391,12 @@ behav_tracks <- function(d, value, scale, pages, ask, land) {
     pad <- 0.05 * max(diff(range(s$lon)), diff(range(s$lat)), 0.1)
     p + geom_path(aes(lon, lat, group = interaction(id, segment)), data = s,
                   colour = "grey40", linewidth = 0.25) +
-      geom_point(aes(lon, lat, colour = .data[[value]]), data = s, size = 1) +
+      (if (is.null(size)) {
+        geom_point(aes(lon, lat, colour = .data[[value]]), data = s, size = 1)
+      } else {
+        list(geom_point(aes(lon, lat, colour = .data[[value]], size = .data[[size]]), data = s),
+             ggplot2::scale_size(range = c(0.1, 2.5), guide = "none"))
+      }) +
       scale +
       ggplot2::coord_sf(xlim = range(s$lon) + c(-pad, pad), ylim = range(s$lat) + c(-pad, pad),
                         crs = 4326, default_crs = 4326, expand = FALSE) +
@@ -301,7 +417,7 @@ behav_land <- function() {
   if (inherits(wm, "try-error")) NULL else wm
 }
 
-## return or render a list of plots, as plot.mpm_df() does; a single plot
+## return or render a list of plots; a single plot
 ##  (one track) is drawn without asking for input
 behav_output <- function(p, pages, ncol, ask) {
   if (!pages) {

@@ -27,8 +27,10 @@ fitted, predicted, or rerouted}
 
 \item{type}{of plot to generate: 1-d time series for lon and lat separately
 (type = 1, default); 2-d track plot (type = 2); 1-d time series of move
-persistence estimates (type = 3; if fitted model was \code{mp}); 2-d track plot
-with locations coloured by move persistence (type = 4; if fitted model was \code{mp})}
+persistence estimates (type = 3; if fitted model was \code{mp}); track map
+with locations coloured by move persistence (type = 4; if fitted model was
+\code{mp}). Types 3 and 4 are drawn as by \code{\link[=plot.mpm_mi]{plot.mpm_mi()}} (\code{type = "timeseries"}
+and \code{type = "track"}); for type 4, \code{pages = 1} draws all tracks on one map}
 
 \item{outlier}{include outlier locations dropped by prefilter
 (outlier = TRUE, default)}
@@ -49,7 +51,8 @@ is rendered. set to FALSE to return ggplot objects}
 for options)}
 
 \item{normalise}{logical; if plotting move persistence estimates from an \code{mp}
-model fit, should estimates be normalised to 0,1 (default = TRUE).}
+model fit, should estimates be normalised to 0,1 (default = TRUE). The 95\%
+interval is rescaled with them and truncated to 0,1.}
 
 \item{group}{logical; should \code{g} be normalised among individuals as a group,
 a 'relative g', or to individuals separately to highlight regions of lowest
