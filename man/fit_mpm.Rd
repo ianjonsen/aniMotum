@@ -21,25 +21,35 @@ fit_mpm(
 )
 }
 \arguments{
-\item{x}{a \code{ssm_df} fit object or a data frame of observations (see details).
-With \code{reps}, an \code{ssm_df} fit object (\code{rw}, \code{crw} or \code{mp}) with regular
-predicted locations, or a data frame of Kinéis locations (see
-\code{\link[=impute_tracks]{impute_tracks()}})}
+\item{x}{one of:
+\enumerate{
+\item an \code{ssm_df} fit object from \code{\link[=fit_ssm]{fit_ssm()}} (\code{rw}, \code{crw} or \code{mp});
+\item a data frame of Kinéis locations with error radii, or the path to a
+file of them (see \code{\link[=impute_tracks]{impute_tracks()}}). Kinéis locations need \code{reps} and
+\code{time.step};
+\item a data frame of locations: \code{id}, \code{date} and two coordinate columns
+(see \code{coords}), treated as data. \code{reps} is not available.
+}}
 
-\item{what}{if a \code{ssm_df} fit object is supplied then \code{what} determines
-whether fitted, predicted (default), or rerouted values are mapped; ignored if
-\code{x} is a data frame}
+\item{what}{for an \code{ssm_df} fit without \code{reps}, the locations fitted:
+\code{"predicted"} (default), \code{"fitted"} or \code{"rerouted"}. With \code{reps}, the
+imputed tracks are at the predicted times, so only \code{"predicted"}}
 
-\item{model}{mpm model to fit; either \code{mpm} with unpooled random walk
-variance parameters (\code{sigma_(g,i)}) or \code{jmpm} with a single,
-pooled random variance parameter (\code{sigma_g})}
+\item{model}{mpm model to fit; either \code{jmpm} (default) with a single,
+pooled random walk variance parameter (\code{sigma_g}) for all tracks, or \code{mpm}
+with a separate variance parameter (\code{sigma_(g,i)}) for each track, fitted
+separately}
 
-\item{coords}{column numbers of the location coordinates (default = 3:4)}
+\item{coords}{for a data frame of locations, the column numbers of the
+coordinates (default = 3:4). Coordinates named \code{lon} and \code{lat} are kept as
+the track's longitude and latitude; others (e.g. projected \code{x}, \code{y}) are
+fitted, but \code{lon} and \code{lat} are missing in the output, so the track cannot
+be mapped}
 
 \item{control}{list of control settings for the outer optimizer
-(see \link{mpm_control} for details). With \code{model = "mpm"} and more than one
-individual, \code{verbose = 1} shows a progress bar over individuals instead of
-the parameter trace; with \code{reps}, a progress bar over the imputation fits}
+(see \link{mpm_control} for details). With more than one fit (\code{mpm}
+with more than one track, or \code{reps}), \code{verbose = 1} shows a progress bar
+over the fits instead of the parameter trace}
 
 \item{inner.control}{list of control parameters for the inner optimization}
 
@@ -55,66 +65,79 @@ see \link{ssm_control} for details}
 \item{reps}{if NULL (default), the model is fitted once, treating the
 locations as data. If a number, the model is fitted to \code{reps} tracks
 imputed with \code{\link[=impute_tracks]{impute_tracks()}}, and the estimates are pooled with Rubin's
-rules, so the results carry location uncertainty (see details).}
+rules (see details)}
 
-\item{time.step}{with \code{reps} and Kinéis locations, the time step (h) of
-the regular grid (see \code{\link[=impute_tracks]{impute_tracks()}})}
+\item{time.step}{for Kinéis locations, the time step (h) of the regular
+grid (see \code{\link[=impute_tracks]{impute_tracks()}}); required}
 
-\item{max_gap}{with \code{reps} and Kinéis locations, the longest gap (h)
-interpolated across (see \code{\link[=impute_tracks]{impute_tracks()}})}
+\item{max_gap}{for Kinéis locations, the longest gap (h) interpolated
+across (see \code{\link[=impute_tracks]{impute_tracks()}})}
 
-\item{kineis}{with \code{reps} and Kinéis locations, the Kinéis error model (see
+\item{kineis}{for Kinéis locations, the Kinéis error model (see
 \code{\link[=impute_tracks]{impute_tracks()}})}
 }
 \value{
-a list with components
-\itemize{
-\item \code{fitted} a dataframe of fitted locations
-\item \code{par} model parameter summary
-\item \code{data} input data.frame
-\item \code{tmb} the \code{TMB} object
-\item \code{opt} the object returned by the optimizer
-}
-
-With \code{reps}, a list with class \code{mpm_mi}:
-\itemize{
-\item \code{fitted} a tibble with, for each id, track segment and time, the
-point-estimate track (\code{lon}, \code{lat}), the pooled \code{logit_g} and its total
-standard error (\code{logit_g.se}), move persistence \code{g} and its 95\% interval
-(\code{lower}, \code{upper}), and the fraction of missing information
-(\code{fraction_missing}: the share of the variance due to location
-uncertainty)
-\item \code{par} pooled estimates of \code{sigma_g}, \code{sigma_x} and \code{sigma_y} (\code{sigma_x},
-\code{sigma_y} in coordinates divided by the largest absolute x or y), by
-track segment (\code{mpm}) or joint
-(\code{jmpm})
-\item \code{model}, \code{reps}, \code{n_failed} (imputed-track fits that failed or did not
-converge), \code{source} (\code{"ssm"} or \code{"kineis"}) and \code{time.step}
+a list with class \code{mpm_df}:
+\enumerate{
+\item \code{fitted}: a tibble with, for each id, track segment and time, the
+track's longitude and latitude (\code{lon}, \code{lat}: the SSM-estimated locations,
+the Kinéis locations interpolated onto the regular grid without
+perturbation, or the locations supplied), \code{logit_g} and its standard error
+(\code{logit_g.se}; with \code{reps}, the total standard error from Rubin's rules),
+move persistence \code{g} and its 95\% interval (\code{lower}, \code{upper}), and, with
+\code{reps}, the fraction of missing information (\code{fraction_missing}: the share
+of the variance due to location uncertainty);
+\item \code{par}: estimates of \code{sigma_g}, \code{sigma_x} and \code{sigma_y}, with 95\%
+intervals, by track (\code{mpm}) or joint (\code{jmpm}). \code{sigma_x} and \code{sigma_y} are
+in the fitted coordinates divided by their largest absolute value;
+\item \code{convergence}: a tibble, by track (\code{mpm}) or joint (\code{jmpm}), of the
+number of fits used (\code{fits}: 1, or the imputations pooled), the number
+that failed or did not converge (\code{failed}), and, without \code{reps}, whether
+the Hessian was positive definite (\code{pdHess}) and the \code{aic};
+\item \code{tmb}: without \code{reps}, the TMB object of each fit (e.g. for
+\code{TMB::sdreport(fit$tmb[[1]], getJointPrecision = TRUE)}); NULL with \code{reps};
+\item \code{model}, \code{reps} (0 without imputation), \code{source} (\code{"ssm"}, \code{"kineis"} or
+\code{"data"}), \code{time.step} (h; NA for irregular locations) and \code{what} (the
+\code{ssm_df} locations fitted).
 }
 }
 \description{
-fit a random walk with time-varying move persistence to
-temporally regular or irregular location data
+fit a random walk with time-varying move persistence (g) to
+animal tracks. With \code{reps}, the model is fitted to tracks imputed from an
+SSM fit or from Kinéis locations (see \code{\link[=impute_tracks]{impute_tracks()}}), and the estimates
+are pooled with Rubin's rules, so they carry location uncertainty. Without
+\code{reps}, the model is fitted once, treating the locations as data.
 }
 \details{
 With \code{reps}, the move persistence model is fitted to each imputed
 track, treating its locations as data, and Rubin's rules pool \code{logit_g} at
 each time and the log of each parameter. This replaces treating the SSM
-point estimates as data, which ignores location uncertainty. Imputed
-tracks are split into segments at long data gaps (Kinéis locations); with
-\code{mpm} each segment is fitted separately, and with \code{jmpm} each segment is a
-track.
+point estimates as data, which ignores location uncertainty. Kinéis
+locations are estimates with known error, at irregular times, so they are
+only fitted this way. Imputed Kinéis tracks are split into segments at
+gaps longer than \code{max_gap}; with \code{mpm} each segment is fitted separately,
+and with \code{jmpm} each segment is a track. Track segments with fewer than 3
+locations are dropped.
+
+Locations from an \code{ssm_df} fit are fitted in projected coordinates (\code{x},
+\code{y}, km). Coordinates are divided by one common constant, their largest
+absolute value, for the optimiser; g does not depend on this scaling.
 }
 \examples{
 ## fit jmpm to two southern elephant seal tracks
 xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
 
 fmpm <- fit_mpm(xs, model = "jmpm")
+fmpm$par
 
 ## with location uncertainty, by multiple imputation
 \dontrun{
 fmi <- fit_mpm(xs, model = "jmpm", reps = 20)
 plot(fmi)
+
+## directly from Kinéis locations, without an SSM
+fki <- fit_mpm(kineis_locations, model = "jmpm", reps = 20, time.step = 12)
+plot(fki, type = "track", pages = 1)
 }
 
 }

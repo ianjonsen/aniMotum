@@ -9,7 +9,7 @@
 ##' (type = 1, default); 2-d track plot (type = 2); 1-d time series of move
 ##' persistence estimates (type = 3; if fitted model was `mp`); track map 
 ##' with locations coloured by move persistence (type = 4; if fitted model was
-##' `mp`). Types 3 and 4 are drawn as by [plot.mpm_mi()] (`type = "timeseries"`
+##' `mp`). Types 3 and 4 are drawn as by [plot.mpm_df()] (`type = "timeseries"`
 ##' and `type = "track"`); for type 4, `pages = 1` draws all tracks on one map
 ##' @param outlier include outlier locations dropped by prefilter 
 ##' (outlier = TRUE, default)

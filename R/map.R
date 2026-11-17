@@ -3,11 +3,17 @@
 ##' @description map aniMotum-estimated locations and behavioural indices with
 ##' coastline and projection options
 ##'
-##' @param x a `aniMotum` ssm fit object with class `ssm_df` or (old) `fG_ssm`
+##' @param x a `aniMotum` ssm fit object with class `ssm_df` or (old) `fG_ssm`;
+##' or [fit_mpm()] output (class `mpm_df`, aniMotum 1.3-1 on), e.g. a move
+##' persistence model fitted directly to Kinéis locations, mapped from its
+##' own track locations. An `mpm_df` map has no confidence ellipses or
+##' observed locations
 ##' @param y optionally, a `aniMotum` mpm fit object with class `mpm_df` or (old)
-##' `fG_mpm`
+##' `fG_mpm`, fitted to the locations of the ssm fit `x`. Ignored when `x` is
+##' an `mpm_df`
 ##' @param what specify which location estimates to map: fitted, predicted or
-##' rerouted
+##' rerouted. If not given and `y` is supplied, the locations the move
+##' persistence model was fitted to; otherwise fitted
 ##' @param aes a list of map controls and aesthetics (shape, size, col, fill, alpha)
 ##' for each map feature (estimated locations, confidence ellipses, track lines, 
 ##' observed locations, land masses, water bodies). Constructed by `aes_lst()` and
@@ -82,13 +88,24 @@ map <- function(x,
                 silent = FALSE,
                 ...) {
 
+  ## fit_mpm() output (1.3-1 on) records which ssm locations it was fitted
+  ##  to: map those unless `what` is given
+  if (missing(what) && inherits(y, "mpm_df") && !is.data.frame(y) &&
+      identical(y$source, "ssm")) what <- y$what
   what <- match.arg(what)
-  stopifnot("x must be a aniMotum ssm fit object with class `ssm_df`" = 
-              any(inherits(x, "ssm_df"), inherits(x, "fG_ssm")))
+  ## fit_mpm() output (1.3-1 on) as x: mapped from the track locations it holds
+  mpm.x <- inherits(x, "mpm_df") && !is.data.frame(x)
+  stopifnot("x must be a aniMotum ssm fit object with class `ssm_df`, or fit_mpm() output with class `mpm_df`" = 
+              any(inherits(x, "ssm_df"), inherits(x, "fG_ssm"), mpm.x))
   stopifnot("y must either be NULL or a aniMotum mpm fit object with class `mpm_df`" = 
               any(inherits(y, "mpm_df"), inherits(y, "fG_mpm"), is.null(y)))
-  stopifnot("individual `ssm` fit objects with differing projections not currently supported" = 
-              length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
+  if (mpm.x && !is.null(y)) {
+    warning("`y` ignored: x is fit_mpm() output, which holds its own locations", call. = FALSE)
+    y <- NULL
+  }
+  if (!mpm.x)
+    stopifnot("individual `ssm` fit objects with differing projections not currently supported" = 
+                length(unique(sapply(x$ssm, function(.) st_crs(.$predicted)$epsg))) == 1)
   if(!is.null(crs)) {
     stopifnot("crs must be a proj4string with units=km,
               \n eg. `+proj=stere +lat_0=-90 +lon_0=0 +datum=WGS84 +units=km +no_defs`" = 
@@ -103,7 +120,12 @@ map <- function(x,
   }
 
   ## estimated locations in projected form
-  if (all(what == "rerouted", !"rerouted" %in% names(x$ssm[[1]]))){
+  if (mpm.x) {
+    loc_sf <- mpm_map_locations(x, normalise, group)
+    ## no location standard errors or observed locations in an mpm fit
+    aes$conf <- FALSE
+    aes$obs <- FALSE
+  } else if (all(what == "rerouted", !"rerouted" %in% names(x$ssm[[1]]))){
     stop("what = 'rerouted' can not be used as model fits do not have rerouted paths")
   } else {
     loc_sf <- grab(x, what = what, as_sf = TRUE, normalise = normalise, group = group)
@@ -126,7 +148,8 @@ map <- function(x,
 
   ## generate track lines & cast to MULTILINESTRING for plot efficiency
   if (aes$line) {
-    line_sf <- group_by(loc_sf, id)
+    ## one line per track segment, so lines do not cross data gaps
+    line_sf <- if ("segment" %in% names(loc_sf)) group_by(loc_sf, id, segment) else group_by(loc_sf, id)
     line_sf <- summarise(line_sf, do_union = FALSE)
     line_sf <- st_cast(line_sf, "MULTILINESTRING")
   } else {
@@ -185,7 +208,8 @@ map <- function(x,
                                            f = ext.rng[2])  
   
   ## select appropriate mapping fn based on x, y inputs
-  if(all(nrow(x) == 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
+  n.track <- length(unique(loc_sf$id))
+  if(all(n.track == 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
     m <- map_single_track_base(map_type, 
                                obs_sf,
                                conf_sf, 
@@ -198,7 +222,7 @@ map <- function(x,
                                silent,
                                ...)
   }
-  else if(all(nrow(x) > 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
+  else if(all(n.track > 1, any(!"g" %in% names(loc_sf), !aes$mp))) {
     m <- map_multi_track_base(map_type, 
                          obs_sf,
                          conf_sf, 
@@ -212,7 +236,7 @@ map <- function(x,
                          silent,
                          ...)
   }
-  else if(all(nrow(x) == 1, "g" %in% names(loc_sf), aes$mp)) {
+  else if(all(n.track == 1, "g" %in% names(loc_sf), aes$mp)) {
     m <- map_single_track_mp(map_type, 
                              obs_sf,
                              conf_sf, 
@@ -224,7 +248,7 @@ map <- function(x,
                              silent,
                              ...)
   }
-  else if(all(nrow(x) > 1, "g" %in% names(loc_sf), aes$mp)) {
+  else if(all(n.track > 1, "g" %in% names(loc_sf), aes$mp)) {
     m <- map_multi_track_mp(map_type, 
                             obs_sf,
                             conf_sf, 
@@ -239,4 +263,20 @@ map <- function(x,
   
   return(m)
    
+}
+
+## track locations of fit_mpm() output (1.3-1 on) as projected sf points, for
+##  map(). Mercator (km), centred on 180 degrees if a track crosses it, as
+##  for SSM fits
+mpm_map_locations <- function(x, normalise, group) {
+  d <- grab(x, "fitted", normalise = normalise, group = group)
+  if (all(is.na(d$lon)))
+    stop("no longitude and latitude to map: the move persistence model was fitted to projected coordinates",
+         call. = FALSE)
+  d <- d[!is.na(d$lon) & !is.na(d$lat), ]
+  cross <- any(vapply(split(d$lon, d$id), function(lon)
+    any(abs(diff(wrap_lon(lon, -180))) > 300), logical(1)))
+  prj <- paste0("+proj=merc +lon_0=", if (cross) 180 else 0,
+                " +datum=WGS84 +units=km +no_defs")
+  st_transform(st_as_sf(d, coords = c("lon", "lat"), crs = 4326, remove = FALSE), st_crs(prj))
 }

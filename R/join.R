@@ -43,8 +43,21 @@ join <- function(ssm,
   x <- grab(ssm, what = what.ssm, as_sf = as_sf) 
   y <- grab(mpm, what = "fitted", normalise = normalise, group = group)
   
-  ## deal w old `fG_mpm` & new `mpm_df` classes
-  if(all(c("logit_g","logit_g.se") %in% names(y))) {
+  if (inherits(mpm, "mpm_df") && !is.data.frame(mpm)) {
+    ## fit_mpm() output from 1.3-1 on: match the estimates to the ssm
+    ##  locations by id and time
+    if (mpm$source != "ssm")
+      stop("mpm was fitted to ", if (mpm$source == "kineis") "Kinéis" else "data frame",
+           " locations, not to this ssm fit; its locations are in grab(mpm, \"fitted\")",
+           call. = FALSE)
+    m <- match(paste(x$id, x$date), paste(y$id, y$date))
+    if (all(is.na(m)))
+      stop("ssm and mpm have no times in common; check what.ssm", call. = FALSE)
+    if (any(is.na(m)))
+      warning(sum(is.na(m)), " ssm location(s) without a move persistence estimate", call. = FALSE)
+    y <- y[m, c("logit_g", "logit_g.se", "g")]
+  } else if(all(c("logit_g","logit_g.se") %in% names(y))) {
+    ## deal w old `fG_mpm` & earlier `mpm_df` classes
     y <- y[, c("logit_g","logit_g.se","g")]
   } else {
     y <- y[, c("g","g.se")]
@@ -55,6 +68,7 @@ join <- function(ssm,
   }
   
   if(nrow(x) != nrow(y)) stop("number of rows in ssm is NOT equal to number of rows in mpm")
+  y <- as.data.frame(y)
   
   xy <- cbind(x, y) 
   

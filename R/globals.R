@@ -3,7 +3,7 @@
 ##     jmp_nll(). RTMB::getAll() creates them in the function's environment at
 ##     run time. Note that dt here is the time-interval data vector, not
 ##     stats::dt.
-##  2) Column names used in dplyr verbs in route_path().
+##  2) Column names used in dplyr verbs in route_path() and map().
 utils::globalVariables(c(
   ## RTMB data and parameters
   "A", "an_mode", "c_eor", "dt", "est_ho", "g_rho_p", "g_sg", "G_tau",
@@ -13,5 +13,5 @@ utils::globalVariables(c(
   "m", "M", "m_ax", "m_mode", "m_pop", "m_re", "mu", "n_gl", "n_kf", "n_ls",
   "r_psi", "r_rho_o", "r_tau", "sig_mode", "state0", "theta", "u_re", "zeroA",
   ## dplyr column names
-  "ho", "on_land"
+  "ho", "on_land", "segment"
 ))

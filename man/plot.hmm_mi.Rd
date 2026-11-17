@@ -43,7 +43,7 @@ requires the \code{rnaturalearth} data)}
 }
 \value{
 for \code{type = "densities"}, a patchwork of the step-length and
-turning-angle panels; for \code{type = "track"}, as for \code{\link[=plot.mpm_mi]{plot.mpm_mi()}}
+turning-angle panels; for \code{type = "track"}, as for \code{\link[=plot.mpm_df]{plot.mpm_df()}}
 }
 \description{
 Plots of a hidden Markov model fitted by \code{\link[=fit_hmm]{fit_hmm()}}:

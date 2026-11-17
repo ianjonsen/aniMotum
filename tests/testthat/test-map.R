@@ -88,3 +88,16 @@ test_that("m with 1 track has s3 classes `gg`, `ggplot`", {
   m <- map(xs, xm, what = "p", map_type = "cartolight", silent=TRUE)
   expect_s3_class(m, c("gg","ggplot"))
 })
+
+## fit_mpm() output as x: mapped from its own track locations
+test_that("map draws fit_mpm() output without an ssm fit", {
+  skip_on_cran()
+  xm2 <- fit_mpm(xs, model = "jmpm", control = mpm_control(verbose = 0))
+  m <- map(xm2, silent = TRUE)
+  expect_s3_class(m, c("gg","ggplot"))
+  m <- map(xm2, aes = aes_lst(line = TRUE), normalise = FALSE, silent = TRUE)
+  expect_s3_class(m, c("gg","ggplot"))
+  m <- map(xm2, crs = "+proj=stere +lat_0=-90 +lon_0=0 +datum=WGS84 +units=km +no_defs", silent = TRUE)
+  expect_s3_class(m, c("gg","ggplot"))
+  expect_warning(map(xm2, xm2, silent = TRUE), "ignored")
+})

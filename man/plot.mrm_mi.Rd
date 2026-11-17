@@ -47,7 +47,7 @@ its intervals are symmetric}
 \item{...}{unused}
 }
 \value{
-as for \code{\link[=plot.mpm_mi]{plot.mpm_mi()}}
+as for \code{\link[=plot.mpm_df]{plot.mpm_df()}}
 }
 \description{
 Plots of the movement rate from \code{\link[=fit_mrm]{fit_mrm()}}, shown as a

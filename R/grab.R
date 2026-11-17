@@ -360,7 +360,25 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              class(out) <- c("sf", "tbl_df", "tbl", "data.frame")
            }
          },
-         mpm_df = {
+         mpm_df = if (!is.data.frame(x)) {
+           ## fit_mpm() output from aniMotum 1.3-1 on: a list holding the
+           ##  fitted tibble, which includes the track locations
+           if (what == "data")
+             stop("fit_mpm() output holds no separate data; its locations are in grab(x, \"fitted\")",
+                  call. = FALSE)
+           out <- x$fitted
+           if(normalise & !group) {
+             out <- out |> 
+               group_by(id) |>
+               mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE))) |>
+               ungroup()
+           } else if(normalise & group) {
+             out <- out |> 
+               mutate(g = (g - min(g, na.rm = TRUE))/(max(g, na.rm = TRUE) - min(g, na.rm = TRUE)))
+           }
+           out
+         } else {
+           ## fit_mpm() output before 1.3-1: a tibble of fits
            ## remove optimiser crash results from extraction
            nf <- which(sapply(x$mpm, length) < 8)
            if (length(nf) > 0) {

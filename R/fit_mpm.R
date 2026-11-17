@@ -1,87 +1,112 @@
 ##' @title fit a **Move Persistence Model** (`mpm`)
-##' 
-##' @description fit a random walk with time-varying move persistence to 
-##' temporally regular or irregular location data
-##' 
-##' @param x a `ssm_df` fit object or a data frame of observations (see details).
-##' With `reps`, an `ssm_df` fit object (`rw`, `crw` or `mp`) with regular
-##' predicted locations, or a data frame of Kinéis locations (see
-##' [impute_tracks()])
-##' @param what if a `ssm_df` fit object is supplied then `what` determines
-##'  whether fitted, predicted (default), or rerouted values are mapped; ignored if 
-##'  `x` is a data frame
-##' @param model mpm model to fit; either `mpm` with unpooled random walk 
-##' variance parameters (`sigma_(g,i)`) or `jmpm` with a single, 
-##' pooled random variance parameter (`sigma_g`)
-##' @param coords column numbers of the location coordinates (default = 3:4)
-##' @param control list of control settings for the outer optimizer 
-##' (see [aniMotum::mpm_control] for details). With `model = "mpm"` and more than one
-##' individual, `verbose = 1` shows a progress bar over individuals instead of
-##' the parameter trace; with `reps`, a progress bar over the imputation fits
+##'
+##' @description fit a random walk with time-varying move persistence (g) to
+##' animal tracks. With `reps`, the model is fitted to tracks imputed from an
+##' SSM fit or from Kinéis locations (see [impute_tracks()]), and the estimates
+##' are pooled with Rubin's rules, so they carry location uncertainty. Without
+##' `reps`, the model is fitted once, treating the locations as data.
+##'
+##' @param x one of:
+##' 1. an `ssm_df` fit object from [fit_ssm()] (`rw`, `crw` or `mp`);
+##' 2. a data frame of Kinéis locations with error radii, or the path to a
+##' file of them (see [impute_tracks()]). Kinéis locations need `reps` and
+##' `time.step`;
+##' 3. a data frame of locations: `id`, `date` and two coordinate columns
+##' (see `coords`), treated as data. `reps` is not available.
+##' @param what for an `ssm_df` fit without `reps`, the locations fitted:
+##' `"predicted"` (default), `"fitted"` or `"rerouted"`. With `reps`, the
+##' imputed tracks are at the predicted times, so only `"predicted"`
+##' @param model mpm model to fit; either `jmpm` (default) with a single,
+##' pooled random walk variance parameter (`sigma_g`) for all tracks, or `mpm`
+##' with a separate variance parameter (`sigma_(g,i)`) for each track, fitted
+##' separately
+##' @param coords for a data frame of locations, the column numbers of the
+##' coordinates (default = 3:4). Coordinates named `lon` and `lat` are kept as
+##' the track's longitude and latitude; others (e.g. projected `x`, `y`) are
+##' fitted, but `lon` and `lat` are missing in the output, so the track cannot
+##' be mapped
+##' @param control list of control settings for the outer optimizer
+##' (see [aniMotum::mpm_control] for details). With more than one fit (`mpm`
+##' with more than one track, or `reps`), `verbose = 1` shows a progress bar
+##' over the fits instead of the parameter trace
 ##' @param inner.control list of control parameters for the inner optimization
-##' @param verbose is deprecated, use ssm_control(verbose = 1) instead, 
+##' @param verbose is deprecated, use ssm_control(verbose = 1) instead,
 ##' see [aniMotum::ssm_control] for details
-##' @param optim is deprecated, use ssm_control(optim = "optim") instead, 
+##' @param optim is deprecated, use ssm_control(optim = "optim") instead,
 ##' see [aniMotum::ssm_control] for details
-##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead, 
+##' @param optMeth is deprecated, use ssm_control(method = "L-BFGS-B") instead,
 ##' see [ssm_control] for details
 ##' @param reps if NULL (default), the model is fitted once, treating the
 ##' locations as data. If a number, the model is fitted to `reps` tracks
 ##' imputed with [impute_tracks()], and the estimates are pooled with Rubin's
-##' rules, so the results carry location uncertainty (see details).
-##' @param time.step with `reps` and Kinéis locations, the time step (h) of
-##' the regular grid (see [impute_tracks()])
-##' @param max_gap with `reps` and Kinéis locations, the longest gap (h)
-##' interpolated across (see [impute_tracks()])
-##' @param kineis with `reps` and Kinéis locations, the Kinéis error model (see
+##' rules (see details)
+##' @param time.step for Kinéis locations, the time step (h) of the regular
+##' grid (see [impute_tracks()]); required
+##' @param max_gap for Kinéis locations, the longest gap (h) interpolated
+##' across (see [impute_tracks()])
+##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()])
-##' 
-##' @return a list with components
-##' * `fitted` a dataframe of fitted locations
-##' * `par` model parameter summary
-##' * `data` input data.frame
-##' * `tmb` the `TMB` object
-##' * `opt` the object returned by the optimizer
 ##'
-##' With `reps`, a list with class `mpm_mi`:
-##' * `fitted` a tibble with, for each id, track segment and time, the
-##' point-estimate track (`lon`, `lat`), the pooled `logit_g` and its total
-##' standard error (`logit_g.se`), move persistence `g` and its 95% interval
-##' (`lower`, `upper`), and the fraction of missing information
-##' (`fraction_missing`: the share of the variance due to location
-##' uncertainty)
-##' * `par` pooled estimates of `sigma_g`, `sigma_x` and `sigma_y` (`sigma_x`,
-##' `sigma_y` in coordinates divided by the largest absolute x or y), by
-##' track segment (`mpm`) or joint
-##' (`jmpm`)
-##' * `model`, `reps`, `n_failed` (imputed-track fits that failed or did not
-##' converge), `source` (`"ssm"` or `"kineis"`) and `time.step`
+##' @return a list with class `mpm_df`:
+##' 1. `fitted`: a tibble with, for each id, track segment and time, the
+##' track's longitude and latitude (`lon`, `lat`: the SSM-estimated locations,
+##' the Kinéis locations interpolated onto the regular grid without
+##' perturbation, or the locations supplied), `logit_g` and its standard error
+##' (`logit_g.se`; with `reps`, the total standard error from Rubin's rules),
+##' move persistence `g` and its 95% interval (`lower`, `upper`), and, with
+##' `reps`, the fraction of missing information (`fraction_missing`: the share
+##' of the variance due to location uncertainty);
+##' 2. `par`: estimates of `sigma_g`, `sigma_x` and `sigma_y`, with 95%
+##' intervals, by track (`mpm`) or joint (`jmpm`). `sigma_x` and `sigma_y` are
+##' in the fitted coordinates divided by their largest absolute value;
+##' 3. `convergence`: a tibble, by track (`mpm`) or joint (`jmpm`), of the
+##' number of fits used (`fits`: 1, or the imputations pooled), the number
+##' that failed or did not converge (`failed`), and, without `reps`, whether
+##' the Hessian was positive definite (`pdHess`) and the `aic`;
+##' 4. `tmb`: without `reps`, the TMB object of each fit (e.g. for
+##' `TMB::sdreport(fit$tmb[[1]], getJointPrecision = TRUE)`); NULL with `reps`;
+##' 5. `model`, `reps` (0 without imputation), `source` (`"ssm"`, `"kineis"` or
+##' `"data"`), `time.step` (h; NA for irregular locations) and `what` (the
+##' `ssm_df` locations fitted).
 ##'
 ##' @details With `reps`, the move persistence model is fitted to each imputed
 ##' track, treating its locations as data, and Rubin's rules pool `logit_g` at
 ##' each time and the log of each parameter. This replaces treating the SSM
-##' point estimates as data, which ignores location uncertainty. Imputed
-##' tracks are split into segments at long data gaps (Kinéis locations); with
-##' `mpm` each segment is fitted separately, and with `jmpm` each segment is a
-##' track.
-##' 
-##' @references 
-##' Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to 
-##' environment: fast inference of variation among southern elephant seals with 
-##' a mixed effects model. Ecology. 100(1):e02566 
-##' 
+##' point estimates as data, which ignores location uncertainty. Kinéis
+##' locations are estimates with known error, at irregular times, so they are
+##' only fitted this way. Imputed Kinéis tracks are split into segments at
+##' gaps longer than `max_gap`; with `mpm` each segment is fitted separately,
+##' and with `jmpm` each segment is a track. Track segments with fewer than 3
+##' locations are dropped.
+##'
+##' Locations from an `ssm_df` fit are fitted in projected coordinates (`x`,
+##' `y`, km). Coordinates are divided by one common constant, their largest
+##' absolute value, for the optimiser; g does not depend on this scaling.
+##'
+##' @references
+##' Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to
+##' environment: fast inference of variation among southern elephant seals with
+##' a mixed effects model. Ecology. 100(1):e02566
+##'
 ##' @examples
 ##' ## fit jmpm to two southern elephant seal tracks
 ##' xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72, control = ssm_control(verbose = 0))
-##' 
+##'
 ##' fmpm <- fit_mpm(xs, model = "jmpm")
+##' fmpm$par
 ##'
 ##' ## with location uncertainty, by multiple imputation
 ##' \dontrun{
 ##' fmi <- fit_mpm(xs, model = "jmpm", reps = 20)
 ##' plot(fmi)
+##'
+##' ## directly from Kinéis locations, without an SSM
+##' fki <- fit_mpm(kineis_locations, model = "jmpm", reps = 20, time.step = 12)
+##' plot(fki, type = "track", pages = 1)
 ##' }
-##' 
+##'
+##' @importFrom dplyr tibble bind_rows
+##' @importFrom stats plogis qnorm
 ##' @export
 ##' @md
 
@@ -99,9 +124,9 @@ fit_mpm <- function(x,
                     max_gap = NULL,
                     kineis = ssm_control()$kineis
                     ) {
-  
+
   model <- match.arg(model)
-  
+
   ## warnings for deprecated arguments
   if(!is.null(verbose)) {
     warning("the `verbose` arg is deprecated as of 0.7-5, use `control = ssm_control(verbose)` instead. See `?ssm_control for details",
@@ -121,102 +146,223 @@ fit_mpm <- function(x,
       control$method <- optMeth
     else stop("invalid optimisation method specified, see ?ssm_control for options")
   }
-  
-  
+
   if(control$verbose == 1)
     cat(paste0("fitting ", model, "...\n"))
 
-  ## multiple imputation: fit to imputed tracks and pool
+  ## locations: rep 0 is the point-estimate track; reps 1, 2, ... are imputed
+  ##  tracks
+  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis)
+  source <- attr(loc, "source")
+  time.step <- attr(loc, "time.step")
+  what <- attr(loc, "what")
+  loc <- as.data.frame(loc)
+  estimate <- loc[loc$rep == 0, ]
+
+  ## rescale x and y for the optimiser by one common constant, so sigma_x and
+  ##  sigma_y are in the same units, and by the same constant in every
+  ##  imputation, so the sigma estimates can be pooled. g is unaffected: each
+  ##  axis has its own sigma and the model is linear within each axis
+  scale <- max(abs(c(estimate$x, estimate$y)), na.rm = TRUE)
+  loc$x <- loc$x / scale
+  loc$y <- loc$y / scale
+
+  ## track units: each segment of each individual (a segment needs >= 3
+  ##  locations for the move persistence model)
+  loc$track <- paste(loc$id, loc$segment, sep = "_segment_")
+  estimate$track <- paste(estimate$id, estimate$segment, sep = "_segment_")
+  n.track <- table(estimate$track)
+  short <- names(n.track)[n.track < 3]
+  if (length(short) > 0) {
+    message(length(short), " track segment(s) with fewer than 3 locations dropped")
+    loc <- loc[!loc$track %in% short, ]
+    estimate <- estimate[!estimate$track %in% short, ]
+  }
+
+  ## one fit per imputation (jmpm), or per imputation and track segment (mpm);
+  ##  without reps, one fit to the point-estimate track
+  units <- if (model == "jmpm") "all" else unique(estimate$track)
+  imps <- if (is.null(reps)) 0L else seq_len(reps)
+  ## progress bar over more than one fit; mpmf()'s parameter trace is
+  ##  switched off, as it would overwrite the bar
+  show <- control$verbose == 1 && length(units) * length(imps) > 1
+  ctl <- control
+  if (show) ctl$verbose <- 0
+  pb <- progress_bar(length(units) * length(imps), show)
+  fits <- lapply(units, function(u) {
+    lapply(imps, function(k) {
+      d <- loc[loc$rep == k & (u == "all" | loc$track == u), ]
+      d <- data.frame(id = d$id, tid = if (model == "jmpm") d$segment else NA,
+                      date = d$date, x = d$x, y = d$y)
+      f <- mpm_fit_one(d, model, ctl, inner.control,
+                       quiet = show || !is.null(reps), keep = is.null(reps))
+      pb$tick()
+      f
+    })
+  })
+  pb$close()
+  names(fits) <- units
+
+  fitted <- list()
+  par <- list()
+  convergence <- list()
+  for (u in units) {
+    f <- Filter(Negate(is.null), fits[[u]])
+    convergence[[u]] <- tibble(unit = if (u == "all") "joint" else u,
+                               fits = length(f),
+                               failed = length(imps) - length(f),
+                               pdHess = if (is.null(reps) && length(f) == 1) f[[1]]$pdHess else NA,
+                               aic = if (is.null(reps) && length(f) == 1) f[[1]]$aic else NA_real_)
+    if (length(f) == 0) {
+      warning("the move persistence model failed for ",
+              if (!is.null(reps)) "every imputation of " else "",
+              if (u == "all") "the joint fit" else u, call. = FALSE)
+      next
+    }
+    if (is.null(reps) && !f[[1]]$pdHess)
+      warning("the Hessian is not positive definite for ",
+              if (u == "all") "the joint fit" else u,
+              "; standard errors are unreliable", call. = FALSE)
+    e <- if (u == "all") estimate else estimate[estimate$track == u, ]
+    e <- e[order(e$id, e$segment, e$date), ]
+    ## mpmf() orders rows by id, tid, date: align each fit to e
+    key <- function(z) paste(z$id, z$date)
+    lg <- do.call(cbind, lapply(f, function(z) z$fitted$logit_g[match(key(e), key(z$fitted))]))
+    lgse <- do.call(cbind, lapply(f, function(z) z$fitted$logit_g.se[match(key(e), key(z$fitted))]))
+    pr <- mpm_combine(lg, lgse)
+    fitted[[u]] <- tibble(id = e$id, segment = e$segment, date = e$date,
+                          lon = e$lon, lat = e$lat,
+                          logit_g = pr$estimate, logit_g.se = pr$se,
+                          g = plogis(pr$estimate),
+                          lower = plogis(pr$lower), upper = plogis(pr$upper))
+    if (!is.null(reps)) fitted[[u]]$fraction_missing <- pr$fraction_missing
+    pp <- mpm_combine(do.call(cbind, lapply(f, function(z) z$par[, 1])),
+                      do.call(cbind, lapply(f, function(z) z$par[, 2])))
+    nm <- rownames(f[[1]]$par)
+    nm[nm == "log_sigma"] <- c("log_sigma_x", "log_sigma_y")
+    par[[u]] <- tibble(unit = if (u == "all") "joint" else u,
+                       parameter = sub("^log_", "", nm),
+                       estimate = exp(pp$estimate),
+                       lower = exp(pp$lower), upper = exp(pp$upper))
+  }
+  if (length(fitted) == 0) stop("the move persistence model failed for every track", call. = FALSE)
+
+  tmb <- NULL
+  if (is.null(reps)) {
+    tmb <- lapply(fits, function(f) if (is.null(f[[1]])) NULL else f[[1]]$tmb)
+    names(tmb) <- vapply(units, function(u) if (u == "all") "joint" else u, character(1))
+  }
+
+  out <- list(fitted = bind_rows(fitted),
+              par = bind_rows(par),
+              convergence = bind_rows(convergence),
+              tmb = tmb,
+              model = model,
+              reps = if (is.null(reps)) 0L else reps,
+              source = source,
+              time.step = time.step,
+              what = what)
+  class(out) <- append("mpm_df", class(out))
+  out
+}
+
+## the locations to fit, as a tibble with columns rep (0 = the point-estimate
+##  track), id, segment, date, lon, lat, x, y, and attributes source,
+##  time.step and what
+mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis) {
+  kineis.data <- is.character(x) || (is.data.frame(x) && !inherits(x, "ssm_df") &&
+    any(c("error.radius", "error_radius") %in% tolower(names(x))))
   if (!is.null(reps)) {
-    if (!what %in% c("predicted", "p"))
+    if (inherits(x, "ssm_df") && !grepl("^p", what))
       stop("with `reps`, imputed tracks are at the predicted (regular) times; use what = \"predicted\"",
            call. = FALSE)
-    return(fit_mpm_mi(x, model = model, reps = reps, time.step = time.step,
-                      max_gap = max_gap, kineis = kineis,
-                      control = control, inner.control = inner.control))
+    if (!inherits(x, "ssm_df") && !kineis.data)
+      stop("with `reps`, x must be an ssm_df fit object or Kinéis locations with error radii",
+           call. = FALSE)
+    out <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
+                         kineis = kineis)
+    attr(out, "what") <- if (inherits(x, "ssm_df")) "predicted" else NA_character_
+    return(out)
   }
-  
-  if(inherits(x, "ssm_df")) {
-    x <- grab(x, what = what, as_sf = FALSE)[, c(1:2, coords[1], coords[2])]
+  if (kineis.data)
+    stop("Kinéis locations are estimates with known error, at irregular times: fit them by multiple imputation, with `reps` and `time.step` (h), e.g. fit_mpm(x, reps = 20, time.step = 12)",
+         call. = FALSE)
+  if (inherits(x, "ssm_df")) {
+    g <- grab(x, what = what, as_sf = FALSE)
+    what <- c("fitted", "predicted", "rerouted")[pmatch(what, c("fitted", "predicted", "rerouted"))]
+    out <- tibble(rep = 0L, id = g$id, segment = 1L, date = g$date,
+                  lon = g$lon, lat = g$lat, x = g$x, y = g$y)
+    attr(out, "source") <- "ssm"
+    attr(out, "time.step") <- if (what == "predicted") x$ssm[[1]]$ts else NA_real_
+    attr(out, "what") <- what
+  } else if (is.data.frame(x)) {
+    d <- as.data.frame(x)
+    lonlat <- identical(tolower(names(d)[coords]), c("lon", "lat"))
+    out <- tibble(rep = 0L, id = d[[1]], segment = 1L, date = d[[2]],
+                  lon = if (lonlat) d[[coords[1]]] else NA_real_,
+                  lat = if (lonlat) d[[coords[2]]] else NA_real_,
+                  x = d[[coords[1]]], y = d[[coords[2]]])
+    attr(out, "source") <- "data"
+    attr(out, "time.step") <- NA_real_
+    attr(out, "what") <- NA_character_
   } else {
-    x <- x[, c(1:2, coords[1], coords[2])]
+    stop("x must be an ssm_df fit object, Kinéis locations or a data frame of locations",
+         call. = FALSE)
   }
-  
-  if(all(c("x","y") %in% names(x))) {
-    # rescale x,y in km for better optimisation
-    # Rescale in place, so that the id and date columns are kept. Divide by
-    # the largest absolute value: projected coordinates are often negative,
-    # and max() of an all-negative column would reverse the sign of the axis.
-    # Divide x and y by one common constant, so that sigma_x and sigma_y are
-    # in the same units and can be compared (e.g. at longitude 135, x is about
-    # 15,000 km and y about -1,100 km, so separate constants made sigma_x 13
-    # times smaller relative to sigma_y). g is unaffected either way: each
-    # axis has its own sigma and the model is linear within each axis, so a
-    # per-axis rescaling is absorbed exactly by that axis's sigma.
-    scale <- max(abs(c(x$x, x$y)), na.rm = TRUE)
-    x$x <- x$x / scale
-    x$y <- x$y / scale
-  } else {
-    # standardise coord names to x,y 
-    names(x)[3:4] <- c("x","y")
-  }
+  out
+}
 
-  switch(model,
-         mpm = {
-           ## progress bar over individuals when verbose = 1; the
-           ##  per-iteration parameter trace is switched off, as it would
-           ##  overwrite the bar
-           xs <- split(x, x$id)
-           show <- control$verbose == 1 && length(xs) > 1
-           ctl <- control
-           if (show) ctl$verbose <- 0
-           pb <- progress_bar(length(xs), show)
-           fit <- lapply(xs, function(x) {
-             f <- try({
-               if (show) {
-                 utils::capture.output(r <- mpmf(x, model = model, control = ctl,
-                                                 inner.control = inner.control))
-                 r
-               } else {
-                 mpmf(x, model = model, control = ctl, inner.control = inner.control)
-               }
-             }, silent = TRUE)
-             pb$tick()
-             f
-           })
-           pb$close()
-          fit <- tibble(id = names(fit), mpm = fit) 
-          fit <- with(fit, tibble(fit,
-                                  converged = sapply(mpm, function(x) 
-                                    if(length(x) == 8) {
-                                      x$opt$convergence == 0
-                                    } else if(length(x) < 8) {
-                                      FALSE
-                                    }),
-                                  model = model)
-                      )
-         },
-         jmpm = {
-           fit <- try(mpmf( 
-               x = x,
-               model = model,
-               control = control,
-               inner.control = inner.control
-             ), silent = TRUE)
-           
-           fit <- tibble(mpm = list(fit)) 
-           fit <- with(fit, 
-                       tibble(fit, 
-                              converged = 
-                                    ifelse(length(mpm[[1]]) == 8, 
-                                           mpm[[1]]$opt$convergence == 0, 
-                                                          FALSE),
-                                  model = model)
-                       )
-         })
+## fit the move persistence model once. Returns NULL if the fit crashed or
+##  did not converge (or, for an imputed track, if the Hessian is not positive
+##  definite); otherwise the fitted values, the log-scale parameters, and,
+##  if keep, the TMB object
+mpm_fit_one <- function(d, model, control, inner.control, quiet, keep) {
+  ## mpmf() prints optimiser errors from its own try(); silence them, the
+  ##  failed fit is caught and counted by fit_mpm()
+  old <- options(try.outFile = nullfile())
+  on.exit(options(old))
+  f <- try(suppressWarnings({
+    if (quiet) {
+      utils::capture.output(r <- mpmf(d, model = model, control = control,
+                                      inner.control = inner.control))
+      r
+    } else {
+      mpmf(d, model = model, control = control, inner.control = inner.control)
+    }
+  }), silent = TRUE)
+  if (inherits(f, "try-error") || !inherits(f$opt, "list") || f$opt$convergence != 0 ||
+      inherits(f$rep, "try-error")) return(NULL)
+  pdHess <- isTRUE(f$rep$pdHess)
+  if (!keep && !pdHess) return(NULL)
+  fx <- summary(f$rep, "fixed")
+  list(fitted = as.data.frame(f$fitted), par = fx[, 1:2, drop = FALSE],
+       tmb = if (keep) f$tmb, aic = f$aic, pdHess = pdHess)
+}
 
-  class(fit) <- append("mpm_df", class(fit))  
+## estimate, standard error and 95% interval from one fit (Wald), or pooled
+##  across imputations (Rubin's rules); columns of est and se are fits
+mpm_combine <- function(est, se) {
+  if (ncol(est) > 1) return(pool_rubin(est, se))
+  est <- est[, 1]
+  se <- se[, 1]
+  list(estimate = est, se = se,
+       lower = est - qnorm(0.975) * se, upper = est + qnorm(0.975) * se)
+}
 
-return(fit)
-  
+## print a summary of a fit_mpm() fit, not its TMB objects
+##' @method print mpm_df
+##' @export
+##' @noRd
+print.mpm_df <- function(x, ...) {
+  ## fit_mpm() output before aniMotum 1.3-1 is a tibble
+  if (is.data.frame(x)) return(NextMethod())
+  cat("move persistence model (", x$model, ") fitted to ",
+      switch(x$source, ssm = paste(x$what, "SSM locations"),
+             kineis = "Kinéis locations", data = "locations as data"),
+      if (!is.na(x$time.step)) paste0(" at a ", x$time.step, " h time step") else "",
+      if (x$reps > 0) paste0(", by multiple imputation (", x$reps, " imputations)") else "",
+      "\n", sep = "")
+  cat(length(unique(x$fitted$id)), "track(s),", nrow(x$fitted), "estimates of g\n\n")
+  print(x$par, ...)
+  invisible(x)
 }

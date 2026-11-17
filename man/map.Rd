@@ -22,13 +22,19 @@ map(
 )
 }
 \arguments{
-\item{x}{a \code{aniMotum} ssm fit object with class \code{ssm_df} or (old) \code{fG_ssm}}
+\item{x}{a \code{aniMotum} ssm fit object with class \code{ssm_df} or (old) \code{fG_ssm};
+or \code{\link[=fit_mpm]{fit_mpm()}} output (class \code{mpm_df}, aniMotum 1.3-1 on), e.g. a move
+persistence model fitted directly to Kinéis locations, mapped from its
+own track locations. An \code{mpm_df} map has no confidence ellipses or
+observed locations}
 
 \item{y}{optionally, a \code{aniMotum} mpm fit object with class \code{mpm_df} or (old)
-\code{fG_mpm}}
+\code{fG_mpm}, fitted to the locations of the ssm fit \code{x}. Ignored when \code{x} is
+an \code{mpm_df}}
 
 \item{what}{specify which location estimates to map: fitted, predicted or
-rerouted}
+rerouted. If not given and \code{y} is supplied, the locations the move
+persistence model was fitted to; otherwise fitted}
 
 \item{aes}{a list of map controls and aesthetics (shape, size, col, fill, alpha)
 for each map feature (estimated locations, confidence ellipses, track lines,

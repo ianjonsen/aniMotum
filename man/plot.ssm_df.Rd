@@ -29,7 +29,7 @@ fitted, predicted, or rerouted}
 (type = 1, default); 2-d track plot (type = 2); 1-d time series of move
 persistence estimates (type = 3; if fitted model was \code{mp}); track map
 with locations coloured by move persistence (type = 4; if fitted model was
-\code{mp}). Types 3 and 4 are drawn as by \code{\link[=plot.mpm_mi]{plot.mpm_mi()}} (\code{type = "timeseries"}
+\code{mp}). Types 3 and 4 are drawn as by \code{\link[=plot.mpm_df]{plot.mpm_df()}} (\code{type = "timeseries"}
 and \code{type = "track"}); for type 4, \code{pages = 1} draws all tracks on one map}
 
 \item{outlier}{include outlier locations dropped by prefilter

@@ -1,5 +1,5 @@
-## Plot methods for the behavioural models: fit_mpm() (classes mpm_mi and
-##  mpm_df; also used by plot.ssm_df() for mp fits), fit_mrm() (mrm_mi) and
+## Plot methods for the behavioural models: fit_mpm() (class mpm_df; also
+##  used by plot.ssm_df() for mp fits), fit_mrm() (mrm_mi) and
 ##  fit_hmm() (hmm_mi). They share the helpers below.
 
 ##' @title Plot move persistence estimates from [fit_mpm()]
@@ -14,14 +14,16 @@
 ##' `plot(x, type = 3)` (time series) and `plot(x, type = 4)` (tracks); see
 ##' [plot.ssm_df()].
 ##'
-##' @param x an `mpm_mi` object from `fit_mpm(reps = )`, or an `mpm_df` object
-##' from `fit_mpm()` without `reps`, including fits from earlier versions of
-##' aniMotum
-##' @param y for an `mpm_df` object, the `ssm_df` fit that `x` was fitted to.
-##' Required for `type = "track"`, because an `mpm_df` object holds no
-##' locations. Ignored for an `mpm_mi` object, which holds its locations
+##' @param x an `mpm_df` object from [fit_mpm()], including fits from earlier
+##' versions of aniMotum
+##' @param y only for `fit_mpm()` output from aniMotum before 1.3-1, which
+##' holds no locations: the `ssm_df` fit that `x` was fitted to, required for
+##' `type = "track"`. Ignored for current `fit_mpm()` output, which holds its
+##' locations
 ##' @param type `"timeseries"` or `"track"`. If NULL (default), `"track"` when
-##' `y` is supplied, otherwise `"timeseries"`
+##' `y` is supplied, otherwise `"timeseries"`. Tracks need longitude and
+##' latitude: they are missing when `fit_mpm()` was fitted to a data frame of
+##' projected coordinates
 ##' @param pages for `type = "timeseries"`, one plot per track on separate
 ##' pages (`pages = 0`, default) or all plots on one page (`pages = 1`); for
 ##' `type = "track"`, one map per track (`pages = 0`) or all tracks on one map
@@ -48,7 +50,8 @@
 ##' (`pages = 0`, `ask = TRUE`)
 ##'
 ##' @details The 95% interval is the pooled (Rubin's rules) interval for an
-##' `mpm_mi` object, and `plogis(logit_g -/+ 1.96 * logit_g.se)` otherwise.
+##' fit by multiple imputation (`fit_mpm(reps = )`), and
+##' `plogis(logit_g -/+ 1.96 * logit_g.se)` otherwise.
 ##'
 ##' @examples
 ##' ## move persistence model fitted to ssm-estimated locations
@@ -69,10 +72,10 @@
 ##' @importFrom ggplot2 scale_colour_gradientn labs xlab ylab ylim theme_minimal
 ##' @importFrom grDevices hcl.colors hcl.pals
 ##' @importFrom stats plogis qlogis qnorm
-##' @method plot mpm_mi
+##' @method plot mpm_df
 ##' @export
 ##' @md
-plot.mpm_mi <- function(x,
+plot.mpm_df <- function(x,
                         y = NULL,
                         type = NULL,
                         pages = 0,
@@ -94,26 +97,26 @@ plot.mpm_mi <- function(x,
   } else {
     match.arg(type, c("timeseries", "track"))
   }
-  if (inherits(x, "mpm_mi") && !is.null(y)) {
-    warning("`y` ignored: fit_mpm(reps = ) output holds its own locations", call. = FALSE)
+  current <- mpm_current(x)
+  if (current && !is.null(y)) {
+    warning("`y` ignored: fit_mpm() output holds its own locations", call. = FALSE)
     y <- NULL
   }
-  if (type == "track" && !inherits(x, "mpm_mi") && is.null(y))
+  if (type == "track" && !current && is.null(y))
     stop("type = \"track\" needs the ssm fit for the locations: plot(x, y = <ssm fit>, type = \"track\")",
          call. = FALSE)
   mpm_plot(mpm_plot_data(x, y), type, pages, ncol, ask, pal, rev, land,
            se = se, normalise = normalise, group = group)
 }
 
-##' @rdname plot.mpm_mi
-##' @method plot mpm_df
-##' @export
-plot.mpm_df <- function(x, y = NULL, ...) plot.mpm_mi(x, y = y, ...)
+## TRUE for fit_mpm() output from aniMotum 1.3-1 on (a list holding the
+##  fitted tibble with locations); FALSE for earlier output (a tibble of fits)
+mpm_current <- function(x) inherits(x, "mpm_df") && !is.data.frame(x)
 
 ## move persistence estimates in one layout for plotting: id, date, g,
 ##  logit_g, logit_g.se, and lon, lat when the locations are available
 mpm_plot_data <- function(x, y = NULL) {
-  if (inherits(x, "mpm_mi")) return(as.data.frame(x$fitted))
+  if (mpm_current(x)) return(as.data.frame(x$fitted))
   if (!inherits(x, c("mpm_df", "fG_mpm")))
     stop("x must be a fit_mpm() object", call. = FALSE)
   if (is.null(y)) {
@@ -141,7 +144,7 @@ mpm_plot_data <- function(x, y = NULL) {
 }
 
 ## draw the move persistence plots from data in the mpm_plot_data() layout;
-##  shared by plot.mpm_mi(), plot.mpm_df() and plot.ssm_df() (types 3 and 4)
+##  shared by plot.mpm_df() and plot.ssm_df() (types 3 and 4)
 mpm_plot <- function(d, type, pages, ncol, ask, pal, rev, land,
                      se = FALSE, normalise = FALSE, group = FALSE) {
   d <- as.data.frame(d)
@@ -159,6 +162,9 @@ mpm_plot <- function(d, type, pages, ncol, ask, pal, rev, land,
     p <- behav_timeseries(d, "g", scale, ylab = label, limits = c(0, 1))
     behav_output(p, pages, ncol, ask)
   } else {
+    if (all(is.na(d$lon)))
+      stop("no longitude and latitude to map: the move persistence model was fitted to projected coordinates",
+           call. = FALSE)
     ## point size proportional to SE^-2 (indicative only)
     if (se) d$se_weight <- d$logit_g.se^-2
     behav_tracks(d, "g", scale, pages, ask, land,
@@ -189,13 +195,13 @@ mpm_normalise <- function(d, group) {
 ##' 2. `type = "track"`: tracks (point-estimate locations) with locations
 ##' coloured by speed.
 ##'
-##' @inheritParams plot.mpm_mi
+##' @inheritParams plot.mpm_df
 ##' @param x an `mrm_mi` object from [fit_mrm()]
 ##' @param type `"timeseries"` (default) or `"track"`
 ##' @param log logical; plot the speed on a log scale (default TRUE), on which
 ##' its intervals are symmetric
 ##'
-##' @return as for [plot.mpm_mi()]
+##' @return as for [plot.mpm_df()]
 ##'
 ##' @examples
 ##' \dontrun{
@@ -257,7 +263,7 @@ plot.mrm_mi <- function(x,
 ##' 2. `type = "track"`: tracks (point-estimate locations) with locations
 ##' coloured by their most probable state.
 ##'
-##' @inheritParams plot.mpm_mi
+##' @inheritParams plot.mpm_df
 ##' @param x an `hmm_mi` object from [fit_hmm()]
 ##' @param type `"densities"` (default) or `"track"`
 ##' @param pages for `type = "track"`, one map per track (`pages = 0`,
@@ -266,7 +272,7 @@ plot.mrm_mi <- function(x,
 ##' @param bins number of histogram bins (default 40)
 ##'
 ##' @return for `type = "densities"`, a patchwork of the step-length and
-##' turning-angle panels; for `type = "track"`, as for [plot.mpm_mi()]
+##' turning-angle panels; for `type = "track"`, as for [plot.mpm_df()]
 ##'
 ##' @details States are numbered by mean step length (state 1 has the
 ##' shortest steps). The state proportions used to weight the densities are
