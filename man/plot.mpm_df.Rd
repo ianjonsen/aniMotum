@@ -33,7 +33,8 @@ or each individual on a separate page (pages = 0)}
 this may be increased for multi-individual objects. Ignored if pages = 0}
 
 \item{ask}{logical; if TRUE (default) user is asked for input before each
-plot is rendered. set to FALSE to return ggplot objects}
+plot is rendered (not for a single track, which is drawn directly). set to
+FALSE to return ggplot objects}
 
 \item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette to use (default: "Plasma";
 see \link[grDevices:palettes]{grDevices::hcl.pals} for options)}

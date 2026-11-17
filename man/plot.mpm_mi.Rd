@@ -30,7 +30,8 @@ pages (\code{pages = 0}, default) or all plots on one page (\code{pages = 1}); f
 \item{ncol}{number of columns when \code{pages = 1} (time series)}
 
 \item{ask}{logical; if TRUE (default) and \code{pages = 0}, the user is asked
-before each plot is rendered. Set to FALSE to return the ggplot objects}
+before each plot is rendered (not for a single track, which is drawn
+directly). Set to FALSE to return the ggplot objects}
 
 \item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette (default "Plasma"; see
 \link[grDevices:palettes]{grDevices::hcl.pals})}

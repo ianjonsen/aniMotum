@@ -26,7 +26,8 @@ default) or all tracks on one map (\code{pages = 1}). Ignored for
 \code{type = "densities"}, which is one plot of all tracks}
 
 \item{ask}{logical; if TRUE (default) and \code{pages = 0}, the user is asked
-before each plot is rendered. Set to FALSE to return the ggplot objects}
+before each plot is rendered (not for a single track, which is drawn
+directly). Set to FALSE to return the ggplot objects}
 
 \item{pal}{\link[grDevices:palettes]{grDevices::hcl.colors} palette (default "Plasma"; see
 \link[grDevices:palettes]{grDevices::hcl.pals})}

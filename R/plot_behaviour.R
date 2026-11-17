@@ -19,7 +19,8 @@
 ##' (`pages = 1`)
 ##' @param ncol number of columns when `pages = 1` (time series)
 ##' @param ask logical; if TRUE (default) and `pages = 0`, the user is asked
-##' before each plot is rendered. Set to FALSE to return the ggplot objects
+##' before each plot is rendered (not for a single track, which is drawn
+##' directly). Set to FALSE to return the ggplot objects
 ##' @param pal [grDevices::hcl.colors] palette (default "Plasma"; see
 ##' [grDevices::hcl.pals])
 ##' @param rev logical; reverse the colour palette
@@ -287,13 +288,17 @@ behav_land <- function() {
   if (inherits(wm, "try-error")) NULL else wm
 }
 
-## return or render a list of plots, as plot.mpm_df() does
+## return or render a list of plots, as plot.mpm_df() does; a single plot
+##  (one track) is drawn without asking for input
 behav_output <- function(p, pages, ncol, ask) {
   if (!pages) {
-    if (ask) {
+    if (ask && length(p) > 1) {
       grDevices::devAskNewPage(ask = TRUE)
       print(p)
       grDevices::devAskNewPage(ask = FALSE)
+      invisible(p)
+    } else if (ask) {
+      print(p[[1]])
       invisible(p)
     } else {
       p

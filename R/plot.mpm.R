@@ -13,7 +13,8 @@
 ##' @param ncol number of columns to use for faceting. Default is ncol = 1 but 
 ##' this may be increased for multi-individual objects. Ignored if pages = 0
 ##' @param ask logical; if TRUE (default) user is asked for input before each 
-##' plot is rendered. set to FALSE to return ggplot objects
+##' plot is rendered (not for a single track, which is drawn directly). set to
+##' FALSE to return ggplot objects
 ##' @param pal [grDevices::hcl.colors] palette to use (default: "Plasma"; 
 ##' see [grDevices::hcl.pals] for options)
 ##' @param rev reverse colour palette (logical)
@@ -105,10 +106,14 @@ plot.mpm_df <-
       })
       names(p) <- sapply(d, function(x) x$id[1])
       if (!pages) {
-        if(ask) {
+        if(ask && length(p) > 1) {
           devAskNewPage(ask = TRUE)
           print(p)
           devAskNewPage(ask = FALSE)
+        } else if(ask) {
+          ## a single track: draw it without asking for input
+          print(p[[1]])
+          return(invisible(p))
         } else {
           return(p)
         }
@@ -160,10 +165,14 @@ plot.mpm_df <-
       names(p) <- y$id
       
       if (!pages) {
-        if(ask) {
+        if(ask && length(p) > 1) {
           devAskNewPage(ask = TRUE)
           print(p)
           devAskNewPage(ask = FALSE)
+        } else if(ask) {
+          ## a single track: draw it without asking for input
+          print(p[[1]])
+          return(invisible(p))
         } else {
           return(p)
         }
