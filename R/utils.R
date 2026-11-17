@@ -275,3 +275,13 @@ speedfilter_int <- function (x, max.speed = NULL, test = FALSE)
     return(res)
   okFULL
 }
+
+## Did an SSM fit (from sfilter(), mpfilter() or jsfilter()) come back
+##  complete? A successful fit carries the optimiser result and the sdreport;
+##  a failed one is a try-error or a short list carrying `errmsg`. Testing the
+##  number of list elements instead (e.g. length(x) == 15) makes that number
+##  part of the package's interface: adding one field to the fit object turns
+##  every fit into a failure (see also fit_ssm()).
+ssm_fit_complete <- function(x) {
+  is.list(x) && !inherits(x, "try-error") && !is.null(x$opt) && !is.null(x$rep)
+}

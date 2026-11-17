@@ -37,10 +37,12 @@
 ##' @noRd
 
 pf_kineis_jacobian <- function(x, step = 0.1) {
-  x$KIjac.xe <- x$KIjac.xn <- x$KIjac.ye <- x$KIjac.yn <- as.double(NA)
+  ## the Jacobian columns are added only when there are KI observations, so
+  ##  prefilter() output for other data is unchanged
   if (!"obs.type" %in% names(x)) return(x)
   ki <- which(x$obs.type == "KI")
   if (length(ki) == 0) return(x)
+  x$KIjac.xe <- x$KIjac.xn <- x$KIjac.ye <- x$KIjac.yn <- as.double(NA)
 
   ## ground steps on the WGS84 ellipsoid: prime vertical radius of curvature
   ##  (east) and meridional radius of curvature (north), km
@@ -80,7 +82,9 @@ kineis_columns <- function() {
 ## TMB data entries for the KI observation model
 kineis_data <- function(d.all) {
   n <- nrow(d.all)
-  if (!"error.radius" %in% names(d.all)) {
+  ## no KI observations: the Jacobian columns are absent (and error.radius may
+  ##  be absent, or present but missing for every row)
+  if (!all(kineis_columns() %in% names(d.all))) {
     return(list(KIrad = rep(NA_real_, n),
                 KIjac = matrix(NA_real_, n, 4)))
   }

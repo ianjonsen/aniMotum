@@ -450,7 +450,7 @@ route_path <-
 rp_ho <- function(x, what, onland = NULL) {
   out <- lapply(seq_len(nrow(x)), function(i) {
     s <- x$ssm[[i]]
-    if (length(s) < 15) return(NULL)
+    if (!ssm_fit_complete(s)) return(NULL)
     p <- s[[what]]
     ho <- if ("ho" %in% names(p)) as.integer(p$ho) else rep(0L, nrow(p))
     ho[is.na(ho)] <- 0L
