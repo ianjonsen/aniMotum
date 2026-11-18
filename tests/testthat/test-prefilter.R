@@ -80,3 +80,39 @@ test_that("prefilter adds Kinéis Jacobian columns only for KI data", {
   f <- prefilter(format_data(ellie), vmax = 10, ang = c(15, 25), min.dt = 120)
   expect_false(any(grepl("^KIjac", names(f))))
 })
+
+## the Kinéis error radius is found under other spellings of its name
+test_that("error_radius, ERROR_RADIUS and errorRadius are read as the error radius", {
+  expect_equal(aniMotum:::error_radius_column(c("id", "error_radius")), "error_radius")
+  expect_equal(aniMotum:::error_radius_column(c("ERROR_RADIUS", "lon")), "ERROR_RADIUS")
+  expect_equal(aniMotum:::error_radius_column(c("errorRadius")), "errorRadius")
+  expect_null(aniMotum:::error_radius_column(c("id", "radius")))
+  data(ellie)
+  d <- ellie[1:30, ]
+  d$error_radius <- c(rep(NA, 10), rep(800, 20))
+  f <- format_data(d)
+  expect_equal(f$error.radius, d$error_radius)
+  expect_false("error_radius" %in% names(f))
+  f <- prefilter(f, vmax = 10, ang = c(15, 25), min.dt = 120)
+  expect_equal(sum(f$obs.type == "KI"), 20)
+})
+
+## pre-Kinéis SMRU diag data also carry an error radius: a location is Kinéis
+##  only if its ellipse semi-axes both equal its error radius
+test_that("an error radius with unequal ellipse semi-axes is an Argos location", {
+  data(ellie)
+  d <- ellie[1:30, ]
+  d$smaj <- d$smin <- d$eor <- NULL
+  d$error_radius <- 800
+  d$semi_major_axis <- c(rep(2000, 10), rep(800, 20))
+  d$semi_minor_axis <- c(rep(300, 10), rep(800, 20))
+  d$ellipse_orientation <- 45
+  expect_message(f <- format_data(d), "10 location\\(s\\) with an error radius")
+  expect_equal(f$error.radius, c(rep(NA, 10), rep(800, 20)))
+  ## the Argos locations are fitted with their ellipses when given as epar
+  f <- format_data(d, epar = c("semi_major_axis", "semi_minor_axis", "ellipse_orientation"))
+  f <- prefilter(f, vmax = 10, ang = c(15, 25), min.dt = 120)
+  expect_equal(as.vector(table(f$obs.type)[c("KF", "KI")]), c(10, 20))
+  ## without semi-axes, any positive error radius is Kinéis
+  expect_equal(aniMotum:::kineis_radius_rows(data.frame(a = 1:2), c(800, NA)), c(TRUE, FALSE))
+})

@@ -89,8 +89,14 @@ to a regular time grid.
 For location data, the errors of each location are read from the
 first of these that \code{x} has:
 \enumerate{
-\item a Kinéis error radius (\code{error.radius}, or SMRU \code{ERROR_RADIUS}; m),
-through the Kinéis error model (\code{kineis});
+\item a Kinéis error radius (m), in a column named \code{error.radius},
+\code{error_radius} or any other spelling of "error radius" (ignoring case and
+separators),
+through the Kinéis error model (\code{kineis}). In SMRU diag data from before
+Kinéis, the error radius is the CLS Argos (Kalman filter) radius, and
+the ellipse semi-axes (\code{semi_major_axis}, \code{semi_minor_axis}) differ from
+it; such locations are still imputed from their error radius through the
+Kinéis error model, with a message;
 \item standard errors: \code{lon.se}, \code{lat.se} or \code{lonerr}, \code{laterr} (degrees), or
 \code{x.se}, \code{y.se} (km, east and north on the ground). Set \code{error.units} if
 the units differ from those the names imply. Constant errors (e.g. for

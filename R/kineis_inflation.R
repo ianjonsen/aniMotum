@@ -14,7 +14,8 @@
 ##' @param argos Argos locations, as a data frame or the path to a .csv file:
 ##' an SMRU diag file (columns `REF`, `D_DATE`, `LQ`, `LAT`, `LON`,
 ##' `ERROR_RADIUS`), or a data frame with columns `id`, `date`, `lc`, `lon`,
-##' `lat` and `error.radius` (m). Kinéis locations are those with a positive
+##' `lat` and `error.radius` (m; `error_radius` and other spellings are also
+##' accepted). Kinéis locations are those with a positive
 ##' error radius; other Argos locations are ignored.
 ##' @param gps GPS locations for the same tracks, as a data frame or the path
 ##' to a .csv file: an SMRU gps file (columns `REF`, `D_DATE`, `LAT`, `LON`),
@@ -243,6 +244,9 @@ kineis_inflation_locations <- function(d, type = c("argos", "gps")) {
     columns <- c(id = "id", date = "date", lon = "lon", lat = "lat",
                  lc = "lc", error.radius = "error.radius")
   }
+  ## the error radius under any spelling (error.radius, error_radius, ...)
+  er <- error_radius_column(names(d))
+  if (!is.null(er)) columns["error.radius"] <- er
   if (type == "gps") columns <- columns[c("id", "date", "lon", "lat")]
   missing.columns <- setdiff(columns, names(d))
   if (length(missing.columns) > 0)
@@ -263,6 +267,9 @@ kineis_inflation_locations <- function(d, type = c("argos", "gps")) {
     lc[recode] <- smru.lc[lc[recode]]
     out$lc <- lc
     out$error.radius <- as.numeric(d[[columns["error.radius"]]])
+    ## pre-Kinéis SMRU data also have an error radius: keep it only where the
+    ##  ellipse semi-axes equal it (see kineis_radius_rows())
+    out$error.radius[!kineis_radius_rows(d, out$error.radius)] <- NA
   }
   out[!is.na(out$date) & !is.na(out$lon) & !is.na(out$lat), ]
 }

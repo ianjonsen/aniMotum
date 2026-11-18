@@ -47,8 +47,15 @@ geolocations, or high-resolution acoustic detections. The argument is ignored
 if these variables are missing from the input data.}
 
 \item{error.radius}{the name (as a quoted character string) of the Kinéis
-error radius variable (m): default is "error.radius". Locations with a
-non-missing, positive error radius are fitted with the Kinéis (KI)
+error radius variable (m): default is "error.radius", which also matches
+\code{error_radius}, \code{ERROR_RADIUS} and other spellings (ignoring case and
+separators). In SMRU diag data from before Kinéis, the error radius is
+the CLS Argos (Kalman filter) radius; in Kinéis data, SMRU sets both error
+ellipse semi-axes equal to it. So where SMRU's \code{semi_major_axis} and
+\code{semi_minor_axis} are present (names ignoring case), only locations whose
+semi-major axis, semi-minor axis and error radius are equal are taken as
+Kinéis; the others are fitted as Argos locations. Kinéis locations (with a
+non-missing, positive error radius) are fitted with the Kinéis (KI)
 observation model, which takes precedence over any error ellipse supplied
 for the same location (see \code{ssm_control()}). Ignored if the variable is
 missing from the input data.}

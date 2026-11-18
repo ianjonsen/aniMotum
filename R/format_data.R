@@ -29,8 +29,15 @@
 ##' geolocations, or high-resolution acoustic detections. The argument is ignored
 ##' if these variables are missing from the input data.
 ##' @param error.radius the name (as a quoted character string) of the Kinéis
-##' error radius variable (m): default is "error.radius". Locations with a
-##' non-missing, positive error radius are fitted with the Kinéis (KI)
+##' error radius variable (m): default is "error.radius", which also matches
+##' `error_radius`, `ERROR_RADIUS` and other spellings (ignoring case and
+##' separators). In SMRU diag data from before Kinéis, the error radius is
+##' the CLS Argos (Kalman filter) radius; in Kinéis data, SMRU sets both error
+##' ellipse semi-axes equal to it. So where SMRU's `semi_major_axis` and
+##' `semi_minor_axis` are present (names ignoring case), only locations whose
+##' semi-major axis, semi-minor axis and error radius are equal are taken as
+##' Kinéis; the others are fitted as Argos locations. Kinéis locations (with a
+##' non-missing, positive error radius) are fitted with the Kinéis (KI)
 ##' observation model, which takes precedence over any error ellipse supplied
 ##' for the same location (see `ssm_control()`). Ignored if the variable is
 ##' missing from the input data.
@@ -80,6 +87,12 @@ format_data <- function(x,
   stopifnot("epar must be a character vector with 3 elements" = all(is.character(epar)))
   stopifnot("sderr must be a character vector with 2 elements" = all(is.character(sderr)))
   stopifnot("error.radius must be a character string" = is.character(error.radius) & length(error.radius) == 1)
+  ## the default error radius name also matches error_radius, ERROR_RADIUS,
+  ##  errorRadius and other spellings (see error_radius_column())
+  if (error.radius == "error.radius" && !error.radius %in% names(x)) {
+    er <- error_radius_column(names(x))
+    if (!is.null(er)) error.radius <- er
+  }
   
   ## if "lonerr", "laterr" exist in x then rename "x.sd", "y.sd"
   ## return warning that "lonerr", "laterr" are deprecated
@@ -209,6 +222,17 @@ format_data <- function(x,
   ## Kinéis error radius (m), carried as `error.radius`
   if (error.radius %in% names(x)) {
     xx$error.radius <- as.numeric(as.data.frame(x)[[error.radius]])
+    ## SMRU diag data from before Kinéis also have an error radius (the CLS
+    ##  Argos Kalman filter radius). Kinéis locations have both ellipse
+    ##  semi-axes equal to the error radius; drop the error radius of the
+    ##  others, so they are fitted as Argos locations (see kineis_radius_rows())
+    ki <- kineis_radius_rows(x, xx$error.radius)
+    argos <- !ki & !is.na(xx$error.radius) & xx$error.radius > 0
+    if (any(argos))
+      message(sum(argos), " location(s) with an error radius but error ellipse semi-axes ",
+              "that differ from it are Argos (Kalman filter) locations, not Kinéis: ",
+              "fitted with their error ellipse, or their location class if no ellipse is given")
+    xx$error.radius[!ki] <- NA
   }
 
   ## in cases where user supplies id as a factor, drop any unused factor levels 

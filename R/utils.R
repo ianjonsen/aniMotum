@@ -314,3 +314,43 @@ elps <- function(x, y, a, b, theta = 90, conf = TRUE) {
   
   cbind(c(x+x1, x+x1[1]), c(y+y1, y+y1[1]))
 }
+
+## the name of the column holding the Kinéis error radius: any name that reads
+##  "error radius" ignoring case and separators (error.radius, error_radius,
+##  ERROR_RADIUS, errorRadius, "error radius"); NULL if there is none. With
+##  more than one, the first is used, with a warning
+error_radius_column <- function(nm) {
+  key <- gsub("[^a-z]", "", tolower(nm))
+  i <- which(key == "errorradius")
+  if (length(i) == 0) return(NULL)
+  if (length(i) > 1)
+    warning("more than one error radius column (", paste(nm[i], collapse = ", "),
+            "); using ", nm[i[1]], call. = FALSE)
+  nm[i[1]]
+}
+
+## which locations with an error radius r (m) are Kinéis locations. SMRU diag
+##  data from before Kinéis also carry an error radius: the CLS Argos Kalman
+##  filter radius. In Kinéis data, SMRU sets both error ellipse semi-axes
+##  equal to the error radius. So where SMRU's semi-axes are given
+##  (semi_major_axis and semi_minor_axis, names ignoring case), a location is
+##  Kinéis only if semi-major axis = semi-minor axis = error radius (within
+##  0.5 m). Without them, any positive error radius marks a Kinéis location:
+##  in other data (e.g. aniMotum's smaj, smin), an error radius is taken to
+##  be Kinéis, as before
+kineis_radius_rows <- function(x, r) {
+  x <- as.data.frame(x)
+  nm <- names(x)
+  key <- tolower(nm)
+  pick <- function(a) {
+    i <- match(tolower(a), key)
+    if (is.na(i)) NULL else suppressWarnings(as.numeric(x[[nm[i]]]))
+  }
+  ki <- !is.na(r) & r > 0
+  major <- pick("semi_major_axis")
+  minor <- pick("semi_minor_axis")
+  if (is.null(major) || is.null(minor)) return(ki)
+  given <- !is.na(major) & !is.na(minor)
+  same <- function(a, b) !is.na(a) & !is.na(b) & abs(a - b) < 0.5
+  ki & (!given | (same(major, minor) & same(minor, r)))
+}

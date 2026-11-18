@@ -61,7 +61,11 @@
 ##' 1. a Kinéis error radius (m), in a column named `error.radius`,
 ##' `error_radius` or any other spelling of "error radius" (ignoring case and
 ##' separators),
-##' through the Kinéis error model (`kineis`);
+##' through the Kinéis error model (`kineis`). In SMRU diag data from before
+##' Kinéis, the error radius is the CLS Argos (Kalman filter) radius, and
+##' the ellipse semi-axes (`semi_major_axis`, `semi_minor_axis`) differ from
+##' it; such locations are still imputed from their error radius through the
+##' Kinéis error model, with a message;
 ##' 2. standard errors: `lon.se`, `lat.se` or `lonerr`, `laterr` (degrees), or
 ##' `x.se`, `y.se` (km, east and north on the ground). Set `error.units` if
 ##' the units differ from those the names imply. Constant errors (e.g. for
@@ -349,6 +353,15 @@ location_errors <- function(d, lat, kineis, error.units = NULL) {
       stop("kineis must be a list with `scale` (length 2) and `exponent`", call. = FALSE)
     r <- as.numeric(d[[r.col]])
     r[!is.na(r) & r <= 0] <- NA
+    ## pre-Kinéis SMRU diag data also carry an error radius (the CLS Argos
+    ##  Kalman filter radius), with ellipse semi-axes that differ from it (see
+    ##  kineis_radius_rows()). The imputation has no Argos ellipse model, so
+    ##  their radius is used with the Kinéis error model anyway
+    argos <- !is.na(r) & !kineis_radius_rows(d, r)
+    if (any(argos))
+      message(sum(argos), " location(s) have an error radius but error ellipse semi-axes that ",
+              "differ from it: Argos (Kalman filter) locations from before Kinéis. Their error ",
+              "radius is used with the Kinéis error model anyway")
     r <- (r / 1000)^exponent
     return(list(type = "kineis", east = scale[1] * r, north = scale[2] * r))
   }

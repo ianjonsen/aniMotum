@@ -117,6 +117,18 @@ test_that("vmax drops extreme Kinéis locations before imputation", {
   expect_error(impute_tracks(d, reps = 1, time.step = 6, vmax = -1), "vmax")
 })
 
+test_that("the Kinéis error radius is read under other spellings of its name", {
+  d <- data.frame(id = "a", date = as.POSIXct("2026-01-01", tz = "UTC") + 0:9 * 3600,
+                  lon = 130 + 0:9 * 0.01, lat = -10, ERROR_RADIUS = 500)
+  imp <- impute_tracks(d, reps = 1, time.step = 2)
+  expect_equal(attr(imp, "source"), "kineis")
+  ## pre-Kinéis SMRU data: semi-axes differ from the radius; the radius is used
+  d$SEMI_MAJOR_AXIS <- c(rep(1500, 5), rep(500, 5))
+  d$SEMI_MINOR_AXIS <- c(rep(200, 5), rep(500, 5))
+  expect_message(imp <- impute_tracks(d, reps = 1, time.step = 2), "5 location\\(s\\) have an error radius")
+  expect_equal(sum(attr(imp, "data")$keep), 10)
+})
+
 ## location data other than Kinéis: errors from standard errors (degrees or
 ##  km), 95% intervals, or none
 sd_ground <- function(imp) {

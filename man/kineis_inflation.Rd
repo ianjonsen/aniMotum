@@ -18,7 +18,8 @@ kineis_inflation(
 \item{argos}{Argos locations, as a data frame or the path to a .csv file:
 an SMRU diag file (columns \code{REF}, \code{D_DATE}, \code{LQ}, \code{LAT}, \code{LON},
 \code{ERROR_RADIUS}), or a data frame with columns \code{id}, \code{date}, \code{lc}, \code{lon},
-\code{lat} and \code{error.radius} (m). Kinéis locations are those with a positive
+\code{lat} and \code{error.radius} (m; \code{error_radius} and other spellings are also
+accepted). Kinéis locations are those with a positive
 error radius; other Argos locations are ignored.}
 
 \item{gps}{GPS locations for the same tracks, as a data frame or the path
