@@ -1,6 +1,6 @@
 ## Plot methods for the behavioural models: fit_mpm() (class mpm_df; also
-##  used by plot.ssm_df() for mp fits), fit_mrm() (mrm_mi) and
-##  fit_hmm() (hmm_mi). They share the helpers below.
+##  used by plot.ssm_df() for mp fits), and fit_bm(model = "mrm")
+##  (mrm_mi) and fit_bm(model = "hmm") (hmm_mi). They share the helpers below.
 
 ##' @title Plot move persistence estimates from [fit_mpm()]
 ##'
@@ -194,19 +194,19 @@ mpm_normalise <- function(d, group) {
   if (group) rescale(d) else do.call(rbind, lapply(split(d, d$id), rescale))
 }
 
-##' @title Plot movement rate estimates from [fit_mrm()]
+##' @title Plot movement rate estimates from [fit_bm()]
 ##'
-##' @description Plots of the movement rate from [fit_mrm()], shown as a
+##' @description Plots of the movement rate from `fit_bm(model = "mrm")`, shown as a
 ##' speed (km/h) at the fit's time step: the root-mean-square net
 ##' displacement over one time step, divided by the time step (see
-##' [fit_mrm()]):
+##' [fit_bm()]):
 ##' 1. `type = "timeseries"`: speed against time for each track, with the
 ##' pooled 95% interval;
 ##' 2. `type = "track"`: tracks (point-estimate locations) with locations
 ##' coloured by speed.
 ##'
 ##' @inheritParams plot.mpm_df
-##' @param x an `mrm_mi` object from [fit_mrm()]
+##' @param x an `mrm_mi` object from `fit_bm(model = "mrm")`
 ##' @param type `"timeseries"` (default) or `"track"`
 ##' @param log logical; plot the speed on a log scale (default TRUE), on which
 ##' its intervals are symmetric
@@ -216,7 +216,7 @@ mpm_normalise <- function(d, group) {
 ##' @examples
 ##' \dontrun{
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-##' m <- fit_mrm(fit, reps = 20)
+##' m <- fit_bm(fit, model = "mrm", reps = 20)
 ##' plot(m)
 ##' plot(m, type = "track")
 ##' }
@@ -263,9 +263,9 @@ plot.mrm_mi <- function(x,
   }
 }
 
-##' @title Plot hidden Markov model results from [fit_hmm()]
+##' @title Plot hidden Markov model results from [fit_bm()]
 ##'
-##' @description Plots of a hidden Markov model fitted by [fit_hmm()]:
+##' @description Plots of a hidden Markov model fitted by `fit_bm(model = "hmm")`:
 ##' 1. `type = "densities"`: histograms of the step lengths and turning angles
 ##' of the point-estimate tracks, with the fitted state-dependent densities
 ##' (pooled across imputations) weighted by the proportion of time in each
@@ -274,7 +274,7 @@ plot.mrm_mi <- function(x,
 ##' coloured by their most probable state.
 ##'
 ##' @inheritParams plot.mpm_df
-##' @param x an `hmm_mi` object from [fit_hmm()]
+##' @param x an `hmm_mi` object from `fit_bm(model = "hmm")`
 ##' @param type `"densities"` (default) or `"track"`
 ##' @param pages for `type = "track"`, one map per track (`pages = 0`,
 ##' default) or all tracks on one map (`pages = 1`). Ignored for
@@ -291,7 +291,7 @@ plot.mrm_mi <- function(x,
 ##' @examples
 ##' \dontrun{
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-##' h <- fit_hmm(fit, reps = 20)
+##' h <- fit_bm(fit, model = "hmm", reps = 20)
 ##' plot(h)
 ##' plot(h, type = "track")
 ##' }

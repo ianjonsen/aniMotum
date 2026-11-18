@@ -122,6 +122,8 @@ animal tracks. With \code{reps}, the model is fitted to tracks imputed from an
 SSM fit or from Kinéis locations (see \code{\link[=impute_tracks]{impute_tracks()}}), and the estimates
 are pooled with Rubin's rules, so they carry location uncertainty. Without
 \code{reps}, the model is fitted once, treating the locations as data.
+\code{\link[=fit_bm]{fit_bm()}} fits this and the other behavioural models through one
+interface (\code{model = "mpm"}); \code{fit_mpm()} is kept for compatibility.
 }
 \details{
 With \code{reps}, the move persistence model is fitted to each imputed

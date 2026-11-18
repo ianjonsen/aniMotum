@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_behaviour.R
 \name{plot.hmm_mi}
 \alias{plot.hmm_mi}
-\title{Plot hidden Markov model results from \code{\link[=fit_hmm]{fit_hmm()}}}
+\title{Plot hidden Markov model results from \code{\link[=fit_bm]{fit_bm()}}}
 \usage{
 \method{plot}{hmm_mi}(
   x,
@@ -17,7 +17,7 @@
 )
 }
 \arguments{
-\item{x}{an \code{hmm_mi} object from \code{\link[=fit_hmm]{fit_hmm()}}}
+\item{x}{an \code{hmm_mi} object from \code{fit_bm(model = "hmm")}}
 
 \item{type}{\code{"densities"} (default) or \code{"track"}}
 
@@ -46,7 +46,7 @@ for \code{type = "densities"}, a patchwork of the step-length and
 turning-angle panels; for \code{type = "track"}, as for \code{\link[=plot.mpm_df]{plot.mpm_df()}}
 }
 \description{
-Plots of a hidden Markov model fitted by \code{\link[=fit_hmm]{fit_hmm()}}:
+Plots of a hidden Markov model fitted by \code{fit_bm(model = "hmm")}:
 \enumerate{
 \item \code{type = "densities"}: histograms of the step lengths and turning angles
 of the point-estimate tracks, with the fitted state-dependent densities
@@ -64,7 +64,7 @@ the mean state probabilities over all locations.
 \examples{
 \dontrun{
 fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-h <- fit_hmm(fit, reps = 20)
+h <- fit_bm(fit, model = "hmm", reps = 20)
 plot(h)
 plot(h, type = "track")
 }

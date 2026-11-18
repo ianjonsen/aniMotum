@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_hmm.R
 \name{fit_hmm}
 \alias{fit_hmm}
-\title{Fit a hidden Markov model to tracks, by multiple imputation}
+\title{Fit a hidden Markov model to tracks, by multiple imputation (internal; use fit_bm())}
 \usage{
 fit_hmm(
   x,
@@ -15,7 +15,8 @@ fit_hmm(
   angle_par = NULL,
   silent = TRUE,
   progress = TRUE,
-  vmax = NULL
+  vmax = NULL,
+  crs = NULL
 )
 }
 \arguments{
@@ -54,6 +55,8 @@ TRUE).}
 \item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
 speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
+
+\item{crs}{the projection of the imputed tracks (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 }
 \value{
 a list with class \code{hmm_mi}:
@@ -115,12 +118,13 @@ Requires the \code{hmmTMB} package.
 \examples{
 \dontrun{
 fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-h <- fit_hmm(fit, reps = 20)
+h <- fit_bm(fit, model = "hmm", reps = 20)
 h$par_summary
 h$states
 
 ## directly from Kinéis locations, without an SSM
-h <- fit_hmm(kineis_locations, time.step = 12)
+h <- fit_bm(kineis_locations, model = "hmm", time.step = 12)
 }
 
 }
+\keyword{internal}

@@ -5,6 +5,8 @@
 ##' SSM fit or from Kinéis locations (see [impute_tracks()]), and the estimates
 ##' are pooled with Rubin's rules, so they carry location uncertainty. Without
 ##' `reps`, the model is fitted once, treating the locations as data.
+##' [fit_bm()] fits this and the other behavioural models through one
+##' interface (`model = "mpm"`); `fit_mpm()` is kept for compatibility.
 ##'
 ##' @param x one of:
 ##' 1. an `ssm_df` fit object from [fit_ssm()] (`rw`, `crw` or `mp`);

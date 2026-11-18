@@ -20,9 +20,9 @@ test_that("fit_hmm checks its input", {
   ##  non-positive-definite Hessian and a warning unrelated to fit_hmm()
   f <- fit_ssm(ellie, model = "crw", time.step = NA, map = list(psi = factor(NA)),
                control = ssm_control(verbose = 0))
-  expect_error(fit_hmm(f), "regular predicted locations")
-  expect_error(fit_hmm(1), "ssm_df fit object or a data frame")
-  expect_error(fit_hmm(f, n_states = 1), "n_states")
+  expect_error(fit_bm(f, model = "hmm"), "regular predicted locations")
+  expect_error(fit_bm(1, model = "hmm"), "ssm_df fit object or a data frame")
+  expect_error(fit_bm(f, model = "hmm", n_states = 1), "n_states")
 })
 
 test_that("fit_hmm returns pooled states and parameters", {
@@ -31,7 +31,7 @@ test_that("fit_hmm returns pooled states and parameters", {
   data(ellie)
   f <- fit_ssm(ellie, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
   set.seed(1)
-  h <- fit_hmm(f, reps = 3)
+  h <- fit_bm(f, model = "hmm", reps = 3)
   expect_s3_class(h, "hmm_mi")
   expect_equal(nrow(h$states), nrow(grab(f, "predicted")))
   expect_equal(rowSums(as.matrix(h$states[, c("p1", "p2")])), rep(1, nrow(h$states)), tolerance = 1e-6)

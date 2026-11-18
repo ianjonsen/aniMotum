@@ -62,7 +62,7 @@ of grid times, numbered within \code{id}), \code{date}, \code{lon}, \code{lat}, 
 }
 \description{
 Generates \code{reps} imputed tracks on a regular time grid, for
-fitting behavioural models (e.g. \code{\link[=fit_hmm]{fit_hmm()}}, \code{\link[=fit_mpm]{fit_mpm()}}, \code{\link[=fit_mrm]{fit_mrm()}})
+fitting behavioural models with \code{\link[=fit_bm]{fit_bm()}}
 with location uncertainty carried in by multiple imputation. Tracks are
 imputed from either:
 \enumerate{

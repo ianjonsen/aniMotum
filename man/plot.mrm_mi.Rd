@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_behaviour.R
 \name{plot.mrm_mi}
 \alias{plot.mrm_mi}
-\title{Plot movement rate estimates from \code{\link[=fit_mrm]{fit_mrm()}}}
+\title{Plot movement rate estimates from \code{\link[=fit_bm]{fit_bm()}}}
 \usage{
 \method{plot}{mrm_mi}(
   x,
@@ -18,7 +18,7 @@
 )
 }
 \arguments{
-\item{x}{an \code{mrm_mi} object from \code{\link[=fit_mrm]{fit_mrm()}}}
+\item{x}{an \code{mrm_mi} object from \code{fit_bm(model = "mrm")}}
 
 \item{type}{\code{"timeseries"} (default) or \code{"track"}}
 
@@ -50,10 +50,10 @@ its intervals are symmetric}
 as for \code{\link[=plot.mpm_df]{plot.mpm_df()}}
 }
 \description{
-Plots of the movement rate from \code{\link[=fit_mrm]{fit_mrm()}}, shown as a
+Plots of the movement rate from \code{fit_bm(model = "mrm")}, shown as a
 speed (km/h) at the fit's time step: the root-mean-square net
 displacement over one time step, divided by the time step (see
-\code{\link[=fit_mrm]{fit_mrm()}}):
+\code{\link[=fit_bm]{fit_bm()}}):
 \enumerate{
 \item \code{type = "timeseries"}: speed against time for each track, with the
 pooled 95\% interval;
@@ -64,7 +64,7 @@ coloured by speed.
 \examples{
 \dontrun{
 fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-m <- fit_mrm(fit, reps = 20)
+m <- fit_bm(fit, model = "mrm", reps = 20)
 plot(m)
 plot(m, type = "track")
 }

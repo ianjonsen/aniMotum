@@ -1,4 +1,4 @@
-##' @title Fit a hidden Markov model to tracks, by multiple imputation
+##' @title Fit a hidden Markov model to tracks, by multiple imputation (internal; use fit_bm())
 ##'
 ##' @description Fits an \code{n_states}-state hidden Markov model (HMM) to
 ##' step lengths and turning angles of regular-interval tracks. Location
@@ -19,6 +19,7 @@
 ##' across (see [impute_tracks()]).
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
+##' @param crs the projection of the imputed tracks (see [impute_tracks()]).
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -81,17 +82,17 @@
 ##' @examples
 ##' \dontrun{
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-##' h <- fit_hmm(fit, reps = 20)
+##' h <- fit_bm(fit, model = "hmm", reps = 20)
 ##' h$par_summary
 ##' h$states
 ##'
 ##' ## directly from Kinéis locations, without an SSM
-##' h <- fit_hmm(kineis_locations, time.step = 12)
+##' h <- fit_bm(kineis_locations, model = "hmm", time.step = 12)
 ##' }
 ##'
 ##' @importFrom dplyr tibble bind_rows group_by summarise
 ##' @importFrom stats quantile median
-##' @export
+##' @keywords internal
 ##' @md
 fit_hmm <- function(x,
                     reps = 20,
@@ -103,7 +104,8 @@ fit_hmm <- function(x,
                     angle_par = NULL,
                     silent = TRUE,
                     progress = TRUE,
-                    vmax = NULL) {
+                    vmax = NULL,
+                    crs = NULL) {
 
   if (!requireNamespace("hmmTMB", quietly = TRUE))
     stop("fit_hmm() requires the hmmTMB package: install.packages(\"hmmTMB\")", call. = FALSE)
@@ -111,7 +113,7 @@ fit_hmm <- function(x,
     stop("n_states must be a single number >= 2", call. = FALSE)
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax)
+                       kineis = kineis, vmax = vmax, crs = crs)
 
   ## segments need >= 3 locations (one turning angle) to enter the HMM
   seg <- paste(imp$id, imp$segment)

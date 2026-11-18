@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_mrm.R
 \name{fit_mrm}
 \alias{fit_mrm}
-\title{Fit a time-varying movement rate model, by multiple imputation}
+\title{Fit a time-varying movement rate model, by multiple imputation (internal; use fit_bm())}
 \usage{
 fit_mrm(
   x,
@@ -11,7 +11,8 @@ fit_mrm(
   max_gap = NULL,
   kineis = ssm_control()$kineis,
   control = mpm_control(),
-  vmax = NULL
+  vmax = NULL,
+  crs = NULL
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ fits; \code{verbose = 0} is silent.}
 \item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
 speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
+
+\item{crs}{the projection of the imputed tracks (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 }
 \value{
 a list with class \code{mrm_mi}:
@@ -93,12 +96,13 @@ large relative to location error (e.g. 6-24 h for Kinéis or Argos data).
 \examples{
 \dontrun{
 fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-m <- fit_mrm(fit, reps = 20)
+m <- fit_bm(fit, model = "mrm", reps = 20)
 m$fitted
 plot(m)
 
 ## directly from Kinéis locations, without an SSM
-m <- fit_mrm(kineis_locations, time.step = 12)
+m <- fit_bm(kineis_locations, model = "mrm", time.step = 12)
 }
 
 }
+\keyword{internal}

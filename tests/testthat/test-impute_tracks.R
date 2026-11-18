@@ -56,7 +56,7 @@ test_that("fit_mrm pools the movement rate across imputations", {
   data(ellie)
   f <- fit_ssm(ellie, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
   set.seed(1)
-  m <- fit_mrm(f, reps = 3)
+  m <- fit_bm(f, model = "mrm", reps = 3)
   expect_s3_class(m, "mrm_mi")
   expect_equal(nrow(m$fitted), nrow(grab(f, "predicted")))
   expect_true(all(m$fitted$lower <= m$fitted$rate & m$fitted$rate <= m$fitted$upper))

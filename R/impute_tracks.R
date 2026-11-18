@@ -1,7 +1,7 @@
 ##' @title Multiple imputation of regular-interval tracks
 ##'
 ##' @description Generates `reps` imputed tracks on a regular time grid, for
-##' fitting behavioural models (e.g. [fit_hmm()], [fit_mpm()], [fit_mrm()])
+##' fitting behavioural models with [fit_bm()]
 ##' with location uncertainty carried in by multiple imputation. Tracks are
 ##' imputed from either:
 ##' 1. an SSM fit: tracks are simulated from the fit's joint posterior with

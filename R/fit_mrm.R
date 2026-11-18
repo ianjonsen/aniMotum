@@ -1,4 +1,4 @@
-##' @title Fit a time-varying movement rate model, by multiple imputation
+##' @title Fit a time-varying movement rate model, by multiple imputation (internal; use fit_bm())
 ##'
 ##' @description Estimates a time-varying movement rate along each track. The
 ##' model is fitted to each of `reps` imputed tracks (see [impute_tracks()]),
@@ -15,6 +15,7 @@
 ##' across (see [impute_tracks()]).
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
+##' @param crs the projection of the imputed tracks (see [impute_tracks()]).
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -67,17 +68,17 @@
 ##' @examples
 ##' \dontrun{
 ##' fit <- fit_ssm(ellie, model = "crw", time.step = 12)
-##' m <- fit_mrm(fit, reps = 20)
+##' m <- fit_bm(fit, model = "mrm", reps = 20)
 ##' m$fitted
 ##' plot(m)
 ##'
 ##' ## directly from Kinéis locations, without an SSM
-##' m <- fit_mrm(kineis_locations, time.step = 12)
+##' m <- fit_bm(kineis_locations, model = "mrm", time.step = 12)
 ##' }
 ##'
 ##' @importFrom TMB MakeADFun sdreport
 ##' @importFrom dplyr tibble bind_rows
-##' @export
+##' @keywords internal
 ##' @md
 fit_mrm <- function(x,
                     reps = 20,
@@ -85,10 +86,11 @@ fit_mrm <- function(x,
                     max_gap = NULL,
                     kineis = ssm_control()$kineis,
                     control = mpm_control(),
-                    vmax = NULL) {
+                    vmax = NULL,
+                    crs = NULL) {
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax)
+                       kineis = kineis, vmax = vmax, crs = crs)
   estimate <- imp[imp$rep == 0, ]
   ids <- unique(estimate$id)
 
