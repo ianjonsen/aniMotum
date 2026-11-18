@@ -14,7 +14,8 @@ fit_hmm(
   step_par = NULL,
   angle_par = NULL,
   silent = TRUE,
-  progress = TRUE
+  progress = TRUE,
+  vmax = NULL
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ distribution (\code{mu}, \code{kappa}, each of length \code{n_states}). By defau
 
 \item{progress}{logical; show a progress bar over imputations (default
 TRUE).}
+
+\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+speed-distance-angle filter applied before imputation, to drop extreme
+locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
 }
 \value{
 a list with class \code{hmm_mi}:

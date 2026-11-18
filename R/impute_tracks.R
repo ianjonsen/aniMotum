@@ -25,6 +25,13 @@
 ##' `scale` (east and north error SDs relative to the error radius) and
 ##' `exponent` (on the error radius, in km); default as for [ssm_control()].
 ##' @param inflate for SSM fits, passed to [sim_post()] (default TRUE).
+##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' speed-distance-angle filter (`trip::sda()`, as `fit_ssm()` uses) applied
+##' before imputation, to drop extreme locations; e.g. 4 for seals. A
+##' location is dropped if reaching it implies a speed above `vmax` and it
+##' forms a spike (angle and lengths as in `fit_ssm()`'s defaults,
+##' `ang = c(15, 25)`, `distlim = c(2500, 5000)`). NULL (default): no
+##' filter. Ignored for SSM fits, whose data were filtered by `fit_ssm()`.
 ##' @param crs the projection (proj4 string, units km) for the imputed
 ##' tracks' `x`, `y`, and, for Kinéis locations, for the interpolation. If
 ##' NULL (default), chosen from the extent of all the locations by
@@ -76,12 +83,15 @@ impute_tracks <- function(x,
                           max_gap = NULL,
                           kineis = ssm_control()$kineis,
                           inflate = TRUE,
-                          crs = NULL) {
+                          crs = NULL,
+                          vmax = NULL) {
 
   if (!is.numeric(reps) || length(reps) != 1 || reps < 1)
     stop("reps must be a single number >= 1", call. = FALSE)
   if (!is.null(crs) && (!is.character(crs) || length(crs) != 1))
     stop("crs must be NULL or a proj4 string", call. = FALSE)
+  if (!is.null(vmax) && (!is.numeric(vmax) || length(vmax) != 1 || !(vmax > 0)))
+    stop("vmax must be NULL or a single positive number (m/s)", call. = FALSE)
 
   if (inherits(x, "ssm_df")) {
     out <- impute_from_ssm(x, reps, inflate, crs)
@@ -91,7 +101,7 @@ impute_tracks <- function(x,
     if (is.null(time.step) || !is.numeric(time.step) || length(time.step) != 1 || time.step <= 0)
       stop("for Kinéis locations, time.step (h) must be a single positive number", call. = FALSE)
     if (is.null(max_gap)) max_gap <- 2 * time.step
-    out <- impute_from_kineis(x, reps, time.step, max_gap, kineis, crs)
+    out <- impute_from_kineis(x, reps, time.step, max_gap, kineis, crs, vmax)
     attr(out, "source") <- "kineis"
     attr(out, "time.step") <- time.step
   } else {
@@ -137,8 +147,10 @@ impute_from_ssm <- function(x, reps, inflate, crs = NULL) {
 
 ## imputations directly from Kinéis locations: perturb each location by a
 ##  draw from its error-radius distribution, then interpolate to a regular grid
-impute_from_kineis <- function(x, reps, time.step, max_gap, kineis, crs = NULL) {
+impute_from_kineis <- function(x, reps, time.step, max_gap, kineis, crs = NULL,
+                               vmax = NULL) {
   d <- kineis_locations(x)
+  if (!is.null(vmax)) d <- kineis_speed_filter(d, vmax)
   ## one projection for all individuals, chosen from all the locations
   if (is.null(crs)) crs <- auto_crs(d$lon, d$lat)
   scale <- kineis$scale
@@ -295,4 +307,30 @@ progress_bar <- function(n, show = TRUE) {
          utils::setTxtProgressBar(pb, i)
        },
        close = function() close(pb))
+}
+
+## drop extreme Kinéis locations with the speed-distance-angle filter that
+##  fit_ssm() uses (pf_sda_filter(), trip::sda()), separately for each id,
+##  with fit_ssm()'s default spike angles and lengths
+kineis_speed_filter <- function(d, vmax, ang = c(15, 25), distlim = c(2500, 5000)) {
+  d <- d[order(d$id, d$date), ]
+  d <- d[!duplicated(d[, c("id", "date")]), ]
+  keep <- unlist(lapply(split(d, d$id), function(z) {
+    if (nrow(z) < 3) return(rep(TRUE, nrow(z)))
+    z$keep <- TRUE
+    z$obs.type <- "KI"
+    f <- try(suppressWarnings(pf_sda_filter(z, spdf = TRUE, vmax = vmax, ang = ang,
+                                            distlim = distlim)), silent = TRUE)
+    if (inherits(f, "try-error")) {
+      warning("speed filter failed for id ", z$id[1], "; its locations are kept",
+              call. = FALSE)
+      return(rep(TRUE, nrow(z)))
+    }
+    f$keep
+  }), use.names = FALSE)
+  keep[is.na(keep)] <- TRUE
+  if (any(!keep))
+    message("speed filter (vmax = ", vmax, " m/s) dropped ", sum(!keep), " of ",
+            length(keep), " Kinéis locations")
+  d[keep, ]
 }

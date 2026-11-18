@@ -20,8 +20,10 @@
 ##' \code{l_tau} a vector of length 2, log scale; \code{l_rho_o} a scalar, logit scale
 ##' @param upper a list of named parameter upper bounds, if NULL then built in
 ##' defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}
-##' @param verbose integer; report progress during minimization: 0 = silent;
-##' 1 = optimizer trace; 2 = parameter trace (default))
+##' @param verbose integer; report progress: 0 = silent; 1 = progress
+##' (default): a progress bar over the fits, or, for a single fit, the number
+##' of objective function evaluations and the time elapsed; 2 = TMB's trace
+##' of the inner optimisation
 ##' @param ... control parameters for the chosen optimizer
 ##' @return Returns a list with components
 ##'   \item{\code{optim}}{the name of the numerical optimizer as a
@@ -57,7 +59,7 @@ mpm_control <-
     if(!method %in% c("L-BFGS-B", "BFGS", "Nelder-Mead", "CG", "SANN", "Brent")) 
       stop("optMeth can only be `L-BFGS-B`, `BFGS`, `Nelder-Mead`, `CG`, `SANN`, or `Brent` - see ?optim")
     if(!(is.numeric(verbose) & verbose %in% c(0,1,2))) 
-      stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show parameter trace` (default), or 2 = `show optimisere trace`")
+      stop("verbose must be a numeric value of 0 = `be silent`, 1 = `show progress` (default), or 2 = `show the inner optimiser trace`")
     
     dots <- list(...)
     

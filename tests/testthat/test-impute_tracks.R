@@ -102,3 +102,17 @@ test_that("imputed tracks are projected in a crs suited to the data, or the one 
   m <- fit_mpm(f, model = "jmpm", control = mpm_control(verbose = 0))
   expect_equal(m$crs, attr(imp, "crs"))
 })
+
+test_that("vmax drops extreme Kinéis locations before imputation", {
+  t0 <- as.POSIXct("2026-01-01", tz = "UTC")
+  d <- data.frame(id = "a", date = t0 + 0:49 * 3600 * 2,
+                  lon = 140 + 0:49 * 0.02, lat = -60 - 0:49 * 0.01, error.radius = 500)
+  ## a spike: 2 degrees of latitude out and back in 2 h
+  d$lat[25] <- d$lat[25] + 2
+  expect_message(imp <- impute_tracks(d, reps = 1, time.step = 6, vmax = 4), "dropped 1 of 50")
+  expect_true(max(imp$lat) < -59.5)
+  ## without vmax the spike is interpolated into the track
+  imp <- impute_tracks(d, reps = 1, time.step = 2)
+  expect_true(max(imp$lat) > -59)
+  expect_error(impute_tracks(d, reps = 1, time.step = 6, vmax = -1), "vmax")
+})

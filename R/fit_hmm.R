@@ -19,6 +19,9 @@
 ##' across (see [impute_tracks()]).
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
+##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' speed-distance-angle filter applied before imputation, to drop extreme
+##' locations (see [impute_tracks()]). NULL (default): no filter
 ##' @param n_states number of behavioural states (default 2).
 ##' @param step_par optional list of starting values for the step-length
 ##' distribution (`mean`, `sd`, each of length `n_states`, km). By default,
@@ -99,7 +102,8 @@ fit_hmm <- function(x,
                     step_par = NULL,
                     angle_par = NULL,
                     silent = TRUE,
-                    progress = TRUE) {
+                    progress = TRUE,
+                    vmax = NULL) {
 
   if (!requireNamespace("hmmTMB", quietly = TRUE))
     stop("fit_hmm() requires the hmmTMB package: install.packages(\"hmmTMB\")", call. = FALSE)
@@ -107,7 +111,7 @@ fit_hmm <- function(x,
     stop("n_states must be a single number >= 2", call. = FALSE)
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis)
+                       kineis = kineis, vmax = vmax)
 
   ## segments need >= 3 locations (one turning angle) to enter the HMM
   seg <- paste(imp$id, imp$segment)

@@ -10,7 +10,8 @@ fit_mrm(
   time.step = NULL,
   max_gap = NULL,
   kineis = ssm_control()$kineis,
-  control = mpm_control()
+  control = mpm_control(),
+  vmax = NULL
 )
 }
 \arguments{
@@ -31,6 +32,10 @@ across (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 \item{control}{a list from \code{\link[=mpm_control]{mpm_control()}} (optimiser settings). With
 \code{verbose = 1} (the default) a progress bar is shown over the imputation
 fits; \code{verbose = 0} is silent.}
+
+\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+speed-distance-angle filter applied before imputation, to drop extreme
+locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
 }
 \value{
 a list with class \code{mrm_mi}:

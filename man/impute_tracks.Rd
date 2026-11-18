@@ -11,7 +11,8 @@ impute_tracks(
   max_gap = NULL,
   kineis = ssm_control()$kineis,
   inflate = TRUE,
-  crs = NULL
+  crs = NULL,
+  vmax = NULL
 )
 }
 \arguments{
@@ -42,6 +43,14 @@ NULL (default), chosen from the extent of all the locations by
 \code{\link[=auto_crs]{auto_crs()}}: Mercator where its scale varies little across the data,
 otherwise Lambert conformal conic, polar stereographic or oblique
 stereographic. All are conformal.}
+
+\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+speed-distance-angle filter (\code{trip::sda()}, as \code{fit_ssm()} uses) applied
+before imputation, to drop extreme locations; e.g. 4 for seals. A
+location is dropped if reaching it implies a speed above \code{vmax} and it
+forms a spike (angle and lengths as in \code{fit_ssm()}'s defaults,
+\code{ang = c(15, 25)}, \code{distlim = c(2500, 5000)}). NULL (default): no
+filter. Ignored for SSM fits, whose data were filtered by \code{fit_ssm()}.}
 }
 \value{
 a tibble with columns \code{rep} (0 = the point estimate: the SSM-

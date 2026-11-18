@@ -18,7 +18,8 @@ fit_mpm(
   time.step = NULL,
   max_gap = NULL,
   kineis = ssm_control()$kineis,
-  crs = NULL
+  crs = NULL,
+  vmax = NULL
 )
 }
 \arguments{
@@ -48,9 +49,11 @@ fitted, but \code{lon} and \code{lat} are missing in the output, so the track ca
 be mapped}
 
 \item{control}{list of control settings for the outer optimizer
-(see \link{mpm_control} for details). With more than one fit (\code{mpm}
-with more than one track, or \code{reps}), \code{verbose = 1} shows a progress bar
-over the fits instead of the parameter trace}
+(see \link{mpm_control} for details). With \code{verbose = 1} (default),
+more than one fit (\code{mpm} with more than one track, or \code{reps}) shows a
+progress bar over the fits; a single fit (e.g. \code{jmpm} to an \code{ssm_df} fit)
+shows the number of objective function evaluations and the time elapsed.
+\code{verbose = 0} is silent}
 
 \item{inner.control}{list of control parameters for the inner optimization}
 
@@ -81,6 +84,10 @@ across (see \code{\link[=impute_tracks]{impute_tracks()}})}
 fitted. If NULL (default), chosen from the extent of all the locations by
 \code{\link[=auto_crs]{auto_crs()}} (see \code{\link[=impute_tracks]{impute_tracks()}}). Ignored for a data frame of
 projected coordinates}
+
+\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+speed-distance-angle filter applied before imputation, to drop extreme
+locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
 }
 \value{
 a list with class \code{mpm_df}:

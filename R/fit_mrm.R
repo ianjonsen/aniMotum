@@ -15,6 +15,9 @@
 ##' across (see [impute_tracks()]).
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
+##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' speed-distance-angle filter applied before imputation, to drop extreme
+##' locations (see [impute_tracks()]). NULL (default): no filter
 ##' @param control a list from [mpm_control()] (optimiser settings). With
 ##' `verbose = 1` (the default) a progress bar is shown over the imputation
 ##' fits; `verbose = 0` is silent.
@@ -81,10 +84,11 @@ fit_mrm <- function(x,
                     time.step = NULL,
                     max_gap = NULL,
                     kineis = ssm_control()$kineis,
-                    control = mpm_control()) {
+                    control = mpm_control(),
+                    vmax = NULL) {
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis)
+                       kineis = kineis, vmax = vmax)
   estimate <- imp[imp$rep == 0, ]
   ids <- unique(estimate$id)
 

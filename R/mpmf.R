@@ -103,9 +103,16 @@ mpmf <-
     
     obj$env$tracemgc <- ifelse(control$verbose == 2, TRUE, FALSE)
     
-    ## add par values to trace if verbose = TRUE
+    ## with verbose = 1, show progress as the number of objective function
+    ##  evaluations and the time elapsed, updated in place. The number of
+    ##  evaluations the optimiser will need is not known in advance, so this
+    ##  counts up rather than filling a bar
+    n.eval <- 0
+    t.start <- Sys.time()
     myfn <- function(x) {
-      cat("\r", "pars:  ", round(x, 5), "     ")
+      n.eval <<- n.eval + 1
+      cat("\r", sprintf("fitting %s: %d objective evaluations, %.0f s   ", model, n.eval,
+                        as.numeric(difftime(Sys.time(), t.start, units = "secs"))))
       flush.console()
       obj$fn(x)
     }
@@ -157,11 +164,19 @@ mpmf <-
                  upper = U
                )
              ), silent = TRUE))
-    cat("\n")
+    if (control$verbose == 1) {
+      cat("\r", sprintf("fitting %s: %d objective evaluations, %.0f s; computing standard errors   ",
+                        model, n.eval, as.numeric(difftime(Sys.time(), t.start, units = "secs"))))
+      flush.console()
+    }
     
     ## if error then exit with limited output to aid debugging
     ## check if pdHess is FALSE at end and return warning
     rep <- try(sdreport(obj))
+    if (control$verbose == 1)
+      cat("\r", sprintf("fitting %s: %d objective evaluations, %.0f s; done%s\n", model, n.eval,
+                        as.numeric(difftime(Sys.time(), t.start, units = "secs")),
+                        strrep(" ", 24)))
     
     options(warn = oldw) ## turn warnings back on
 

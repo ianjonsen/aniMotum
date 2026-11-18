@@ -26,9 +26,11 @@
 ##' fitted, but `lon` and `lat` are missing in the output, so the track cannot
 ##' be mapped
 ##' @param control list of control settings for the outer optimizer
-##' (see [aniMotum::mpm_control] for details). With more than one fit (`mpm`
-##' with more than one track, or `reps`), `verbose = 1` shows a progress bar
-##' over the fits instead of the parameter trace
+##' (see [aniMotum::mpm_control] for details). With `verbose = 1` (default),
+##' more than one fit (`mpm` with more than one track, or `reps`) shows a
+##' progress bar over the fits; a single fit (e.g. `jmpm` to an `ssm_df` fit)
+##' shows the number of objective function evaluations and the time elapsed.
+##' `verbose = 0` is silent
 ##' @param inner.control list of control parameters for the inner optimization
 ##' @param verbose is deprecated, use ssm_control(verbose = 1) instead,
 ##' see [aniMotum::ssm_control] for details
@@ -46,6 +48,9 @@
 ##' across (see [impute_tracks()])
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()])
+##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' speed-distance-angle filter applied before imputation, to drop extreme
+##' locations (see [impute_tracks()]). NULL (default): no filter
 ##' @param crs the projection (proj4 string, units km) in which the model is
 ##' fitted. If NULL (default), chosen from the extent of all the locations by
 ##' [auto_crs()] (see [impute_tracks()]). Ignored for a data frame of
@@ -142,7 +147,8 @@ fit_mpm <- function(x,
                     time.step = NULL,
                     max_gap = NULL,
                     kineis = ssm_control()$kineis,
-                    crs = NULL
+                    crs = NULL,
+                    vmax = NULL
                     ) {
 
   model <- match.arg(model)
@@ -167,12 +173,10 @@ fit_mpm <- function(x,
     else stop("invalid optimisation method specified, see ?ssm_control for options")
   }
 
-  if(control$verbose == 1)
-    cat(paste0("fitting ", model, "...\n"))
 
   ## locations: rep 0 is the point-estimate track; reps 1, 2, ... are imputed
   ##  tracks
-  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs)
+  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs, vmax)
   source <- attr(loc, "source")
   crs <- attr(loc, "crs")
   time.step <- attr(loc, "time.step")
@@ -209,6 +213,10 @@ fit_mpm <- function(x,
   show <- control$verbose == 1 && length(units) * length(imps) > 1
   ctl <- control
   if (show) ctl$verbose <- 0
+  if (show)
+    cat(sprintf("fitting %s: %d fits (%s)\n", model, length(units) * length(imps),
+                if (is.null(reps)) "one per track" else
+                  paste(reps, if (model == "mpm") "imputations of each track" else "imputations")))
   pb <- progress_bar(length(units) * length(imps), show)
   fits <- lapply(units, function(u) {
     lapply(imps, function(k) {
@@ -293,7 +301,8 @@ fit_mpm <- function(x,
 ## the locations to fit, as a tibble with columns rep (0 = the point-estimate
 ##  track), id, segment, date, lon, lat, x, y, and attributes source,
 ##  time.step and what
-mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs = NULL) {
+mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs = NULL,
+                          vmax = NULL) {
   kineis.data <- is.character(x) || (is.data.frame(x) && !inherits(x, "ssm_df") &&
     any(c("error.radius", "error_radius") %in% tolower(names(x))))
   if (!is.null(reps)) {
@@ -304,7 +313,7 @@ mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs
       stop("with `reps`, x must be an ssm_df fit object or Kinéis locations with error radii",
            call. = FALSE)
     out <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                         kineis = kineis, crs = crs)
+                         kineis = kineis, crs = crs, vmax = vmax)
     attr(out, "what") <- if (inherits(x, "ssm_df")) "predicted" else NA_character_
     return(out)
   }

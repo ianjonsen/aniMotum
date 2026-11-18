@@ -29,8 +29,10 @@ defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are:
 \item{upper}{a list of named parameter upper bounds, if NULL then built in
 defaults are used when \code{method = "L-BFGS-B"}. Possible parameter names are same as \code{lower}}
 
-\item{verbose}{integer; report progress during minimization: 0 = silent;
-1 = optimizer trace; 2 = parameter trace (default))}
+\item{verbose}{integer; report progress: 0 = silent; 1 = progress
+(default): a progress bar over the fits, or, for a single fit, the number
+of objective function evaluations and the time elapsed; 2 = TMB's trace
+of the inner optimisation}
 
 \item{...}{control parameters for the chosen optimizer}
 }
