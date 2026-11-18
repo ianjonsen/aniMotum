@@ -13,7 +13,8 @@ fit_mrm(
   control = mpm_control(),
   vmax = NULL,
   crs = NULL,
-  error.units = NULL
+  error.units = NULL,
+  haulout = NULL
 )
 }
 \arguments{
@@ -44,12 +45,15 @@ locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): n
 \item{error.units}{for location data with standard-error columns, their
 units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
 \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{haulout}{optional haulout bouts at which imputed track segments end
+(see \code{\link[=impute_tracks]{impute_tracks()}}); needs \code{reps}. NULL (default): not split.}
 }
 \value{
 a list with class \code{mrm_mi}:
 \enumerate{
-\item \code{fitted}: a tibble with, for each id and time, the point-estimate track
-(\code{lon}, \code{lat}), the pooled log movement rate (\code{log_rate}), its total
+\item \code{fitted}: a tibble with, for each id, track segment and time, the
+point-estimate track (\code{lon}, \code{lat}), the pooled log movement rate (\code{log_rate}), its total
 standard error (\code{log_rate.se}), the movement rate (\code{rate}, km h^-1/2) and
 its 95\% interval (\code{lower}, \code{upper}), the speed (\code{speed}, km/h; see
 details) and its 95\% interval (\code{speed_lower}, \code{speed_upper}), and the
@@ -60,6 +64,9 @@ log rate, per h^1/2) and \code{rho_p} (correlation between east and north
 displacements), by id;
 \item \code{reps}, \code{n_failed} (imputed-track fits that failed or did not
 converge), \code{source} (\code{"ssm"}, \code{"kineis"} or \code{"data"}) and \code{time.step};
+\item \code{imputed}: each imputation's \code{log_rate}, \code{log_rate.se} and \code{speed}
+(\code{rep}, \code{id}, \code{segment}, \code{date}), for analyses that carry location
+uncertainty forward (see \code{\link[=join]{join()}});
 \item for location data, \code{data}: the input, every column, with \code{keep}
 (whether each location was used) and \code{speed}, \code{speed_lower} and
 \code{speed_upper} interpolated to the observation times (NA outside the

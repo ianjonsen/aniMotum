@@ -45,6 +45,13 @@
 ##' @param error.units for location data with standard-error columns, their
 ##' units, `"degrees"` or `"km"`, overriding the units implied by the column
 ##' names (see details). NULL (default): from the column names.
+##' @param haulout optional haulout bouts at which imputed track segments end:
+##' a data frame with `id`, `start` and `end` (e.g. from [ho_bouts()],
+##' filtered as needed), or SMRU haulout records (a file path, or a data frame
+##' with `ref`, `s_date` and `e_date`), merged into bouts by [ho_bouts()] with
+##' its defaults. Grid times inside a bout are dropped and a new segment
+##' starts at the first grid time after it, so no step spans time ashore.
+##' NULL (default): tracks are not split at haulouts.
 ##'
 ##' @return a tibble with columns `rep` (0 = the point estimate: the SSM-
 ##' predicted track, or the Kinéis locations interpolated without
@@ -118,7 +125,8 @@ impute_tracks <- function(x,
                           inflate = TRUE,
                           crs = NULL,
                           vmax = NULL,
-                          error.units = NULL) {
+                          error.units = NULL,
+                          haulout = NULL) {
 
   if (!is.numeric(reps) || length(reps) != 1 || reps < 1)
     stop("reps must be a single number >= 1", call. = FALSE)
@@ -140,6 +148,7 @@ impute_tracks <- function(x,
   } else {
     stop("x must be an ssm_df fit object or a data frame of locations", call. = FALSE)
   }
+  if (!is.null(haulout)) out <- ho_split(out, haulout)
   out
 }
 

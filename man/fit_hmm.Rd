@@ -13,11 +13,15 @@ fit_hmm(
   kineis = ssm_control()$kineis,
   step_par = NULL,
   angle_par = NULL,
+  streams = NULL,
+  stream_dists = NULL,
+  stream_par = NULL,
   silent = TRUE,
   progress = TRUE,
   vmax = NULL,
   crs = NULL,
-  error.units = NULL
+  error.units = NULL,
+  haulout = NULL
 )
 }
 \arguments{
@@ -48,6 +52,25 @@ quantiles of the step lengths of the SSM-predicted track.}
 distribution (\code{mu}, \code{kappa}, each of length \code{n_states}). By default
 \code{mu = 0} and \code{kappa} increasing from 0.5 to 5 across states.}
 
+\item{streams}{optional data frame of extra data streams, observed by the
+tag, to model jointly with step length and turning angle: \code{id}, \code{date}
+(POSIXct) and one column per stream (e.g. mean dive duration from SMRU
+6-h summary records). Each record is assigned to the time step during
+which it was observed: grid time t takes the mean of the records of its
+individual with \code{date} in (t - time.step, t]. For records summarising an
+interval, give the interval's midpoint as \code{date}. Time steps without
+records are missing for that stream (the HMM handles missing values).}
+
+\item{stream_dists}{named list of the hmmTMB distribution of each stream,
+e.g. \code{list(dive_dur = "gamma2")}; its names choose the columns of
+\code{streams} used. Names must not contain dots.}
+
+\item{stream_par}{optional named list of starting values for each stream
+(as hmmTMB's \code{Observation$new(par = )}, one value per state). By default,
+for \code{"gamma2"} streams \code{mean} and \code{sd} from quantiles of the stream, and
+for \code{"norm"} streams \code{mean} from quantiles and \code{sd} the stream's SD;
+other distributions need starting values.}
+
 \item{silent}{logical; suppress hmmTMB fitting output (default TRUE).}
 
 \item{progress}{logical; show a progress bar over imputations (default
@@ -62,6 +85,9 @@ locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): n
 \item{error.units}{for location data with standard-error columns, their
 units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
 \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{haulout}{optional haulout bouts at which imputed track segments end
+(see \code{\link[=impute_tracks]{impute_tracks()}}); needs \code{reps}. NULL (default): not split.}
 }
 \value{
 a list with class \code{hmm_mi}:
@@ -90,6 +116,10 @@ their total standard errors, degrees of freedom and 95\% intervals;
 states, imputations whose HMM fit failed, and imputations pooled for the
 parameters (those with finite working-scale standard errors); \code{source}
 (\code{"ssm"}, \code{"kineis"} or \code{"data"}) and \code{time.step};
+\item \code{imputed}: the state probabilities (\code{p1}, \code{p2}, ...) and Viterbi state
+(\code{state}) of each imputation (\code{rep}) at each time, for analyses that carry
+location uncertainty forward (see \code{\link[=join]{join()}});
+\item \code{streams}: the names and distributions of any extra data streams;
 \item for location data, \code{data}: the input, every column, with \code{keep}
 (whether each location was used), the state probabilities (\code{p1},
 \code{p2}, ...) interpolated to the observation times and the most probable
@@ -106,7 +136,9 @@ results are pooled across imputations.
 }
 \details{
 The HMM has gamma-distributed step lengths, von Mises turning
-angles, a stationary initial state distribution, and no covariates. All
+angles, any extra data streams (\code{streams}), a stationary initial state
+distribution, and no covariates. Given the states, the data streams are
+independent of each other. All
 tracks in \code{x} share one set of HMM parameters. Each track segment (see
 \code{\link[=impute_tracks]{impute_tracks()}}) is a separate series, so no step spans a data gap.
 

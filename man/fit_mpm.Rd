@@ -20,7 +20,8 @@ fit_mpm(
   kineis = ssm_control()$kineis,
   crs = NULL,
   vmax = NULL,
-  error.units = NULL
+  error.units = NULL,
+  haulout = NULL
 )
 }
 \arguments{
@@ -97,6 +98,9 @@ locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): n
 \item{error.units}{for location data with standard-error columns, their
 units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
 \code{\link[=impute_tracks]{impute_tracks()}})}
+
+\item{haulout}{optional haulout bouts at which imputed track segments end
+(see \code{\link[=impute_tracks]{impute_tracks()}}); needs \code{reps}. NULL (default): not split.}
 }
 \value{
 a list with class \code{mpm_df}:
@@ -123,6 +127,9 @@ the Hessian was positive definite (\code{pdHess}) and the \code{aic};
 \code{"data"}), \code{time.step} (h; NA for irregular locations), \code{what} (the
 \code{ssm_df} locations fitted) and \code{crs} (the projection fitted in; NA for a
 data frame of projected coordinates);
+\item with \code{reps}, \code{imputed}: each imputation's \code{g} and \code{g.se} (\code{rep}, \code{id},
+\code{segment}, \code{date}), for analyses that carry location uncertainty forward
+(see \code{\link[=join]{join()}});
 \item for a data frame input, \code{data}: the input, every column, with \code{keep}
 (whether each location was used) and g and its 95\% interval (\code{g},
 \code{lower}, \code{upper}) interpolated to the observation times (NA outside the

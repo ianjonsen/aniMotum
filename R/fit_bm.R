@@ -44,6 +44,11 @@
 ##' units, `"degrees"` or `"km"`, if not those the column names imply. NULL
 ##' (default): from the names (`lon.se`, `lat.se`, `lonerr`, `laterr`:
 ##' degrees; `x.se`, `y.se`: km on the ground; see [impute_tracks()]).
+##' @param haulout optional haulout bouts at which imputed track segments
+##' end, so no step spans time ashore: a data frame with `id`, `start` and
+##' `end` (e.g. from [ho_bouts()], filtered as needed), or SMRU haulout
+##' records, merged into bouts by [ho_bouts()] with its defaults (see
+##' [impute_tracks()]). Needs `reps`. NULL (default): tracks are not split.
 ##' @param control a list from [mpm_control()]: optimiser settings for `"mpm"`
 ##' and `"mrm"`, and, for every model, `verbose` (0 = silent; 1, default =
 ##' progress bar).
@@ -54,7 +59,9 @@
 ##' [fit_mpm()]);
 ##' 2. `"mrm"`: none;
 ##' 3. `"hmm"`: `n_states` (default 2), `step_par`, `angle_par` (starting
-##' values) and `silent` (suppress `hmmTMB` output, default TRUE).
+##' values), `streams`, `stream_dists`, `stream_par` (extra data streams, such
+##' as dive variables, modelled jointly with the movement; see details) and
+##' `silent` (suppress `hmmTMB` output, default TRUE).
 ##'
 ##' @return a list with class `behaviour_fit` and a class for the model:
 ##' 1. `"mpm"`, class `mpm_df`: `fitted` (the track's `lon`, `lat`, g, its
@@ -71,7 +78,15 @@
 ##' imputations, the most probable state and the agreement between
 ##' imputations), `par` (each imputation's parameters), `par_summary` and
 ##' `par_working` (pooled estimates on the natural and working scales),
-##' `reps`, `n_states`, `n_failed`, `n_pooled`, `source` and `time.step`.
+##' `reps`, `n_states`, `n_failed`, `n_pooled`, `streams`, `source` and
+##' `time.step`.
+##'
+##' With `reps`, each also has `imputed`: the estimates of each imputation
+##' (`rep`) at each time (`"mpm"`: `g`, `g.se`; `"mrm"`: `log_rate`,
+##' `log_rate.se`, `speed`; `"hmm"`: the state probabilities and the Viterbi
+##' state). [join()] interpolates them to the times of tag-measured events
+##' (`by_rep = TRUE`), so a second-stage analysis can be fitted to each
+##' imputation and pooled with Rubin's rules.
 ##'
 ##' For location data, each also has `data`: the input, every column, with
 ##' `keep` (whether each location was used) and the estimates interpolated to
@@ -104,7 +119,16 @@
 ##' all tracks share one set of parameters, and each track segment is a
 ##' separate series. States are numbered by mean step length (state 1 has the
 ##' shortest steps) in every imputation, which prevents label switching.
-##' Working-scale estimates are pooled with Rubin's rules.
+##' Working-scale estimates are pooled with Rubin's rules. Extra data
+##' streams observed by the tag (`streams`), e.g. mean dive duration or the
+##' percentage of time diving per time step, are modelled jointly with the
+##' step lengths and turning angles, each with its own state-dependent
+##' distribution (`stream_dists`), conditionally independent given the state.
+##'
+##' \strong{Haulouts.} With `haulout`, imputed track segments end at each
+##' haulout bout (see [ho_bouts()]): grid times during the bout are dropped
+##' and no step spans time ashore, so the models estimate at-sea behaviour
+##' only.
 ##'
 ##' The time step should be long enough that movement between locations is
 ##' large relative to location error (e.g. 6 to 24 h for Kinéis or Argos
@@ -113,7 +137,8 @@
 ##' \strong{Adding a model.} Each model is an entry in
 ##' `behaviour_models()`: a fitting function taking the shared arguments
 ##' (`x`, `reps`, `time.step`, `max_gap`, `vmax`, `crs`, `kineis`,
-##' `error.units`, `control`) and its own, and returning a list with a class of its own.
+##' `error.units`, `haulout`, `control`) and its own, and returning a list
+##' with a class of its own.
 ##'
 ##' @examples
 ##' \dontrun{
@@ -131,6 +156,18 @@
 ##' gps$x.se <- gps$y.se <- 0.03
 ##' r <- fit_bm(gps, model = "mrm", reps = 20, time.step = 6)
 ##' r$data
+##'
+##' ## SMRU tag data: tracks split at haulouts of at least 1 h, and mean
+##' ##  dive duration per 6-h summary record as an extra HMM data stream
+##' ho <- ho_bouts("haulout.csv", min_dur = 1)
+##' smry <- read.csv("summary.csv")
+##' dv <- data.frame(id = smry$ref,
+##'                  date = as.POSIXct(smry$s_date, format = "%Y-%m-%dT%H:%M:%SZ",
+##'                                    tz = "UTC") + 3 * 3600,
+##'                  dive_dur = smry$av_dur / 60)
+##' fit <- fit_ssm(diag, model = "crw", time.step = 6, haulout = "haulout.csv")
+##' h <- fit_bm(fit, model = "hmm", reps = 20, haulout = ho,
+##'             streams = dv, stream_dists = list(dive_dur = "gamma2"))
 ##' }
 ##'
 ##' @export
@@ -144,6 +181,7 @@ fit_bm <- function(x,
                           crs = NULL,
                           kineis = ssm_control()$kineis,
                           error.units = NULL,
+                          haulout = NULL,
                           control = mpm_control(),
                           ...) {
   models <- behaviour_models()
@@ -167,14 +205,15 @@ fit_bm <- function(x,
   out <- do.call(m$fit, c(list(x = x, reps = reps, time.step = time.step,
                                max_gap = max_gap, vmax = vmax, crs = crs,
                                kineis = kineis, error.units = error.units,
-                               control = control), dots))
+                               haulout = haulout, control = control), dots))
   class(out) <- append(class(out), "behaviour_fit", after = 1)
   out
 }
 
 ## arguments every behavioural model's fitting function takes
 behaviour_shared_arguments <- function() {
-  c("x", "reps", "time.step", "max_gap", "vmax", "crs", "kineis", "error.units", "control")
+  c("x", "reps", "time.step", "max_gap", "vmax", "crs", "kineis", "error.units", "haulout",
+    "control")
 }
 
 ## the behavioural models available to fit_bm(). To add a model, add
@@ -187,31 +226,37 @@ behaviour_models <- function() {
     mpm = list(
       description = "move persistence model",
       point_fit = TRUE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control,
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, haulout,
+                     control,
                      joint = TRUE, what = "predicted", coords = 3:4, inner.control = NULL) {
         fit_mpm(x, what = what, model = if (isTRUE(joint)) "jmpm" else "mpm",
                 coords = coords, control = control, inner.control = inner.control,
                 reps = reps, time.step = time.step, max_gap = max_gap,
-                kineis = kineis, crs = crs, vmax = vmax, error.units = error.units)
+                kineis = kineis, crs = crs, vmax = vmax, error.units = error.units,
+                haulout = haulout)
       }),
     mrm = list(
       description = "movement rate model",
       point_fit = FALSE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control) {
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, haulout,
+                     control) {
         fit_mrm(x, reps = reps, time.step = time.step, max_gap = max_gap,
                 kineis = kineis, control = control, vmax = vmax, crs = crs,
-                error.units = error.units)
+                error.units = error.units, haulout = haulout)
       }),
     hmm = list(
       description = "hidden Markov model",
       point_fit = FALSE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control,
-                     n_states = 2, step_par = NULL, angle_par = NULL, silent = TRUE) {
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, haulout,
+                     control,
+                     n_states = 2, step_par = NULL, angle_par = NULL,
+                     streams = NULL, stream_dists = NULL, stream_par = NULL, silent = TRUE) {
         fit_hmm(x, reps = reps, n_states = n_states, time.step = time.step,
                 max_gap = max_gap, kineis = kineis, step_par = step_par,
-                angle_par = angle_par, silent = silent,
+                angle_par = angle_par, streams = streams, stream_dists = stream_dists,
+                stream_par = stream_par, silent = silent,
                 progress = control$verbose >= 1, vmax = vmax, crs = crs,
-                error.units = error.units)
+                error.units = error.units, haulout = haulout)
       })
   )
 }

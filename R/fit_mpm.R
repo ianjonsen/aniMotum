@@ -57,6 +57,8 @@
 ##' @param error.units for location data with standard-error columns, their
 ##' units, `"degrees"` or `"km"`, if not those the column names imply (see
 ##' [impute_tracks()])
+##' @param haulout optional haulout bouts at which imputed track segments end
+##' (see [impute_tracks()]); needs `reps`. NULL (default): not split.
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -88,7 +90,10 @@
 ##' `"data"`), `time.step` (h; NA for irregular locations), `what` (the
 ##' `ssm_df` locations fitted) and `crs` (the projection fitted in; NA for a
 ##' data frame of projected coordinates);
-##' 6. for a data frame input, `data`: the input, every column, with `keep`
+##' 6. with `reps`, `imputed`: each imputation's `g` and `g.se` (`rep`, `id`,
+##' `segment`, `date`), for analyses that carry location uncertainty forward
+##' (see [join()]);
+##' 7. for a data frame input, `data`: the input, every column, with `keep`
 ##' (whether each location was used) and g and its 95% interval (`g`,
 ##' `lower`, `upper`) interpolated to the observation times (NA outside the
 ##' fitted track segments).
@@ -162,7 +167,8 @@ fit_mpm <- function(x,
                     kineis = ssm_control()$kineis,
                     crs = NULL,
                     vmax = NULL,
-                    error.units = NULL
+                    error.units = NULL,
+                    haulout = NULL
                     ) {
 
   model <- match.arg(model)
@@ -190,8 +196,10 @@ fit_mpm <- function(x,
 
   ## locations: rep 0 is the point-estimate track; reps 1, 2, ... are imputed
   ##  tracks
+  if (!is.null(haulout) && is.null(reps))
+    stop("haulout splits imputed tracks: give `reps` (e.g. 20)", call. = FALSE)
   loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs, vmax,
-                       error.units)
+                       error.units, haulout)
   data <- attr(loc, "data")
   source <- attr(loc, "source")
   crs <- attr(loc, "crs")
@@ -251,7 +259,9 @@ fit_mpm <- function(x,
   fitted <- list()
   par <- list()
   convergence <- list()
+  imputed <- list()
   for (u in units) {
+    rep_ok <- imps[!vapply(fits[[u]], is.null, logical(1))]
     f <- Filter(Negate(is.null), fits[[u]])
     convergence[[u]] <- tibble(unit = if (u == "all") "joint" else u,
                                fits = length(f),
@@ -282,7 +292,14 @@ fit_mpm <- function(x,
                           ##  report it, and its interval, within 0 to 1
                           g = pmin(pmax(pr$estimate, 0), 1), g.se = pr$se,
                           lower = pmax(pr$lower, 0), upper = pmin(pr$upper, 1))
-    if (!is.null(reps)) fitted[[u]]$fraction_missing <- pr$fraction_missing
+    if (!is.null(reps)) {
+      fitted[[u]]$fraction_missing <- pr$fraction_missing
+      ## each imputation's estimates, for analyses that carry location
+      ##  uncertainty forward
+      imputed[[u]] <- bind_rows(lapply(seq_along(f), function(k)
+        tibble(rep = rep_ok[k], id = e$id, segment = e$segment, date = e$date,
+               g = pmin(pmax(gm[, k], 0), 1), g.se = gse[, k])))
+    }
     pp <- mpm_combine(do.call(cbind, lapply(f, function(z) z$par[, 1])),
                       do.call(cbind, lapply(f, function(z) z$par[, 2])))
     nm <- rownames(f[[1]]$par)
@@ -310,6 +327,7 @@ fit_mpm <- function(x,
               time.step = time.step,
               what = what,
               crs = crs)
+  if (!is.null(reps)) out$imputed <- bind_rows(imputed)
   ## data frame input: the input, with the estimates at its observation times
   if (!is.null(data)) out$data <- bm_data(data, out$fitted, c("g", "lower", "upper"))
   class(out) <- append("mpm_df", class(out))
@@ -320,7 +338,7 @@ fit_mpm <- function(x,
 ##  track), id, segment, date, lon, lat, x, y, and attributes source,
 ##  time.step and what
 mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs = NULL,
-                          vmax = NULL, error.units = NULL) {
+                          vmax = NULL, error.units = NULL, haulout = NULL) {
   ## location data with errors (Kinéis error radii, standard errors or 95%
   ##  intervals)
   error.data <- !inherits(x, "ssm_df") &&
@@ -330,7 +348,8 @@ mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs
       stop("with `reps`, imputed tracks are at the predicted (regular) times; use what = \"predicted\"",
            call. = FALSE)
     out <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                         kineis = kineis, crs = crs, vmax = vmax, error.units = error.units)
+                         kineis = kineis, crs = crs, vmax = vmax, error.units = error.units,
+                         haulout = haulout)
     attr(out, "what") <- if (inherits(x, "ssm_df")) "predicted" else NA_character_
     return(out)
   }

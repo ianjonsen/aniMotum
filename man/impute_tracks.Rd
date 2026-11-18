@@ -13,7 +13,8 @@ impute_tracks(
   inflate = TRUE,
   crs = NULL,
   vmax = NULL,
-  error.units = NULL
+  error.units = NULL,
+  haulout = NULL
 )
 }
 \arguments{
@@ -59,6 +60,14 @@ filter. Ignored for SSM fits, whose data were filtered by \code{fit_ssm()}.}
 \item{error.units}{for location data with standard-error columns, their
 units, \code{"degrees"} or \code{"km"}, overriding the units implied by the column
 names (see details). NULL (default): from the column names.}
+
+\item{haulout}{optional haulout bouts at which imputed track segments end:
+a data frame with \code{id}, \code{start} and \code{end} (e.g. from \code{\link[=ho_bouts]{ho_bouts()}},
+filtered as needed), or SMRU haulout records (a file path, or a data frame
+with \code{ref}, \code{s_date} and \code{e_date}), merged into bouts by \code{\link[=ho_bouts]{ho_bouts()}} with
+its defaults. Grid times inside a bout are dropped and a new segment
+starts at the first grid time after it, so no step spans time ashore.
+NULL (default): tracks are not split at haulouts.}
 }
 \value{
 a tibble with columns \code{rep} (0 = the point estimate: the SSM-

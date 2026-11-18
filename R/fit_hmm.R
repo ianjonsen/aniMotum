@@ -23,6 +23,8 @@
 ##' @param error.units for location data with standard-error columns, their
 ##' units, `"degrees"` or `"km"`, if not those the column names imply (see
 ##' [impute_tracks()]).
+##' @param haulout optional haulout bouts at which imputed track segments end
+##' (see [impute_tracks()]); needs `reps`. NULL (default): not split.
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -33,6 +35,22 @@
 ##' @param angle_par optional list of starting values for the turning-angle
 ##' distribution (`mu`, `kappa`, each of length `n_states`). By default
 ##' `mu = 0` and `kappa` increasing from 0.5 to 5 across states.
+##' @param streams optional data frame of extra data streams, observed by the
+##' tag, to model jointly with step length and turning angle: `id`, `date`
+##' (POSIXct) and one column per stream (e.g. mean dive duration from SMRU
+##' 6-h summary records). Each record is assigned to the time step during
+##' which it was observed: grid time t takes the mean of the records of its
+##' individual with `date` in (t - time.step, t]. For records summarising an
+##' interval, give the interval's midpoint as `date`. Time steps without
+##' records are missing for that stream (the HMM handles missing values).
+##' @param stream_dists named list of the hmmTMB distribution of each stream,
+##' e.g. `list(dive_dur = "gamma2")`; its names choose the columns of
+##' `streams` used. Names must not contain dots.
+##' @param stream_par optional named list of starting values for each stream
+##' (as hmmTMB's `Observation$new(par = )`, one value per state). By default,
+##' for `"gamma2"` streams `mean` and `sd` from quantiles of the stream, and
+##' for `"norm"` streams `mean` from quantiles and `sd` the stream's SD;
+##' other distributions need starting values.
 ##' @param silent logical; suppress hmmTMB fitting output (default TRUE).
 ##' @param progress logical; show a progress bar over imputations (default
 ##' TRUE).
@@ -62,13 +80,19 @@
 ##' states, imputations whose HMM fit failed, and imputations pooled for the
 ##' parameters (those with finite working-scale standard errors); `source`
 ##' (`"ssm"`, `"kineis"` or `"data"`) and `time.step`;
-##' 6. for location data, `data`: the input, every column, with `keep`
+##' 6. `imputed`: the state probabilities (`p1`, `p2`, ...) and Viterbi state
+##' (`state`) of each imputation (`rep`) at each time, for analyses that carry
+##' location uncertainty forward (see [join()]);
+##' 7. `streams`: the names and distributions of any extra data streams;
+##' 8. for location data, `data`: the input, every column, with `keep`
 ##' (whether each location was used), the state probabilities (`p1`,
 ##' `p2`, ...) interpolated to the observation times and the most probable
 ##' state (`state`; NA outside the imputed track segments).
 ##'
 ##' @details The HMM has gamma-distributed step lengths, von Mises turning
-##' angles, a stationary initial state distribution, and no covariates. All
+##' angles, any extra data streams (`streams`), a stationary initial state
+##' distribution, and no covariates. Given the states, the data streams are
+##' independent of each other. All
 ##' tracks in `x` share one set of HMM parameters. Each track segment (see
 ##' [impute_tracks()]) is a separate series, so no step spans a data gap.
 ##'
@@ -109,19 +133,28 @@ fit_hmm <- function(x,
                     kineis = ssm_control()$kineis,
                     step_par = NULL,
                     angle_par = NULL,
+                    streams = NULL,
+                    stream_dists = NULL,
+                    stream_par = NULL,
                     silent = TRUE,
                     progress = TRUE,
                     vmax = NULL,
                     crs = NULL,
-                    error.units = NULL) {
+                    error.units = NULL,
+                    haulout = NULL) {
 
   if (!requireNamespace("hmmTMB", quietly = TRUE))
     stop("fit_hmm() requires the hmmTMB package: install.packages(\"hmmTMB\")", call. = FALSE)
   if (!is.numeric(n_states) || length(n_states) != 1 || n_states < 2)
     stop("n_states must be a single number >= 2", call. = FALSE)
 
+  if (!is.null(streams) && is.null(stream_dists))
+    stop("give the distribution of each stream in `stream_dists`, e.g. list(dive_dur = \"gamma2\")",
+         call. = FALSE)
+
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units)
+                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units,
+                       haulout = haulout)
 
   ## segments need >= 3 locations (one turning angle) to enter the HMM
   seg <- paste(imp$id, imp$segment)
@@ -146,17 +179,30 @@ fit_hmm <- function(x,
                       kappa = seq(0.5, 5, length.out = n_states))
   }
 
+  ## extra data streams, aligned to the time steps of the regular grid
+  if (!is.null(stream_dists)) {
+    sv <- hmm_streams(est, streams, stream_dists, attr(imp, "time.step"))
+    est <- cbind(est, sv)
+    stream_par <- hmm_stream_par(sv, stream_dists, stream_par, n_states)
+  }
+  key0 <- paste(est$id, as.numeric(est$date))
+
   sims <- as.data.frame(imp[imp$rep > 0, ])
   pb <- progress_bar(reps, progress)
   fits <- lapply(sort(unique(sims$rep)), function(r) {
     d <- hmm_moves(sims[sims$rep == r, c("id", "segment", "date", "lon", "lat")])
-    f <- hmm_fit_one(d, n_states, step_par, angle_par, silent)
+    if (!is.null(stream_dists)) {
+      m <- match(paste(d$id, as.numeric(d$date)), key0)
+      d <- cbind(d, est[m, names(stream_dists), drop = FALSE])
+    }
+    f <- hmm_fit_one(d, n_states, step_par, angle_par, silent, stream_dists, stream_par)
     pb$tick()
     f
   })
   pb$close()
   ok <- !vapply(fits, is.null, logical(1))
   if (!any(ok)) stop("the HMM fit failed for every imputation", call. = FALSE)
+  rep_ok <- sort(unique(sims$rep))[ok]
   fits <- fits[ok]
 
   ## pool state probabilities and Viterbi states across imputations
@@ -166,10 +212,19 @@ fit_hmm <- function(x,
   viterbi <- do.call(cbind, lapply(fits, function(f) f$viterbi))
   agreement <- rowMeans(viterbi == state)
 
-  states <- tibble(est[, c("id", "segment", "date", "lon", "lat", "step", "angle")],
+  states <- tibble(est[, c("id", "segment", "date", "lon", "lat", "step", "angle",
+                           names(stream_dists))],
                    as.data.frame(probs),
                    state = state,
                    agreement = agreement)
+
+  ## each imputation's state probabilities and Viterbi states
+  imputed <- bind_rows(lapply(seq_along(fits), function(i) {
+    p <- fits[[i]]$probs
+    colnames(p) <- paste0("p", seq_len(n_states))
+    tibble(rep = rep_ok[i], est[, c("id", "segment", "date")], as.data.frame(p),
+           state = fits[[i]]$viterbi)
+  }))
 
   par <- bind_rows(lapply(seq_along(fits), function(i) tibble(rep = i, fits[[i]]$par)))
 
@@ -187,6 +242,8 @@ fit_hmm <- function(x,
               reps = reps,
               n_states = n_states,
               n_failed = sum(!ok),
+              imputed = imputed,
+              streams = stream_dists,
               source = attr(imp, "source"),
               time.step = attr(imp, "time.step"))
   ## location data: the input, with the state probabilities at its
@@ -234,11 +291,13 @@ hmm_moves <- function(d) {
 
 ## fit one HMM with hmmTMB; states ordered by mean step length. Returns NULL
 ##  if the fit fails.
-hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
+hmm_fit_one <- function(d, n_states, step_par, angle_par, silent,
+                        stream_dists = NULL, stream_par = NULL) {
   ## each track segment is a separate series
   data <- data.frame(ID = factor(paste(d$id, d$segment, sep = "_segment_"),
                                  levels = unique(paste(d$id, d$segment, sep = "_segment_"))),
                      time = d$date, step = d$step, angle = d$angle)
+  for (v in names(stream_dists)) data[[v]] <- d[[v]]
   ## gamma step lengths must be positive
   data$step[!is.na(data$step) & data$step <= 0] <- 1e-6
   res <- try({
@@ -247,9 +306,9 @@ hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
     hid <- hmmTMB::MarkovChain$new(data = data, n_states = n_states,
                                    initial_state = "stationary")
     obs <- hmmTMB::Observation$new(data = data,
-                                   dists = list(step = "gamma2", angle = "vm"),
+                                   dists = c(list(step = "gamma2", angle = "vm"), stream_dists),
                                    n_states = n_states,
-                                   par = list(step = step_par, angle = angle_par))
+                                   par = c(list(step = step_par, angle = angle_par), stream_par))
     hmm <- hmmTMB::HMM$new(obs = obs, hid = hid)
     ## NaN standard-error warnings (Hessian not positive-definite) are
     ##  handled below: such fits are excluded from parameter pooling
@@ -276,10 +335,10 @@ hmm_fit_one <- function(d, n_states, step_par, angle_par, silent) {
   viterbi <- match(decoded$viterbi, ord)
   tpm <- tpm[ord, ord, drop = FALSE]
 
-  par <- c(stats::setNames(obspar["step.mean", ord], paste0("step_mean_", seq_len(n_states))),
-           stats::setNames(obspar["step.sd", ord], paste0("step_sd_", seq_len(n_states))),
-           stats::setNames(obspar["angle.mu", ord], paste0("angle_mu_", seq_len(n_states))),
-           stats::setNames(obspar["angle.kappa", ord], paste0("angle_kappa_", seq_len(n_states))))
+  ## every observation parameter (step, angle, then any streams), named
+  ##  variable_parameter_state
+  par <- unlist(lapply(rownames(obspar), function(r)
+    stats::setNames(obspar[r, ord], paste0(sub(".", "_", r, fixed = TRUE), "_", seq_len(n_states)))))
   tpm_names <- outer(seq_len(n_states), seq_len(n_states), function(i, j) paste0("tpm_", i, j))
   par <- c(par, stats::setNames(as.vector(tpm), as.vector(tpm_names)))
 
@@ -368,8 +427,81 @@ hmm_pool <- function(fits, n_states) {
   }))
   natural <- bind_rows(c(natural, unlist(tp, recursive = FALSE)))
   ## same parameter order as the per-imputation table
-  natural <- natural[order(match(sub("_[0-9]+$", "", natural$parameter),
-                                 c("step_mean", "step_sd", "angle_mu", "angle_kappa", "tpm")),
-                           natural$parameter), ]
+  base <- sub("_[0-9]+$", "", natural$parameter)
+  lev <- unique(c("step_mean", "step_sd", "angle_mu", "angle_kappa",
+                  setdiff(base, "tpm"), "tpm"))
+  natural <- natural[order(match(base, lev), natural$parameter), ]
   list(natural = natural, working = working, n_pooled = n_pooled)
+}
+
+## extra data streams on the regular grid `est` (id, date): each stream record
+##  is assigned to the time step during which it was observed, (t -
+##  time.step, t], and records in the same step are averaged. Returns a data
+##  frame with one column per stream, aligned with the rows of est
+hmm_streams <- function(est, streams, stream_dists, time.step) {
+  if (!is.data.frame(streams) || !all(c("id", "date") %in% names(streams)))
+    stop("streams must be a data frame with `id`, `date` and the stream columns", call. = FALSE)
+  v <- names(stream_dists)
+  if (is.null(v) || any(v == "") || any(grepl(".", v, fixed = TRUE)))
+    stop("stream_dists must be a named list; names must not contain dots", call. = FALSE)
+  if (any(v %in% c("step", "angle", "ID", "time")))
+    stop("stream names must not be step, angle, ID or time", call. = FALSE)
+  miss <- setdiff(v, names(streams))
+  if (length(miss) > 0)
+    stop("streams is missing column(s): ", paste(miss, collapse = ", "), call. = FALSE)
+  s <- as.data.frame(streams)
+  if (!inherits(s$date, "POSIXct")) s$date <- as.POSIXct(s$date, tz = "UTC")
+  s <- s[!is.na(s$date), ]
+  out <- as.data.frame(matrix(NA_real_, nrow(est), length(v), dimnames = list(NULL, v)))
+  ts <- time.step * 3600
+  for (i in unique(est$id)) {
+    r <- which(est$id == i)
+    tg <- as.numeric(est$date[r])
+    o <- order(tg)
+    si <- s[as.character(s$id) == i, , drop = FALSE]
+    if (nrow(si) == 0) next
+    t <- as.numeric(si$date)
+    ## the first grid time at or after each record, if within one time step
+    j <- findInterval(t, tg[o], left.open = TRUE) + 1
+    use <- j <= length(o)
+    use[use] <- tg[o][j[use]] - t[use] < ts
+    if (!any(use)) next
+    rows <- r[o][j[use]]
+    for (k in v) {
+      m <- tapply(as.numeric(si[[k]][use]), rows, mean, na.rm = TRUE)
+      out[[k]][as.integer(names(m))] <- as.numeric(m)
+    }
+  }
+  for (k in v) {
+    x <- out[[k]]
+    x[is.nan(x)] <- NA
+    ## positive-valued distributions cannot take values <= 0
+    if (stream_dists[[k]] %in% c("gamma", "gamma2", "lnorm", "weibull", "exp") &&
+        any(x <= 0, na.rm = TRUE)) {
+      message(sum(x <= 0, na.rm = TRUE), " value(s) <= 0 of stream ", k,
+              " set to missing (", stream_dists[[k]], " is positive)")
+      x[!is.na(x) & x <= 0] <- NA
+    }
+    if (all(is.na(x))) stop("stream ", k, " has no values in the time steps of the tracks",
+                            call. = FALSE)
+    out[[k]] <- x
+  }
+  out
+}
+
+## starting values for the extra data streams: those given, otherwise from
+##  quantiles of each stream for gamma2 and norm streams
+hmm_stream_par <- function(sv, stream_dists, stream_par, n_states) {
+  par <- if (is.null(stream_par)) list() else stream_par
+  for (k in names(stream_dists)) {
+    if (!is.null(par[[k]])) next
+    x <- sv[[k]][!is.na(sv[[k]])]
+    q <- stats::quantile(x, seq(0.25, 0.75, length.out = n_states), names = FALSE)
+    par[[k]] <- switch(stream_dists[[k]],
+      gamma2 = list(mean = pmax(q, 1e-3), sd = pmax(rep(stats::sd(x), n_states), 1e-3)),
+      norm = list(mean = q, sd = rep(stats::sd(x), n_states)),
+      stop("give starting values for stream ", k, " (", stream_dists[[k]],
+           ") in `stream_par`", call. = FALSE))
+  }
+  par[names(stream_dists)]
 }

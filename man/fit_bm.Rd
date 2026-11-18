@@ -14,6 +14,7 @@ fit_bm(
   crs = NULL,
   kineis = ssm_control()$kineis,
   error.units = NULL,
+  haulout = NULL,
   control = mpm_control(),
   ...
 )
@@ -57,6 +58,12 @@ units, \code{"degrees"} or \code{"km"}, if not those the column names imply. NUL
 (default): from the names (\code{lon.se}, \code{lat.se}, \code{lonerr}, \code{laterr}:
 degrees; \code{x.se}, \code{y.se}: km on the ground; see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
+\item{haulout}{optional haulout bouts at which imputed track segments
+end, so no step spans time ashore: a data frame with \code{id}, \code{start} and
+\code{end} (e.g. from \code{\link[=ho_bouts]{ho_bouts()}}, filtered as needed), or SMRU haulout
+records, merged into bouts by \code{\link[=ho_bouts]{ho_bouts()}} with its defaults (see
+\code{\link[=impute_tracks]{impute_tracks()}}). Needs \code{reps}. NULL (default): tracks are not split.}
+
 \item{control}{a list from \code{\link[=mpm_control]{mpm_control()}}: optimiser settings for \code{"mpm"}
 and \code{"mrm"}, and, for every model, \code{verbose} (0 = silent; 1, default =
 progress bar).}
@@ -69,7 +76,9 @@ separately, the \code{mpm}), \code{what}, \code{coords} and \code{inner.control}
 \code{\link[=fit_mpm]{fit_mpm()}});
 \item \code{"mrm"}: none;
 \item \code{"hmm"}: \code{n_states} (default 2), \code{step_par}, \code{angle_par} (starting
-values) and \code{silent} (suppress \code{hmmTMB} output, default TRUE).
+values), \code{streams}, \code{stream_dists}, \code{stream_par} (extra data streams, such
+as dive variables, modelled jointly with the movement; see details) and
+\code{silent} (suppress \code{hmmTMB} output, default TRUE).
 }}
 }
 \value{
@@ -89,8 +98,16 @@ length and turning angle, state probabilities averaged across
 imputations, the most probable state and the agreement between
 imputations), \code{par} (each imputation's parameters), \code{par_summary} and
 \code{par_working} (pooled estimates on the natural and working scales),
-\code{reps}, \code{n_states}, \code{n_failed}, \code{n_pooled}, \code{source} and \code{time.step}.
+\code{reps}, \code{n_states}, \code{n_failed}, \code{n_pooled}, \code{streams}, \code{source} and
+\code{time.step}.
 }
+
+With \code{reps}, each also has \code{imputed}: the estimates of each imputation
+(\code{rep}) at each time (\code{"mpm"}: \code{g}, \code{g.se}; \code{"mrm"}: \code{log_rate},
+\code{log_rate.se}, \code{speed}; \code{"hmm"}: the state probabilities and the Viterbi
+state). \code{\link[=join]{join()}} interpolates them to the times of tag-measured events
+(\code{by_rep = TRUE}), so a second-stage analysis can be fitted to each
+imputation and pooled with Rubin's rules.
 
 For location data, each also has \code{data}: the input, every column, with
 \code{keep} (whether each location was used) and the estimates interpolated to
@@ -141,7 +158,16 @@ distributions, a stationary initial state distribution and no covariates;
 all tracks share one set of parameters, and each track segment is a
 separate series. States are numbered by mean step length (state 1 has the
 shortest steps) in every imputation, which prevents label switching.
-Working-scale estimates are pooled with Rubin's rules.
+Working-scale estimates are pooled with Rubin's rules. Extra data
+streams observed by the tag (\code{streams}), e.g. mean dive duration or the
+percentage of time diving per time step, are modelled jointly with the
+step lengths and turning angles, each with its own state-dependent
+distribution (\code{stream_dists}), conditionally independent given the state.
+
+\strong{Haulouts.} With \code{haulout}, imputed track segments end at each
+haulout bout (see \code{\link[=ho_bouts]{ho_bouts()}}): grid times during the bout are dropped
+and no step spans time ashore, so the models estimate at-sea behaviour
+only.
 
 The time step should be long enough that movement between locations is
 large relative to location error (e.g. 6 to 24 h for Kinéis or Argos
@@ -150,7 +176,8 @@ data).
 \strong{Adding a model.} Each model is an entry in
 \code{behaviour_models()}: a fitting function taking the shared arguments
 (\code{x}, \code{reps}, \code{time.step}, \code{max_gap}, \code{vmax}, \code{crs}, \code{kineis},
-\code{error.units}, \code{control}) and its own, and returning a list with a class of its own.
+\code{error.units}, \code{haulout}, \code{control}) and its own, and returning a list
+with a class of its own.
 }
 \examples{
 \dontrun{
@@ -168,6 +195,18 @@ g <- fit_bm(kineis_locations, model = "mpm", reps = 20,
 gps$x.se <- gps$y.se <- 0.03
 r <- fit_bm(gps, model = "mrm", reps = 20, time.step = 6)
 r$data
+
+## SMRU tag data: tracks split at haulouts of at least 1 h, and mean
+##  dive duration per 6-h summary record as an extra HMM data stream
+ho <- ho_bouts("haulout.csv", min_dur = 1)
+smry <- read.csv("summary.csv")
+dv <- data.frame(id = smry$ref,
+                 date = as.POSIXct(smry$s_date, format = "\%Y-\%m-\%dT\%H:\%M:\%SZ",
+                                   tz = "UTC") + 3 * 3600,
+                 dive_dur = smry$av_dur / 60)
+fit <- fit_ssm(diag, model = "crw", time.step = 6, haulout = "haulout.csv")
+h <- fit_bm(fit, model = "hmm", reps = 20, haulout = ho,
+            streams = dv, stream_dists = list(dive_dur = "gamma2"))
 }
 
 }

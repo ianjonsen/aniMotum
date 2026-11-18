@@ -19,6 +19,8 @@
 ##' @param error.units for location data with standard-error columns, their
 ##' units, `"degrees"` or `"km"`, if not those the column names imply (see
 ##' [impute_tracks()]).
+##' @param haulout optional haulout bouts at which imputed track segments end
+##' (see [impute_tracks()]); needs `reps`. NULL (default): not split.
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -27,8 +29,8 @@
 ##' fits; `verbose = 0` is silent.
 ##'
 ##' @return a list with class `mrm_mi`:
-##' 1. `fitted`: a tibble with, for each id and time, the point-estimate track
-##' (`lon`, `lat`), the pooled log movement rate (`log_rate`), its total
+##' 1. `fitted`: a tibble with, for each id, track segment and time, the
+##' point-estimate track (`lon`, `lat`), the pooled log movement rate (`log_rate`), its total
 ##' standard error (`log_rate.se`), the movement rate (`rate`, km h^-1/2) and
 ##' its 95% interval (`lower`, `upper`), the speed (`speed`, km/h; see
 ##' details) and its 95% interval (`speed_lower`, `speed_upper`), and the
@@ -39,7 +41,10 @@
 ##' displacements), by id;
 ##' 3. `reps`, `n_failed` (imputed-track fits that failed or did not
 ##' converge), `source` (`"ssm"`, `"kineis"` or `"data"`) and `time.step`;
-##' 4. for location data, `data`: the input, every column, with `keep`
+##' 4. `imputed`: each imputation's `log_rate`, `log_rate.se` and `speed`
+##' (`rep`, `id`, `segment`, `date`), for analyses that carry location
+##' uncertainty forward (see [join()]);
+##' 5. for location data, `data`: the input, every column, with `keep`
 ##' (whether each location was used) and `speed`, `speed_lower` and
 ##' `speed_upper` interpolated to the observation times (NA outside the
 ##' imputed track segments).
@@ -95,10 +100,12 @@ fit_mrm <- function(x,
                     control = mpm_control(),
                     vmax = NULL,
                     crs = NULL,
-                    error.units = NULL) {
+                    error.units = NULL,
+                    haulout = NULL) {
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units)
+                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units,
+                       haulout = haulout)
   estimate <- imp[imp$rep == 0, ]
   ids <- unique(estimate$id)
 
@@ -117,7 +124,10 @@ fit_mrm <- function(x,
 
   fitted <- list()
   par <- list()
+  imputed <- list()
+  to_speed <- mrm_speed_factor(attr(imp, "time.step"))
   for (i in ids) {
+    rep_ok <- which(!vapply(fits[[i]], is.null, logical(1)))
     f <- Filter(Negate(is.null), fits[[i]])
     if (length(f) == 0) {
       warning("the movement rate model failed for every imputation of ", i, call. = FALSE)
@@ -128,14 +138,17 @@ fit_mrm <- function(x,
                      do.call(cbind, lapply(f, function(z) z$log_rate.se)))
     ## speed (km/h): root-mean-square net displacement over one time step,
     ##  divided by the time step: rate * sqrt(2 * dt) / dt
-    to_speed <- mrm_speed_factor(attr(imp, "time.step"))
-    fitted[[i]] <- tibble(id = i, date = e$date, lon = e$lon, lat = e$lat,
+    fitted[[i]] <- tibble(id = i, segment = e$segment, date = e$date, lon = e$lon, lat = e$lat,
                           log_rate = lr$estimate, log_rate.se = lr$se,
                           rate = exp(lr$estimate), lower = exp(lr$lower), upper = exp(lr$upper),
                           speed = exp(lr$estimate) * to_speed,
                           speed_lower = exp(lr$lower) * to_speed,
                           speed_upper = exp(lr$upper) * to_speed,
                           fraction_missing = lr$fraction_missing)
+    imputed[[i]] <- bind_rows(lapply(seq_along(f), function(k)
+      tibble(rep = rep_ok[k], id = i, segment = e$segment, date = e$date,
+             log_rate = f[[k]]$log_rate, log_rate.se = f[[k]]$log_rate.se,
+             speed = exp(f[[k]]$log_rate) * to_speed)))
     p <- pool_rubin(do.call(cbind, lapply(f, function(z) z$par[, 1])),
                     do.call(cbind, lapply(f, function(z) z$par[, 2])))
     ## back-transform: sigma_rate from the log scale; rho_p from its link
@@ -154,13 +167,12 @@ fit_mrm <- function(x,
               par = bind_rows(par),
               reps = reps,
               n_failed = n_failed,
+              imputed = bind_rows(imputed),
               source = attr(imp, "source"),
               time.step = attr(imp, "time.step"))
   ## location data: the input, with the estimates at its observation times
   if (!is.null(attr(imp, "data"))) {
-    f <- out$fitted
-    f$segment <- estimate$segment[match(paste(f$id, f$date), paste(estimate$id, estimate$date))]
-    out$data <- bm_data(attr(imp, "data"), f, c("speed", "speed_lower", "speed_upper"))
+    out$data <- bm_data(attr(imp, "data"), out$fitted, c("speed", "speed_lower", "speed_upper"))
   }
   class(out) <- append("mrm_mi", class(out))
   out

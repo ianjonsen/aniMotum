@@ -2,21 +2,28 @@
 % Please edit documentation in R/join.R
 \name{join}
 \alias{join}
-\title{join an mpm-estimated behavioural index to ssm-predicted locations}
+\title{Join behavioural estimates to locations or to tag-measured events}
 \usage{
 join(
-  ssm,
-  mpm,
+  x,
+  y,
   what.ssm = "predicted",
   as_sf = FALSE,
   normalise = FALSE,
-  group = FALSE
+  group = FALSE,
+  by_rep = FALSE,
+  ssm,
+  mpm
 )
 }
 \arguments{
-\item{ssm}{an \code{aniMotum} ssm fitted model object}
+\item{x}{an \code{aniMotum} ssm fit (\code{ssm_df}), or a behavioural model fit from
+\code{\link[=fit_bm]{fit_bm()}} (\code{mpm_df}, \code{mrm_mi}, \code{hmm_mi})}
 
-\item{mpm}{an \code{aniMotum} mpm fitted model object}
+\item{y}{with an ssm fit \code{x}: an \code{aniMotum} mpm fit (\code{mpm_df}). With a
+behavioural model fit \code{x}: a data frame of events with columns \code{id} and
+\code{date} (POSIXct), e.g. dives (\code{date} = dive end), CTD profiles or
+haulouts (\code{date} = start). Other columns are kept.}
 
 \item{what.ssm}{specifies whether ssm \code{predicted} or \code{fitted} values are to be extracted}
 
@@ -30,12 +37,48 @@ maximum = 1 (default = FALSE).}
 \item{group}{logical; should g be normalised among individuals as a group,
 a 'relative g', or separately to highlight regions of lowest and highest move
 persistence along a track (default = FALSE).}
+
+\item{by_rep}{logical; for events, interpolate the estimates of each
+imputation (\code{x$imputed}, from \code{\link[=fit_bm]{fit_bm()}} with \code{reps}) rather than the
+pooled estimates (default FALSE).}
+
+\item{ssm, mpm}{the names of \code{x} and \code{y} before aniMotum 1.4-1, still
+accepted.}
 }
 \value{
-a single tbl with all individuals
+for an ssm and an mpm fit, a single tbl with all individuals. For
+events, the events tibble with the estimates added, interpolated
+linearly in time between the model's time steps within a track segment
+(NA for events outside the segments, e.g. during a haulout or a data
+gap):
+\enumerate{
+\item move persistence (\code{mpm_df}): \code{g}, \code{lower}, \code{upper} (pooled) or \code{g},
+\code{g.se} (\code{by_rep});
+\item movement rate (\code{mrm_mi}): \code{speed}, \code{speed_lower}, \code{speed_upper},
+\code{log_rate}, \code{log_rate.se} (pooled) or \code{log_rate}, \code{log_rate.se}, \code{speed}
+(\code{by_rep});
+\item hidden Markov model (\code{hmm_mi}): the state probabilities \code{p1}, \code{p2},
+... and the most probable state \code{state}, from the interpolated
+probabilities.
+}
+
+With \code{by_rep = TRUE}, one row per event and imputation, with column \code{rep}.
+Existing columns with these names are overwritten.
 }
 \description{
-\code{join()} joins ssm-predicted locations and mpm-estimated behavioural index into a single tibble. If the ssm-predicted tibble is a projected sf object then the output of join will also be an sf object (default). This can be avoided by using \code{as_sf = FALSE}.
+\code{join()} does one of two things, depending on its inputs:
+\enumerate{
+\item \code{join(ssm, mpm)}: joins ssm-predicted locations and the mpm-estimated
+move persistence into a single tibble. If the ssm-predicted tibble is a
+projected sf object then the output of join will also be an sf object
+(default). This can be avoided by using \code{as_sf = FALSE};
+\item \code{join(fit, events)}: interpolates the estimates of a behavioural model
+(\code{\link[=fit_bm]{fit_bm()}}) to the times of tag-measured events, such as
+dives, CTD profiles or haulouts, so the events can be analysed against
+behaviour. With \code{by_rep = TRUE}, the estimates of each imputation are
+interpolated, one row per event and imputation, so a second-stage
+analysis can be fitted to each imputation and pooled with Rubin's rules.
+}
 }
 \examples{
 ## load example aniMotum fit objects (to save time)
@@ -46,4 +89,11 @@ xm <- fit_mpm(xs, what = "p", model = "mpm")
 ## join predicted values as an un-projected tibble
 xsm <- join(xs, xm)
 xsm
+
+\dontrun{
+## move persistence at the end time of each dive, by imputation
+g <- fit_bm(xs, model = "mpm", reps = 20)
+dives <- data.frame(id = ..., date = ..., dive_dur = ...)
+dg <- join(g, dives, by_rep = TRUE)
+}
 }
