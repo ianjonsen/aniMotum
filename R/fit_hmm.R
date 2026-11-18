@@ -46,7 +46,7 @@
 ##' 2. `par`: a tibble of the estimated parameters for each imputation:
 ##' step-length mean and SD (km), turning-angle mean and concentration, and the
 ##' transition probability matrix (`tpm_ij`, from state i to state j);
-##' 3. `par_summary`: the pooled estimate of each parameter and its 95\%
+##' 3. `par_summary`: the pooled estimate of each parameter and its 95%
 ##' interval, from Rubin's rules on the working (link) scale, back-transformed
 ##' with hmmTMB's inverse links; `fraction_missing` is the share of the
 ##' working-scale variance due to location uncertainty. Transition
@@ -54,7 +54,7 @@
 ##' probability depends on several working parameters; see `par_working`);
 ##' 4. `par_working`: the pooled working-scale coefficients (observation
 ##' parameters, and transition parameters `Si>Sj` = log(p_ij / p_ii)), with
-##' their total standard errors, degrees of freedom and 95\% intervals;
+##' their total standard errors, degrees of freedom and 95% intervals;
 ##' 5. `reps`, `n_states`, `n_failed`, `n_pooled`: the number of imputations,
 ##' states, imputations whose HMM fit failed, and imputations pooled for the
 ##' parameters (those with finite working-scale standard errors); `source`

@@ -6,7 +6,7 @@
 ##' without inflation, and locations are predicted at the GPS times. The
 ##' factor is the one that puts a proportion `coverage` of the x and y errors
 ##' (predicted minus GPS) within the matching multiple of the inflated
-##' standard errors. By default, 68.3\% of errors fall within 1 standard
+##' standard errors. By default, 68.3% of errors fall within 1 standard
 ##' error, so `x.se` and `y.se` keep their meaning as standard errors. Pass
 ##' the result to `ssm_control(kineis = list(se.inflation = ))` when fitting
 ##' Kinéis-only tracks.
@@ -52,8 +52,8 @@
 ##'
 ##' @details
 ##' Column names are matched ignoring case. Dates may be POSIXct or text in
-##' one of the formats `"\%Y-\%m-\%dT\%H:\%M:\%SZ"` (IMOS/AODN), `"\%Y-\%m-\%d \%H:\%M:\%S"` or
-##' `"\%m/\%d/\%y \%H:\%M:\%S"` (SMRU database export), and are taken to be UTC.
+##' one of the formats `"%Y-%m-%dT%H:%M:%SZ"` (IMOS/AODN), `"%Y-%m-%d %H:%M:%S"` or
+##' `"%m/%d/%y %H:%M:%S"` (SMRU database export), and are taken to be UTC.
 ##' Locations with missing dates or coordinates, and duplicated GPS dates
 ##' within a track, are dropped.
 ##'
@@ -69,8 +69,8 @@
 ##'
 ##' If standardised errors were normal, a factor calibrated at one coverage
 ##' would hold at all others. Kinéis errors are heavier-tailed than normal: on
-##' tu126, factors calibrated at 1 standard error gave about 89-90\% of errors
-##' within 1.96 inflated standard errors, not 95\%. Use `coverage = 0.95` if
+##' tu126, factors calibrated at 1 standard error gave about 89-90% of errors
+##' within 1.96 inflated standard errors, not 95%. Use `coverage = 0.95` if
 ##' wide intervals matter more than the standard errors themselves.
 ##'
 ##' The Kinéis observation covariance is mapped to the projection through its

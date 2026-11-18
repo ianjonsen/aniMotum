@@ -296,10 +296,10 @@ ssm_fit_complete <- function(x) {
 ##' @param a ellipse semi-major axis (km)
 ##' @param b ellipse semi-minor axis (km)
 ##' @param theta ellipse orientation from north (degrees)
-##' @param conf logical; if TRUE (default) the 95\% confidence ellipse, with
+##' @param conf logical; if TRUE (default) the 95% confidence ellipse, with
 ##' semi-axes `sqrt(qchisq(0.95, 2))` (2.448) times `a` and `b`, which
-##' contains 95\% of a bivariate normal distribution; if FALSE the 1 standard
-##' error ellipse (semi-axes `a` and `b`, 39\%)
+##' contains 95% of a bivariate normal distribution; if FALSE the 1 standard
+##' error ellipse (semi-axes `a` and `b`, 39%)
 ##'
 ##' @importFrom stats qchisq
 ##' @keywords internal

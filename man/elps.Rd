@@ -17,10 +17,10 @@ elps(x, y, a, b, theta = 90, conf = TRUE)
 
 \item{theta}{ellipse orientation from north (degrees)}
 
-\item{conf}{logical; if TRUE (default) the 95\\% confidence ellipse, with
+\item{conf}{logical; if TRUE (default) the 95\% confidence ellipse, with
 semi-axes \code{sqrt(qchisq(0.95, 2))} (2.448) times \code{a} and \code{b}, which
-contains 95\\% of a bivariate normal distribution; if FALSE the 1 standard
-error ellipse (semi-axes \code{a} and \code{b}, 39\\%)}
+contains 95\% of a bivariate normal distribution; if FALSE the 1 standard
+error ellipse (semi-axes \code{a} and \code{b}, 39\%)}
 }
 \description{
 generate error ellipses from x,y coordinates, semi-major, semi-minor axes

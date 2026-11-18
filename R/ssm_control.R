@@ -46,13 +46,13 @@
 ##' For mp, only location standard errors are inflated (not g). Point
 ##' estimates are unchanged. Tracks that mix KI with other observation types
 ##' (e.g. GPS) are not inflated. The default factors are calibrated at 1
-##' standard error: 68.3\% of x and y errors, relative to withheld Fastloc GPS
+##' standard error: 68.3% of x and y errors, relative to withheld Fastloc GPS
 ##' locations in tu126, fall within 1 inflated standard error. Coverage was
 ##' lower in about the first month after release and varied between tracks.
 ##' Kinéis errors are heavier-tailed than normal, so intervals of 1.96
-##' standard errors contain about 90\%, not 95\%, of errors. For this reason,
-##' with the default factors, the 95\% confidence regions drawn by
-##' \code{map()} and \code{plot()} for Kinéis-only tracks use separate 95\%
+##' standard errors contain about 90%, not 95%, of errors. For this reason,
+##' with the default factors, the 95% confidence regions drawn by
+##' \code{map()} and \code{plot()} for Kinéis-only tracks use separate 95%
 ##' factors, stored in each fit: for ellipses, crw 2.5, rw 1.65, mp 2.35; for
 ##' the time-series intervals of \code{plot(type = 1)}, crw 2.4, rw 1.55,
 ##' mp 2.25. No refit is needed. With a user-specified factor, confidence
