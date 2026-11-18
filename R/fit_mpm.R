@@ -10,11 +10,15 @@
 ##'
 ##' @param x one of:
 ##' 1. an `ssm_df` fit object from [fit_ssm()] (`rw`, `crw` or `mp`);
-##' 2. a data frame of Kinéis locations with error radii, or the path to a
-##' file of them (see [impute_tracks()]). Kinéis locations need `reps` and
-##' `time.step`;
-##' 3. a data frame of locations: `id`, `date` and two coordinate columns
-##' (see `coords`), treated as data. `reps` is not available.
+##' 2. a data frame of locations with their errors (Kinéis error radii,
+##' standard errors or 95% intervals; see [impute_tracks()]), or the path to
+##' a csv file of them, fitted by multiple imputation with `reps` and
+##' `time.step`. Kinéis locations need `reps`; other locations with errors
+##' are fitted as data without `reps`, ignoring the errors;
+##' 3. a data frame of locations without errors: `id`, `date` and two
+##' coordinate columns (see `coords`). Without `reps` they are fitted as data,
+##' at their own times; with `reps` and `time.step`, they are interpolated to
+##' a regular grid as known locations (every imputation is the same).
 ##' @param what for an `ssm_df` fit without `reps`, the locations fitted:
 ##' `"predicted"` (default), `"fitted"` or `"rerouted"`. With `reps`, the
 ##' imputed tracks are at the predicted times, so only `"predicted"`
@@ -50,6 +54,9 @@
 ##' across (see [impute_tracks()])
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()])
+##' @param error.units for location data with standard-error columns, their
+##' units, `"degrees"` or `"km"`, if not those the column names imply (see
+##' [impute_tracks()])
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -80,7 +87,11 @@
 ##' 5. `model`, `reps` (0 without imputation), `source` (`"ssm"`, `"kineis"` or
 ##' `"data"`), `time.step` (h; NA for irregular locations), `what` (the
 ##' `ssm_df` locations fitted) and `crs` (the projection fitted in; NA for a
-##' data frame of projected coordinates).
+##' data frame of projected coordinates);
+##' 6. for a data frame input, `data`: the input, every column, with `keep`
+##' (whether each location was used) and g and its 95% interval (`g`,
+##' `lower`, `upper`) interpolated to the observation times (NA outside the
+##' fitted track segments).
 ##'
 ##' @details With `reps`, the move persistence model is fitted to each imputed
 ##' track, treating its locations as data, and Rubin's rules pool `g` at
@@ -150,7 +161,8 @@ fit_mpm <- function(x,
                     max_gap = NULL,
                     kineis = ssm_control()$kineis,
                     crs = NULL,
-                    vmax = NULL
+                    vmax = NULL,
+                    error.units = NULL
                     ) {
 
   model <- match.arg(model)
@@ -178,7 +190,9 @@ fit_mpm <- function(x,
 
   ## locations: rep 0 is the point-estimate track; reps 1, 2, ... are imputed
   ##  tracks
-  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs, vmax)
+  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs, vmax,
+                       error.units)
+  data <- attr(loc, "data")
   source <- attr(loc, "source")
   crs <- attr(loc, "crs")
   time.step <- attr(loc, "time.step")
@@ -296,6 +310,8 @@ fit_mpm <- function(x,
               time.step = time.step,
               what = what,
               crs = crs)
+  ## data frame input: the input, with the estimates at its observation times
+  if (!is.null(data)) out$data <- bm_data(data, out$fitted, c("g", "lower", "upper"))
   class(out) <- append("mpm_df", class(out))
   out
 }
@@ -304,24 +320,31 @@ fit_mpm <- function(x,
 ##  track), id, segment, date, lon, lat, x, y, and attributes source,
 ##  time.step and what
 mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs = NULL,
-                          vmax = NULL) {
-  kineis.data <- is.character(x) || (is.data.frame(x) && !inherits(x, "ssm_df") &&
-    any(c("error.radius", "error_radius") %in% tolower(names(x))))
+                          vmax = NULL, error.units = NULL) {
+  ## location data with errors (Kinéis error radii, standard errors or 95%
+  ##  intervals)
+  error.data <- !inherits(x, "ssm_df") &&
+    (is.character(x) || (is.data.frame(x) && has_location_errors(x)))
   if (!is.null(reps)) {
     if (inherits(x, "ssm_df") && !grepl("^p", what))
       stop("with `reps`, imputed tracks are at the predicted (regular) times; use what = \"predicted\"",
            call. = FALSE)
-    if (!inherits(x, "ssm_df") && !kineis.data)
-      stop("with `reps`, x must be an ssm_df fit object or Kinéis locations with error radii",
-           call. = FALSE)
     out <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                         kineis = kineis, crs = crs, vmax = vmax)
+                         kineis = kineis, crs = crs, vmax = vmax, error.units = error.units)
     attr(out, "what") <- if (inherits(x, "ssm_df")) "predicted" else NA_character_
     return(out)
   }
+  ## Kinéis locations are estimates at irregular times: fit them only by
+  ##  multiple imputation. Other locations with errors (e.g. grab() output
+  ##  with x.se, y.se) are fitted as data, as before, ignoring the errors
+  kineis.data <- error.data && (is.character(x) ||
+    !is.null(error_radius_column(names(x))))
   if (kineis.data)
-    stop("Kinéis locations are estimates with known error, at irregular times: fit them by multiple imputation, with `reps` and `time.step` (h), e.g. fit_mpm(x, reps = 20, time.step = 12)",
+    stop("Kinéis locations are estimates with known error, at irregular times: fit them by multiple imputation, with `reps` and `time.step` (h), e.g. fit_bm(x, model = \"mpm\", reps = 20, time.step = 12)",
          call. = FALSE)
+  if (error.data)
+    message("location errors are not used without `reps`: the locations are fitted as data. ",
+            "Give `reps` and `time.step` to fit by multiple imputation from the errors")
   if (inherits(x, "ssm_df")) {
     g <- grab(x, what = what, as_sf = FALSE)
     what <- c("fitted", "predicted", "rerouted")[pmatch(what, c("fitted", "predicted", "rerouted"))]
@@ -354,8 +377,14 @@ mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs
     attr(out, "source") <- "data"
     attr(out, "time.step") <- NA_real_
     attr(out, "what") <- NA_character_
+    ## the input, every column, with standard id and date columns
+    data <- d
+    data$id <- d[[1]]
+    data$date <- d[[2]]
+    data$keep <- TRUE
+    attr(out, "data") <- data
   } else {
-    stop("x must be an ssm_df fit object, Kinéis locations or a data frame of locations",
+    stop("x must be an ssm_df fit object or a data frame of locations",
          call. = FALSE)
   }
   out
@@ -407,7 +436,8 @@ print.mpm_df <- function(x, ...) {
   if (is.data.frame(x)) return(NextMethod())
   cat("move persistence model (", x$model, ") fitted to ",
       switch(x$source, ssm = paste(x$what, "SSM locations"),
-             kineis = "Kinéis locations", data = "locations as data"),
+             kineis = "Kinéis locations",
+             data = if (x$reps > 0) "location data" else "locations as data"),
       if (!is.na(x$time.step)) paste0(" at a ", x$time.step, " h time step") else "",
       if (x$reps > 0) paste0(", by multiple imputation (", x$reps, " imputations)") else "",
       "\n", sep = "")

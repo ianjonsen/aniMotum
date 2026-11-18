@@ -20,6 +20,9 @@
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
 ##' @param crs the projection of the imputed tracks (see [impute_tracks()]).
+##' @param error.units for location data with standard-error columns, their
+##' units, `"degrees"` or `"km"`, if not those the column names imply (see
+##' [impute_tracks()]).
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -58,7 +61,11 @@
 ##' 5. `reps`, `n_states`, `n_failed`, `n_pooled`: the number of imputations,
 ##' states, imputations whose HMM fit failed, and imputations pooled for the
 ##' parameters (those with finite working-scale standard errors); `source`
-##' (`"ssm"` or `"kineis"`) and `time.step`.
+##' (`"ssm"`, `"kineis"` or `"data"`) and `time.step`;
+##' 6. for location data, `data`: the input, every column, with `keep`
+##' (whether each location was used), the state probabilities (`p1`,
+##' `p2`, ...) interpolated to the observation times and the most probable
+##' state (`state`; NA outside the imputed track segments).
 ##'
 ##' @details The HMM has gamma-distributed step lengths, von Mises turning
 ##' angles, a stationary initial state distribution, and no covariates. All
@@ -105,7 +112,8 @@ fit_hmm <- function(x,
                     silent = TRUE,
                     progress = TRUE,
                     vmax = NULL,
-                    crs = NULL) {
+                    crs = NULL,
+                    error.units = NULL) {
 
   if (!requireNamespace("hmmTMB", quietly = TRUE))
     stop("fit_hmm() requires the hmmTMB package: install.packages(\"hmmTMB\")", call. = FALSE)
@@ -113,7 +121,7 @@ fit_hmm <- function(x,
     stop("n_states must be a single number >= 2", call. = FALSE)
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax, crs = crs)
+                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units)
 
   ## segments need >= 3 locations (one turning angle) to enter the HMM
   seg <- paste(imp$id, imp$segment)
@@ -181,6 +189,17 @@ fit_hmm <- function(x,
               n_failed = sum(!ok),
               source = attr(imp, "source"),
               time.step = attr(imp, "time.step"))
+  ## location data: the input, with the state probabilities at its
+  ##  observation times, and the most probable state
+  if (!is.null(attr(imp, "data"))) {
+    pc <- paste0("p", seq_len(n_states))
+    d <- bm_data(attr(imp, "data"), states, pc)
+    p <- as.matrix(as.data.frame(d)[, pc, drop = FALSE])
+    d$state <- NA_integer_
+    has <- stats::complete.cases(p)
+    d$state[has] <- max.col(p[has, , drop = FALSE], ties.method = "first")
+    out$data <- d
+  }
   class(out) <- append("hmm_mi", class(out))
   out
 }

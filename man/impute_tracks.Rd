@@ -12,21 +12,25 @@ impute_tracks(
   kineis = ssm_control()$kineis,
   inflate = TRUE,
   crs = NULL,
-  vmax = NULL
+  vmax = NULL,
+  error.units = NULL
 )
 }
 \arguments{
 \item{x}{an \code{ssm_df} fit object (\code{rw}, \code{crw} or \code{mp}) with regular predicted
-locations, or a data frame of Kinéis locations with columns \code{id}, \code{date}
-(POSIXct), \code{lon}, \code{lat} and \code{error.radius} (m). SMRU column names (\code{REF},
-\code{D_DATE}, \code{LON}, \code{LAT}, \code{ERROR_RADIUS}) are also accepted, ignoring case.}
+locations; or a data frame of locations (or the path to a csv file of
+them) with columns \code{id}, \code{date} (POSIXct, or text such as
+\code{"2024-01-31 12:00:00"}), \code{lon} and \code{lat}, and optionally their errors
+(see details). Column names are matched ignoring case; SMRU names (\code{REF},
+\code{D_DATE}) are also accepted. Other columns are kept in the input data
+returned (attribute \code{data}).}
 
 \item{reps}{number of imputed tracks (default 20).}
 
-\item{time.step}{for Kinéis locations, the time step (h) of the regular
+\item{time.step}{for location data, the time step (h) of the regular
 grid. Ignored for SSM fits, which use their own prediction times.}
 
-\item{max_gap}{for Kinéis locations, the longest gap between consecutive
+\item{max_gap}{for location data, the longest gap between consecutive
 locations (h) that is interpolated across (default \code{2 * time.step}). Grid
 times inside longer gaps are dropped and the track is split into segments
 there. Ignored for SSM fits.}
@@ -38,27 +42,34 @@ there. Ignored for SSM fits.}
 \item{inflate}{for SSM fits, passed to \code{\link[=sim_post]{sim_post()}} (default TRUE).}
 
 \item{crs}{the projection (proj4 string, units km) for the imputed
-tracks' \code{x}, \code{y}, and, for Kinéis locations, for the interpolation. If
+tracks' \code{x}, \code{y}, and, for location data, for the interpolation. If
 NULL (default), chosen from the extent of all the locations by
 \code{\link[=auto_crs]{auto_crs()}}: Mercator where its scale varies little across the data,
 otherwise Lambert conformal conic, polar stereographic or oblique
 stereographic. All are conformal.}
 
-\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+\item{vmax}{for location data, the maximum travel rate (m/s) of a
 speed-distance-angle filter (\code{trip::sda()}, as \code{fit_ssm()} uses) applied
 before imputation, to drop extreme locations; e.g. 4 for seals. A
 location is dropped if reaching it implies a speed above \code{vmax} and it
 forms a spike (angle and lengths as in \code{fit_ssm()}'s defaults,
 \code{ang = c(15, 25)}, \code{distlim = c(2500, 5000)}). NULL (default): no
 filter. Ignored for SSM fits, whose data were filtered by \code{fit_ssm()}.}
+
+\item{error.units}{for location data with standard-error columns, their
+units, \code{"degrees"} or \code{"km"}, overriding the units implied by the column
+names (see details). NULL (default): from the column names.}
 }
 \value{
 a tibble with columns \code{rep} (0 = the point estimate: the SSM-
 predicted track, or the Kinéis locations interpolated without
 perturbation; 1 to \code{reps} = imputations), \code{id}, \code{segment} (contiguous runs
 of grid times, numbered within \code{id}), \code{date}, \code{lon}, \code{lat}, and \code{x}, \code{y}
-(km, in projection \code{crs}). The attribute \code{source} is \code{"ssm"} or
-\code{"kineis"}; \code{time.step} holds the time step (h) and \code{crs} the projection.
+(km, in projection \code{crs}). Attributes: \code{source} (\code{"ssm"}, \code{"kineis"} or
+\code{"data"}), \code{time.step} (h), \code{crs} (the projection), and, for location
+data, \code{errors} (where the location errors came from) and \code{data} (the
+input, every column, with standard \code{id} and \code{date} columns and \code{keep}:
+whether each location was used).
 }
 \description{
 Generates \code{reps} imputed tracks on a regular time grid, for
@@ -68,12 +79,32 @@ imputed from either:
 \enumerate{
 \item an SSM fit: tracks are simulated from the fit's joint posterior with
 \code{\link[=sim_post]{sim_post()}}, at the fit's predicted (regular) times;
-\item Kinéis locations, without an SSM: each location is perturbed by a draw
-from its error distribution, defined by its CLS error radius, and the
-perturbed locations are linearly interpolated to a regular time grid.
+\item location data, without an SSM: Kinéis locations, or any locations
+with their errors (or none). Each location is perturbed by a draw from its
+error distribution and the perturbed locations are linearly interpolated
+to a regular time grid.
 }
 }
 \details{
+For location data, the errors of each location are read from the
+first of these that \code{x} has:
+\enumerate{
+\item a Kinéis error radius (\code{error.radius}, or SMRU \code{ERROR_RADIUS}; m),
+through the Kinéis error model (\code{kineis});
+\item standard errors: \code{lon.se}, \code{lat.se} or \code{lonerr}, \code{laterr} (degrees), or
+\code{x.se}, \code{y.se} (km, east and north on the ground). Set \code{error.units} if
+the units differ from those the names imply. Constant errors (e.g. for
+GPS) are given by repeating the value in every row;
+\item 95\% intervals: \code{lon.lci}, \code{lon.uci}, \code{lat.lci}, \code{lat.uci} (degrees),
+taken as normal: SE = (uci - lci) / (2 * 1.96).
+}
+
+Without any of these the locations are taken as known: every imputation
+is the interpolated track. Standard errors in degrees are converted to
+km on the ground at each location's latitude. Note that \code{x.se}, \code{y.se}
+must be ground distances: those in \code{fit_ssm()} output are in the fit's
+projection (e.g. Mercator km, stretched by 1 / cos(latitude)).
+
 For Kinéis locations, the errors are drawn independently for each
 location, with ground SDs \code{scale[1] * r^exponent} (east) and
 \code{scale[2] * r^exponent} (north), r the error radius (km); the same error

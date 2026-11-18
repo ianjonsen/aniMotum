@@ -19,18 +19,23 @@ fit_mpm(
   max_gap = NULL,
   kineis = ssm_control()$kineis,
   crs = NULL,
-  vmax = NULL
+  vmax = NULL,
+  error.units = NULL
 )
 }
 \arguments{
 \item{x}{one of:
 \enumerate{
 \item an \code{ssm_df} fit object from \code{\link[=fit_ssm]{fit_ssm()}} (\code{rw}, \code{crw} or \code{mp});
-\item a data frame of Kinéis locations with error radii, or the path to a
-file of them (see \code{\link[=impute_tracks]{impute_tracks()}}). Kinéis locations need \code{reps} and
-\code{time.step};
-\item a data frame of locations: \code{id}, \code{date} and two coordinate columns
-(see \code{coords}), treated as data. \code{reps} is not available.
+\item a data frame of locations with their errors (Kinéis error radii,
+standard errors or 95\% intervals; see \code{\link[=impute_tracks]{impute_tracks()}}), or the path to
+a csv file of them, fitted by multiple imputation with \code{reps} and
+\code{time.step}. Kinéis locations need \code{reps}; other locations with errors
+are fitted as data without \code{reps}, ignoring the errors;
+\item a data frame of locations without errors: \code{id}, \code{date} and two
+coordinate columns (see \code{coords}). Without \code{reps} they are fitted as data,
+at their own times; with \code{reps} and \code{time.step}, they are interpolated to
+a regular grid as known locations (every imputation is the same).
 }}
 
 \item{what}{for an \code{ssm_df} fit without \code{reps}, the locations fitted:
@@ -88,6 +93,10 @@ projected coordinates}
 \item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
 speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
+
+\item{error.units}{for location data with standard-error columns, their
+units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
+\code{\link[=impute_tracks]{impute_tracks()}})}
 }
 \value{
 a list with class \code{mpm_df}:
@@ -113,7 +122,11 @@ the Hessian was positive definite (\code{pdHess}) and the \code{aic};
 \item \code{model}, \code{reps} (0 without imputation), \code{source} (\code{"ssm"}, \code{"kineis"} or
 \code{"data"}), \code{time.step} (h; NA for irregular locations), \code{what} (the
 \code{ssm_df} locations fitted) and \code{crs} (the projection fitted in; NA for a
-data frame of projected coordinates).
+data frame of projected coordinates);
+\item for a data frame input, \code{data}: the input, every column, with \code{keep}
+(whether each location was used) and g and its 95\% interval (\code{g},
+\code{lower}, \code{upper}) interpolated to the observation times (NA outside the
+fitted track segments).
 }
 }
 \description{

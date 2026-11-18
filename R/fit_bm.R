@@ -10,24 +10,29 @@
 ##' turning angles, fitted with the `hmmTMB` package.
 ##'
 ##' With `reps`, each model is fitted to `reps` tracks imputed with
-##' [impute_tracks()], from an SSM fit or directly from Kinéis locations and
-##' their error radii, and the results are pooled across imputations (Rubin's
-##' rules), so they carry location uncertainty.
+##' [impute_tracks()], from an SSM fit or directly from location data and
+##' their errors (e.g. Kinéis error radii, or standard errors), and the
+##' results are pooled across imputations (Rubin's rules), so they carry
+##' location uncertainty.
 ##'
 ##' @param x an `ssm_df` fit object from [fit_ssm()] (`rw`, `crw` or `mp`,
-##' with regular predicted locations), or a data frame of Kinéis locations
-##' (see [impute_tracks()]). For `model = "mpm"` without `reps`, also a data
-##' frame of locations treated as data (see [fit_mpm()]).
+##' with regular predicted locations), or a data frame of locations (or the
+##' path to a csv file): `id`, `date`, `lon`, `lat` and, optionally, their
+##' errors as Kinéis error radii, standard errors (degrees or km) or 95%
+##' intervals (see [impute_tracks()]). Other columns are returned, with the
+##' estimates at their observation times, in the output's `data`. For
+##' `model = "mpm"` without `reps`, a data frame of locations without errors
+##' is fitted as data (see [fit_mpm()]).
 ##' @param model the behavioural model: `"mpm"`, `"mrm"` or `"hmm"`
 ##' (see description).
 ##' @param reps number of imputed tracks (default 20). NULL fits the model
 ##' once to the point-estimate track, treating the locations as data; only
 ##' `model = "mpm"` allows this.
-##' @param time.step for Kinéis locations, the time step (h) of the regular
+##' @param time.step for location data, the time step (h) of the regular
 ##' grid (required; see [impute_tracks()]).
-##' @param max_gap for Kinéis locations, the longest gap (h) interpolated
+##' @param max_gap for location data, the longest gap (h) interpolated
 ##' across (see [impute_tracks()]).
-##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' @param vmax for location data, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter.
 ##' @param crs the projection (proj4 string, units km) of the imputed tracks.
@@ -35,6 +40,10 @@
 ##' (see [impute_tracks()]).
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
+##' @param error.units for location data with standard-error columns, their
+##' units, `"degrees"` or `"km"`, if not those the column names imply. NULL
+##' (default): from the names (`lon.se`, `lat.se`, `lonerr`, `laterr`:
+##' degrees; `x.se`, `y.se`: km on the ground; see [impute_tracks()]).
 ##' @param control a list from [mpm_control()]: optimiser settings for `"mpm"`
 ##' and `"mrm"`, and, for every model, `verbose` (0 = silent; 1, default =
 ##' progress bar).
@@ -63,6 +72,13 @@
 ##' imputations), `par` (each imputation's parameters), `par_summary` and
 ##' `par_working` (pooled estimates on the natural and working scales),
 ##' `reps`, `n_states`, `n_failed`, `n_pooled`, `source` and `time.step`.
+##'
+##' For location data, each also has `data`: the input, every column, with
+##' `keep` (whether each location was used) and the estimates interpolated to
+##' the observation times (`"mpm"`: `g`, `lower`, `upper`; `"mrm"`: `speed`,
+##' `speed_lower`, `speed_upper`; `"hmm"`: the state probabilities and the
+##' most probable state). Observations outside the imputed track segments
+##' (e.g. in gaps longer than `max_gap`) get NA.
 ##'
 ##' `plot()` and, for `"mpm"`, [map()] draw each kind of fit.
 ##'
@@ -97,7 +113,7 @@
 ##' \strong{Adding a model.} Each model is an entry in
 ##' `behaviour_models()`: a fitting function taking the shared arguments
 ##' (`x`, `reps`, `time.step`, `max_gap`, `vmax`, `crs`, `kineis`,
-##' `control`) and its own, and returning a list with a class of its own.
+##' `error.units`, `control`) and its own, and returning a list with a class of its own.
 ##'
 ##' @examples
 ##' \dontrun{
@@ -110,6 +126,11 @@
 ##' ## directly from Kinéis locations, without an SSM
 ##' g <- fit_bm(kineis_locations, model = "mpm", reps = 20,
 ##'              time.step = 12, max_gap = 48, vmax = 4)
+##'
+##' ## GPS locations with a constant 30 m error, repeated in every row
+##' gps$x.se <- gps$y.se <- 0.03
+##' r <- fit_bm(gps, model = "mrm", reps = 20, time.step = 6)
+##' r$data
 ##' }
 ##'
 ##' @export
@@ -122,6 +143,7 @@ fit_bm <- function(x,
                           vmax = NULL,
                           crs = NULL,
                           kineis = ssm_control()$kineis,
+                          error.units = NULL,
                           control = mpm_control(),
                           ...) {
   models <- behaviour_models()
@@ -144,14 +166,15 @@ fit_bm <- function(x,
 
   out <- do.call(m$fit, c(list(x = x, reps = reps, time.step = time.step,
                                max_gap = max_gap, vmax = vmax, crs = crs,
-                               kineis = kineis, control = control), dots))
+                               kineis = kineis, error.units = error.units,
+                               control = control), dots))
   class(out) <- append(class(out), "behaviour_fit", after = 1)
   out
 }
 
 ## arguments every behavioural model's fitting function takes
 behaviour_shared_arguments <- function() {
-  c("x", "reps", "time.step", "max_gap", "vmax", "crs", "kineis", "control")
+  c("x", "reps", "time.step", "max_gap", "vmax", "crs", "kineis", "error.units", "control")
 }
 
 ## the behavioural models available to fit_bm(). To add a model, add
@@ -164,29 +187,31 @@ behaviour_models <- function() {
     mpm = list(
       description = "move persistence model",
       point_fit = TRUE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, control,
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control,
                      joint = TRUE, what = "predicted", coords = 3:4, inner.control = NULL) {
         fit_mpm(x, what = what, model = if (isTRUE(joint)) "jmpm" else "mpm",
                 coords = coords, control = control, inner.control = inner.control,
                 reps = reps, time.step = time.step, max_gap = max_gap,
-                kineis = kineis, crs = crs, vmax = vmax)
+                kineis = kineis, crs = crs, vmax = vmax, error.units = error.units)
       }),
     mrm = list(
       description = "movement rate model",
       point_fit = FALSE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, control) {
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control) {
         fit_mrm(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                kineis = kineis, control = control, vmax = vmax, crs = crs)
+                kineis = kineis, control = control, vmax = vmax, crs = crs,
+                error.units = error.units)
       }),
     hmm = list(
       description = "hidden Markov model",
       point_fit = FALSE,
-      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, control,
+      fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, control,
                      n_states = 2, step_par = NULL, angle_par = NULL, silent = TRUE) {
         fit_hmm(x, reps = reps, n_states = n_states, time.step = time.step,
                 max_gap = max_gap, kineis = kineis, step_par = step_par,
                 angle_par = angle_par, silent = silent,
-                progress = control$verbose >= 1, vmax = vmax, crs = crs)
+                progress = control$verbose >= 1, vmax = vmax, crs = crs,
+                error.units = error.units)
       })
   )
 }

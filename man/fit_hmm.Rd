@@ -16,7 +16,8 @@ fit_hmm(
   silent = TRUE,
   progress = TRUE,
   vmax = NULL,
-  crs = NULL
+  crs = NULL,
+  error.units = NULL
 )
 }
 \arguments{
@@ -57,6 +58,10 @@ speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
 
 \item{crs}{the projection of the imputed tracks (see \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{error.units}{for location data with standard-error columns, their
+units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
+\code{\link[=impute_tracks]{impute_tracks()}}).}
 }
 \value{
 a list with class \code{hmm_mi}:
@@ -84,7 +89,11 @@ their total standard errors, degrees of freedom and 95\% intervals;
 \item \code{reps}, \code{n_states}, \code{n_failed}, \code{n_pooled}: the number of imputations,
 states, imputations whose HMM fit failed, and imputations pooled for the
 parameters (those with finite working-scale standard errors); \code{source}
-(\code{"ssm"} or \code{"kineis"}) and \code{time.step}.
+(\code{"ssm"}, \code{"kineis"} or \code{"data"}) and \code{time.step};
+\item for location data, \code{data}: the input, every column, with \code{keep}
+(whether each location was used), the state probabilities (\code{p1},
+\code{p2}, ...) interpolated to the observation times and the most probable
+state (\code{state}; NA outside the imputed track segments).
 }
 }
 \description{

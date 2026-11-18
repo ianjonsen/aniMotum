@@ -12,7 +12,8 @@ fit_mrm(
   kineis = ssm_control()$kineis,
   control = mpm_control(),
   vmax = NULL,
-  crs = NULL
+  crs = NULL,
+  error.units = NULL
 )
 }
 \arguments{
@@ -39,6 +40,10 @@ speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter}
 
 \item{crs}{the projection of the imputed tracks (see \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{error.units}{for location data with standard-error columns, their
+units, \code{"degrees"} or \code{"km"}, if not those the column names imply (see
+\code{\link[=impute_tracks]{impute_tracks()}}).}
 }
 \value{
 a list with class \code{mrm_mi}:
@@ -54,7 +59,11 @@ variance due to location uncertainty);
 log rate, per h^1/2) and \code{rho_p} (correlation between east and north
 displacements), by id;
 \item \code{reps}, \code{n_failed} (imputed-track fits that failed or did not
-converge), \code{source} (\code{"ssm"} or \code{"kineis"}) and \code{time.step}.
+converge), \code{source} (\code{"ssm"}, \code{"kineis"} or \code{"data"}) and \code{time.step};
+\item for location data, \code{data}: the input, every column, with \code{keep}
+(whether each location was used) and \code{speed}, \code{speed_lower} and
+\code{speed_upper} interpolated to the observation times (NA outside the
+imputed track segments).
 }
 }
 \description{

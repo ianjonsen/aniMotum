@@ -16,6 +16,9 @@
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()]).
 ##' @param crs the projection of the imputed tracks (see [impute_tracks()]).
+##' @param error.units for location data with standard-error columns, their
+##' units, `"degrees"` or `"km"`, if not those the column names imply (see
+##' [impute_tracks()]).
 ##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter
@@ -35,7 +38,11 @@
 ##' log rate, per h^1/2) and `rho_p` (correlation between east and north
 ##' displacements), by id;
 ##' 3. `reps`, `n_failed` (imputed-track fits that failed or did not
-##' converge), `source` (`"ssm"` or `"kineis"`) and `time.step`.
+##' converge), `source` (`"ssm"`, `"kineis"` or `"data"`) and `time.step`;
+##' 4. for location data, `data`: the input, every column, with `keep`
+##' (whether each location was used) and `speed`, `speed_lower` and
+##' `speed_upper` interpolated to the observation times (NA outside the
+##' imputed track segments).
 ##'
 ##' @details Displacements between consecutive locations follow a Brownian
 ##' random walk whose rate varies in time:
@@ -87,10 +94,11 @@ fit_mrm <- function(x,
                     kineis = ssm_control()$kineis,
                     control = mpm_control(),
                     vmax = NULL,
-                    crs = NULL) {
+                    crs = NULL,
+                    error.units = NULL) {
 
   imp <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                       kineis = kineis, vmax = vmax, crs = crs)
+                       kineis = kineis, vmax = vmax, crs = crs, error.units = error.units)
   estimate <- imp[imp$rep == 0, ]
   ids <- unique(estimate$id)
 
@@ -148,6 +156,12 @@ fit_mrm <- function(x,
               n_failed = n_failed,
               source = attr(imp, "source"),
               time.step = attr(imp, "time.step"))
+  ## location data: the input, with the estimates at its observation times
+  if (!is.null(attr(imp, "data"))) {
+    f <- out$fitted
+    f$segment <- estimate$segment[match(paste(f$id, f$date), paste(estimate$id, estimate$date))]
+    out$data <- bm_data(attr(imp, "data"), f, c("speed", "speed_lower", "speed_upper"))
+  }
   class(out) <- append("mrm_mi", class(out))
   out
 }

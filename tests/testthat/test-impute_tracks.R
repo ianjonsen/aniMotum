@@ -116,3 +116,79 @@ test_that("vmax drops extreme Kinéis locations before imputation", {
   expect_true(max(imp$lat) > -59)
   expect_error(impute_tracks(d, reps = 1, time.step = 6, vmax = -1), "vmax")
 })
+
+## location data other than Kinéis: errors from standard errors (degrees or
+##  km), 95% intervals, or none
+sd_ground <- function(imp) {
+  e <- imp[imp$rep == 0, ]
+  r <- imp[imp$rep > 0, ]
+  i <- match(r$date, e$date)
+  c(east = sd((r$lon - e$lon[i]) * pi / 180 * 6371.0088 * cos(r$lat * pi / 180)),
+    north = sd((r$lat - e$lat[i]) * pi / 180 * 6371.0088))
+}
+locs <- function() {
+  set.seed(3)
+  data.frame(id = "a", date = as.POSIXct("2026-01-01", tz = "UTC") + 0:47 * 3600,
+             lon = 130 + cumsum(rnorm(48, 0.01, 0.01)), lat = -10 + cumsum(rnorm(48, 0, 0.01)),
+             depth = 1:48)
+}
+
+test_that("standard errors in km, in degrees and as 95% intervals give the ground SDs", {
+  set.seed(1)
+  d <- locs(); d$x.se <- 2; d$y.se <- 1
+  imp <- impute_tracks(d, reps = 300, time.step = 1)
+  expect_equal(attr(imp, "source"), "data")
+  expect_match(attr(imp, "errors"), "x.se")
+  expect_equal(unname(sd_ground(imp)), c(2, 1), tolerance = 0.05)
+  ## degrees: 1 km north is 1 / 111.2 degrees of latitude
+  d <- locs(); d$lat.se <- 1 / (6371.0088 * pi / 180); d$lon.se <- d$lat.se / cos(10 * pi / 180)
+  imp <- impute_tracks(d, reps = 300, time.step = 1)
+  expect_equal(unname(sd_ground(imp)), c(1, 1), tolerance = 0.05)
+  ## the same values read as km
+  d <- locs(); d$lon.se <- 2; d$lat.se <- 1
+  imp <- impute_tracks(d, reps = 300, time.step = 1, error.units = "km")
+  expect_equal(unname(sd_ground(imp)), c(2, 1), tolerance = 0.05)
+  ## 95% intervals, in degrees
+  d <- locs(); h <- 1.96 / (6371.0088 * pi / 180)
+  d$lat.lci <- d$lat - h; d$lat.uci <- d$lat + h
+  d$lon.lci <- d$lon - h / cos(10 * pi / 180); d$lon.uci <- d$lon + h / cos(10 * pi / 180)
+  imp <- impute_tracks(d, reps = 300, time.step = 1)
+  expect_equal(unname(sd_ground(imp)), c(1, 1), tolerance = 0.05)
+})
+
+test_that("locations without errors are taken as known, and the input is kept", {
+  d <- locs()
+  d$lon[5] <- NA
+  expect_message(imp <- impute_tracks(d, reps = 2, time.step = 2), "taken as known")
+  expect_equal(imp$lon[imp$rep == 1], imp$lon[imp$rep == 0])
+  dat <- attr(imp, "data")
+  expect_true(all(c("depth", "keep") %in% names(dat)))
+  expect_equal(nrow(dat), nrow(d))
+  expect_false(dat$keep[5])
+  expect_error(impute_tracks(d[, c("id", "date", "lon")], reps = 2, time.step = 2), "lat")
+})
+
+test_that("behavioural estimates are interpolated to the observation times", {
+  est <- data.frame(id = "a", segment = c(1, 1, 2), date = as.POSIXct("2026-01-01", tz = "UTC") + c(0, 2, 10) * 3600,
+                    g = c(0.2, 0.6, 0.9))
+  dat <- data.frame(id = "a", date = as.POSIXct("2026-01-01", tz = "UTC") + c(0, 1, 2, 5, 10) * 3600)
+  out <- aniMotum:::bm_data(dat, est, "g")
+  ## exact, halfway, exact, in the gap between segments (NA), exact
+  expect_equal(out$g, c(0.2, 0.4, 0.6, NA, 0.9))
+})
+
+test_that("fit_bm returns the input data with the estimates at observation times", {
+  skip_on_cran()
+  set.seed(1)
+  d <- locs(); d$x.se <- d$y.se <- 0.5
+  d <- rbind(d, transform(d, id = "b", lat = lat - 1))
+  m <- fit_bm(d, model = "mrm", reps = 3, time.step = 6, control = mpm_control(verbose = 0))
+  expect_true(all(c("depth", "keep", "speed", "speed_lower", "speed_upper") %in% names(m$data)))
+  expect_equal(nrow(m$data), nrow(d))
+  g <- fit_bm(d, model = "mpm", reps = 3, time.step = 6, control = mpm_control(verbose = 0))
+  expect_true(all(c("depth", "g", "lower", "upper") %in% names(g$data)))
+  expect_equal(g$source, "data")
+  ## without reps, their errors are not used
+  suppressWarnings(expect_message(fit_bm(d, model = "mpm", reps = NULL, control = mpm_control(verbose = 0)),
+                                  "not used without `reps`"))
+})

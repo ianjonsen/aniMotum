@@ -13,15 +13,20 @@ fit_bm(
   vmax = NULL,
   crs = NULL,
   kineis = ssm_control()$kineis,
+  error.units = NULL,
   control = mpm_control(),
   ...
 )
 }
 \arguments{
 \item{x}{an \code{ssm_df} fit object from \code{\link[=fit_ssm]{fit_ssm()}} (\code{rw}, \code{crw} or \code{mp},
-with regular predicted locations), or a data frame of Kinéis locations
-(see \code{\link[=impute_tracks]{impute_tracks()}}). For \code{model = "mpm"} without \code{reps}, also a data
-frame of locations treated as data (see \code{\link[=fit_mpm]{fit_mpm()}}).}
+with regular predicted locations), or a data frame of locations (or the
+path to a csv file): \code{id}, \code{date}, \code{lon}, \code{lat} and, optionally, their
+errors as Kinéis error radii, standard errors (degrees or km) or 95\%
+intervals (see \code{\link[=impute_tracks]{impute_tracks()}}). Other columns are returned, with the
+estimates at their observation times, in the output's \code{data}. For
+\code{model = "mpm"} without \code{reps}, a data frame of locations without errors
+is fitted as data (see \code{\link[=fit_mpm]{fit_mpm()}}).}
 
 \item{model}{the behavioural model: \code{"mpm"}, \code{"mrm"} or \code{"hmm"}
 (see description).}
@@ -30,13 +35,13 @@ frame of locations treated as data (see \code{\link[=fit_mpm]{fit_mpm()}}).}
 once to the point-estimate track, treating the locations as data; only
 \code{model = "mpm"} allows this.}
 
-\item{time.step}{for Kinéis locations, the time step (h) of the regular
+\item{time.step}{for location data, the time step (h) of the regular
 grid (required; see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
-\item{max_gap}{for Kinéis locations, the longest gap (h) interpolated
+\item{max_gap}{for location data, the longest gap (h) interpolated
 across (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
-\item{vmax}{for Kinéis locations, the maximum travel rate (m/s) of a
+\item{vmax}{for location data, the maximum travel rate (m/s) of a
 speed-distance-angle filter applied before imputation, to drop extreme
 locations (see \code{\link[=impute_tracks]{impute_tracks()}}). NULL (default): no filter.}
 
@@ -46,6 +51,11 @@ If NULL (default), chosen from the extent of the data by \code{\link[=auto_crs]{
 
 \item{kineis}{for Kinéis locations, the Kinéis error model (see
 \code{\link[=impute_tracks]{impute_tracks()}}).}
+
+\item{error.units}{for location data with standard-error columns, their
+units, \code{"degrees"} or \code{"km"}, if not those the column names imply. NULL
+(default): from the names (\code{lon.se}, \code{lat.se}, \code{lonerr}, \code{laterr}:
+degrees; \code{x.se}, \code{y.se}: km on the ground; see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
 \item{control}{a list from \code{\link[=mpm_control]{mpm_control()}}: optimiser settings for \code{"mpm"}
 and \code{"mrm"}, and, for every model, \code{verbose} (0 = silent; 1, default =
@@ -82,6 +92,13 @@ imputations), \code{par} (each imputation's parameters), \code{par_summary} and
 \code{reps}, \code{n_states}, \code{n_failed}, \code{n_pooled}, \code{source} and \code{time.step}.
 }
 
+For location data, each also has \code{data}: the input, every column, with
+\code{keep} (whether each location was used) and the estimates interpolated to
+the observation times (\code{"mpm"}: \code{g}, \code{lower}, \code{upper}; \code{"mrm"}: \code{speed},
+\code{speed_lower}, \code{speed_upper}; \code{"hmm"}: the state probabilities and the
+most probable state). Observations outside the imputed track segments
+(e.g. in gaps longer than \code{max_gap}) get NA.
+
 \code{plot()} and, for \code{"mpm"}, \code{\link[=map]{map()}} draw each kind of fit.
 }
 \description{
@@ -97,9 +114,10 @@ turning angles, fitted with the \code{hmmTMB} package.
 }
 
 With \code{reps}, each model is fitted to \code{reps} tracks imputed with
-\code{\link[=impute_tracks]{impute_tracks()}}, from an SSM fit or directly from Kinéis locations and
-their error radii, and the results are pooled across imputations (Rubin's
-rules), so they carry location uncertainty.
+\code{\link[=impute_tracks]{impute_tracks()}}, from an SSM fit or directly from location data and
+their errors (e.g. Kinéis error radii, or standard errors), and the
+results are pooled across imputations (Rubin's rules), so they carry
+location uncertainty.
 }
 \details{
 \strong{Move persistence model.} Displacements follow a correlated random
@@ -132,7 +150,7 @@ data).
 \strong{Adding a model.} Each model is an entry in
 \code{behaviour_models()}: a fitting function taking the shared arguments
 (\code{x}, \code{reps}, \code{time.step}, \code{max_gap}, \code{vmax}, \code{crs}, \code{kineis},
-\code{control}) and its own, and returning a list with a class of its own.
+\code{error.units}, \code{control}) and its own, and returning a list with a class of its own.
 }
 \examples{
 \dontrun{
@@ -145,6 +163,11 @@ plot(g, type = "track", pages = 1)
 ## directly from Kinéis locations, without an SSM
 g <- fit_bm(kineis_locations, model = "mpm", reps = 20,
              time.step = 12, max_gap = 48, vmax = 4)
+
+## GPS locations with a constant 30 m error, repeated in every row
+gps$x.se <- gps$y.se <- 0.03
+r <- fit_bm(gps, model = "mrm", reps = 20, time.step = 6)
+r$data
 }
 
 }

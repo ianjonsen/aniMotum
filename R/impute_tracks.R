@@ -6,18 +6,22 @@
 ##' imputed from either:
 ##' 1. an SSM fit: tracks are simulated from the fit's joint posterior with
 ##' [sim_post()], at the fit's predicted (regular) times;
-##' 2. Kinéis locations, without an SSM: each location is perturbed by a draw
-##' from its error distribution, defined by its CLS error radius, and the
-##' perturbed locations are linearly interpolated to a regular time grid.
+##' 2. location data, without an SSM: Kinéis locations, or any locations
+##' with their errors (or none). Each location is perturbed by a draw from its
+##' error distribution and the perturbed locations are linearly interpolated
+##' to a regular time grid.
 ##'
 ##' @param x an `ssm_df` fit object (`rw`, `crw` or `mp`) with regular predicted
-##' locations, or a data frame of Kinéis locations with columns `id`, `date`
-##' (POSIXct), `lon`, `lat` and `error.radius` (m). SMRU column names (`REF`,
-##' `D_DATE`, `LON`, `LAT`, `ERROR_RADIUS`) are also accepted, ignoring case.
+##' locations; or a data frame of locations (or the path to a csv file of
+##' them) with columns `id`, `date` (POSIXct, or text such as
+##' `"2024-01-31 12:00:00"`), `lon` and `lat`, and optionally their errors
+##' (see details). Column names are matched ignoring case; SMRU names (`REF`,
+##' `D_DATE`) are also accepted. Other columns are kept in the input data
+##' returned (attribute `data`).
 ##' @param reps number of imputed tracks (default 20).
-##' @param time.step for Kinéis locations, the time step (h) of the regular
+##' @param time.step for location data, the time step (h) of the regular
 ##' grid. Ignored for SSM fits, which use their own prediction times.
-##' @param max_gap for Kinéis locations, the longest gap between consecutive
+##' @param max_gap for location data, the longest gap between consecutive
 ##' locations (h) that is interpolated across (default `2 * time.step`). Grid
 ##' times inside longer gaps are dropped and the track is split into segments
 ##' there. Ignored for SSM fits.
@@ -25,7 +29,7 @@
 ##' `scale` (east and north error SDs relative to the error radius) and
 ##' `exponent` (on the error radius, in km); default as for [ssm_control()].
 ##' @param inflate for SSM fits, passed to [sim_post()] (default TRUE).
-##' @param vmax for Kinéis locations, the maximum travel rate (m/s) of a
+##' @param vmax for location data, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter (`trip::sda()`, as `fit_ssm()` uses) applied
 ##' before imputation, to drop extreme locations; e.g. 4 for seals. A
 ##' location is dropped if reaching it implies a speed above `vmax` and it
@@ -33,20 +37,45 @@
 ##' `ang = c(15, 25)`, `distlim = c(2500, 5000)`). NULL (default): no
 ##' filter. Ignored for SSM fits, whose data were filtered by `fit_ssm()`.
 ##' @param crs the projection (proj4 string, units km) for the imputed
-##' tracks' `x`, `y`, and, for Kinéis locations, for the interpolation. If
+##' tracks' `x`, `y`, and, for location data, for the interpolation. If
 ##' NULL (default), chosen from the extent of all the locations by
 ##' [auto_crs()]: Mercator where its scale varies little across the data,
 ##' otherwise Lambert conformal conic, polar stereographic or oblique
 ##' stereographic. All are conformal.
+##' @param error.units for location data with standard-error columns, their
+##' units, `"degrees"` or `"km"`, overriding the units implied by the column
+##' names (see details). NULL (default): from the column names.
 ##'
 ##' @return a tibble with columns `rep` (0 = the point estimate: the SSM-
 ##' predicted track, or the Kinéis locations interpolated without
 ##' perturbation; 1 to `reps` = imputations), `id`, `segment` (contiguous runs
 ##' of grid times, numbered within `id`), `date`, `lon`, `lat`, and `x`, `y`
-##' (km, in projection `crs`). The attribute `source` is `"ssm"` or
-##' `"kineis"`; `time.step` holds the time step (h) and `crs` the projection.
+##' (km, in projection `crs`). Attributes: `source` (`"ssm"`, `"kineis"` or
+##' `"data"`), `time.step` (h), `crs` (the projection), and, for location
+##' data, `errors` (where the location errors came from) and `data` (the
+##' input, every column, with standard `id` and `date` columns and `keep`:
+##' whether each location was used).
 ##'
-##' @details For Kinéis locations, the errors are drawn independently for each
+##' @details For location data, the errors of each location are read from the
+##' first of these that `x` has:
+##' 1. a Kinéis error radius (m), in a column named `error.radius`,
+##' `error_radius` or any other spelling of "error radius" (ignoring case and
+##' separators),
+##' through the Kinéis error model (`kineis`);
+##' 2. standard errors: `lon.se`, `lat.se` or `lonerr`, `laterr` (degrees), or
+##' `x.se`, `y.se` (km, east and north on the ground). Set `error.units` if
+##' the units differ from those the names imply. Constant errors (e.g. for
+##' GPS) are given by repeating the value in every row;
+##' 3. 95% intervals: `lon.lci`, `lon.uci`, `lat.lci`, `lat.uci` (degrees),
+##' taken as normal: SE = (uci - lci) / (2 * 1.96).
+##'
+##' Without any of these the locations are taken as known: every imputation
+##' is the interpolated track. Standard errors in degrees are converted to
+##' km on the ground at each location's latitude. Note that `x.se`, `y.se`
+##' must be ground distances: those in `fit_ssm()` output are in the fit's
+##' projection (e.g. Mercator km, stretched by 1 / cos(latitude)).
+##'
+##' For Kinéis locations, the errors are drawn independently for each
 ##' location, with ground SDs `scale[1] * r^exponent` (east) and
 ##' `scale[2] * r^exponent` (north), r the error radius (km); the same error
 ##' model as `fit_ssm()` uses for KI observations. The perturbed locations are
@@ -84,7 +113,8 @@ impute_tracks <- function(x,
                           kineis = ssm_control()$kineis,
                           inflate = TRUE,
                           crs = NULL,
-                          vmax = NULL) {
+                          vmax = NULL,
+                          error.units = NULL) {
 
   if (!is.numeric(reps) || length(reps) != 1 || reps < 1)
     stop("reps must be a single number >= 1", call. = FALSE)
@@ -99,13 +129,12 @@ impute_tracks <- function(x,
     attr(out, "time.step") <- x$ssm[[1]]$ts
   } else if (is.data.frame(x) || is.character(x)) {
     if (is.null(time.step) || !is.numeric(time.step) || length(time.step) != 1 || time.step <= 0)
-      stop("for Kinéis locations, time.step (h) must be a single positive number", call. = FALSE)
+      stop("for location data, time.step (h) must be a single positive number", call. = FALSE)
     if (is.null(max_gap)) max_gap <- 2 * time.step
-    out <- impute_from_kineis(x, reps, time.step, max_gap, kineis, crs, vmax)
-    attr(out, "source") <- "kineis"
+    out <- impute_from_locations(x, reps, time.step, max_gap, kineis, crs, vmax, error.units)
     attr(out, "time.step") <- time.step
   } else {
-    stop("x must be an ssm_df fit object or a data frame of Kinéis locations", call. = FALSE)
+    stop("x must be an ssm_df fit object or a data frame of locations", call. = FALSE)
   }
   out
 }
@@ -145,20 +174,19 @@ impute_from_ssm <- function(x, reps, inflate, crs = NULL) {
   out
 }
 
-## imputations directly from Kinéis locations: perturb each location by a
-##  draw from its error-radius distribution, then interpolate to a regular grid
-impute_from_kineis <- function(x, reps, time.step, max_gap, kineis, crs = NULL,
-                               vmax = NULL) {
-  d <- kineis_locations(x)
+## imputations directly from location data (Kinéis, or any locations with
+##  standard errors, 95% intervals or no errors): perturb each location by a
+##  draw from its error distribution, then interpolate to a regular grid
+impute_from_locations <- function(x, reps, time.step, max_gap, kineis, crs = NULL,
+                                  vmax = NULL, error.units = NULL) {
+  tl <- track_locations(x, kineis, error.units)
+  d <- tl$loc
   if (!is.null(vmax)) d <- kineis_speed_filter(d, vmax)
   ## one projection for all individuals, chosen from all the locations
   if (is.null(crs)) crs <- auto_crs(d$lon, d$lat)
-  scale <- kineis$scale
-  exponent <- kineis$exponent
-  if (is.null(scale) || length(scale) != 2 || is.null(exponent))
-    stop("kineis must be a list with `scale` (length 2) and `exponent`", call. = FALSE)
 
   earth <- 6371.0088
+  used <- integer(0)
   out <- lapply(split(d, d$id), function(s) {
     s <- s[order(s$date), ]
     s <- s[!duplicated(s$date), ]
@@ -166,11 +194,11 @@ impute_from_kineis <- function(x, reps, time.step, max_gap, kineis, crs = NULL,
     tt <- as.numeric(s$date) / 3600
     grid <- regular_grid(tt, time.step, max_gap)
     if (is.null(grid)) return(NULL)
+    used <<- c(used, s$.row)
 
-    ## error SDs (km)
-    r <- (s$error.radius / 1000)^exponent
-    sd_east <- scale[1] * r
-    sd_north <- scale[2] * r
+    ## error SDs on the ground (km)
+    sd_east <- s$sd_east
+    sd_north <- s$sd_north
     lon <- s$lon
     lat <- s$lat
     n <- nrow(s)
@@ -196,12 +224,18 @@ impute_from_kineis <- function(x, reps, time.step, max_gap, kineis, crs = NULL,
     })
   })
   out <- bind_rows(unlist(out, recursive = FALSE))
-  if (nrow(out) == 0) stop("no track has enough Kinéis locations to impute", call. = FALSE)
+  if (nrow(out) == 0) stop("no track has enough locations to impute", call. = FALSE)
 
   out <- out[order(out$rep, out$id, out$date), c("rep", "id", "segment", "date", "lon", "lat", "x", "y")]
   row.names(out) <- NULL
   out <- tibble(out)
+  ## the input data, with every column, and whether each location was used
+  data <- tl$data
+  data$keep <- seq_len(nrow(data)) %in% used
   attr(out, "crs") <- crs
+  attr(out, "source") <- if (tl$errors == "kineis") "kineis" else "data"
+  attr(out, "errors") <- tl$errors
+  attr(out, "data") <- data
   out
 }
 
@@ -238,36 +272,167 @@ regular_grid <- function(tt, time.step, max_gap) {
   list(t = t, i = i, w = pmin(pmax(w, 0), 1), segment = segment)
 }
 
-## standardise Kinéis locations: id, date, lon, lat, error.radius (m); SMRU
-##  or aniMotum column names, ignoring case; locations without a positive
-##  error radius are dropped
-kineis_locations <- function(d) {
-  if (is.character(d) && length(d) == 1) {
-    if (!file.exists(d)) stop("file not found: ", d, call. = FALSE)
-    d <- utils::read.csv(d, stringsAsFactors = FALSE)
+## standardise location data for imputation. Returns a list:
+##  loc: one row per usable location, with .row (its row in the input), id,
+##   date, lon, lat, and the ground error SDs east and north (km), sd_east and
+##   sd_north;
+##  data: the input, every column, with standard `id` and `date` (POSIXct)
+##   columns added where its own are named otherwise (e.g. SMRU REF, D_DATE);
+##  errors: where the errors came from (see location_errors()).
+## Column names are matched ignoring case; SMRU names (REF, D_DATE) are
+##  accepted.
+track_locations <- function(x, kineis = ssm_control()$kineis, error.units = NULL) {
+  if (is.character(x) && length(x) == 1) {
+    if (!file.exists(x)) stop("file not found: ", x, call. = FALSE)
+    x <- utils::read.csv(x, stringsAsFactors = FALSE)
   }
-  if (inherits(d, "sf")) stop("x must be a data frame, not an sf object", call. = FALSE)
-  d <- as.data.frame(d)
+  if (inherits(x, "sf")) stop("x must be a data frame, not an sf object", call. = FALSE)
+  data <- as.data.frame(x)
+  d <- data
   names(d) <- tolower(names(d))
-  if (all(c("ref", "d_date") %in% names(d))) {
-    columns <- c(id = "ref", date = "d_date", lon = "lon", lat = "lat", error.radius = "error_radius")
-  } else {
-    columns <- c(id = "id", date = "date", lon = "lon", lat = "lat", error.radius = "error.radius")
-  }
-  missing.columns <- setdiff(columns, names(d))
+  smru <- all(c("ref", "d_date") %in% names(d)) && !all(c("id", "date") %in% names(d))
+  id.col <- if (smru) "ref" else "id"
+  date.col <- if (smru) "d_date" else "date"
+  missing.columns <- setdiff(c(id.col, date.col, "lon", "lat"), names(d))
   if (length(missing.columns) > 0)
-    stop("x is missing column(s): ", paste(missing.columns, collapse = ", "), call. = FALSE)
-  out <- data.frame(id = as.character(d[[columns["id"]]]),
-                    date = kineis_inflation_dates(d[[columns["date"]]], "x"),
-                    lon = as.numeric(d[[columns["lon"]]]),
-                    lat = as.numeric(d[[columns["lat"]]]),
-                    error.radius = as.numeric(d[[columns["error.radius"]]]),
+    stop("x is missing column(s): ", paste(missing.columns, collapse = ", "),
+         " (id, date, lon and lat are required)", call. = FALSE)
+
+  loc <- data.frame(.row = seq_len(nrow(d)),
+                    id = as.character(d[[id.col]]),
+                    date = kineis_inflation_dates(d[[date.col]], "x"),
+                    lon = as.numeric(d$lon),
+                    lat = as.numeric(d$lat),
                     stringsAsFactors = FALSE)
-  ki <- !is.na(out$error.radius) & out$error.radius > 0 &
-    !is.na(out$date) & !is.na(out$lon) & !is.na(out$lat)
-  if (!any(ki)) stop("x has no Kinéis locations (positive error radius)", call. = FALSE)
-  if (any(!ki)) message(sum(!ki), " location(s) without a positive error radius, date or coordinates dropped")
-  out[ki, ]
+  err <- location_errors(d, loc$lat, kineis, error.units)
+  loc$sd_east <- err$east
+  loc$sd_north <- err$north
+  ok <- !is.na(loc$date) & !is.na(loc$lon) & !is.na(loc$lat) &
+    !is.na(loc$sd_east) & !is.na(loc$sd_north)
+  if (!any(ok))
+    stop("x has no usable locations", if (err$type == "kineis") " (positive error radius)" else "",
+         call. = FALSE)
+  if (any(!ok))
+    message(sum(!ok), " location(s) without ",
+            if (err$type == "kineis") "a positive error radius, " else if (err$type != "none") "errors, " else "",
+            "a date or coordinates dropped")
+
+  ## standard id and date columns in the data returned
+  data$id <- loc$id
+  data$date <- loc$date
+  list(loc = loc[ok, ], data = data, errors = err$type)
+}
+
+## ground error SDs (km), east and north, of each location, from the first of
+##  these that x has (names ignoring case):
+##  1) Kinéis error radius (error.radius, error_radius or another spelling;
+##     see error_radius_column(); m), with the Kinéis
+##     error model `kineis` (as fit_ssm() uses for KI observations);
+##  2) standard errors: lon.se and lat.se, or lonerr and laterr (degrees), or
+##     x.se and y.se (km, east and north on the ground);
+##  3) 95% intervals: lon.lci, lon.uci, lat.lci, lat.uci (degrees), taken as
+##     normal: SE = (uci - lci) / (2 * 1.96).
+##  Without any, the locations are taken as known (SDs of 0).
+##  error.units ("degrees" or "km") overrides the units implied by the names
+##  of standard-error columns. Returns list(type, east, north).
+location_errors <- function(d, lat, kineis, error.units = NULL) {
+  earth <- 6371.0088
+  if (!is.null(error.units))
+    error.units <- match.arg(error.units, c("degrees", "km"))
+  n <- nrow(d)
+  ## 1) Kinéis error radius
+  r.col <- error_radius_column(names(d))
+  if (!is.null(r.col)) {
+    scale <- kineis$scale
+    exponent <- kineis$exponent
+    if (is.null(scale) || length(scale) != 2 || is.null(exponent))
+      stop("kineis must be a list with `scale` (length 2) and `exponent`", call. = FALSE)
+    r <- as.numeric(d[[r.col]])
+    r[!is.na(r) & r <= 0] <- NA
+    r <- (r / 1000)^exponent
+    return(list(type = "kineis", east = scale[1] * r, north = scale[2] * r))
+  }
+  ## 2) standard errors
+  pairs <- list(c("lon.se", "lat.se", "degrees"), c("lonerr", "laterr", "degrees"),
+                c("x.se", "y.se", "km"))
+  for (p in pairs) {
+    if (all(p[1:2] %in% names(d))) {
+      se_e <- as.numeric(d[[p[1]]])
+      se_n <- as.numeric(d[[p[2]]])
+      if (any(se_e < 0 | se_n < 0, na.rm = TRUE))
+        stop("location standard errors (", p[1], ", ", p[2], ") must not be negative", call. = FALSE)
+      units <- if (is.null(error.units)) p[3] else error.units
+      if (units == "degrees") {
+        se_n <- se_n * pi / 180 * earth
+        se_e <- se_e * pi / 180 * earth * cos(lat * pi / 180)
+      }
+      return(list(type = paste0("standard errors (", p[1], ", ", p[2], "; ", units, ")"),
+                  east = se_e, north = se_n))
+    }
+  }
+  ## 3) 95% intervals, in degrees
+  ci <- c("lon.lci", "lon.uci", "lat.lci", "lat.uci")
+  if (all(ci %in% names(d))) {
+    if (identical(error.units, "km"))
+      stop("95% interval columns (lon.lci, lon.uci, lat.lci, lat.uci) are longitudes and latitudes, in degrees",
+           call. = FALSE)
+    z <- stats::qnorm(0.975)
+    se_e <- (as.numeric(d$lon.uci) - as.numeric(d$lon.lci)) / (2 * z)
+    se_n <- (as.numeric(d$lat.uci) - as.numeric(d$lat.lci)) / (2 * z)
+    if (any(se_e < 0 | se_n < 0, na.rm = TRUE))
+      stop("95% intervals must have lower limits below their upper limits", call. = FALSE)
+    return(list(type = "95% intervals (degrees)",
+                east = se_e * pi / 180 * earth * cos(lat * pi / 180),
+                north = se_n * pi / 180 * earth))
+  }
+  message("no location error columns found (error.radius; lon.se, lat.se; lonerr, laterr; ",
+          "x.se, y.se; or lon.lci, lon.uci, lat.lci, lat.uci): locations are taken as known")
+  list(type = "none", east = rep(0, n), north = rep(0, n))
+}
+
+## TRUE if a data frame of locations carries errors that location_errors()
+##  reads
+has_location_errors <- function(x) {
+  if (is.character(x)) return(TRUE)
+  nm <- tolower(names(x))
+  !is.null(error_radius_column(nm)) ||
+    all(c("lon.se", "lat.se") %in% nm) || all(c("lonerr", "laterr") %in% nm) ||
+    all(c("x.se", "y.se") %in% nm) ||
+    all(c("lon.lci", "lon.uci", "lat.lci", "lat.uci") %in% nm)
+}
+
+## behavioural estimates at the observation times of the input data: columns
+##  `cols` of `est` (on the regular grid, with id, segment and date) are
+##  interpolated linearly in time between the grid times on either side,
+##  within a track segment. Observations outside the segments (e.g. in a data
+##  gap longer than max_gap) get NA
+bm_data <- function(data, est, cols) {
+  out <- as.data.frame(data)
+  est <- as.data.frame(est)
+  if (!"segment" %in% names(est)) est$segment <- 1L
+  for (v in cols) out[[v]] <- NA_real_
+  for (i in unique(est$id)) {
+    e <- est[est$id == i, ]
+    e <- e[order(e$date), ]
+    r <- which(out$id == i & !is.na(out$date))
+    if (length(r) == 0) next
+    tg <- as.numeric(e$date)
+    ng <- length(tg)
+    t <- as.numeric(out$date[r])
+    j <- findInterval(t, tg)
+    j0 <- pmax(j, 1)
+    j1 <- pmin(j + 1, ng)
+    exact <- j >= 1 & tg[j0] == t
+    inside <- j >= 1 & j < ng & e$segment[j0] == e$segment[j1]
+    w <- ifelse(inside, (t - tg[j0]) / (tg[j1] - tg[j0]), 0)
+    use <- exact | inside
+    for (v in cols) {
+      val <- (1 - w) * e[[v]][j0] + w * e[[v]][j1]
+      val[exact] <- e[[v]][j0][exact]
+      out[[v]][r[use]] <- val[use]
+    }
+  }
+  tibble(out)
 }
 
 ## Rubin's rules: pool estimates (rows = quantities, columns = imputations)
@@ -331,6 +496,6 @@ kineis_speed_filter <- function(d, vmax, ang = c(15, 25), distlim = c(2500, 5000
   keep[is.na(keep)] <- TRUE
   if (any(!keep))
     message("speed filter (vmax = ", vmax, " m/s) dropped ", sum(!keep), " of ",
-            length(keep), " Kinéis locations")
+            length(keep), " locations")
   d[keep, ]
 }
