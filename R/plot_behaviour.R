@@ -113,8 +113,9 @@ plot.mpm_df <- function(x,
 ##  fitted tibble with locations); FALSE for earlier output (a tibble of fits)
 mpm_current <- function(x) inherits(x, "mpm_df") && !is.data.frame(x)
 
-## move persistence estimates in one layout for plotting: id, date, g,
-##  logit_g, logit_g.se, and lon, lat when the locations are available
+## move persistence estimates in one layout for plotting: id, date, g, its
+##  standard error (g.se, or logit_g.se for fits before 1.3-1), and lon, lat
+##  when the locations are available
 mpm_plot_data <- function(x, y = NULL) {
   if (mpm_current(x)) return(as.data.frame(x$fitted))
   if (!inherits(x, c("mpm_df", "fG_mpm")))
@@ -148,11 +149,20 @@ mpm_plot_data <- function(x, y = NULL) {
 mpm_plot <- function(d, type, pages, ncol, ask, pal, rev, land,
                      se = FALSE, normalise = FALSE, group = FALSE) {
   d <- as.data.frame(d)
-  ## 95% interval from the standard error of logit(g), unless pooled
+  ## 95% interval, unless already given (fit_mpm() output): from the
+  ##  standard error of g, or of logit(g) for fits made before 1.3-1
   if (!all(c("lower", "upper") %in% names(d))) {
-    d$lower <- plogis(d$logit_g - qnorm(0.975) * d$logit_g.se)
-    d$upper <- plogis(d$logit_g + qnorm(0.975) * d$logit_g.se)
+    if ("logit_g.se" %in% names(d)) {
+      d$lower <- plogis(d$logit_g - qnorm(0.975) * d$logit_g.se)
+      d$upper <- plogis(d$logit_g + qnorm(0.975) * d$logit_g.se)
+    } else {
+      d$lower <- d$g - qnorm(0.975) * d$g.se
+      d$upper <- d$g + qnorm(0.975) * d$g.se
+    }
   }
+  ## g can stray slightly outside 0 to 1 (its bounds are soft): show it, and
+  ##  its interval, within 0 to 1
+  for (v in c("g", "lower", "upper")) d[[v]] <- pmin(pmax(d[[v]], 0), 1)
   if (normalise) d <- mpm_normalise(d, group)
   label <- if (normalise) "move persistence (g), normalised" else "move persistence (g)"
   scale <- scale_colour_gradientn(colours = hcl.colors(100, pal, rev = rev),
@@ -166,7 +176,7 @@ mpm_plot <- function(d, type, pages, ncol, ask, pal, rev, land,
       stop("no longitude and latitude to map: the move persistence model was fitted to projected coordinates",
            call. = FALSE)
     ## point size proportional to SE^-2 (indicative only)
-    if (se) d$se_weight <- d$logit_g.se^-2
+    if (se) d$se_weight <- (if ("g.se" %in% names(d)) d$g.se else d$logit_g.se)^-2
     behav_tracks(d, "g", scale, pages, ask, land,
                  size = if (se) "se_weight" else NULL)
   }

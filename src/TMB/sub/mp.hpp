@@ -45,10 +45,10 @@ Type mp(objective_function<Type>* obj) {
   
   // PROCESS PARAMETERS
   PARAMETER_VECTOR(l_sigma);      //  Innovation variance (link scale)
-  PARAMETER(l_sigma_g);           //  logistic scale parameter of rw on lg (log scale)
+  PARAMETER(l_sigma_g);           //  SD of the random walk on g (log scale)
   PARAMETER(l_rho_p);             //  Innovation correlation (link scale)
   PARAMETER_ARRAY(X);             //  Predicted locations
-  PARAMETER_VECTOR(lg);           //  logit(gamma): move persistence on link scale
+  PARAMETER_VECTOR(g);            //  move persistence (see move_persistence.hpp)
   // OBSERVATION PARAMETERS
   PARAMETER(l_psi);               //  error SD scaling parameter (KF obs model)
   PARAMETER_VECTOR(l_tau);        //  error dispersion for LS obs model (log scale)
@@ -66,7 +66,6 @@ Type mp(objective_function<Type>* obj) {
   vector<Type> kineis_scale = exp(l_kineis_scale);
   Type kineis_exponent = l_kineis_exponent;
   Type sigma_g = exp(l_sigma_g);
-  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg)); 
   
   Type jnll = 0.0;
   
@@ -85,13 +84,12 @@ Type mp(objective_function<Type>* obj) {
   // PROCESS MODEL
   // ---------------------------------------------------------------------------
 
-  // RW on logit(gamma): variance scales with dt so gamma is naturally free to
-  // drift over long gaps or haulout periods. No modification needed here --
+  // RW on gamma, with a prior on its first value and a soft barrier at 0, 1
+  // (move_persistence.hpp): variance scales with dt so gamma is naturally free
+  // to drift over long gaps or haulout periods. No modification needed here --
   // during haulout, near-zero displacements (enforced by the tight location
   // process below) will drive gamma toward zero without explicit intervention.
-  for(int i = 1; i < dt.size(); ++i) {
-    jnll -= dnorm(lg(i), lg(i-1), dt(i) * sigma_g, TRUE);  
-  }
+  jnll += g_track_nll(g, dt, sigma_g, 0, int(dt.size()) - 1);
 
   // Location first-differences.
   // First step is always a pure RW (no previous difference to condition on).

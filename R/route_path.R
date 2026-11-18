@@ -74,7 +74,7 @@
 ##'   grab(fit, what = "rerouted")
 ##' }
 ##' 
-##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows
+##' @importFrom dplyr group_by ungroup rowwise select nest_by mutate bind_rows any_of
 ##' @importFrom tidyr nest unnest
 ##' @importFrom sf st_as_sf st_transform st_make_valid st_buffer st_union 
 ##' @importFrom sf st_convex_hull st_intersection st_collection_extract st_sf 
@@ -314,9 +314,9 @@ route_path <-
             if(!is.null(df_rrt$pts_rrt[[i]])) {
               if("g" %in% names(x$ssm[[i]]$predicted)) {
                 x$ssm[[i]]$rerouted <- left_join(df_rrt$pts_rrt[[i]], grab(x[i,], what=what) %>%
-                                                   select(date, logit_g, logit_g.se, g),
+                                                   select(date, any_of(c("logit_g", "logit_g.se", "g", "g.se"))),
                                                  by = "date") %>%
-                  select(id, date, x.se, y.se, on_land, logit_g, logit_g.se, g, geometry)
+                  select(id, date, x.se, y.se, on_land, any_of(c("logit_g", "logit_g.se", "g", "g.se")), geometry)
               } else {
                 x$ssm[[i]]$rerouted <- df_rrt$pts_rrt[[i]]
               }
@@ -333,16 +333,16 @@ route_path <-
           out <-  lapply(1:nrow(df_rrt), function(i) {
             if("g" %in% names(x$ssm[[i]]$predicted)) {
               left_join(df_rrt$pts_rrt[[i]], grab(x, what=what) %>%
-                          select(date, logit_g, logit_g.se, g),
+                          select(date, any_of(c("logit_g", "logit_g.se", "g", "g.se"))),
                         by = "date") %>%
-                select(id, date, x.se, y.se, on_land, logit_g, logit_g.se, g, geometry) %>%
+                select(id, date, x.se, y.se, on_land, any_of(c("logit_g", "logit_g.se", "g", "g.se")), geometry) %>%
                 mutate(x = st_coordinates(.)[,1], 
                        y = st_coordinates(.)[,2]) %>% 
                 st_transform(4326) %>% 
                 mutate(lon = st_coordinates(.)[,1], 
                        lat = st_coordinates(.)[,2]) %>% 
                 st_drop_geometry() %>%
-                select(id, date, lon, lat, x, y, x.se, y.se, on_land, logit_g, logit_g.se, g)
+                select(id, date, lon, lat, x, y, x.se, y.se, on_land, any_of(c("logit_g", "logit_g.se", "g", "g.se")))
             } else {
               df_rrt$pts_rrt[[i]] %>% 
                 mutate(x = st_coordinates(.)[,1], 

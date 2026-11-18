@@ -79,3 +79,26 @@ test_that("fit_mpm with reps pools move persistence across imputations", {
   expect_true(all(m$fitted$g >= 0 & m$fitted$g <= 1))
   expect_true(all(c("sigma_g", "sigma_x", "sigma_y") %in% m$par$parameter))
 })
+
+test_that("imputed tracks are projected in a crs suited to the data, or the one given", {
+  set.seed(1)
+  t0 <- as.POSIXct("2026-01-01", tz = "UTC")
+  ## high southern latitudes, wide latitude range: not Mercator
+  d <- data.frame(id = "a", date = t0 + 0:99 * 3600 * 6,
+                  lon = 70 + 0:99 * 0.1, lat = -48 - 0:99 * 0.2, error.radius = 500)
+  imp <- impute_tracks(d, reps = 2, time.step = 12)
+  expect_false(grepl("merc", attr(imp, "crs")))
+  xy <- sf::sf_project("+proj=longlat +datum=WGS84", attr(imp, "crs"), cbind(imp$lon, imp$lat))
+  expect_equal(unname(xy[, 1]), imp$x, tolerance = 1e-6)
+  expect_equal(unname(xy[, 2]), imp$y, tolerance = 1e-6)
+  ## a given crs is used
+  prj <- "+proj=stere +lat_0=-90 +lon_0=70 +datum=WGS84 +units=km +no_defs"
+  imp <- impute_tracks(d, reps = 2, time.step = 12, crs = prj)
+  expect_equal(attr(imp, "crs"), prj)
+  ## an SSM fit's simulated tracks are reprojected to the chosen crs
+  f <- fit_ssm(sese2, model = "rw", time.step = 72, control = ssm_control(verbose = 0))
+  imp <- impute_tracks(f, reps = 2)
+  expect_equal(attr(imp, "crs"), auto_crs(imp$lon[imp$rep == 0], imp$lat[imp$rep == 0]))
+  m <- fit_mpm(f, model = "jmpm", control = mpm_control(verbose = 0))
+  expect_equal(m$crs, attr(imp, "crs"))
+})

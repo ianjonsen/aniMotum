@@ -17,7 +17,8 @@ fit_mpm(
   reps = NULL,
   time.step = NULL,
   max_gap = NULL,
-  kineis = ssm_control()$kineis
+  kineis = ssm_control()$kineis,
+  crs = NULL
 )
 }
 \arguments{
@@ -75,6 +76,11 @@ across (see \code{\link[=impute_tracks]{impute_tracks()}})}
 
 \item{kineis}{for Kinéis locations, the Kinéis error model (see
 \code{\link[=impute_tracks]{impute_tracks()}})}
+
+\item{crs}{the projection (proj4 string, units km) in which the model is
+fitted. If NULL (default), chosen from the extent of all the locations by
+\code{\link[=auto_crs]{auto_crs()}} (see \code{\link[=impute_tracks]{impute_tracks()}}). Ignored for a data frame of
+projected coordinates}
 }
 \value{
 a list with class \code{mpm_df}:
@@ -82,9 +88,10 @@ a list with class \code{mpm_df}:
 \item \code{fitted}: a tibble with, for each id, track segment and time, the
 track's longitude and latitude (\code{lon}, \code{lat}: the SSM-estimated locations,
 the Kinéis locations interpolated onto the regular grid without
-perturbation, or the locations supplied), \code{logit_g} and its standard error
-(\code{logit_g.se}; with \code{reps}, the total standard error from Rubin's rules),
-move persistence \code{g} and its 95\% interval (\code{lower}, \code{upper}), and, with
+perturbation, or the locations supplied), move persistence \code{g}, its
+standard error (\code{g.se}; with \code{reps}, the total standard error from
+Rubin's rules) and its 95\% interval (\code{lower}, \code{upper}, truncated to 0 and
+1), and, with
 \code{reps}, the fraction of missing information (\code{fraction_missing}: the share
 of the variance due to location uncertainty);
 \item \code{par}: estimates of \code{sigma_g}, \code{sigma_x} and \code{sigma_y}, with 95\%
@@ -97,8 +104,9 @@ the Hessian was positive definite (\code{pdHess}) and the \code{aic};
 \item \code{tmb}: without \code{reps}, the TMB object of each fit (e.g. for
 \code{TMB::sdreport(fit$tmb[[1]], getJointPrecision = TRUE)}); NULL with \code{reps};
 \item \code{model}, \code{reps} (0 without imputation), \code{source} (\code{"ssm"}, \code{"kineis"} or
-\code{"data"}), \code{time.step} (h; NA for irregular locations) and \code{what} (the
-\code{ssm_df} locations fitted).
+\code{"data"}), \code{time.step} (h; NA for irregular locations), \code{what} (the
+\code{ssm_df} locations fitted) and \code{crs} (the projection fitted in; NA for a
+data frame of projected coordinates).
 }
 }
 \description{
@@ -110,7 +118,7 @@ are pooled with Rubin's rules, so they carry location uncertainty. Without
 }
 \details{
 With \code{reps}, the move persistence model is fitted to each imputed
-track, treating its locations as data, and Rubin's rules pool \code{logit_g} at
+track, treating its locations as data, and Rubin's rules pool \code{g} at
 each time and the log of each parameter. This replaces treating the SSM
 point estimates as data, which ignores location uncertainty. Kinéis
 locations are estimates with known error, at irregular times, so they are
@@ -119,9 +127,22 @@ gaps longer than \code{max_gap}; with \code{mpm} each segment is fitted separate
 and with \code{jmpm} each segment is a track. Track segments with fewer than 3
 locations are dropped.
 
-Locations from an \code{ssm_df} fit are fitted in projected coordinates (\code{x},
-\code{y}, km). Coordinates are divided by one common constant, their largest
-absolute value, for the optimiser; g does not depend on this scaling.
+The model is fitted in projected coordinates (km), in one conformal
+projection for all individuals, chosen to suit the data (\code{crs}): a single
+\code{sigma_x}, \code{sigma_y} is then not averaging over places stretched by
+different amounts, as in Mercator over a wide range of latitudes.
+Coordinates are divided by one common constant, their largest absolute
+value, for the optimiser; g does not depend on this scaling.
+
+Move persistence g follows a random walk on its own scale, with standard
+deviation \code{sigma_g} per time step, held within 0 to 1 by a soft barrier
+(a penalty that is near zero inside 0 to 1 and rises quadratically
+outside it), rather than a random walk on logit(g). The first g of each
+track has a diffuse Normal(0.5, 2) prior. With a logistic link the
+Laplace approximation's inner problem is not convex in logit(g), and fits
+often failed; on the scale of g it is convex, with a single mode.
+\code{sigma_g} is therefore on the scale of g, not comparable with estimates
+from earlier versions.
 }
 \examples{
 ## fit jmpm to two southern elephant seal tracks

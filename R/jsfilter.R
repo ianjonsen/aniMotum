@@ -265,9 +265,10 @@ jsfilter <- function(x,
   if (is.null(parameters)) {
 
     lsig0 <- matrix(0, A, 2)
-    lsg0 <- numeric(A)
+    ## sigma_g, the SD of the random walk on g, starts at 0.1
+    lsg0 <- rep(log(0.1), A)
     X0 <- lapply(prep, function(p) t(p$xs))
-    lg0 <- lapply(prep, function(p) rep(0, ncol(p$Y)))
+    g0 <- lapply(prep, function(p) rep(0.5, ncol(p$Y)))
     V0s <- lapply(prep, function(p) t(p$v.init))
 
     ## crude moment starting values for sigma: the covariance of the
@@ -340,9 +341,9 @@ jsfilter <- function(x,
               if (length(vv) == 2 * ni[i]) V0s[[i]] <- matrix(vv, nrow = 2)
             } else {
               xx <- rs[rownames(rs) == "X", 1]
-              gg <- rs[rownames(rs) == "lg", 1]
+              gg <- rs[rownames(rs) == "g", 1]
               if (length(xx) == 2 * ni[i]) X0[[i]] <- matrix(xx, nrow = 2)
-              if (length(gg) == ni[i]) lg0[[i]] <- gg
+              if (length(gg) == ni[i]) g0[[i]] <- gg
             }
           }
         }
@@ -395,7 +396,7 @@ jsfilter <- function(x,
       l_rho_o = rep(0, G_rho_o),
       l_ho_scale = 0,
       X = unname(do.call(cbind, X0)),
-      lg = unlist(lg0, use.names = FALSE)
+      g = unlist(g0, use.names = FALSE)
     )
     }
   }
@@ -478,7 +479,7 @@ jsfilter <- function(x,
     rnd <- c("mu", "v")
     if (m_mode == 1L) rnd <- c(rnd, "m_re")
   } else {
-    rnd <- c("X", "lg")
+    rnd <- c("X", "g")
     if (sig_mode %in% c(1L, 2L)) rnd <- c(rnd, "lsig_re")
   }
 
@@ -641,7 +642,7 @@ jsfilter <- function(x,
   srep <- summary(rep, "report")
   rdm.all <- summary(rep, "random")
   X.all <- rdm.all[rownames(rdm.all) == if (crw) "mu" else "X", , drop = FALSE]
-  lg.all <- rdm.all[rownames(rdm.all) == "lg", , drop = FALSE]
+  g.all <- rdm.all[rownames(rdm.all) == "g", , drop = FALSE]
   V.all <- rdm.all[rownames(rdm.all) == "v", , drop = FALSE]
 
   npar <- length(opt[["par"]])
@@ -659,8 +660,8 @@ jsfilter <- function(x,
     rr <- ((i1[i] - 1) * 2 + 1):(i2[i] * 2)
 
     loc <- X.all[rr, , drop = FALSE]
-    ## lg exists only in the move persistence model; for jcrw lg.all has no rows
-    lgi <- if (crw) NULL else lg.all[k, , drop = FALSE]
+    ## g exists only in the move persistence model; for jcrw g.all has no rows
+    gi <- if (crw) NULL else g.all[k, , drop = FALSE]
 
     rdm <- as.data.frame(cbind(loc[seq(1, nrow(loc), by = 2), ],
                                loc[seq(2, nrow(loc), by = 2), ]),
@@ -675,16 +676,17 @@ jsfilter <- function(x,
       names(vel) <- c("u", "v", "u.se", "v.se")
       rdm <- cbind(rdm, vel)
     } else {
-      rdm$logit_g <- lgi[, 1]
-      rdm$logit_g.se <- lgi[, 2]
-      rdm$g <- plogis(lgi[, 1])
+      ## g can stray slightly outside 0 to 1 (its bounds are soft; see
+      ##  src/TMB/sub/move_persistence.hpp): report it within 0 to 1
+      rdm$g <- pmin(pmax(gi[, 1], 0), 1)
+      rdm$g.se <- gi[, 2]
     }
 
     rdm$id <- ids[i]
     rdm$date <- d.all$date
     rdm$isd <- d.all$isd
 
-    ## Mask g during haulout. The model estimates lg continuously across
+    ## Mask g during haulout. The model estimates g continuously across
     ## haulout steps, which is required to connect the pre- and post-haulout
     ## gamma states through the likelihood, but those values reflect the animal
     ## being stationary rather than at-sea movement behaviour and would be
@@ -692,8 +694,7 @@ jsfilter <- function(x,
     hoi <- p$ho_flag
     if (!crw && any(hoi == 1L)) {
       rdm$g[hoi == 1L] <- NA_real_
-      rdm$logit_g[hoi == 1L] <- NA_real_
-      rdm$logit_g.se[hoi == 1L] <- NA_real_
+      rdm$g.se[hoi == 1L] <- NA_real_
     }
     rdm$ho <- as.integer(d.all$ho)
 
@@ -727,10 +728,9 @@ jsfilter <- function(x,
       }
 
     } else {
-      rdm <- rdm[, c("id", "date", "x.se", "y.se",
-                     "logit_g", "logit_g.se", "g", "isd")]
-      fv <- subset(rdm, isd)[, -8]
-      if (all(!is.na(time.step))) pv <- subset(rdm, !isd)[, -8] else pv <- NULL
+      rdm <- rdm[, c("id", "date", "x.se", "y.se", "g", "g.se", "isd")]
+      fv <- subset(rdm, isd, select = -isd)
+      if (all(!is.na(time.step))) pv <- subset(rdm, !isd, select = -isd) else pv <- NULL
     }
 
     ## Parameter table. Any parameter estimated per group - which includes

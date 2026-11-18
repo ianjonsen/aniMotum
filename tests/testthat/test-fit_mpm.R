@@ -45,13 +45,12 @@ test_that("fit_mpm with mpm fits each track", {
   skip_on_cran()
   xs <- fit_ssm(sese2, spdf=FALSE, model = "rw", time.step=72,
                 control = ssm_control(verbose = 0))
-  ## one sese2 track does not converge (false convergence) with the mpm; it
-  ##  is reported as failed and left out of the estimates
-  fmp <- suppressWarnings(fit_mpm(xs, model = "mpm", control = mpm_control(verbose = 0)))
+  ## ct36-E-09 gave false convergence before the prior on the first g
+  fmp <- fit_mpm(xs, model = "mpm", control = mpm_control(verbose = 0))
   expect_equal(nrow(fmp$convergence), length(unique(xs$id)))
+  expect_equal(fmp$convergence$failed, rep(0, length(unique(xs$id))))
   expect_length(fmp$tmb, length(unique(xs$id)))
-  expect_setequal(unique(fmp$par$unit), fmp$convergence$unit[fmp$convergence$failed == 0])
-  expect_warning(fit_mpm(xs, model = "mpm", control = mpm_control(verbose = 0)), "failed")
+  expect_equal(length(unique(fmp$par$unit)), length(unique(xs$id)))
 })
 
 ## issue #90
@@ -109,4 +108,20 @@ test_that("grab warns, and does not error, on a crashed jmpm fit before 1.3-1", 
   class(fmp) <- append("mpm_df", class(fmp))
   expect_warning(out <- grab(fmp, "fitted"), "crashed")
   expect_equal(nrow(out), 0)
+})
+
+## many short tracks, some with g near 1 throughout: the joint fit crashed
+##  (singular inner Hessian) before the prior on each track's first g
+test_that("jmpm fits many short tracks", {
+  skip_on_cran()
+  set.seed(11)
+  t0 <- as.POSIXct("2024-01-01", tz = "UTC")
+  d <- do.call(rbind, lapply(1:30, function(i) {
+    n <- sample(3:8, 1)
+    data.frame(id = paste0("t", i), date = t0 + (0:(n - 1)) * 3600 * 12,
+               x = cumsum(rep(5, n)) + rnorm(n, 0, 0.1), y = cumsum(rep(2, n)) + rnorm(n, 0, 0.1))
+  }))
+  f <- fit_mpm(d, model = "jmpm", control = mpm_control(verbose = 0))
+  expect_equal(f$convergence$failed, 0)
+  expect_true(all(f$fitted$g > -0.05 & f$fitted$g < 1.05))
 })

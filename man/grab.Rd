@@ -19,8 +19,8 @@ if x is an \code{mpm} model object.}
 \item{normalise}{logical; if output includes a move persistence estimate,
 should \code{g} (the move persistence index) be normalised to have minimum = 0 and
 maximum = 1 (default = FALSE). Note, this normalisation is not applied to the
-standard errors of the logit-scale move persistence estimates (\code{logit_g},
-\code{logit_g.se}).}
+standard errors of the move persistence estimates (\code{g.se}; \code{logit_g.se} in
+fits made before aniMotum 1.3-1).}
 
 \item{group}{logical; should \code{g} be normalised among individuals as a group,
 a 'relative g', or to individuals separately to highlight regions of lowest

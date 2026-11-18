@@ -222,8 +222,8 @@ mpfilter <-
         l_sigma = log(pmax(1e-08, sigma)),
         l_rho_p = log((1 + rho) / (1 - rho)),
         X = t(xs),
-        lg = rep(0, dim(xs)[1]),
-        l_sigma_g = 0,
+        g = rep(0.5, dim(xs)[1]),
+        l_sigma_g = log(0.1),
         l_psi = 0,
         l_tau = c(0, 0),
         l_rho_o = 0
@@ -378,7 +378,7 @@ mpfilter <-
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-    rnd <- c("X", "lg")
+    rnd <- c("X", "g")
     
     obj <-
       MakeADFun(
@@ -489,31 +489,32 @@ mpfilter <-
       
       tmp <- summary(rep, "random")
       X <- tmp[rownames(tmp) %in% "X",]
-      lg <- tmp[rownames(tmp) %in% "lg",]
+      gs <- tmp[rownames(tmp) %in% "g", , drop = FALSE]
       
       rdm <- data.frame(cbind(X[seq(1, nrow(X), by = 2), ],
                               X[seq(2, nrow(X), by = 2), ]
       ))[, c(1,3,2,4)] 
       names(rdm) <- c("x","y","x.se","y.se")
-      rdm <- data.frame(rdm, logit_g = lg[,1], logit_g.se = lg[,2], g = plogis(lg[,1]))
+      ## g can stray slightly outside 0 to 1 (its bounds are soft; see
+      ##  src/TMB/sub/move_persistence.hpp): report it within 0 to 1
+      rdm <- data.frame(rdm, g = pmin(pmax(gs[, 1], 0), 1), g.se = gs[, 2])
       
       
       rdm$id <- unique(d.all$id)
       rdm$date <- d.all$date
       rdm$isd <- d.all$isd  
-      rdm <- rdm[, c("id","date","x","y","x.se","y.se", "logit_g", "logit_g.se", "g", "isd")]
+      rdm <- rdm[, c("id","date","x","y","x.se","y.se", "g", "g.se", "isd")]
       
-      ## Mask g and logit_g estimates during haulout periods. The mp model estimates
-      ## lg continuously across haulout steps (required to connect pre- and post-
+      ## Mask g estimates during haulout periods. The mp model estimates
+      ## g continuously across haulout steps (required to connect pre- and post-
       ## haulout gamma states through the likelihood chain), but those values are
       ## not meaningful behavioural indicators -- they reflect the animal being
       ## stationary, not at-sea movement behaviour. Setting them to NA prevents
       ## confusion with genuinely low move persistence at sea, which is usually
       ## the quantity of interest.
       if (any(ho_flag == 1L)) {
-        rdm$g[ho_flag == 1L]          <- NA_real_
-        rdm$logit_g[ho_flag == 1L]    <- NA_real_
-        rdm$logit_g.se[ho_flag == 1L] <- NA_real_
+        rdm$g[ho_flag == 1L]    <- NA_real_
+        rdm$g.se[ho_flag == 1L] <- NA_real_
       }
       
       ## add `ho` column to rdm so it flows into fitted/predicted output
@@ -524,10 +525,10 @@ mpfilter <-
       rdm <- st_set_crs(rdm, prj)
       
       # drop x,y as we have the geom
-      rdm <- rdm[, c("id","date","x.se","y.se", "logit_g", "logit_g.se", "g", "isd")]
-      pv <- subset(rdm, !isd)[, -8]
+      rdm <- rdm[, c("id","date","x.se","y.se", "g", "g.se", "isd")]
+      pv <- subset(rdm, !isd, select = -isd)
       #pv$gn <- with(pv, (g - min(g))  / (max(g) - min(g)))
-      fv <- subset(rdm, isd)[, -8]
+      fv <- subset(rdm, isd, select = -isd)
       #fv$gn <- with(fv, (g - min(g))  / (max(g) - min(g)))
 
       ## Kinéis (KI) standard-error inflation, for tracks of KI observations

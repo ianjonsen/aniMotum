@@ -1,5 +1,6 @@
 #define TMB_LIB_INIT R_init_foieGras
 #include <TMB.hpp>
+#include "TMB/sub/move_persistence.hpp"
 #include "TMB/sub/rw.hpp"
 #include "TMB/sub/crw.hpp"
 #include "TMB/sub/mpm.hpp"

@@ -55,7 +55,7 @@ join <- function(ssm,
       stop("ssm and mpm have no times in common; check what.ssm", call. = FALSE)
     if (any(is.na(m)))
       warning(sum(is.na(m)), " ssm location(s) without a move persistence estimate", call. = FALSE)
-    y <- y[m, c("logit_g", "logit_g.se", "g")]
+    y <- y[m, c("g", "g.se")]
   } else if(all(c("logit_g","logit_g.se") %in% names(y))) {
     ## deal w old `fG_mpm` & earlier `mpm_df` classes
     y <- y[, c("logit_g","logit_g.se","g")]

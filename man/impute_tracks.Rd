@@ -10,7 +10,8 @@ impute_tracks(
   time.step = NULL,
   max_gap = NULL,
   kineis = ssm_control()$kineis,
-  inflate = TRUE
+  inflate = TRUE,
+  crs = NULL
 )
 }
 \arguments{
@@ -34,15 +35,21 @@ there. Ignored for SSM fits.}
 \code{exponent} (on the error radius, in km); default as for \code{\link[=ssm_control]{ssm_control()}}.}
 
 \item{inflate}{for SSM fits, passed to \code{\link[=sim_post]{sim_post()}} (default TRUE).}
+
+\item{crs}{the projection (proj4 string, units km) for the imputed
+tracks' \code{x}, \code{y}, and, for Kinéis locations, for the interpolation. If
+NULL (default), chosen from the extent of all the locations by
+\code{\link[=auto_crs]{auto_crs()}}: Mercator where its scale varies little across the data,
+otherwise Lambert conformal conic, polar stereographic or oblique
+stereographic. All are conformal.}
 }
 \value{
 a tibble with columns \code{rep} (0 = the point estimate: the SSM-
 predicted track, or the Kinéis locations interpolated without
 perturbation; 1 to \code{reps} = imputations), \code{id}, \code{segment} (contiguous runs
 of grid times, numbered within \code{id}), \code{date}, \code{lon}, \code{lat}, and \code{x}, \code{y}
-(km, in the SSM fit's projection, or Mercator for Kinéis locations). The
-attribute \code{source} is \code{"ssm"} or \code{"kineis"}; \code{time.step} holds the time
-step (h).
+(km, in projection \code{crs}). The attribute \code{source} is \code{"ssm"} or
+\code{"kineis"}; \code{time.step} holds the time step (h) and \code{crs} the projection.
 }
 \description{
 Generates \code{reps} imputed tracks on a regular time grid, for
@@ -61,7 +68,10 @@ perturbed locations are linearly interpolated to a regular time grid.
 For Kinéis locations, the errors are drawn independently for each
 location, with ground SDs \code{scale[1] * r^exponent} (east) and
 \code{scale[2] * r^exponent} (north), r the error radius (km); the same error
-model as \code{fit_ssm()} uses for KI observations. Kinéis locations are
+model as \code{fit_ssm()} uses for KI observations. The perturbed locations are
+projected and interpolated linearly in the projected plane, which follows
+the great circle more closely than interpolation in longitude and
+latitude, at high latitudes especially. Kinéis locations are
 Kalman-smoothed estimates, so their errors are serially correlated;
 independent draws ignore this. At time steps much longer than the interval
 between Kinéis locations, each grid location is interpolated from the two
@@ -69,7 +79,8 @@ nearest locations, and the effect of ignoring the correlation is small.
 Linear interpolation does not add uncertainty for movement between
 locations, so \code{max_gap} should be short relative to the time step.
 
-For SSM fits, the imputations include uncertainty in the SSM parameters
+For SSM fits, the simulated locations are reprojected from the fit's
+projection to \code{crs}. The imputations include uncertainty in the SSM parameters
 (see \code{\link[=sim_post]{sim_post()}}). The imputation model is the SSM, which has constant
 movement parameters: where the data constrain the track weakly, imputed
 movement reverts towards the SSM's average behaviour, which can attenuate

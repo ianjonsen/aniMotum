@@ -12,7 +12,10 @@
 ##' `ho_flag` handling.
 ##'
 ##' The parameter that matters most here is `sigma_g`, the scale of the random
-##' walk on `logit(gamma)`. It is pooled across individuals by default, for the
+##' walk on move persistence `gamma` (g). As in the TMB templates (see
+##' `src/TMB/sub/move_persistence.hpp`, which this must match), g is a random
+##' walk on its own scale with a Normal(0.5, 2) prior on each individual's
+##' first g and a soft barrier holding it within 0 to 1. It is pooled across individuals by default, for the
 ##' reason set out in Jonsen et al. (2019) and already embodied in
 ##' `joint_mpm.hpp`: with an individual-specific `sigma_g`, each animal's
 ##' `g_t` series is smoothed on its own scale and the series are not comparable
@@ -117,14 +120,21 @@ jmp_nll <- function(dat) {
       om <- 1 - r * r
       lsxy <- log(sx) + log(sy) + 0.5 * log(om)
 
+      ## prior on the individual's first g, and the soft barrier holding g
+      ##  within 0 to 1 (as g_track_nll() in move_persistence.hpp)
+      jnll <- jnll - dnorm(g[k1], 0.5, 2, log = TRUE)
+      gk <- g[k1:k2]
+      jnll <- jnll + 0.5 * sum(RTMB::logspace_add(0 * gk, -gk / 0.02)^2 +
+                               RTMB::logspace_add(0 * gk, (gk - 1) / 0.02)^2)
+
       if (k2 > k1) {
 
-        ## random walk on logit(gamma). The innovation standard deviation is
+        ## random walk on gamma. The innovation standard deviation is
         ## dt * sigma_g, matching mp.hpp, so gamma is free to drift across long
         ## gaps and haulout periods without further intervention.
         kk <- (k1 + 1):k2
         kp <- k1:(k2 - 1)
-        jnll <- jnll - sum(dnorm(lg[kk], lg[kp], dt[kk] * sg[i], log = TRUE))
+        jnll <- jnll - sum(dnorm(g[kk], g[kp], dt[kk] * sg[i], log = TRUE))
 
         ## first location step is a pure random walk: there is no previous
         ## displacement to condition on, and the covariance is not dt-scaled
@@ -149,7 +159,7 @@ jmp_nll <- function(dat) {
         ## correlated first-difference term. gap_flag takes precedence and
         ## ho_flag has already been cleared wherever gap_flag is set.
         brk <- pmax(gf, hf)
-        gi <- 1 / (1 + exp(-lg[kk]))
+        gi <- g[kk]
         fac <- (1 - brk) * gi * (dti / dtp)
 
         ex <- X[1, kk] - X[1, km1] - fac * (X[1, km1] - X[1, km2])

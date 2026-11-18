@@ -17,7 +17,7 @@
 ##' @importFrom TMB MakeADFun sdreport newtonOption
 ##' @importFrom dplyr count
 ##' @importFrom tibble tibble
-##' @importFrom stats plogis median
+##' @importFrom stats median
 ##' @keywords internal
 
 mpmf <-
@@ -75,10 +75,12 @@ mpmf <-
                               dt = x$dt)
            })
     
+    ## g starts at 0.5, within its soft bounds of 0 and 1 (see
+    ##  src/TMB/sub/move_persistence.hpp), and sigma_g, on the scale of g, at 0.1
     parameters <- list(
-      lg = rep(0, dim(x)[1]),
+      g = rep(0.5, dim(x)[1]),
       log_sigma = c(0, 0),
-      log_sigma_g = 0
+      log_sigma_g = log(0.1)
     )
     
     ## TMB - create objective function
@@ -86,7 +88,7 @@ mpmf <-
       inner.control <- list(smartsearch = TRUE)
     }
     
-    rnd <- switch(model, jmpm = "lg", mpm = "lg")
+    rnd <- "g"
 
     obj <-
       MakeADFun(
@@ -168,24 +170,22 @@ mpmf <-
     fxd_log <- summary(rep, "fixed")
     rdm <- summary(rep, "random")
     
-    lgs <- rdm[rownames(rdm) %in% "lg", ]
+    gs <- rdm[rownames(rdm) %in% "g", , drop = FALSE]
         
     if(all(is.na(x$tid))) {
       fitted <- tibble(
         id = x$id,
         date = x$date,
-        logit_g = lgs[, 1],
-        logit_g.se = lgs[, 2],
-        g = plogis(lgs[, 1])
+        g = gs[, 1],
+        g.se = gs[, 2]
       )
     } else {
       fitted <- tibble(
         id = x$id,
         tid = x$tid,
         date = x$date,
-        logit_g = lgs[, 1],
-        logit_g.se = lgs[, 2],
-        g = plogis(lgs[, 1])
+        g = gs[, 1],
+        g.se = gs[, 2]
       )
     }
     

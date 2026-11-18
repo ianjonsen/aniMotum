@@ -46,14 +46,19 @@
 ##' across (see [impute_tracks()])
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()])
+##' @param crs the projection (proj4 string, units km) in which the model is
+##' fitted. If NULL (default), chosen from the extent of all the locations by
+##' [auto_crs()] (see [impute_tracks()]). Ignored for a data frame of
+##' projected coordinates
 ##'
 ##' @return a list with class `mpm_df`:
 ##' 1. `fitted`: a tibble with, for each id, track segment and time, the
 ##' track's longitude and latitude (`lon`, `lat`: the SSM-estimated locations,
 ##' the Kinéis locations interpolated onto the regular grid without
-##' perturbation, or the locations supplied), `logit_g` and its standard error
-##' (`logit_g.se`; with `reps`, the total standard error from Rubin's rules),
-##' move persistence `g` and its 95% interval (`lower`, `upper`), and, with
+##' perturbation, or the locations supplied), move persistence `g`, its
+##' standard error (`g.se`; with `reps`, the total standard error from
+##' Rubin's rules) and its 95% interval (`lower`, `upper`, truncated to 0 and
+##' 1), and, with
 ##' `reps`, the fraction of missing information (`fraction_missing`: the share
 ##' of the variance due to location uncertainty);
 ##' 2. `par`: estimates of `sigma_g`, `sigma_x` and `sigma_y`, with 95%
@@ -66,11 +71,12 @@
 ##' 4. `tmb`: without `reps`, the TMB object of each fit (e.g. for
 ##' `TMB::sdreport(fit$tmb[[1]], getJointPrecision = TRUE)`); NULL with `reps`;
 ##' 5. `model`, `reps` (0 without imputation), `source` (`"ssm"`, `"kineis"` or
-##' `"data"`), `time.step` (h; NA for irregular locations) and `what` (the
-##' `ssm_df` locations fitted).
+##' `"data"`), `time.step` (h; NA for irregular locations), `what` (the
+##' `ssm_df` locations fitted) and `crs` (the projection fitted in; NA for a
+##' data frame of projected coordinates).
 ##'
 ##' @details With `reps`, the move persistence model is fitted to each imputed
-##' track, treating its locations as data, and Rubin's rules pool `logit_g` at
+##' track, treating its locations as data, and Rubin's rules pool `g` at
 ##' each time and the log of each parameter. This replaces treating the SSM
 ##' point estimates as data, which ignores location uncertainty. Kinéis
 ##' locations are estimates with known error, at irregular times, so they are
@@ -79,9 +85,22 @@
 ##' and with `jmpm` each segment is a track. Track segments with fewer than 3
 ##' locations are dropped.
 ##'
-##' Locations from an `ssm_df` fit are fitted in projected coordinates (`x`,
-##' `y`, km). Coordinates are divided by one common constant, their largest
-##' absolute value, for the optimiser; g does not depend on this scaling.
+##' The model is fitted in projected coordinates (km), in one conformal
+##' projection for all individuals, chosen to suit the data (`crs`): a single
+##' `sigma_x`, `sigma_y` is then not averaging over places stretched by
+##' different amounts, as in Mercator over a wide range of latitudes.
+##' Coordinates are divided by one common constant, their largest absolute
+##' value, for the optimiser; g does not depend on this scaling.
+##'
+##' Move persistence g follows a random walk on its own scale, with standard
+##' deviation `sigma_g` per time step, held within 0 to 1 by a soft barrier
+##' (a penalty that is near zero inside 0 to 1 and rises quadratically
+##' outside it), rather than a random walk on logit(g). The first g of each
+##' track has a diffuse Normal(0.5, 2) prior. With a logistic link the
+##' Laplace approximation's inner problem is not convex in logit(g), and fits
+##' often failed; on the scale of g it is convex, with a single mode.
+##' `sigma_g` is therefore on the scale of g, not comparable with estimates
+##' from earlier versions.
 ##'
 ##' @references
 ##' Jonsen ID, McMahon CR, Patterson TA, et al. (2019) Movement responses to
@@ -106,7 +125,7 @@
 ##' }
 ##'
 ##' @importFrom dplyr tibble bind_rows
-##' @importFrom stats plogis qnorm
+##' @importFrom stats qnorm
 ##' @export
 ##' @md
 
@@ -122,7 +141,8 @@ fit_mpm <- function(x,
                     reps = NULL,
                     time.step = NULL,
                     max_gap = NULL,
-                    kineis = ssm_control()$kineis
+                    kineis = ssm_control()$kineis,
+                    crs = NULL
                     ) {
 
   model <- match.arg(model)
@@ -152,8 +172,9 @@ fit_mpm <- function(x,
 
   ## locations: rep 0 is the point-estimate track; reps 1, 2, ... are imputed
   ##  tracks
-  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis)
+  loc <- mpm_locations(x, what, coords, reps, time.step, max_gap, kineis, crs)
   source <- attr(loc, "source")
+  crs <- attr(loc, "crs")
   time.step <- attr(loc, "time.step")
   what <- attr(loc, "what")
   loc <- as.data.frame(loc)
@@ -227,14 +248,16 @@ fit_mpm <- function(x,
     e <- e[order(e$id, e$segment, e$date), ]
     ## mpmf() orders rows by id, tid, date: align each fit to e
     key <- function(z) paste(z$id, z$date)
-    lg <- do.call(cbind, lapply(f, function(z) z$fitted$logit_g[match(key(e), key(z$fitted))]))
-    lgse <- do.call(cbind, lapply(f, function(z) z$fitted$logit_g.se[match(key(e), key(z$fitted))]))
-    pr <- mpm_combine(lg, lgse)
+    gm <- do.call(cbind, lapply(f, function(z) z$fitted$g[match(key(e), key(z$fitted))]))
+    gse <- do.call(cbind, lapply(f, function(z) z$fitted$g.se[match(key(e), key(z$fitted))]))
+    pr <- mpm_combine(gm, gse)
     fitted[[u]] <- tibble(id = e$id, segment = e$segment, date = e$date,
                           lon = e$lon, lat = e$lat,
-                          logit_g = pr$estimate, logit_g.se = pr$se,
-                          g = plogis(pr$estimate),
-                          lower = plogis(pr$lower), upper = plogis(pr$upper))
+                          ## g can stray slightly outside 0 to 1 (its bounds are
+                          ##  soft; see src/TMB/sub/move_persistence.hpp):
+                          ##  report it, and its interval, within 0 to 1
+                          g = pmin(pmax(pr$estimate, 0), 1), g.se = pr$se,
+                          lower = pmax(pr$lower, 0), upper = pmin(pr$upper, 1))
     if (!is.null(reps)) fitted[[u]]$fraction_missing <- pr$fraction_missing
     pp <- mpm_combine(do.call(cbind, lapply(f, function(z) z$par[, 1])),
                       do.call(cbind, lapply(f, function(z) z$par[, 2])))
@@ -261,7 +284,8 @@ fit_mpm <- function(x,
               reps = if (is.null(reps)) 0L else reps,
               source = source,
               time.step = time.step,
-              what = what)
+              what = what,
+              crs = crs)
   class(out) <- append("mpm_df", class(out))
   out
 }
@@ -269,7 +293,7 @@ fit_mpm <- function(x,
 ## the locations to fit, as a tibble with columns rep (0 = the point-estimate
 ##  track), id, segment, date, lon, lat, x, y, and attributes source,
 ##  time.step and what
-mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis) {
+mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis, crs = NULL) {
   kineis.data <- is.character(x) || (is.data.frame(x) && !inherits(x, "ssm_df") &&
     any(c("error.radius", "error_radius") %in% tolower(names(x))))
   if (!is.null(reps)) {
@@ -280,7 +304,7 @@ mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis) {
       stop("with `reps`, x must be an ssm_df fit object or Kinéis locations with error radii",
            call. = FALSE)
     out <- impute_tracks(x, reps = reps, time.step = time.step, max_gap = max_gap,
-                         kineis = kineis)
+                         kineis = kineis, crs = crs)
     attr(out, "what") <- if (inherits(x, "ssm_df")) "predicted" else NA_character_
     return(out)
   }
@@ -290,18 +314,32 @@ mpm_locations <- function(x, what, coords, reps, time.step, max_gap, kineis) {
   if (inherits(x, "ssm_df")) {
     g <- grab(x, what = what, as_sf = FALSE)
     what <- c("fitted", "predicted", "rerouted")[pmatch(what, c("fitted", "predicted", "rerouted"))]
+    ## projected in crs, chosen from all the locations if not given, as for
+    ##  imputed tracks
+    if (is.null(crs)) crs <- auto_crs(g$lon, g$lat)
+    xy <- lonlat_to_xy(g$lon, g$lat, crs)
     out <- tibble(rep = 0L, id = g$id, segment = 1L, date = g$date,
-                  lon = g$lon, lat = g$lat, x = g$x, y = g$y)
+                  lon = g$lon, lat = g$lat, x = xy[, 1], y = xy[, 2])
+    attr(out, "crs") <- crs
     attr(out, "source") <- "ssm"
     attr(out, "time.step") <- if (what == "predicted") x$ssm[[1]]$ts else NA_real_
     attr(out, "what") <- what
   } else if (is.data.frame(x)) {
     d <- as.data.frame(x)
     lonlat <- identical(tolower(names(d)[coords]), c("lon", "lat"))
+    if (lonlat) {
+      ## longitude and latitude are projected, as for the other inputs
+      if (is.null(crs)) crs <- auto_crs(d[[coords[1]]], d[[coords[2]]])
+      xy <- lonlat_to_xy(d[[coords[1]]], d[[coords[2]]], crs)
+    } else {
+      crs <- NA_character_
+      xy <- cbind(d[[coords[1]]], d[[coords[2]]])
+    }
     out <- tibble(rep = 0L, id = d[[1]], segment = 1L, date = d[[2]],
                   lon = if (lonlat) d[[coords[1]]] else NA_real_,
                   lat = if (lonlat) d[[coords[2]]] else NA_real_,
-                  x = d[[coords[1]]], y = d[[coords[2]]])
+                  x = xy[, 1], y = xy[, 2])
+    attr(out, "crs") <- crs
     attr(out, "source") <- "data"
     attr(out, "time.step") <- NA_real_
     attr(out, "what") <- NA_character_

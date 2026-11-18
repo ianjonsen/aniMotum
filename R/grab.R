@@ -14,8 +14,8 @@
 ##' @param normalise logical; if output includes a move persistence estimate, 
 ##' should `g` (the move persistence index) be normalised to have minimum = 0 and 
 ##' maximum = 1 (default = FALSE). Note, this normalisation is not applied to the 
-##' standard errors of the logit-scale move persistence estimates (`logit_g`, 
-##' `logit_g.se`).
+##' standard errors of the move persistence estimates (`g.se`; `logit_g.se` in
+##' fits made before aniMotum 1.3-1).
 ##' @param group logical; should `g` be normalised among individuals as a group, 
 ##' a 'relative g', or to individuals separately to highlight regions of lowest 
 ##' and highest move persistence along single tracks (default = FALSE).
@@ -216,11 +216,9 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                    }
                  }, jmp = , mp = {
                    if ("gap_flag" %in% names(out)) {
-                   out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
-                           "g", "gap_flag", "geometry")]
+                   out <- out[, c("id", "date", "x.se", "y.se", g_columns(out), "gap_flag", "geometry")]
                    } else {
-                     out <- out[, c("id", "date", "x.se", "y.se", "logit_g", "logit_g.se",
-                                    "g", "geometry")]
+                     out <- out[, c("id", "date", "x.se", "y.se", g_columns(out), "geometry")]
                    }
                    if(normalise & !group) {
                      out <- out |> 
@@ -237,11 +235,9 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              } else if (what == "rerouted") {
                if("g" %in% names(out)) {
                  if ("gap_flag" %in% names(out)) {
-                 out <- out[, c("id", "date", "x.se", "y.se", "logit_g",
-                                "logit_g.se", "g", "gap_flag", "geometry")]
+                 out <- out[, c("id", "date", "x.se", "y.se", g_columns(out), "gap_flag", "geometry")]
                  } else {
-                   out <- out[, c("id", "date", "x.se", "y.se", "logit_g",
-                                  "logit_g.se", "g", "geometry")]
+                   out <- out[, c("id", "date", "x.se", "y.se", g_columns(out), "geometry")]
                  }
                  if(normalise & !group) {
                    out <- out |> 
@@ -300,10 +296,10 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
                  jmp = , mp = {
                    if("gap_flag" %in% names(out)) {
                     out <- out[, c("id", "date", "lon", "lat", "x", "y", 
-                            "x.se", "y.se", "logit_g", "logit_g.se", "g", "gap_flag")]
+                            "x.se", "y.se", g_columns(out), "gap_flag")]
                    } else {
                      out <- out[, c("id", "date", "lon", "lat", "x", "y", 
-                                    "x.se", "y.se", "logit_g", "logit_g.se", "g")]
+                                    "x.se", "y.se", g_columns(out))]
                    }
                     if(normalise & !group) {
                       out <- out |> 
@@ -322,11 +318,9 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
              } else if (what == "rerouted") {
                if("g" %in% names(out)) {
                  if("gap_flag" %in% names(out)) {
-                  out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
-                               "logit_g.se", "g", "gap_flag")]
+                  out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", g_columns(out), "gap_flag")]
                  } else {
-                   out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", "logit_g",
-                                  "logit_g.se", "g")]
+                   out <- out[, c("id", "date", "lon", "lat", "x", "y", "x.se", "y.se", g_columns(out))]
                  }
                 if(normalise & !group) {
                   out <- out |> 
@@ -416,3 +410,7 @@ grab <- function(x, what = "fitted", as_sf = FALSE, normalise = FALSE, group = F
   return(out)
 
 }
+
+## move persistence columns of an mp or jmp fit: g and g.se from aniMotum
+##  1.3-1 on; logit_g, logit_g.se and g in fits made earlier
+g_columns <- function(x) intersect(c("logit_g", "logit_g.se", "g", "g.se"), names(x))

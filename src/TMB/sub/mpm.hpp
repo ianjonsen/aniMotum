@@ -11,13 +11,12 @@ Type mpm(objective_function<Type>* obj) {
   
   DATA_MATRIX(x);                   // locations
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
-  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter 
+  PARAMETER_VECTOR(g);		          // move persistence (see move_persistence.hpp)
   PARAMETER_VECTOR(log_sigma);	      // Innovation variance (log scale)
-  PARAMETER(log_sigma_g);             // logistic scale parameter of rw on lg (log scale)
+  PARAMETER(log_sigma_g);             // SD of the random walk on g (log scale)
   
   
   // transform parameters
-  vector<Type> g = Type(1.0) / (Type(1.0) + exp(-lg)); 
   vector<Type> sigma = exp(log_sigma);
   Type sigma_g = exp(log_sigma_g);
   
@@ -30,10 +29,8 @@ Type mpm(objective_function<Type>* obj) {
   
   Type jnll = 0.0;
   vector<Type> mu(2);
-    //jnll -= dnorm(lg(0), Type(0.0), sigma_g, TRUE);
-    for(int j = 1; j < x.rows(); ++j) {
-      jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
-    }
+    // prior on the first g, random walk on g, and the soft barrier at 0, 1
+    jnll += g_track_nll(g, dt, sigma_g, 0, int(x.rows()) - 1);
     
     for(int j = 2; j < x.rows(); ++j){
       // var-cov depends on time interval

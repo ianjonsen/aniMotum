@@ -11,7 +11,7 @@ xm <- fit_mpm(xs, model = "jmpm", control = mpm_control(verbose = 0))
 ##  in the fitted values and no locations
 old_mpm <- function(xm) {
   f <- xm$fitted
-  fit <- list(fitted = data.frame(id = f$id, date = f$date, g = f$g, g.se = f$logit_g.se),
+  fit <- list(fitted = data.frame(id = f$id, date = f$date, g = f$g, g.se = 0.5),
               par = NULL, model = "jmpm", data = NULL, tmb = NULL, opt = NULL,
               rep = NULL, aic = NULL)
   out <- dplyr::tibble(mpm = list(fit), converged = TRUE, model = "jmpm")

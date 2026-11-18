@@ -26,7 +26,10 @@ identical to the single-individual template, including the \code{gap_flag} and
 \code{ho_flag} handling.
 
 The parameter that matters most here is \code{sigma_g}, the scale of the random
-walk on \code{logit(gamma)}. It is pooled across individuals by default, for the
+walk on move persistence \code{gamma} (g). As in the TMB templates (see
+\code{src/TMB/sub/move_persistence.hpp}, which this must match), g is a random
+walk on its own scale with a Normal(0.5, 2) prior on each individual's
+first g and a soft barrier holding it within 0 to 1. It is pooled across individuals by default, for the
 reason set out in Jonsen et al. (2019) and already embodied in
 \code{joint_mpm.hpp}: with an individual-specific \code{sigma_g}, each animal's
 \code{g_t} series is smoothed on its own scale and the series are not comparable

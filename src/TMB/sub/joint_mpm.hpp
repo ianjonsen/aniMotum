@@ -14,12 +14,11 @@ Type joint_mpm(objective_function<Type>* obj) {
   DATA_VECTOR(dt);                  // dt is time interval between x_i and x_{i-1}
   DATA_IVECTOR(idx);                // cumsum of number of locations for each animal
   
-  PARAMETER_VECTOR(lg);		          // Autocorrelation parameter (link scale)
+  PARAMETER_VECTOR(g);		          // move persistence (see move_persistence.hpp)
   PARAMETER_VECTOR(log_sigma);	      // Innovation variance (log scale)
-  PARAMETER(log_sigma_g);             // logistic scale parameter of rw on lg (log scale)
+  PARAMETER(log_sigma_g);             // SD of the random walk on g (log scale)
   
   // Backtransform parameters from link scale
-  vector<Type> g = Type(0.001) + (Type(0.999) - Type(0.001)) * (Type(1.0) / (Type(1.0) + exp(-lg))); // bounded b/w 0.001 - 0.999
   vector<Type> sigma = exp(log_sigma);
   Type sigma_g = exp(log_sigma_g);
     
@@ -36,9 +35,10 @@ Type joint_mpm(objective_function<Type>* obj) {
   int i,j;
   
   for(i = 0; i < A; ++i) {
-    for(j = (idx(i)+1); j < idx(i+1); ++j) {
-      jnll -= dnorm(lg(j), lg(j-1), dt(j) * sigma_g, TRUE);  // RW on logit(gamma)
-    }
+    // prior on the track's first g, random walk on g, and the soft barrier
+    // at 0, 1. One track with an unidentified g breaks the joint fit, so
+    // every track needs the prior on its first g.
+    jnll += g_track_nll(g, dt, sigma_g, idx(i), idx(i+1) - 1);
     
     for(j = (idx(i)+2); j < idx(i+1); ++j){
       // var-cov depends on time interval
