@@ -38,8 +38,9 @@ Kinéis or Argos data).}
 \item{time.step}{for Kinéis locations, the time step (h) of the regular grid
 (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
-\item{max_gap}{for Kinéis locations, the longest gap (h) interpolated
-across (see \code{\link[=impute_tracks]{impute_tracks()}}).}
+\item{max_gap}{the longest gap (h) between observations imputed across,
+for location data and for SSM fits; longer gaps split the track into
+segments (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
 \item{kineis}{for Kinéis locations, the Kinéis error model (see
 \code{\link[=impute_tracks]{impute_tracks()}}).}

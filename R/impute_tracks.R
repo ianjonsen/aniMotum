@@ -21,10 +21,12 @@
 ##' @param reps number of imputed tracks (default 20).
 ##' @param time.step for location data, the time step (h) of the regular
 ##' grid. Ignored for SSM fits, which use their own prediction times.
-##' @param max_gap for location data, the longest gap between consecutive
-##' locations (h) that is interpolated across (default `2 * time.step`). Grid
-##' times inside longer gaps are dropped and the track is split into segments
-##' there. Ignored for SSM fits.
+##' @param max_gap the longest gap between consecutive locations (h) that is
+##' imputed across. Grid times inside longer gaps are dropped and the track is
+##' split into segments there. For location data, the default is
+##' `2 * time.step`. For SSM fits, the gaps are between the observations the
+##' SSM used (`keep = TRUE`), and the default, NULL, keeps every predicted time
+##' (one segment per track).
 ##' @param kineis for Kinéis locations, the Kinéis error model: a list with
 ##' `scale` (east and north error SDs relative to the error radius) and
 ##' `exponent` (on the error radius, in km); default as for [ssm_control()].
@@ -136,7 +138,9 @@ impute_tracks <- function(x,
     stop("vmax must be NULL or a single positive number (m/s)", call. = FALSE)
 
   if (inherits(x, "ssm_df")) {
-    out <- impute_from_ssm(x, reps, inflate, crs)
+    if (!is.null(max_gap) && (!is.numeric(max_gap) || length(max_gap) != 1 || !(max_gap > 0)))
+      stop("max_gap must be NULL or a single positive number (h)", call. = FALSE)
+    out <- impute_from_ssm(x, reps, inflate, crs, max_gap)
     attr(out, "source") <- "ssm"
     attr(out, "time.step") <- x$ssm[[1]]$ts
   } else if (is.data.frame(x) || is.character(x)) {
@@ -153,7 +157,7 @@ impute_tracks <- function(x,
 }
 
 ## imputations from an SSM fit, via sim_post()
-impute_from_ssm <- function(x, reps, inflate, crs = NULL) {
+impute_from_ssm <- function(x, reps, inflate, crs = NULL, max_gap = NULL) {
   if (!all(x$pmodel %in% c("crw", "rw", "mp")))
     stop("x must be a `crw`, `rw` or `mp` SSM fit", call. = FALSE)
   if (any(vapply(x$ssm, function(s) !is.numeric(s$ts) || is.na(s$ts), logical(1))))
@@ -173,6 +177,23 @@ impute_from_ssm <- function(x, reps, inflate, crs = NULL) {
     s
   }))
   out$segment <- 1L
+  ## drop predicted times inside gaps between observations longer than
+  ##  max_gap, and start a new segment after each, as for location data
+  if (!is.null(max_gap)) {
+    seg <- bind_rows(lapply(seq_len(nrow(x)), function(k) {
+      id <- as.character(x$id[k])
+      d <- x$ssm[[k]]$data
+      tt <- sort(unique(as.numeric(d$date[d$keep])))
+      tp <- sort(unique(as.numeric(out$date[out$id == id])))
+      data.frame(id = id, t = tp,
+                 segment = gap_segments(tp / 3600, tt / 3600, max_gap))
+    }))
+    out$segment <- seg$segment[match(paste(out$id, as.numeric(out$date)),
+                                     paste(seg$id, seg$t))]
+    out <- out[!is.na(out$segment), ]
+    if (nrow(out) == 0) stop("no predicted locations left after dropping gaps longer than max_gap",
+                             call. = FALSE)
+  }
   ## reproject from the fit's projection to crs, chosen from the predicted
   ##  locations (rep 0) if not given, so it does not depend on the draws and
   ##  matches fit_mpm() without imputation
@@ -283,6 +304,24 @@ regular_grid <- function(tt, time.step, max_gap) {
   i <- i[keep]
   w <- (t - tt[i]) / (tt[i + 1] - tt[i])
   list(t = t, i = i, w = pmin(pmax(w, 0), 1), segment = segment)
+}
+
+## segment number of each predicted time tp (h) of an SSM fit, given the
+##  times tt (h) of the observations it used: NA for predicted times inside
+##  gaps between observations longer than max_gap, with a new segment after
+##  each run of them. The same rule as regular_grid() for location data
+gap_segments <- function(tp, tt, max_gap) {
+  n <- length(tt)
+  if (n < 2) return(rep(1L, length(tp)))
+  i <- findInterval(tp, tt, rightmost.closed = TRUE)
+  inside <- i >= 1 & i < n
+  gap <- rep(0, length(tp))
+  gap[inside] <- tt[i[inside] + 1] - tt[i[inside]]
+  on_obs <- inside & (tp == tt[pmax(i, 1)] | tp == tt[pmin(i + 1, n)])
+  keep <- gap <= max_gap | on_obs
+  segment <- rep(NA_integer_, length(tp))
+  if (any(keep)) segment[keep] <- cumsum(c(TRUE, diff(which(keep)) > 1))
+  segment
 }
 
 ## standardise location data for imputation. Returns a list:

@@ -30,8 +30,9 @@
 ##' `model = "mpm"` allows this.
 ##' @param time.step for location data, the time step (h) of the regular
 ##' grid (required; see [impute_tracks()]).
-##' @param max_gap for location data, the longest gap (h) interpolated
-##' across (see [impute_tracks()]).
+##' @param max_gap the longest gap (h) between observations imputed across,
+##' for location data and for SSM fits; longer gaps split the track into
+##' segments (see [impute_tracks()]).
 ##' @param vmax for location data, the maximum travel rate (m/s) of a
 ##' speed-distance-angle filter applied before imputation, to drop extreme
 ##' locations (see [impute_tracks()]). NULL (default): no filter.

@@ -31,10 +31,12 @@ returned (attribute \code{data}).}
 \item{time.step}{for location data, the time step (h) of the regular
 grid. Ignored for SSM fits, which use their own prediction times.}
 
-\item{max_gap}{for location data, the longest gap between consecutive
-locations (h) that is interpolated across (default \code{2 * time.step}). Grid
-times inside longer gaps are dropped and the track is split into segments
-there. Ignored for SSM fits.}
+\item{max_gap}{the longest gap between consecutive locations (h) that is
+imputed across. Grid times inside longer gaps are dropped and the track is
+split into segments there. For location data, the default is
+\code{2 * time.step}. For SSM fits, the gaps are between the observations the
+SSM used (\code{keep = TRUE}), and the default, NULL, keeps every predicted time
+(one segment per track).}
 
 \item{kineis}{for Kinéis locations, the Kinéis error model: a list with
 \code{scale} (east and north error SDs relative to the error radius) and

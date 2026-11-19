@@ -50,8 +50,9 @@
 ##' rules (see details)
 ##' @param time.step for Kinéis locations, the time step (h) of the regular
 ##' grid (see [impute_tracks()]); required
-##' @param max_gap for Kinéis locations, the longest gap (h) interpolated
-##' across (see [impute_tracks()])
+##' @param max_gap the longest gap (h) between observations imputed across,
+##' for location data and for SSM fits; longer gaps split the track into
+##' segments (see [impute_tracks()])
 ##' @param kineis for Kinéis locations, the Kinéis error model (see
 ##' [impute_tracks()])
 ##' @param error.units for location data with standard-error columns, their

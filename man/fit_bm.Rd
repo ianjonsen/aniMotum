@@ -39,8 +39,9 @@ once to the point-estimate track, treating the locations as data; only
 \item{time.step}{for location data, the time step (h) of the regular
 grid (required; see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
-\item{max_gap}{for location data, the longest gap (h) interpolated
-across (see \code{\link[=impute_tracks]{impute_tracks()}}).}
+\item{max_gap}{the longest gap (h) between observations imputed across,
+for location data and for SSM fits; longer gaps split the track into
+segments (see \code{\link[=impute_tracks]{impute_tracks()}}).}
 
 \item{vmax}{for location data, the maximum travel rate (m/s) of a
 speed-distance-angle filter applied before imputation, to drop extreme
