@@ -144,7 +144,8 @@ SSM fit or from Kinéis locations (see \code{\link[=impute_tracks]{impute_tracks
 are pooled with Rubin's rules, so they carry location uncertainty. Without
 \code{reps}, the model is fitted once, treating the locations as data.
 \code{\link[=fit_bm]{fit_bm()}} fits this and the other behavioural models through one
-interface (\code{model = "mpm"}); \code{fit_mpm()} is kept for compatibility.
+interface (\code{model = "mpm"}). \code{fit_mpm()} is deprecated: it warns once per
+session and will become internal in a future release.
 }
 \details{
 With \code{reps}, the move persistence model is fitted to each imputed

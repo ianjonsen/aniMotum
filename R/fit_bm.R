@@ -230,7 +230,7 @@ behaviour_models <- function() {
       fit = function(x, reps, time.step, max_gap, vmax, crs, kineis, error.units, haulout,
                      control,
                      joint = TRUE, what = "predicted", coords = 3:4, inner.control = NULL) {
-        fit_mpm(x, what = what, model = if (isTRUE(joint)) "jmpm" else "mpm",
+        fit_mpm_internal(x, what = what, model = if (isTRUE(joint)) "jmpm" else "mpm",
                 coords = coords, control = control, inner.control = inner.control,
                 reps = reps, time.step = time.step, max_gap = max_gap,
                 kineis = kineis, crs = crs, vmax = vmax, error.units = error.units,

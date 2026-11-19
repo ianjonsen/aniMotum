@@ -6,7 +6,8 @@
 ##' are pooled with Rubin's rules, so they carry location uncertainty. Without
 ##' `reps`, the model is fitted once, treating the locations as data.
 ##' [fit_bm()] fits this and the other behavioural models through one
-##' interface (`model = "mpm"`); `fit_mpm()` is kept for compatibility.
+##' interface (`model = "mpm"`). `fit_mpm()` is deprecated: it warns once per
+##' session and will become internal in a future release.
 ##'
 ##' @param x one of:
 ##' 1. an `ssm_df` fit object from [fit_ssm()] (`rw`, `crw` or `mp`);
@@ -154,6 +155,47 @@
 ##' @md
 
 fit_mpm <- function(x,
+                    what = "predicted",
+                    model = c("jmpm", "mpm"),
+                    coords = 3:4,
+                    control = mpm_control(),
+                    inner.control = NULL,
+                    optim = NULL,
+                    optMeth = NULL,
+                    verbose = NULL,
+                    reps = NULL,
+                    time.step = NULL,
+                    max_gap = NULL,
+                    kineis = ssm_control()$kineis,
+                    crs = NULL,
+                    vmax = NULL,
+                    error.units = NULL,
+                    haulout = NULL
+                    ) {
+  ## called directly by the user: deprecated in favour of fit_bm()
+  fit_mpm_deprecation()
+  mc <- match.call()
+  mc[[1]] <- fit_mpm_internal
+  eval(mc, parent.frame())
+}
+
+## warn, once per session, that fit_mpm() is deprecated
+fit_mpm_deprecation <- function() {
+  if (isTRUE(aniMotum_state$fit_mpm_warned)) return(invisible(NULL))
+  aniMotum_state$fit_mpm_warned <- TRUE
+  warning("fit_mpm() is deprecated and will become internal in a future release: ",
+          "use fit_bm(x, model = \"mpm\", ...) instead. ",
+          "fit_bm() defaults to reps = 20 (multiple imputation); use reps = NULL to fit once ",
+          "to the locations, as fit_mpm() does by default, and joint = FALSE for ",
+          "fit_mpm(model = \"mpm\"). This warning is shown once per session.",
+          call. = FALSE)
+}
+
+## package state for the session (e.g. warnings already given)
+aniMotum_state <- new.env(parent = emptyenv())
+
+## the move persistence model fit: called by fit_bm(), and by fit_mpm()
+fit_mpm_internal <- function(x,
                     what = "predicted",
                     model = c("jmpm", "mpm"),
                     coords = 3:4,
