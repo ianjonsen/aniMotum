@@ -25,7 +25,11 @@
 ##' (`crw`), a time-varying move persistence model (`mp`), or a joint
 ##' (hierarchical) move persistence model fitted to all individuals at once
 ##' (`jmp`), or a joint correlated random walk (`jcrw`), all as
-##' continuous-time process models. `jcrw` parameterises the velocity
+##' continuous-time process models. `ou` is the continuous-time correlated
+##' random walk of Johnson et al. (2008, Ecology 89: 1208-1215): velocity is an
+##' Ornstein-Uhlenbeck process with decay rate `beta` (per hour), so velocity
+##' autocorrelation over a time interval dt is exp(-beta dt). `crw` is its
+##' limit as `beta` goes to 0. `jcrw` parameterises the velocity
 ##' innovation covariance by its magnitude, anisotropy and orientation rather
 ##' than by `D_x`, `D_y` and `rho_p`, so that the quantities shared among
 ##' individuals do not depend on which way each animal travelled. The `jmp`
@@ -198,7 +202,7 @@ fit_ssm <- function(x,
 
   dots <- list(...)
   
-  stopifnot("model can only be 1 of `rw`, `crw`, `mp`, `jmp`, or `jcrw`" = model %in% c("rw","crw","mp","jmp","jcrw"))
+  stopifnot("model can only be 1 of `rw`, `crw`, `ou`, `mp`, `jmp`, or `jcrw`" = model %in% c("rw","crw","ou","mp","jmp","jcrw"))
   init <- match.arg(init)
   
 ## check args - most args handled by prefilter() & sfilter()
@@ -331,7 +335,7 @@ fit_ssm <- function(x,
   } else {
     if(control$verbose == 1)
       cat(paste0("fitting ", model, " SSM to ", length(fit), " tracks...\n"))
-    if(model %in% c("crw", "rw")) {
+    if(model %in% c("crw", "rw", "ou")) {
       fit <- lapply(fit,
                     function(x) {
                       sfilter(

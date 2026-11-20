@@ -48,7 +48,8 @@ test_that("auto_crs rejects data with no finite locations", {
 
 test_that("projection = 'auto' is applied to unprojected data", {
   skip_on_cran()
-  pf <- fit_ssm(sese, vmax = 4, pf = TRUE, projection = "auto")
+  pf <- fit_ssm(sese, vmax = 4, pf = TRUE, projection = "auto",
+                control = ssm_control(verbose = 0))
   expect_match(sf::st_crs(pf)$proj4string, "proj=lcc")
 })
 

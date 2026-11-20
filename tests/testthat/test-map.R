@@ -67,7 +67,7 @@ test_that("m with 1 track has s3 classes `gg`, `ggplot`", {
 
 xs <- fit_ssm(ellie, model = "crw", time.step = 72, 
               control = ssm_control(verbose = 0))
-xm <- fit_mpm(xs, what = "p", model = "mpm")
+xm <- fit_mpm(xs, what = "p", model = "mpm", control = mpm_control(verbose = 0))
 
 test_that("m with 1 track has s3 classes `gg`, `ggplot`", {
   m <- map(xs, xm, what = "p", silent=TRUE)

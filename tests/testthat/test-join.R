@@ -5,7 +5,7 @@ context("test join")
 ## older GDAL versions (ellie is highly sub-sampled for this purpose)
 xs <- fit_ssm(ellie, spdf=FALSE, model = "rw", time.step=72, 
               control = ssm_control(verbose = 0))
-xm <- fit_mpm(xs, model = "mpm")
+xm <- fit_mpm(xs, model = "mpm", control = mpm_control(verbose = 0))
 p <- join(xs, xm, as_sf = TRUE)
 
 test_that("p has s3 classes `ssmmpm`, `sf`, `data.frame`", {

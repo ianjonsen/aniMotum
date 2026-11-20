@@ -31,7 +31,7 @@ test_that("fit_hmm returns pooled states and parameters", {
   data(ellie)
   f <- fit_ssm(ellie, model = "crw", time.step = 24, control = ssm_control(verbose = 0))
   set.seed(1)
-  h <- fit_bm(f, model = "hmm", reps = 3)
+  h <- fit_bm(f, model = "hmm", reps = 3, control = mpm_control(verbose = 0))
   expect_s3_class(h, "hmm_mi")
   expect_equal(nrow(h$states), nrow(grab(f, "predicted")))
   expect_equal(rowSums(as.matrix(h$states[, c("p1", "p2")])), rep(1, nrow(h$states)), tolerance = 1e-6)

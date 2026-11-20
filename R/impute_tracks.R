@@ -158,8 +158,8 @@ impute_tracks <- function(x,
 
 ## imputations from an SSM fit, via sim_post()
 impute_from_ssm <- function(x, reps, inflate, crs = NULL, max_gap = NULL) {
-  if (!all(x$pmodel %in% c("crw", "rw", "mp")))
-    stop("x must be a `crw`, `rw` or `mp` SSM fit", call. = FALSE)
+  if (!all(x$pmodel %in% c("crw", "rw", "mp", "ou")))
+    stop("x must be a `crw`, `rw`, `mp` or `ou` SSM fit", call. = FALSE)
   if (any(vapply(x$ssm, function(s) !is.numeric(s$ts) || is.na(s$ts), logical(1))))
     stop("x must have regular predicted locations: fit with a positive numeric time.step",
          call. = FALSE)

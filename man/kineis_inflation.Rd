@@ -7,7 +7,7 @@
 kineis_inflation(
   argos,
   gps,
-  model = c("crw", "rw", "mp"),
+  model = c("crw", "rw", "mp", "ou"),
   coverage = pnorm(1) - pnorm(-1),
   nboot = 1000,
   control = ssm_control(verbose = 0),
@@ -27,7 +27,7 @@ to a .csv file: an SMRU gps file (columns \code{REF}, \code{D_DATE}, \code{LAT},
 or a data frame with columns \code{id}, \code{date}, \code{lon} and \code{lat}. Filter GPS
 locations before calling \code{kineis_inflation()} (see details).}
 
-\item{model}{the process model, \code{"crw"}, \code{"rw"} or \code{"mp"}.}
+\item{model}{the process model, \code{"crw"}, \code{"rw"}, \code{"mp"} or \code{"ou"}.}
 
 \item{coverage}{the target proportion of x and y errors within
 \code{qnorm((1 + coverage) / 2)} inflated standard errors. The default,

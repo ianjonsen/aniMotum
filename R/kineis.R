@@ -138,6 +138,9 @@ kineis_report <- function(fxd, map) {
 ## >= 6 satellites, spikes removed). Estimated factors (95% interval across
 ## tags): crw 1.78 (1.59-1.96), rw 1.14 (1.05-1.27), mp 1.74 (1.62-1.93, 20
 ## tags: one mp fit did not converge); rounded up to 1.8, 1.15 and 1.75.
+## ou (calibrated later, with the KI error scales estimated leave-one-tag-out
+## and no GPS spikes found): 1.745 (1.64-1.85, resampling tags; 1.73-1.79
+## with one tag held out at a time); rounded up to 1.75.
 ## Coverage within 1 standard error varied widely between tags (held out one
 ## at a time: mean 0.64, range 0.24-0.84) and was lower in the first 30 days
 ## after release (0.60) than later (0.73). Kinéis errors are heavier-tailed
@@ -151,20 +154,21 @@ kineis_report <- function(fxd, map) {
 ##  1. ellipse95, for 95% confidence ellipses (elps(), semi-axes
 ##     sqrt(qchisq(0.95, 2)) standard errors): 95% of GPS locations inside
 ##     the ellipse. crw 2.47 (2.28-2.71), rw 1.64 (1.51-1.81), mp 2.34
-##     (2.16-2.60); rounded up to 2.5, 1.65 and 2.35;
+##     (2.16-2.60), ou 2.30 (2.17-2.48); rounded up to 2.5, 1.65, 2.35 and
+##     2.3;
 ##  2. interval95, for 95% intervals on each coordinate (plot() ribbons):
 ##     95% of x and y errors within 1.96 standard errors. crw 2.37
-##     (2.13-2.56), rw 1.54 (1.45-1.70), mp 2.22 (2.07-2.42); rounded up to
-##     2.4, 1.55 and 2.25.
+##     (2.13-2.56), rw 1.54 (1.45-1.70), mp 2.22 (2.07-2.42), ou 2.23
+##     (2.09-2.34); rounded up to 2.4, 1.55, 2.25 and 2.25.
 ## Standard errors are in projected coordinates; the factor is a scalar, so
 ## inflation does not depend on the projection. The KI observation covariance
 ## itself is mapped to the projection through the local Jacobian
-## (pf_kineis_jacobian()) in all three models.
+## (pf_kineis_jacobian()) in all models.
 ## -----------------------------------------------------------------------------
 
-kineis_se_inflation_default <- c(crw = 1.8, rw = 1.15, mp = 1.75)
-kineis_ellipse95_inflation_default <- c(crw = 2.5, rw = 1.65, mp = 2.35)
-kineis_interval95_inflation_default <- c(crw = 2.4, rw = 1.55, mp = 2.25)
+kineis_se_inflation_default <- c(crw = 1.8, rw = 1.15, mp = 1.75, ou = 1.75)
+kineis_ellipse95_inflation_default <- c(crw = 2.5, rw = 1.65, mp = 2.35, ou = 2.3)
+kineis_interval95_inflation_default <- c(crw = 2.4, rw = 1.55, mp = 2.25, ou = 2.25)
 
 ## factor for one track: obs.type are the types of the observations fitted
 kineis_se_inflation <- function(obs.type, model, control) {

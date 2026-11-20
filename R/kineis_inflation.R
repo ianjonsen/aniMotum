@@ -21,7 +21,7 @@
 ##' to a .csv file: an SMRU gps file (columns `REF`, `D_DATE`, `LAT`, `LON`),
 ##' or a data frame with columns `id`, `date`, `lon` and `lat`. Filter GPS
 ##' locations before calling `kineis_inflation()` (see details).
-##' @param model the process model, `"crw"`, `"rw"` or `"mp"`.
+##' @param model the process model, `"crw"`, `"rw"`, `"mp"` or `"ou"`.
 ##' @param coverage the target proportion of x and y errors within
 ##' `qnorm((1 + coverage) / 2)` inflated standard errors. The default,
 ##' `pnorm(1) - pnorm(-1)` (0.683), calibrates the standard errors themselves
@@ -115,7 +115,7 @@
 ##' @md
 kineis_inflation <- function(argos,
                              gps,
-                             model = c("crw", "rw", "mp"),
+                             model = c("crw", "rw", "mp", "ou"),
                              coverage = pnorm(1) - pnorm(-1),
                              nboot = 1000,
                              control = ssm_control(verbose = 0),

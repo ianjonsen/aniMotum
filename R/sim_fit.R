@@ -103,8 +103,8 @@ sim_fit <-
   if(!what %in% c("fitted", "predicted")) 
     stop("only `fitted` or `predicted` locations can be simulated from a model fit")
   
-  if(any(sapply(x$ssm, function(m) m$pm) %in% c("mp", "jmp")))
-    stop("'mp' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
+  if(any(sapply(x$ssm, function(m) m$pm) %in% c("mp", "jmp", "ou")))
+    stop("'mp', 'jmp' or 'ou' process model fit(s) detected\n  tracks can only be simulated from SSM fits using either the 'rw' or 'crw' process models")
   
   ## Projections
   ## Each track is simulated in the projection its model was fitted in. The

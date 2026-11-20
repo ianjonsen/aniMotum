@@ -95,6 +95,19 @@ test_that("fit_mpm keeps id and date when coordinates are named x, y", {
   expect_true(all(is.na(fm$fitted$lon)))
 })
 
+test_that("fit_mpm warns once per session that it is deprecated", {
+  state <- aniMotum:::aniMotum_state
+  warned <- state$fit_mpm_warned
+  on.exit(assign("fit_mpm_warned", warned, envir = state))
+  assign("fit_mpm_warned", FALSE, envir = state)
+  d <- data.frame(id = "a", date = as.POSIXct("2024-01-01", tz = "UTC") + 3600 * (0:9),
+                  lon = 130 + 0.01 * (0:9), lat = -12 + 0.01 * (0:9), error.radius = 0.5)
+  expect_warning(expect_error(fit_mpm(d, control = mpm_control(verbose = 0))),
+                 "deprecated")
+  ## shown once only
+  expect_silent(expect_error(fit_mpm(d, control = mpm_control(verbose = 0))))
+})
+
 test_that("Kinéis locations without reps give an informative error", {
   d <- data.frame(id = "a", date = as.POSIXct("2024-01-01", tz = "UTC") + 3600 * (0:9),
                   lon = 130 + 0.01 * (0:9), lat = -12 + 0.01 * (0:9), error.radius = 0.5)

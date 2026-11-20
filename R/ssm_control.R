@@ -42,7 +42,8 @@
 ##' \code{estimate.exponent} logical; estimate the exponent (default FALSE);
 ##' \code{se.inflation} factor multiplying the fitted and predicted standard
 ##' errors of tracks made up only of KI observations: \code{"default"} (crw
-##' 1.8, rw 1.15, mp 1.75), a single positive number, or 1 to turn it off.
+##' 1.8, rw 1.15, mp 1.75, ou 1.75), a single positive number, or 1 to turn
+##' it off.
 ##' For mp, only location standard errors are inflated (not g). Point
 ##' estimates are unchanged. Tracks that mix KI with other observation types
 ##' (e.g. GPS) are not inflated. The default factors are calibrated at 1

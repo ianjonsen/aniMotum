@@ -420,21 +420,26 @@ mpfilter <-
           l_kineis_scale=c(Inf,Inf),
           l_kineis_exponent=Inf)
     
-    if(any(!is.null(control$lower))) {
-      L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
+    ## one name per parameter: c() numbers the elements of vector parameters
+    ##  (l_sigma1, l_sigma2), so drop those numbers
+    names(L) <- sub("[0-9]+$", "", names(L))
+    names(U) <- sub("[0-9]+$", "", names(U))
+
+    ## user-specified bounds, by parameter name
+    for (nm in names(control$lower)) {
+      i <- which(names(L) == nm)
+      L[i] <- rep_len(unlist(control$lower[[nm]]), length(i))
     }
-    if(any(!is.null(control$upper))) {
-      U[which(names(U) %in% names(control$upper))] <- unlist(control$upper)
-    } 
-    
-    names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(L)[grepl("^l_kineis_scale", names(L))] <- "l_kineis_scale"
-    names(U)[grepl("^l_kineis_scale", names(U))] <- "l_kineis_scale"
-    
-    # Remove inactive parameters from bounds
-    L <- L[!names(L) %in% names(map)]
-    U <- U[!names(U) %in% names(map)]
+    for (nm in names(control$upper)) {
+      i <- which(names(U) == nm)
+      U[i] <- rep_len(unlist(control$upper[[nm]]), length(i))
+    }
+
+    ## nlminb() matches bounds to parameters by position, so put them in the
+    ##  order of obj$par, which holds only the estimated parameters (not those
+    ##  fixed by map); see bounds_in_order() in sfilter.R
+    L <- bounds_in_order(L, obj$par, -Inf)
+    U <- bounds_in_order(U, obj$par, Inf)
 
     ## Minimize objective function
     oldw <- getOption("warn")
@@ -461,7 +466,8 @@ mpfilter <-
                  upper = U
                )
              ), silent = TRUE))
-    cat("\n")
+    ## end the parameter trace line; print nothing when verbose = 0
+    if (control$verbose >= 1) cat("\n")
     
     FreeADFun(obj)
     

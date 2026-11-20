@@ -6,7 +6,7 @@
 \usage{
 sfilter(
   x,
-  model = c("rw", "crw"),
+  model = c("rw", "crw", "ou"),
   time.step = 6,
   parameters = NULL,
   map = NULL,
@@ -19,7 +19,7 @@ sfilter(
 \arguments{
 \item{x}{Argos data passed through prefilter()}
 
-\item{model}{specify which SSM is to be fit: "rw" or "crw"}
+\item{model}{specify which SSM is to be fit: "rw", "crw" or "ou"}
 
 \item{time.step}{the regular time interval, in hours, to predict to.
 Alternatively, a vector of prediction times, possibly not regular, must be

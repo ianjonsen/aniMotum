@@ -53,7 +53,11 @@ differences > 0 are allowed.}
 (\code{crw}), a time-varying move persistence model (\code{mp}), or a joint
 (hierarchical) move persistence model fitted to all individuals at once
 (\code{jmp}), or a joint correlated random walk (\code{jcrw}), all as
-continuous-time process models. \code{jcrw} parameterises the velocity
+continuous-time process models. \code{ou} is the continuous-time correlated
+random walk of Johnson et al. (2008, Ecology 89: 1208-1215): velocity is an
+Ornstein-Uhlenbeck process with decay rate \code{beta} (per hour), so velocity
+autocorrelation over a time interval dt is exp(-beta dt). \code{crw} is its
+limit as \code{beta} goes to 0. \code{jcrw} parameterises the velocity
 innovation covariance by its magnitude, anisotropy and orientation rather
 than by \code{D_x}, \code{D_y} and \code{rho_p}, so that the quantities shared among
 individuals do not depend on which way each animal travelled. The \code{jmp}

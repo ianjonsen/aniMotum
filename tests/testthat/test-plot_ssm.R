@@ -40,7 +40,7 @@ test_that("plot completes silently - predicted", {
   expect_s3_class(tp, c("patchwork","gg","ggplot"))
 })
 
-system("rm Rplots.pdf")
+if (file.exists("Rplots.pdf")) unlink("Rplots.pdf")
 
 
 ## move persistence from an mp fit: types 3 and 4 use the fit_mpm() plot code

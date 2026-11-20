@@ -10,7 +10,7 @@
 ##' individual track, use \code{fit_ssm} to fit to multiple tracks (see ?fit_ssm).
 ##'
 ##' @param x Argos data passed through prefilter()
-##' @param model specify which SSM is to be fit: "rw" or "crw"
+##' @param model specify which SSM is to be fit: "rw", "crw" or "ou"
 ##' @param time.step the regular time interval, in hours, to predict to.
 ##' Alternatively, a vector of prediction times, possibly not regular, must be
 ##' specified as a data.frame with id and POSIXt dates.
@@ -35,7 +35,7 @@
 
 sfilter <-
   function(x,
-           model = c("rw", "crw"),
+           model = c("rw", "crw", "ou"),
            time.step = 6,
            parameters = NULL,
            map = NULL,
@@ -50,7 +50,7 @@ sfilter <-
 
     ## check args
     if(!inherits(x, c("sf","tbl_df"))) stop("x must be an sf-tibble produced by `prefilter()`")
-    if(!model %in% c("rw","crw")) stop("model can only be 1 of `rw` or `crw`")
+    if(!model %in% c("rw","crw","ou")) stop("model can only be 1 of `rw`, `crw` or `ou`")
     if(!any((is.numeric(time.step) & time.step > 0) | is.na(time.step) | is.data.frame(time.step))) stop("time.step must be either: 1) a positive, non-zero value; 2) NA (to turn off predictions); or 3) a data.frame (see `?fit_ssm`)")
     if(!any(is.list(parameters) || is.null(parameters))) stop("parameters must be a named list of parameter initial values or NULL")
     if(!any(is.list(map) || is.null(map))) stop("map must be a named list of parameters to fix (turn off) in estimation or NULL")
@@ -248,6 +248,8 @@ sfilter <-
         l_rho_o = 0
       )
       parameters <- c(parameters, kineis_parameters(control))
+      ## ou: start the decay rate at 1 / beta = 20 h
+      if (model == "ou") parameters$l_beta <- log(0.05)
     }
 
     ## Kinéis (KI) parameters, if not supplied by the user
@@ -284,7 +286,8 @@ sfilter <-
                             )
                          )
                        },
-                     crw = {
+                     crw = ,
+                     ou = {
                        list(
                          list(
                            l_psi = factor(NA)
@@ -445,7 +448,7 @@ sfilter <-
     if (is.null(inner.control) | !"smartsearch" %in% names(inner.control)) {
       inner.control <- list(smartsearch = TRUE)
     }
-    rnd <- switch(model, rw = "X", crw = c("mu", "v"))
+    rnd <- switch(model, rw = "X", crw = c("mu", "v"), ou = c("mu", "v"))
 
     obj <-
       MakeADFun(
@@ -477,7 +480,8 @@ sfilter <-
           l_tau=c(-Inf,-Inf),
           l_rho_o=-7, ## using 2 / (1 + exp(-x)) - 1 transformation, this gives rho_o = -0.999, 0.999
           l_kineis_scale=c(-Inf,-Inf),
-          l_kineis_exponent=-Inf)
+          l_kineis_exponent=-Inf,
+          l_beta=log(1e-4))         ## 1 / beta = 1.1 years: indistinguishable from crw
     U = c(l_sigma=c(Inf,Inf),
           l_rho_p=7,
           l_D=c(Inf,Inf),
@@ -485,30 +489,29 @@ sfilter <-
           l_tau=c(Inf,Inf),
           l_rho_o=7,
           l_kineis_scale=c(Inf,Inf),
-          l_kineis_exponent=Inf)
+          l_kineis_exponent=Inf,
+          l_beta=log(1e3))          ## 1 / beta = 3.6 s: indistinguishable from Brownian motion
     
-    if(any(!is.null(control$lower))) {
-      L[which(names(L) %in% names(control$lower))] <- unlist(control$lower)
-    }
-    if(any(!is.null(control$upper))) {
-      U[which(names(U) %in% names(control$upper))] <- unlist(control$upper)
-    } 
- 
-    names(L)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(U)[c(1:2,6:7)] <- c("l_sigma", "l_sigma", "l_tau", "l_tau")
-    names(L)[grepl("^l_kineis_scale", names(L))] <- "l_kineis_scale"
-    names(U)[grepl("^l_kineis_scale", names(U))] <- "l_kineis_scale"
+    ## one name per parameter: c() numbers the elements of vector parameters
+    ##  (l_D1, l_D2), so drop those numbers
+    names(L) <- sub("[0-9]+$", "", names(L))
+    names(U) <- sub("[0-9]+$", "", names(U))
 
-    # Remove inactive parameters from bounds
-    L <- L[!names(L) %in% names(map)]
-    U <- U[!names(U) %in% names(map)]
-    if(model == "rw") {
-      L <- L[!names(L) %in% c("l_D","l_D")] ## not sure why but l_D in automap is causing an error in MakeADFun, so remove here to get correct param bounds
-      U <- U[!names(U) %in% c("l_D","l_D")]
-    } else if(model == "crw") {
-      L <- L[!names(L) %in% c("l_sigma","l_sigma")] #,"l_rho_p"
-      U <- U[!names(U) %in% c("l_sigma","l_sigma")] #,"l_rho_p"
+    ## user-specified bounds, by parameter name
+    for (nm in names(control$lower)) {
+      i <- which(names(L) == nm)
+      L[i] <- rep_len(unlist(control$lower[[nm]]), length(i))
     }
+    for (nm in names(control$upper)) {
+      i <- which(names(U) == nm)
+      U[i] <- rep_len(unlist(control$upper[[nm]]), length(i))
+    }
+
+    ## nlminb() matches bounds to parameters by position, so put them in the
+    ##  order of obj$par, which holds only the estimated parameters of this
+    ##  model (not those fixed by map)
+    L <- bounds_in_order(L, obj$par, -Inf)
+    U <- bounds_in_order(U, obj$par, Inf)
 
     ## Minimize objective function
     oldw <- getOption("warn")
@@ -534,7 +537,8 @@ sfilter <-
                                   upper = U
                                 )
                               ), silent = TRUE))
-    cat("\n")
+    ## end the parameter trace line; print nothing when verbose = 0
+    if (control$verbose >= 1) cat("\n")
     
     FreeADFun(obj)
     
@@ -590,7 +594,8 @@ sfilter <-
                
                rdm <- rdm[, c("id","date","x","y","x.se","y.se","isd")]
              },
-             crw = {
+             crw = ,
+             ou = {
                tmp <- summary(rep, "random")
                loc <- tmp[rownames(tmp) == "mu",]
                vel <- tmp[rownames(tmp) == "v",]
@@ -638,7 +643,8 @@ sfilter <-
                  pv$gap_flag <- gap_flag[!d.all$isd]
                }
              },
-             crw = {
+             crw = ,
+             ou = {
                if(control$se) {
                  sf.se <- sf[,2]
                  sf <- sf[,1]
@@ -736,7 +742,7 @@ sfilter <-
         errmsg = opt
       )
 
-      if(model == "crw" & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) {
+      if(model %in% c("crw", "ou") & any(!is.na(x$smaj), !is.na(x$smin), !is.na(x$eor))) {
         warning("The optimiser failed. Try simplifying the model with the following argument: 
                                  map = list(psi = factor(NA))", call. = FALSE)
       } else if (all(is.na(x$smaj), is.na(x$smin), is.na(x$eor))){
@@ -750,3 +756,19 @@ sfilter <-
     class(out) <- append("ssm", class(out))
     out
   }
+
+## Bounds for nlminb(), which matches them to parameters by position: one
+##  value per element of par, taken in order from the bounds of that name
+##  (names of b may carry element numbers, e.g. l_D1, l_D2); parameters with
+##  no bound get the default
+bounds_in_order <- function(b, par, default) {
+  nb <- sub("[0-9]+$", "", names(b))
+  out <- numeric(length(par))
+  for (nm in unique(names(par))) {
+    i <- which(names(par) == nm)
+    v <- unname(b[nb == nm])
+    if (length(v) == 0) v <- default
+    out[i] <- rep_len(v, length(i))
+  }
+  out
+}

@@ -112,7 +112,9 @@ test_that("fit_ssm no spd filter + crw return aniMotum list w 16 elements", {
 ## optim="nlminb" - crw
 test_that("fit_ssm optim + crw return aniMotum list w 16 elements", {
   skip_on_cran()
-  f <- fit_ssm(dkf, model = "crw", time.step = 72, control = ssm_control(verbose = 1, optim="nlminb"))
+  expect_output(f <- fit_ssm(dkf, model = "crw", time.step = 72,
+                             control = ssm_control(verbose = 1, optim = "nlminb")),
+                "fitting crw SSM")
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 16)
   expect_s3_class(f, "ssm_df")
@@ -130,7 +132,8 @@ test_that("fit_ssm full data + crw return aniMotum list w 16 elements", {
 ## turn trace on - crw
 test_that("fit_ssm verbose + crw return aniMotum list w 16 elements", {
   skip_on_cran()
-  f <- fit_ssm(dkf, model = "crw", time.step = 72, control = ssm_control(optim = "nlminb", verbose=2))
+  expect_output(f <- fit_ssm(dkf, model = "crw", time.step = 72,
+                             control = ssm_control(optim = "nlminb", verbose = 2)))
   expect_s3_class(f$ssm[[1]], "ssm")
   expect_equal(length(f$ssm[[1]]), 16)
   expect_s3_class(f, "ssm_df")
@@ -176,4 +179,15 @@ test_that("mp model maps off tau and psi for GL observations", {
   expect_false("l_tau" %in% pars)
   expect_false("l_psi" %in% pars)
   expect_true("l_rho_o" %in% pars)
+})
+
+## nlminb() takes bounds by position: they must follow the order of obj$par
+test_that("sfilter bounds follow the order of the parameters", {
+  L <- c(l_sigma = c(-Inf, -Inf), l_rho_p = -7, l_D = c(-1, -2), l_psi = -3,
+         l_tau = c(-4, -5), l_rho_o = -7)
+  names(L) <- sub("[0-9]+$", "", names(L))
+  par <- c(l_D = 0, l_D = 0, l_psi = 0, l_rho_p = 0, l_rho_o = 0)
+  expect_equal(aniMotum:::bounds_in_order(L, par, -Inf), c(-1, -2, -3, -7, -7))
+  par <- c(l_sigma = 0, l_sigma = 0, l_rho_p = 0, l_tau = 0, l_tau = 0, l_beta = 0)
+  expect_equal(aniMotum:::bounds_in_order(L, par, -Inf), c(-Inf, -Inf, -7, -4, -5, -Inf))
 })
